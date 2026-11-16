@@ -46,5 +46,8 @@
 ## Open cross-chat requests
 _None yet._
 
+## Owner reminders
+⏳ **10–15 testimonials** and more photos of Jitu Bhaiya — see `CONTENT-CHECKLIST.md` (HUB reminds at the end of each module).
+
 ## Blockers / needs from the business
 See `DECISIONS.md` — credentials and content approvals are the main external blockers.
