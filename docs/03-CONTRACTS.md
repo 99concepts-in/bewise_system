@@ -33,7 +33,7 @@
 |---|---|---|
 | identity | HUB → OWNER | `profiles`, `roles`, `permissions`, `role_permissions`, `user_roles`, `staff_members` |
 | crm | MANAGER (base by HUB) | `clients`, `client_addresses`, `consent_records`, `client_contacts`, `leads`, `communication_log` |
-| scheduling | CONSULTANT | `consultation_types`¹, `availability_rules`, `availability_exceptions`, `appointments` (+ `client_note`), `appointment_history`, `session_feedback` |
+| scheduling | CONSULTANT | `consultation_types`¹, `availability_rules`, `availability_exceptions`, `appointments` (+ `client_note`), `appointment_history`, `session_feedback`, `calendar_connections` (provider google/apple, encrypted tokens), `external_busy_blocks` (start/end only), `calendar_feed_tokens` |
 | questionnaires | CONSULTANT | `questionnaire_templates`, `questionnaire_versions`, `questionnaire_assignments`, `questionnaire_responses` |
 | consultation | CONSULTANT | `consultation_records`, `practitioner_notes` 🔒, `client_summaries`, `follow_ups` |
 | remedies | CONSULTANT | `bach_remedies` (configurable, hideable), `formula_templates`, `formulas`, `formula_versions`, `formula_items`, `remedy_orders` |
@@ -161,6 +161,9 @@ cancelAppointment(input: { appointmentId: string; reason: string }): Promise<Res
 listAppointments(q: AppointmentQuery): Promise<Paged<AppointmentSummary>>                       // RLS scopes by role
 getAppointment(id: string): Promise<Appointment | null>
 checkInAppointment(id: string): Promise<Result<Appointment>>                                     // MANAGER desk
+connectCalendar(input: { provider: 'google' | 'apple'; authCode?: string; appleId?: string; appPassword?: string }): Promise<Result<CalendarConnection>>  // CN-28
+syncCalendar(connectionId: string): Promise<Result<{ pushed: number; busyBlocks: number }>>  // cron every 10 min + on change; getAvailableSlots() subtracts external_busy_blocks
+getCalendarFeedUrl(): Promise<string>   // private ICS subscribe link (revocable)
 submitSessionFeedback(input: { appointmentId: string; rating: 1|2|3|4|5; tags: string[]; notesForConsultant?: string }): Promise<Result<SessionFeedback>>  // CLIENT CL-23, editable later by the client
 listSessionFeedback(q: { clientId?: string; consultantId?: string }): Promise<SessionFeedback[]>  // CONSULTANT K-04/K-05; owner sees rating only
 ```

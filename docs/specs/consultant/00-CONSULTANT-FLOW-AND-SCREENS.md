@@ -12,18 +12,23 @@
 5. ➕ **3-line progress summary since the last remedy**, shown to **both** consultant (CN-05, CN-13) and client (CL-08 Home, CL-26 My Remedies). AI-generated from data; client version never uses private notes.
 6. ➕ (Client side) **Ask BeWise** chatbot — see `docs/specs/client/00-CLIENT-FLOW-AND-SCREENS.md` CL-55.
 
+## Owner changes (2026-11-16, round 3)
+7. 📱 **Phone first** (D-24 decided). iPad/laptop layouts (boards 00–15) remain as the larger-screen adaptation. Phone boards: `CN-phone-*`.
+8. ➕ **Calendar sync with Google & Apple** (CN-28): two-way with Google (sessions added to his calendar; his busy times block client slots), Apple/iCloud via CalDAV connect, plus a private subscribe (ICS) link for any calendar app. Event details from his personal calendar are never stored — only busy/free.
+9. ➕ **Me hub** (CN-29) on phone: Library · Follow-ups · Blend templates · My month · Calendar sync · My profile · Settings.
+
 ## Design intent
 His day = **people, not paperwork**. A calm, private study: one thing at a time, everything about a client one tap away,
 notes never lost, a remedy in under a minute. The system **never suggests or prescribes remedies** — it remembers,
 organises, protects and summarises progress.
 
-- **Device:** iPad / laptop first (left rail), full phone layout (bottom nav with +). D-24 open.
+- **Device:** **phone first** (D-24 decided), iPad/laptop adaptation with left rail.
 - **Privacy:** lock icon + "Only you can see this" on private notes; optional app lock (PIN / Face ID).
 - **Speed:** dictation everywhere, autosave, Duplicate last blend, templates.
 
 ## Navigation
 iPad/laptop rail: **Today · Clients · Calendar · Remedies · Library · Follow-ups** (avatar → Me).
-Phone: **Today · Clients · (+) · Calendar · Me** — + = Book for a client · Quick note · Give remedy.
+Phone (primary): **Today · Clients · (+) · Calendar · Me** — + = Book for a client · Quick note · Give remedy. Live session on phone uses three tabs: **Notes 🔒 · Troubling · Summary (optional)**.
 
 ## Flow
 ```
@@ -69,6 +74,8 @@ ME        My profile (what clients see) · Settings · My month
 | CN-25 | Settings | Video link, app lock, reminders, daily summary | 14 |
 | CN-26 | My month | Sessions, returning clients, rating, remedies given, top troubling emotions | 15 |
 | CN-27 | Empty & states | Quiet day, offline (notes saved encrypted, sync later) | 15 |
+| CN-28 | Calendar sync | Google (connected account, add sessions, block busy times), Apple/iCloud connect, subscribe link, privacy note | phone-07 |
+| CN-29 | Me (phone hub) | Avatar (real photo), tiles: Library, Follow-ups, Templates, My month, Calendar sync, My profile; Settings, Help, Sign out | phone-10 |
 
 ## Progress summary (both sides) — rules
 - **Window:** from the last remedy given (or first session) → today. Refreshed daily and before each session.

@@ -130,6 +130,12 @@ ME           Me → Personal details · Addresses · Goals · Reminders & notifi
 
 **Ask BeWise guardrails:** never diagnoses, never changes or recommends Bach remedies (that is the consultant's role), never shows staff notes, never makes cure claims; suggests booking a follow-up when the client describes ongoing difficulty; urgent-distress language → shows helpline + "contact us" immediately; every conversation logged; client can clear history.
 
+### L. Later (owner, 2026-11-16)
+| ID | Screen | Content |
+|---|---|---|
+| CL-57 | Connect health apps (**later phase**) | Optional link to Apple Health / Google Health Connect (sleep, mindful minutes, steps) to enrich progress summaries and Ask BeWise. Needs a native app wrapper (Capacitor) — a PWA cannot read HealthKit/Health Connect. Explicit consent per data type; disconnect anytime |
+| CL-58 | Calendar for clients | "Add to Apple / Google Calendar" on booking confirmed & appointment detail (ICS / Google link); optional auto-add toggle in Reminders |
+
 ### J. System states
 | ID | Screen | Content |
 |---|---|---|

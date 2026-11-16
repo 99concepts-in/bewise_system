@@ -28,11 +28,12 @@
 | D-16 | Refund approval threshold for Manager | Manager can refund up to ₹2,000; above needs Owner approval | O4 | OPEN |
 | D-17 | Who is the Owner account (person) and is the owner also a consultant? | Separate owner account; multi-role supported | Phase 0 | OPEN |
 | D-23 | Logo update | **DECIDED 2026-11-16:** new master logo 'BeWise · Holistic Wellness' (`design/brand/bewise-logo-holistic-wellness.jpg`), descriptor 'Holistic Wellness' replaces 'WELLNESS'. Logo navy sampled `#243D91` (UI navy tokens unchanged). Client v2 boards still show the old descriptor — update when building. Needs SVG master | All | ✅ DECIDED |
-| D-24 | Consultant main device | Default iPad/laptop first with full phone layout | CN | OPEN |
+| D-24 | Consultant main device | **DECIDED 2026-11-16: phone first**; iPad/laptop adaptation | CN | ✅ DECIDED |
 | D-25 | Remedy approval workflow | **DECIDED: none.** Consultant taps "Give remedy" → client + office. FormulaStatus = draft (silent autosave) · given · superseded | K4 | ✅ DECIDED |
 | D-26 | Client summary after session | **DECIDED: optional** (toggle) | K5 | ✅ DECIDED |
 | D-27 | Troubling emotions per session | **DECIDED: yes**, editable catalogue (Anger, Insecurity, Loneliness, Fear, Anxiety, …) | K5 | ✅ DECIDED |
 | D-28 | 3-line progress summary since last remedy for client + consultant | **DECIDED: yes**, AI-generated; client version excludes private notes; private notes not sent to AI by default | K, C | ✅ DECIDED |
 | D-29 | Client AI chatbot "Ask BeWise" (answers on own data, suggests products) | **DECIDED: yes**, with guardrails (no diagnosis, no remedy changes, confirm before actions) | C | ✅ DECIDED |
 | D-30 | Bach library size: owner said 36; standard is 38 + Rescue | Configurable library seeded with 38, hideable | K | OPEN |
-
+| D-31 | Calendar sync | **DECIDED: yes** — Google two-way (OAuth; push sessions, pull busy times), Apple via iCloud CalDAV, private ICS feed for any app; clients get Add-to-calendar. Needs Google Cloud OAuth client (credential) | K1, CN-28 | ✅ DECIDED |
+| D-32 | Apple Health / Google Health Connect | **DECIDED: later phase** — requires native wrapper (Capacitor) since a PWA can't access them; consent per data type | Client P3 | ✅ DECIDED (later) |
