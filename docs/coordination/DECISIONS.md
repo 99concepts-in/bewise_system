@@ -19,6 +19,11 @@
 | D-12 | Domain, email sender, brand email | e.g. bewisewellness.in, `care@` sender | Go-live | OPEN |
 | D-13 | Chart of accounts, GST treatment, inventory valuation method | Draft CoA by OWNER chat, validated by a qualified accountant before go-live | O2 | OPEN |
 | D-14 | Multiple consultants in future? | Data model supports N consultants; v1 UI assumes one (Jitu) with consultant picker hidden | K1 | OPEN |
-| D-15 | Client journal shared with consultant by default? | Yes, with a visible toggle the client controls | C5, K2 | OPEN |
+| D-15 | Client journal shared with consultant by default? | Yes, toggle in Privacy & data (CL-50) | C5, K2 | OPEN |
+| D-18 | Questionnaires in client flow? | **DECIDED 2026-11-16: No.** Optional booking note instead (CL-15). Questionnaire module → P3 | K3, C3 | ✅ DECIDED |
+| D-19 | Journal scope | **DECIDED: minimal** — date, time, emotion (8 owl faces) + search. Goals separate | C5 | ✅ DECIDED |
+| D-20 | Post-session feedback | **DECIDED: yes** — rating + tags + notes for consultant after every appointment (CL-23), consultant can read | K2, C3 | ✅ DECIDED |
+| D-21 | UI font | **DECIDED: Plus Jakarta Sans** (UI) + Cormorant Garamond (display). Owner approved | Phase 0 | ✅ DECIDED |
+| D-22 | Visual direction | **DECIDED: Quiet Luxury v2** (`design/inspiration/README.md`, boards in `design/client-v2/`) | All | ✅ DECIDED |
 | D-16 | Refund approval threshold for Manager | Manager can refund up to ₹2,000; above needs Owner approval | O4 | OPEN |
 | D-17 | Who is the Owner account (person) and is the owner also a consultant? | Separate owner account; multi-role supported | Phase 0 | OPEN |

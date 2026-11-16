@@ -33,11 +33,11 @@
 |---|---|---|
 | identity | HUB → OWNER | `profiles`, `roles`, `permissions`, `role_permissions`, `user_roles`, `staff_members` |
 | crm | MANAGER (base by HUB) | `clients`, `client_addresses`, `consent_records`, `client_contacts`, `leads`, `communication_log` |
-| scheduling | CONSULTANT | `consultation_types`¹, `availability_rules`, `availability_exceptions`, `appointments`, `appointment_history` |
+| scheduling | CONSULTANT | `consultation_types`¹, `availability_rules`, `availability_exceptions`, `appointments` (+ `client_note`), `appointment_history`, `session_feedback` |
 | questionnaires | CONSULTANT | `questionnaire_templates`, `questionnaire_versions`, `questionnaire_assignments`, `questionnaire_responses` |
 | consultation | CONSULTANT | `consultation_records`, `practitioner_notes` 🔒, `client_summaries`, `follow_ups` |
 | remedies | CONSULTANT | `bach_remedies`, `formula_templates`, `formulas`, `formula_versions`, `formula_items`, `remedy_orders` |
-| journal | CLIENT | `journal_entries`, `client_goals` |
+| journal | CLIENT | `journal_entries` (emotion + logged_at only), `client_goals` (separate from journal) |
 | commerce | CLIENT | `carts`, `cart_items`, `wishlists`, `sales_orders`, `order_items`, `return_requests` |
 | catalog | MANAGER | `collections`, `products`, `product_variants`, `product_images` |
 | fulfilment | MANAGER | `fulfilment_tasks`, `prep_sheets`, `qc_checks`, `shipments`, `shipment_events`, `couriers` |
@@ -98,6 +98,8 @@ export type StockMovementType =
   | 'remedy_prep_consume' | 'adjustment' | 'return' | 'wastage' | 'transfer'
 
 export type NotificationChannel = 'in_app' | 'email' | 'whatsapp' | 'sms' | 'push'
+
+export type Emotion = 'calm' | 'joyful' | 'grateful' | 'hopeful' | 'tired' | 'anxious' | 'sad' | 'irritated'  // journal; owl faces in design/assets
 ```
 
 `StatusBadge` maps every enum value to label + icon + tone in `src/components/ui/status-map.ts` (HUB). Adding an enum value = add its badge mapping in the same PR.
@@ -110,7 +112,8 @@ Emit with `emitEvent(type, payload, { tx })` inside the same DB transaction as t
 |---|---|---|---|
 | `client.created` | crm | `clientId, profileId?` | notifications (welcome) |
 | `appointment.held` | scheduling | `appointmentId, clientId, holdExpiresAt` | — |
-| `appointment.confirmed` | scheduling | `appointmentId, clientId, consultantId, startsAt, mode` | notifications, questionnaires (auto-assign), analytics |
+| `appointment.confirmed` | scheduling | `appointmentId, clientId, consultantId, startsAt, mode` | notifications, analytics |
+| `session_feedback.submitted` | scheduling | `feedbackId, appointmentId, clientId, consultantId, rating` | consultant Today (K-01), notifications (consultant), analytics (rating only) |
 | `appointment.rescheduled` | scheduling | `appointmentId, fromStartsAt, toStartsAt, by` | notifications |
 | `appointment.cancelled` | scheduling | `appointmentId, by, reason, refundEligiblePaise` | finance (refund request), notifications |
 | `appointment.completed` | scheduling/consultation | `appointmentId, consultationRecordId` | consultation (follow-up), analytics |
@@ -151,14 +154,16 @@ HUB creates typed stubs for all of these in Phase 0. The **owner chat replaces t
 listConsultationTypes(opts?: { activeOnly?: boolean }): Promise<ConsultationType[]>
 upsertConsultationType(input: ConsultationTypeInput): Promise<Result<ConsultationType>>        // called by OWNER settings
 getAvailableSlots(q: { consultationTypeId: string; mode: AppointmentMode; from: string; to: string; consultantId?: string }): Promise<Slot[]>
-holdAppointment(input: { clientId: string; consultationTypeId: string; mode: AppointmentMode; startsAt: string; consultantId?: string; notes?: string }): Promise<Result<{ appointmentId: string; holdExpiresAt: string; amountPaise: Paise }>>
+holdAppointment(input: { clientId: string; consultationTypeId: string; mode: AppointmentMode; startsAt: string; consultantId?: string; clientNote?: string })  // clientNote = optional CL-15 text, consultant-only: Promise<Result<{ appointmentId: string; holdExpiresAt: string; amountPaise: Paise }>>
 rescheduleAppointment(input: { appointmentId: string; startsAt: string; reason?: string }): Promise<Result<Appointment>>
 cancelAppointment(input: { appointmentId: string; reason: string }): Promise<Result<{ refundEligiblePaise: Paise }>>
 listAppointments(q: AppointmentQuery): Promise<Paged<AppointmentSummary>>                       // RLS scopes by role
 getAppointment(id: string): Promise<Appointment | null>
 checkInAppointment(id: string): Promise<Result<Appointment>>                                     // MANAGER desk
+submitSessionFeedback(input: { appointmentId: string; rating: 1|2|3|4|5; tags: string[]; notesForConsultant?: string }): Promise<Result<SessionFeedback>>  // CLIENT CL-23, editable later by the client
+listSessionFeedback(q: { clientId?: string; consultantId?: string }): Promise<SessionFeedback[]>  // CONSULTANT K-04/K-05; owner sees rating only
 ```
-### questionnaires (CONSULTANT)
+### questionnaires (CONSULTANT) — OPTIONAL / P3 (owner decision 2026-11-16: no questionnaire in the client flow)
 ```ts
 getAssignmentForClient(assignmentId: string): Promise<ClientQuestionnaire | null>   // CLIENT renders
 saveResponseDraft(input: { assignmentId: string; answers: Answer[] }): Promise<Result<void>>
@@ -249,7 +254,9 @@ Checked by `requirePermission()` server-side and mirrored in RLS via `has_permis
 | Client summaries (shareable) | own approved | ✅ | ❌ | view |
 | Formula approve / send to office | — | ✅ | — | — |
 | Prep sheet (remedy names, drops, bottle) | — | ✅ | ✅ | ✅ |
-| Client journal | own | ✅ if client shares | ❌ | ❌ |
+| Client journal (emotions) | own | ✅ if client shares (default on, toggle in CL-50) | ❌ | ❌ |
+| Session feedback & notes for consultant | own (write/edit) | ✅ for own appointments | ❌ | rating only |
+| Booking note (CL-15) | own | ✅ | ❌ | ❌ |
 | Catalogue edit | — | — | ✅ | ✅ |
 | Aroma product formulas 🔒 | — | — | ✅ (manufacturing perm) | ✅ |
 | Fulfilment, shipments, inventory, manufacturing, procurement | — | — | ✅ | ✅ |

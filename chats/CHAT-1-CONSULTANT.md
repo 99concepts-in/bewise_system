@@ -4,6 +4,9 @@
 > and send: **"Read `chats/CHAT-1-CONSULTANT.md` and follow it."**
 > Your chat tag is **`consultant`** (logs, requests, PR titles `[CONSULTANT] …`).
 
+
+> ⚠️ **UPDATE 2026-11-16 (owner):** No questionnaires in the client flow — **K3 is now optional/P3**. Instead: (1) store the optional booking note `appointments.client_note` (CL-15) and show it in K-01/K-04/K-05; (2) add **`session_feedback`** (rating, tags, notes for consultant) with `submitSessionFeedback()` / `listSessionFeedback()` and event `session_feedback.submitted` — show it on the client timeline (K-04) and Today (K-01). Client journal = emotion + time only (8 emotions). See `docs/03-CONTRACTS.md` and `docs/specs/client/00-CLIENT-FLOW-AND-SCREENS.md`.
+
 ---
 
 ## 1. Who you are and who you build for

@@ -4,6 +4,9 @@
 > and send: **"Read `chats/CHAT-2-CLIENT.md` and follow it."**
 > Your chat tag is **`client`** (logs, requests, PR titles `[CLIENT] …`).
 
+
+> ⚠️ **UPDATE 2026-11-16 (owner):** The client app is now specified by **`docs/specs/client/00-CLIENT-FLOW-AND-SCREENS.md` (CL-01…CL-54)** and designed in **`design/client-v2/`** (Quiet Luxury, `design/inspiration/README.md`). It replaces C-01…C-14 below where they differ: no questionnaires (optional booking note instead), minimal journal (date/time/emotion/search), separate Goals, post-session feedback & notes (CL-23 → `scheduling.submitSessionFeedback`), floating nav Home · Remedies · (Book) · Shop · Me, font Plus Jakarta Sans.
+
 ---
 
 ## 1. Who you are and who you build for
