@@ -21,7 +21,8 @@
 |---|---|---|
 | Full logo (owl + BeWise + WELLNESS) | Public header/footer, sign-in, invoices, splash | Never redraw, stretch, recolour outside navy/white. Clear space ≥ owl-head height. |
 | Owl-only mark | App icon, favicon, collapsed sidebar, loading spinner, empty states | |
-| Reference file | `design/brand/bewise-logo-reference.png` | **Needs a designer-made SVG master** before launch (brand guide §2). |
+| **Master logo (2026-11-16)** | `design/brand/bewise-logo-holistic-wellness.jpg` — owl in circle + BeWise + **Holistic Wellness**; logo navy `#243D91` | Use everywhere. Old `bewise-logo-reference.png` (WELLNESS) is retired. |
+| Old reference file | `design/brand/bewise-logo-reference.png` | **Needs a designer-made SVG master** before launch (brand guide §2). |
 | Splash animation | `design/motion/` | Line-draws the owl; ends on exact logo. Disable under reduced-motion. |
 
 ## 3. Colour usage

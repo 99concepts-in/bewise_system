@@ -27,3 +27,5 @@
 | D-22 | Visual direction | **DECIDED: Quiet Luxury v2** (`design/inspiration/README.md`, boards in `design/client-v2/`) | All | ✅ DECIDED |
 | D-16 | Refund approval threshold for Manager | Manager can refund up to ₹2,000; above needs Owner approval | O4 | OPEN |
 | D-17 | Who is the Owner account (person) and is the owner also a consultant? | Separate owner account; multi-role supported | Phase 0 | OPEN |
+| D-23 | Logo update | **DECIDED 2026-11-16:** new master logo 'BeWise · Holistic Wellness' (`design/brand/bewise-logo-holistic-wellness.jpg`), descriptor 'Holistic Wellness' replaces 'WELLNESS'. Logo navy sampled `#243D91` (UI navy tokens unchanged). Client v2 boards still show the old descriptor — update when building. Needs SVG master | All | ✅ DECIDED |
+| D-24 | Consultant main device | Default iPad/laptop first with full phone layout | CN | OPEN |
