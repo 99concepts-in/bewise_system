@@ -57,7 +57,7 @@ ME           Me → Personal details · Addresses · Goals · Reminders & notifi
 | ID | Screen | Content |
 |---|---|---|
 | CL-11 | Choose consultation | Two large cards: First consultation (60 min · ₹fee) / Follow-up (30 min · ₹fee), one-line "what to expect" |
-| CL-12 | Meet your consultant (real photo: `design/assets/people/jitu-bhaiya-portrait.jpg`; testimonials pending — CONTENT-CHECKLIST #1) | Portrait, name, approach in 2 lines, languages, years, "How Bach remedies work" mini animation card |
+| CL-12 | Meet your consultant (real photo: `design/assets/people/jitu-bhaiya-portrait.jpg`; testimonials pending — CONTENT-CHECKLIST #1; quiet "Visit his website" link → www.jitendrakhimlani.com) | Portrait, name, approach in 2 lines, languages, years, "How Bach remedies work" mini animation card |
 | CL-13 | Online or in person | Two choice cards; in person shows studio address |
 | CL-14 | Date & time | Month label, week strip (selected = navy circle), slots grouped Morning / Afternoon / Evening as pills |
 | CL-15 | Anything you'd like to share? | **Optional** text box "What would you like to talk about?" + Skip. Visible to consultant only |

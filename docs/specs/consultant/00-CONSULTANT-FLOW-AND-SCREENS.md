@@ -65,7 +65,7 @@ ME        My profile (what clients see) · Settings · My month
 | CN-21 | Client notes & feedback | Ratings, tags, notes clients wrote after sessions (CL-23) | 12 |
 | CN-22 | Bach Flower library | Groups, search, soft 3D flower cards | 13 |
 | CN-23 | Flower detail | Client-facing text + his private notes + active-blend count | 13 |
-| CN-24 | My profile | What clients see on CL-12, preview. Real photo: `design/assets/people/jitu-bhaiya-square.jpg` | 14 |
+| CN-24 | My profile | What clients see on CL-12, preview. Real photo: `design/assets/people/jitu-bhaiya-square.jpg`. Fields: display name, title(s), experience, languages, quote, **website (www.jitendrakhimlani.com)**, Instagram — draft values in `docs/coordination/CONTENT-CHECKLIST.md` | 14 |
 | CN-25 | Settings | Video link, app lock, reminders, daily summary | 14 |
 | CN-26 | My month | Sessions, returning clients, rating, remedies given, top troubling emotions | 15 |
 | CN-27 | Empty & states | Quiet day, offline (notes saved encrypted, sync later) | 15 |
