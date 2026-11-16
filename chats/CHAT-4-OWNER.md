@@ -4,6 +4,8 @@
 > and send: **"Read `chats/CHAT-4-OWNER.md` and follow it."**
 > Your chat tag is **`owner`** (logs, requests, PR titles `[OWNER] …`).
 
+> ⚠️ **UPDATE 2026-11-16 (owner):** **No refunds** (D-16) — remove refund flows/approvals; credit notes only for owner accounting corrections. Consultant gets read-only business sales views (CN-30…32) — expose `analytics` read functions for them. Shiprocket costs/wallet top-ups appear as supplier/recurring payables.
+
 ---
 
 ## 1. Who you are and who you build for

@@ -4,6 +4,8 @@
 > and send: **"Read `chats/CHAT-3-MANAGER.md` and follow it."**
 > Your chat tag is **`manager`** (logs, requests, PR titles `[MANAGER] …`).
 
+> ⚠️ **UPDATE 2026-11-16 (owner):** Your app is now specified by **`docs/specs/manager/00-MANAGER-FLOW-AND-SCREENS.md` (MG-01…MG-31)** and designed in **`design/manager-v2/`** — **phone first + desktop for products**. Decisions: Haresh does production & purchases; courier = **Shiprocket** (rates, create shipment, labels, pickups, tracking webhook); **no refunds** anywhere → replacement orders; he sees all money (collect, pay, expenses). Overrides M-01…M-16 details below.
+
 ---
 
 ## 1. Who you are and who you build for

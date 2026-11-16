@@ -15,6 +15,7 @@
 | 7 | Studio address & map (in-person sessions) | CL-13, CL-19 | ⏳ | |
 | 8 | Logo SVG master ("Holistic Wellness") | Everywhere | ⏳ D-23 | Designer to vectorise |
 | 8a | Google Cloud OAuth client (Calendar API) + Apple ID app-specific password for iCloud calendar | CN-28 calendar sync | ⏳ | Credentials, set up at build time |
+| 8b | Shiprocket account API credentials + pickup address | MG-09 dispatch | ⏳ | |
 | 9 | Legal pages: privacy, terms, refund, shipping, disclaimer | CL-51, P-09 | ⏳ | Drafts by CLIENT chat for owner review |
 
 ## Draft consultant profile (from www.jitendrakhimlani.com, 2026-11-16 — confirm before use)

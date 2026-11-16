@@ -42,7 +42,7 @@
 | journal | CLIENT | `journal_entries` (emotion + logged_at only), `client_goals` (separate from journal) |
 | commerce | CLIENT | `carts`, `cart_items`, `wishlists`, `sales_orders`, `order_items`, `return_requests` |
 | catalog | MANAGER | `collections`, `products`, `product_variants`, `product_images` |
-| fulfilment | MANAGER | `fulfilment_tasks`, `prep_sheets`, `qc_checks`, `shipments`, `shipment_events`, `couriers` |
+| fulfilment | MANAGER | `fulfilment_tasks`, `prep_sheets`, `qc_checks`, `shipments` (+ shiprocket_order_id, awb, courier, label_url), `shipment_events`, `replacement_orders` — **Shiprocket** integration (rates, create shipment, label, pickup, tracking webhook `/api/webhooks/courier`) |
 | inventory | MANAGER | `stock_items` (raw/packaging/finished), `stock_locations`, `stock_movements`, `reorder_rules`, `stock_takes` |
 | manufacturing | MANAGER | `product_formulas` 🔒, `product_formula_versions`, `production_orders`, `batches`, `material_usage`, `batch_qc` |
 | procurement | MANAGER | `suppliers`, `purchase_orders`, `purchase_order_items`, `goods_receipts` |
@@ -207,7 +207,7 @@ createRemedySalesOrder(input: { remedyOrderId: string; clientId: string; pricePa
 getOrder(id: string): Promise<SalesOrder | null>
 listOrders(q: OrderQuery): Promise<Paged<SalesOrderSummary>>
 setOrderStatusFromFulfilment(input: { salesOrderId: string; status: SalesOrderStatus }): Promise<Result<void>>  // internal: called by commerce's own event handler
-requestReturn(input: { salesOrderId: string; itemIds: string[]; reason: string }): Promise<Result<void>>
+requestReplacement(input: { salesOrderId: string; itemIds: string[]; reason: string; photoIds: string[] }): Promise<Result<void>>  // no refunds (D-16)
 ```
 ### catalog (MANAGER)
 ```ts
@@ -240,7 +240,7 @@ verifyCheckout(input: { razorpayOrderId: string; razorpayPaymentId: string; sign
 createInvoice(input: InvoiceInput): Promise<Result<Invoice>>                       // MANAGER manual invoices
 recordPayment(input: { invoiceId?: string; partyType: PartyType; partyId: string; amountPaise: Paise; method: PaymentMethod; accountId: string; reference?: string; receivedOn: string }): Promise<Result<Payment>>
 createPaymentLink(invoiceId: string): Promise<Result<{ url: string }>>
-requestRefund(input: { paymentId: string; amountPaise: Paise; reason: string }): Promise<Result<Refund>>   // may require approval
+// requestRefund — REMOVED: owner policy 2026-11-16 = no refunds (D-16). Credit notes remain owner-only for accounting corrections.
 listInvoices(q: InvoiceQuery): Promise<Paged<InvoiceSummary>>
 getFollowUpBuckets(q: { partyType: PartyType }): Promise<FollowUpBuckets>          // MANAGER M-14
 sendReminder(input: { invoiceId: string; channels: NotificationChannel[] }): Promise<Result<void>>
@@ -285,8 +285,10 @@ Checked by `requirePermission()` server-side and mirrored in RLS via `has_permis
 | Aroma product formulas 🔒 | — | — | ✅ (manufacturing perm) | ✅ |
 | Fulfilment, shipments, inventory, manufacturing, procurement | — | — | ✅ | ✅ |
 | Invoices create / record payment / reminders | pay own | — | ✅ | ✅ |
-| Refund (≤ threshold) | request | — | ✅ | ✅ |
-| Refund (> threshold), expense/bill approval | — | — | ❌ | ✅ approve |
+| Refunds | ❌ none (policy) | ❌ | ❌ | ❌ (credit note for corrections only) |
+| Replacement order (damaged/wrong/RTO) | request | — | ✅ | ✅ |
+| Expense/bill approval | — | — | submit | ✅ approve |
+| Business sales overview (read-only) | — | ✅ (CN-30…32) | ✅ | ✅ |
 | Accounting, journals, period close, reports (financial) | — | — | ❌ (ops reports only) | ✅ |
 | People & payroll | — | own payslip (future) | ❌ | ✅ |
 | Personal finance | — | — | ❌ | ✅ only |

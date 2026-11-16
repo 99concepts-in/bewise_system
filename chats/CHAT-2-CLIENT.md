@@ -9,6 +9,8 @@
 
 > ⚠️ **UPDATE 2026-11-16 round 2 (owner):** add **CL-55 Ask BeWise** (AI companion on the client's own data + product suggestions, `companion` module — yours) and **CL-56 progress card** (3 lines from `progress.getProgressSummary`, audience client). Board: `design/client-v2/CL-board-18-progress-ask-bewise.jpg`. New master logo 'BeWise · Holistic Wellness'.
 
+> ⚠️ **UPDATE 2026-11-16 round 3 (owner): NO REFUNDS.** CL-22 cancel → reschedule only; CL-43 return → request replacement (photo); remove refund wording everywhere. See client spec section M.
+
 ---
 
 ## 1. Who you are and who you build for

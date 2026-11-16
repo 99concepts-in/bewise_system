@@ -130,6 +130,12 @@ ME           Me → Personal details · Addresses · Goals · Reminders & notifi
 
 **Ask BeWise guardrails:** never diagnoses, never changes or recommends Bach remedies (that is the consultant's role), never shows staff notes, never makes cure claims; suggests booking a follow-up when the client describes ongoing difficulty; urgent-distress language → shows helpline + "contact us" immediately; every conversation logged; client can clear history.
 
+### M. No-refund policy (owner, 2026-11-16) — CHANGES FOR THE CLIENT CHAT
+- **CL-22 Cancel appointment → becomes "Can't make it?"**: offers **Reschedule** only; clear line "Sessions are non-refundable, but you can move yours to another time." (D-08).
+- **CL-43 Return request → becomes "Request a replacement"** for damaged / wrong items (photo required) → manager creates a replacement order.
+- CL-53 payment issues unaffected (failed payments are never charged).
+- Remove all "Refund" wording from CL-16, CL-17, CL-21, CL-51 policies; policy pages state no refunds, replacement for damaged/wrong items.
+
 ### L. Later (owner, 2026-11-16)
 | ID | Screen | Content |
 |---|---|---|

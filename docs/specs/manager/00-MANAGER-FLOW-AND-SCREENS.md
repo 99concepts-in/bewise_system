@@ -1,6 +1,6 @@
 # Manager Operations (Mr. Haresh Moorjani) — Flow & Screen List (v1 draft)
 
-> **Owner:** HUB (designed with the business owner). Status: **DRAFT — waiting for owner feedback.**
+> **Owner:** HUB (designed with the business owner). Status: **APPROVED FLOW (owner answers 2026-11-16) — designs in `design/manager-v2/`.**
 > Supersedes M-01…M-16 in `docs/02-FLOWS-AND-SCREENS.md` once approved. Screen IDs `MG-xx` are stable.
 > Visual direction: Quiet Luxury v2, same family as client & consultant. **Phone first** (owner, 2026-11-16), desktop adaptation later.
 > Boards: `design/manager-v2/`.
@@ -95,7 +95,26 @@ PRODUCTION  Production batches → Batch (request → materials → produce → 
 | MG-28 | Reports | Simple: orders this week, average prep time, courier performance, stock value |
 | MG-29 | Empty & states | All caught up, offline, failed sync |
 
-## Open questions for the owner
+## Owner answers (2026-11-16)
+1. ✅ Haresh **does production and purchases** (MG-19…22 are his). Jitu Bhaiya also sees **sales and business overview** (read-only) — consultant CN-30/31/32.
+2. ✅ Courier = **Shiprocket** (multiple couriers). Dispatch compares Shiprocket courier rates → Create shipment → auto AWB, label PDF, pickup scheduling, tracking via webhook. Manual AWB entry kept as fallback.
+3. ✅ **No refunds** — anywhere in the system. Failed delivery → reattempt; RTO/damaged/wrong item → **replacement order**. Client cancellations → reschedule only.
+4. ✅ He sees **everything** in Money: to collect (clients), to pay (suppliers, recurring like Shiprocket wallet), expenses (owner approves).
+5. ✅ **Computer as well** for adding/editing products (MG-30, MG-31 desktop). Phone has quick edit (price, stock, live toggle).
+
+## Added screens
+| ID | Screen | Content |
+|---|---|---|
+| MG-09 | Dispatch (Shiprocket) | Courier options with price & days (Recommended), pickup slot, WhatsApp tracking, Create shipment |
+| MG-09b | Shipment created | AWB, label print/share, pickup scheduled, tracking sent |
+| MG-10 | Shipments | In transit · Delivered · Problems (failed → Reattempt, RTO → Send replacement); "Synced with Shiprocket" |
+| MG-16 | Quick edit (phone) | Price/MRP/cost per size, show in shop; full edit on computer |
+| MG-23b | Money → To pay | Supplier bills, recurring (Shiprocket wallet) |
+| MG-27b | Quick actions (+) | Walk-in order, record payment, add expense, adjust stock, book appointment, new batch |
+| MG-30 | Products (desktop) | Collection table, search, filters, + Add product |
+| MG-31 | Add / edit product (desktop) | Photos drop zone, details, ingredients/how to use/safety, sizes & prices table, status, tax, stock link, live shop preview |
+
+## (Answered) Open questions
 1. Does Mr. Haresh also do **production (making oils/sprays/salts)** and **purchases**, or is that someone else? (Affects whether MG-19…22 are his.)
 2. Which **courier(s)** do you use today? (Delhivery / Blue Dart / India Post / Shiprocket…)
 3. Can he **give refunds** himself up to a limit (default ₹2,000), above that owner approves?
