@@ -1,5 +1,7 @@
 # BeWise Wellness — Design System
 
+> 🆕 **v3 "Luxe" proposed (2026-11-16, D-34):** Fraunces + Satoshi, midnight hero cards, custom BeWise icon library — see `design/v3-luxe/README.md`.
+>
 > ⚠️ **v2 "Quiet Luxury" approved (2026-11-16, D-21/D-22).** Where this file conflicts with `design/inspiration/README.md`, the v2 direction wins: UI font **Plus Jakarta Sans**, tone-on-tone cards (radius 28, no borders), pill buttons in deep navy, floating glass nav, owl emotion faces, soft 3D objects. Client boards: `design/client-v2/`. Staff spaces get their v2 boards module by module.
 
 > **Owner:** HUB. Token source of truth: `design/tokens.json`. Visual reference boards: `design/boards/`.

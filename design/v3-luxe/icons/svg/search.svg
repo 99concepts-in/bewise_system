@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- BeWise "Wise Line" icon: search · @owner HUB · navy line = currentColor, gold seed dot = --bw-icon-accent -->
+      <path d="m17.3 17.3 4.4 4.4" />
+      <circle cx="10.8" cy="10.8" r="8.3" />
+      <circle cx="15.5" cy="5.3" r=".95" fill="var(--bw-icon-accent, #B89B64)" stroke="none" />
+</svg>

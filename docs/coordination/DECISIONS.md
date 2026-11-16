@@ -38,4 +38,5 @@
 | D-31 | Calendar sync | **DECIDED: yes** — Google two-way (OAuth; push sessions, pull busy times), Apple via iCloud CalDAV, private ICS feed for any app; clients get Add-to-calendar. Needs Google Cloud OAuth client (credential) | K1, CN-28 | ✅ DECIDED |
 | D-32 | Apple Health / Google Health Connect | **DECIDED: later phase** — requires native wrapper (Capacitor) since a PWA can't access them; consent per data type | Client P3 | ✅ DECIDED (later) |
 | D-33 | Consultant sees business sales | **DECIDED: yes**, read-only (sales, splits, best sellers, orders & stock) — CN-30…32 | K | ✅ DECIDED |
-
+| D-34 | Design v3 "Luxe" (Fraunces + Satoshi, midnight cards, custom Wise Line icons) | **PROPOSED** — applied to Owner module; on approval becomes system-wide via tokens | All | OPEN — owner to approve |
+| D-17 | (see above) Owner name & personal finance / payroll timing / accountant login | Asked in owner spec | O | OPEN |

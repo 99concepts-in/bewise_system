@@ -1,0 +1,77 @@
+<svg viewBox="0 0 1024 1024" width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  <title>Twelve wellness navigation icons</title>
+  <desc>A four-column, three-row set of navy outline icons with muted gold dot accents and labels on a transparent background.</desc>
+  <g fill="none" stroke="#263C78" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <g id="home" transform="translate(48 112) scale(8)">
+      <path d="M1.5 10.5 10.8 2.3Q12 1.3 13.2 2.3L22 10.2M3.5 9V19Q3.5 21.5 6 21.5H8.2V17Q8.2 14 11.2 14T14.2 17V21.5" />
+      <path d="M15 22Q23 22 23 14.5 16 14.5 15 20M18 19 15 22" />
+      <circle cx="7" cy="9.5" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="today" transform="translate(288 112) scale(8)">
+      <path d="M1 19Q12 14.5 23 19M5.7 17.5V16A6.3 6.3 0 0 1 18.3 16V17.5M12 3V6M3.8 6.3 5.7 8.3M20.2 6.3 18.3 8.3M1.6 12 4 12.6M22.4 12 20 12.6" />
+      <circle cx="12" cy="13.7" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="clients" transform="translate(528 112) scale(8)">
+      <path d="M5.9 10.4A3.8 3.8 0 1 1 12 10.4M1 21V20A8 8 0 0 1 17 20V21M16 6.4A3.2 3.2 0 0 1 20.4 11M18 13.1Q23 14.3 23 20.8" />
+      <circle cx="5" cy="17.3" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="calendar" transform="translate(768 112) scale(8)">
+      <path d="M7 4H5Q2 4 2 7V19Q2 22 5 22H19Q22 22 22 19V7Q22 4 19 4H17M10 4H14M2 9H22M7 2V6M17 2V6" />
+      <path d="M7 13H8V14H7ZM12 13H13V14H12ZM17 13H18V14H17ZM7 17H8V18H7ZM12 17H13V18H12Z" />
+      <circle cx="17.5" cy="17.5" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="book" transform="translate(48 412) scale(8)">
+      <path d="M7 3H5Q2 3 2 6V19Q2 22 5 22H19Q22 22 22 19V6Q22 3 19 3H17M10 3H14M7 1V5M17 1V5M2 8H22M12 12V18M9 15H15" />
+      <circle cx="18.5" cy="11" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="remedy" transform="translate(288 412) scale(8)">
+      <path d="m13.4 4.7 2.5-3a3.2 3.2 0 0 1 4.6 4.5l-2.8 2.9M12.4 4.2 18.1 9.9M13.5 6 5.3 14.5 4.4 18 8 17.1 16.3 8.8" />
+      <path d="M4.8 19.4Q3.8 21.2 3.8 21.8a1.6 1.6 0 0 0 3.2 0Q7 21.1 5.9 19.4" />
+      <circle cx="18.1" cy="3.5" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="library" transform="translate(528 412) scale(8)">
+      <path d="M12 5.3Q7 1 1 4V20Q6.7 17.5 12 21Q17.3 17.5 23 20V4Q17 1 12 5.3V21" />
+      <path d="M15.2 13.7Q21 13.7 20.5 7.7 15 8.3 15.2 13.7ZM15.2 13.7 18.1 10.8" />
+      <circle cx="4.8" cy="7.2" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="follow-up" transform="translate(768 412) scale(8)">
+      <path d="M21 6.2A10.5 10.5 0 1 0 22.4 11M21.8 2.5 21 6.2 17.2 5.6" />
+      <path d="M12 17s-5.1-3.4-5.1-6.5a2.8 2.8 0 0 1 5.1-1.6 2.8 2.8 0 0 1 5.1 1.6C17.1 13.6 12 17 12 17Z" />
+      <circle cx="20.3" cy="18.5" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="shop" transform="translate(48 716) scale(8)">
+      <path d="M7 6V4.8a5 5 0 0 1 10 0V6M5 6H19Q21 6 21.3 8.2L23 20Q23.3 23 20 23H4Q.7 23 1 20L2.7 8.2Q3 6 5 6Z" />
+      <path d="M8.2 19Q7.5 13 16.8 12 17 19.1 10.2 20M8.3 21 14.3 15.1" />
+      <circle cx="5.5" cy="10" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="profile" transform="translate(288 716) scale(8)">
+      <circle cx="12" cy="6.5" r="5.3" />
+      <path d="M3.2 23Q1.2 23 1.8 20.9 3.5 14 12 14T22.2 20.9Q22.8 23 20.8 23Z" />
+      <circle cx="18" cy="19.5" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="journal" transform="translate(528 716) scale(8)">
+      <path d="M4 5V3Q4 1 7 1H19Q22 1 22 4V20Q22 23 19 23H7Q4 23 4 20V8M2 6H6M2 11H6M2 16H6M2 21H6" />
+      <path d="M13.5 1V9L16 7.2 18.5 9V1" />
+      <circle cx="18.2" cy="19" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+    <g id="goals" transform="translate(768 716) scale(8)">
+      <path d="M17.8 2.6A11 11 0 1 0 22.2 7.9M17.5 7A7.4 7.4 0 1 0 19.3 12" />
+      <path d="M12 17V12M12 14Q6 14 6.3 9.1 11.8 9 12 14ZM12 12Q12 7.8 18.5 8 18.4 12.8 12 13" />
+      <circle cx="20.2" cy="4.8" r="0.9" fill="#B89B64" stroke="none" />
+    </g>
+  </g>
+  <g id="labels" fill="#263C78">
+    <text x="144" y="340">Home</text>
+    <text x="384" y="340">Today</text>
+    <text x="624" y="340">Clients</text>
+    <text x="864" y="340">Calendar</text>
+    <text x="144" y="642">Book</text>
+    <text x="384" y="642">Remedy</text>
+    <text x="624" y="642">Library</text>
+    <text x="864" y="642">Follow-up</text>
+    <text x="144" y="952">Shop</text>
+    <text x="384" y="952">Profile</text>
+    <text x="624" y="952">Journal</text>
+    <text x="864" y="952">Goals</text>
+  </g>
+</svg>

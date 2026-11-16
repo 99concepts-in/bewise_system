@@ -12,7 +12,8 @@
 | Plan, design system, flows, contracts, protocol, chat briefs | ✅ | **`main` created 2026-11-16** (same as `claude/bewise-wellness-design-6xcg8x`) |
 | Client v2 (54+ screens) · Consultant v2 (phone + iPad) designs | ✅ | `design/client-v2`, `design/consultant-v2` |
 | Manager v2 designs | ✅ | 31 phone + 2 desktop screens, Shiprocket, no-refund policy — `design/manager-v2` |
-| Owner v2 designs | ⬜ | Next module |
+| Owner designs (v3 Luxe) | 🟨 | Flow drafted + 2 anchor boards; waiting for owner answers |
+| Design v3 Luxe + BeWise icon library (36 SVG) | 🟨 | Proposed — `design/v3-luxe` |
 | Design boards (12) + motion (splash, hero) | ✅ | `design/boards`, `design/motion` |
 | Next.js/Supabase scaffold, UI kit, shells, auth, spine tables, events, contract stubs, seed, PWA, CI | ⬜ | HUB — next step |
 
