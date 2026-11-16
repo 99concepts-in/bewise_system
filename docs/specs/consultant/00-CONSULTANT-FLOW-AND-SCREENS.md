@@ -1,118 +1,81 @@
-# Consultant Workspace (Jitu Bhaiya) — Flow & Screen List (v1 draft)
+# Consultant Workspace (Jitu Bhaiya) — Flow & Screen List (v2)
 
-> **Owner:** HUB (designed with the business owner). Status: **DRAFT — waiting for owner feedback.**
-> Supersedes K-01…K-11 in `docs/02-FLOWS-AND-SCREENS.md` once approved. Screen IDs `CN-xx` are stable.
+> **Owner:** HUB (designed with the business owner). Status: **APPROVED FLOW — designs in `design/consultant-v2/`.**
+> Supersedes K-01…K-11 in `docs/02-FLOWS-AND-SCREENS.md`. Screen IDs `CN-xx` are stable.
 > Visual direction: Quiet Luxury v2 (`design/inspiration/README.md`), same family as `design/client-v2/`.
-> Boards: `design/consultant-v2/`.
 
-## Design intent (how it should feel)
-Jitu Bhaiya's day = **people, not paperwork**. The workspace should feel like a calm, private study:
-one thing at a time, everything about a client one tap away, writing that never gets lost, and remedies
-he can build in under a minute. The system **never suggests or prescribes** — it remembers, organises and protects.
+## Owner changes (2026-11-16, round 2)
+1. ❌ **No approval workflow.** Jitu Bhaiya builds the blend and taps **Give remedy** → goes to the client and the office at once. No draft/review/approve states visible to him (drafts autosave silently).
+2. ✏️ **Summary for client is optional** — a toggle in End session and a tab in Live session; never required.
+3. ✏️ Remedy builder uses the **Bach Flower library** (owner said "36" — standard system is 38 + Rescue Remedy; library is configurable: he can hide flowers he doesn't use. **D-30 open**).
+4. ➕ **Troubling emotions**: in each session he selects what is troubling the client (Anger, Insecurity, Loneliness, …) from an editable list. Stored per session; drives progress tracking.
+5. ➕ **3-line progress summary since the last remedy**, shown to **both** consultant (CN-05, CN-13) and client (CL-08 Home, CL-26 My Remedies). AI-generated from data; client version never uses private notes.
+6. ➕ (Client side) **Ask BeWise** chatbot — see `docs/specs/client/00-CLIENT-FLOW-AND-SCREENS.md` CL-55.
 
-- **Device:** iPad / laptop first (landscape, left rail), fully usable on phone (bottom nav, + button for quick actions).
-- **Privacy:** private notes always marked with a lock and "Only you can see this". Optional app lock (PIN / Face ID).
-- **Speed:** dictation in every note field, autosave every few seconds, "duplicate last blend", templates.
+## Design intent
+His day = **people, not paperwork**. A calm, private study: one thing at a time, everything about a client one tap away,
+notes never lost, a remedy in under a minute. The system **never suggests or prescribes remedies** — it remembers,
+organises, protects and summarises progress.
+
+- **Device:** iPad / laptop first (left rail), full phone layout (bottom nav with +). D-24 open.
+- **Privacy:** lock icon + "Only you can see this" on private notes; optional app lock (PIN / Face ID).
+- **Speed:** dictation everywhere, autosave, Duplicate last blend, templates.
 
 ## Navigation
-- iPad/laptop: slim frosted left rail — **Today · Clients · Calendar · Remedies · Library · Follow-ups**, avatar → Me.
-- Phone: floating nav — **Today · Clients · (+) · Calendar · Me**. The + opens: Book for a client · Quick note · New blend.
+iPad/laptop rail: **Today · Clients · Calendar · Remedies · Library · Follow-ups** (avatar → Me).
+Phone: **Today · Clients · (+) · Calendar · Me** — + = Book for a client · Quick note · Give remedy.
 
-## Flow at a glance
+## Flow
 ```
-START      Sign in → (App lock) → Today
-BEFORE     Today → Session prep (her note, recent feelings, last summary, current blend, last feedback)
-DURING     Live session (timer, video link, Private notes / Summary for client, dictation)
-AFTER      End session (completed / no-show, follow-up in N weeks) → Remedy builder → Preview as client
-           → Approve & send to office → Share summary with client
-CLIENTS    Clients → Client profile (Overview · Sessions · Feelings · Remedies · Feedback · Notes) → Past session
-CALENDAR   Calendar (day/week) → Availability (weekly hours, online / in person) → Time off → Reschedule for client
-FOLLOW-UP  Follow-ups (due / overdue / upcoming) → WhatsApp nudge or Book for client
-LIBRARY    Bach Flower library (38, 7 groups) → Flower detail (approved text + his own notes) · Blend templates
-LISTEN     Client notes & feedback (ratings + notes clients wrote after sessions)
-ME         Profile (what clients see on CL-12) · Settings · My month (gentle stats)
+START     Sign in → App lock → Today
+BEFORE    Today → Session prep (3-line progress, her note, feelings, last troubling emotions, current blend)
+DURING    Live session: timer · video · What's troubling her? (chips) · Private notes 🔒 · Summary (optional) · dictation
+AFTER     End session (completed / no-show · follow-up · share summary? optional)
+          → Remedy builder → Give remedy (client + office) → Remedy given
+CLIENTS   Clients → Client profile (Overview · Sessions · Feelings · Remedies · Feedback · Notes 🔒) → Past session · Book for client
+CALENDAR  Calendar → Availability → Time off → Reschedule
+LISTEN    Follow-ups (WhatsApp nudge / Book) · Client notes & feedback
+LIBRARY   Bach Flower library → Flower detail (client text + his private notes) · Blend templates
+ME        My profile (what clients see) · Settings · My month
 ```
 
 ## Screens
+| ID | Screen | Content | Board |
+|---|---|---|---|
+| CN-01 | Sign in | Logo panel, "Welcome back, *Jitu*", mobile + OTP, team only | 02 |
+| CN-02 | App lock | PIN / Face ID | 02 |
+| CN-03 | Today | Greeting, Next session hero (her note, Prepare / Start), day timeline, tiles: follow-ups due · new client notes · remedies being prepared | 00 |
+| CN-04 | Notifications | Bookings, reschedules, client notes, remedy delivered | 03 |
+| CN-05 | Session prep | **Progress since last remedy (3 lines)**, booking note, recent feelings, troubling emotions last time, current blend, Start | 03 |
+| CN-06 | Live session | Timer, video link, **What's troubling her?** chips, Private notes 🔒 / Summary (optional) tabs, dictation, autosave, End session / Build remedy | 04 |
+| CN-07 | Troubling emotions | Full sheet grouped (Fear & worry · Heart · Self · Energy · Temper), editable list | 05 |
+| CN-08 | End session | Completed / No-show · follow-up 2/3/4/6 weeks / none · "Share a summary" toggle (optional) · Give remedy / Done | 05 |
+| CN-09 | Remedy builder | Library (search, groups, recently used) + her blend (flowers, private reason 🔒, drops, times/day, weeks, bottle) · Duplicate last · Template · **Give remedy** | 06 |
+| CN-10 | Remedy given | Success: sent to client · office preparing · delivered tracker | 07 |
+| CN-11 | Blend templates | Saved starting blends, used-count, create/edit | 07 |
+| CN-12 | Clients | Search, filters, rows with last/next session + latest feeling | 08 |
+| CN-13 | Client profile | Tabs; Overview = 3-line progress, troubling emotions over time chart, current blend, next session | 08 |
+| CN-14 | Past session | Troubling emotions, private notes, summary (shared or not), remedy given, her feedback | 09 |
+| CN-15 | Book for client | Type, mode, slot, WhatsApp payment link toggle | 09 |
+| CN-16 | Calendar | Day / week, online vs in-person blocks | 10 |
+| CN-17 | Availability | Weekly hours per mode, buffer, booking window | 10 |
+| CN-18 | Time off | Block dates, affected sessions, reschedule & notify | 11 |
+| CN-19 | Reschedule | New slot + optional message | 11 |
+| CN-20 | Follow-ups | Due / Overdue / Upcoming, WhatsApp nudge, Book | 12 |
+| CN-21 | Client notes & feedback | Ratings, tags, notes clients wrote after sessions (CL-23) | 12 |
+| CN-22 | Bach Flower library | Groups, search, soft 3D flower cards | 13 |
+| CN-23 | Flower detail | Client-facing text + his private notes + active-blend count | 13 |
+| CN-24 | My profile | What clients see on CL-12, preview | 14 |
+| CN-25 | Settings | Video link, app lock, reminders, daily summary | 14 |
+| CN-26 | My month | Sessions, returning clients, rating, remedies given, top troubling emotions | 15 |
+| CN-27 | Empty & states | Quiet day, offline (notes saved encrypted, sync later) | 15 |
 
-### A. Start
-| ID | Screen | Content |
-|---|---|---|
-| CN-01 | Sign in | Owl mark, "Welcome back, *Jitu*", phone / email + OTP, staff only |
-| CN-02 | App lock | PIN / Face ID to protect client notes on shared devices (optional, recommended) |
+## Progress summary (both sides) — rules
+- **Window:** from the last remedy given (or first session) → today. Refreshed daily and before each session.
+- **Inputs (client version):** client's own journal emotions, ritual check-ins, troubling-emotion tags from sessions (worded gently), client feedback. **Never** private notes, reasons or rationale.
+- **Inputs (consultant version):** the above + session troubling-emotion counts across sessions. Private notes are *not* sent to the AI by default (D-28).
+- **Format:** exactly 3 short lines, factual, warm, no medical claims, no remedy suggestions. Labelled "Auto summary".
+- If not enough data (< 3 journal entries): show "Not enough check-ins yet — log how you feel to see your progress."
 
-### B. Today
-| ID | Screen | Content |
-|---|---|---|
-| CN-03 | Today | Greeting · hero **Next session** card (client, type, time, mode, her booking note, Prepare / Start) · day timeline with dots (sessions + free slots) · three quiet tiles: blends to approve · follow-ups due · new notes from clients |
-| CN-04 | Notifications | New booking, reschedule, cancellation, client note/feedback, payment for remedy received |
-
-### C. Session
-| ID | Screen | Content |
-|---|---|---|
-| CN-05 | Session prep | One calm page before the session: her booking note · recent feelings (owl faces, last 14 days) · last session summary · current blend · last feedback & notes · "Start session" |
-| CN-06 | Live session | Timer, Open video call, left mini-panel (her note, feelings, current blend), main writing area with **Private notes 🔒** / **Summary for client** tabs, dictation, autosave |
-| CN-07 | End session | Mark Completed / No-show · follow-up in 2 / 3 / 4 / 6 weeks (or none) · next: Build remedy / Share summary / Done |
-| CN-08 | Share summary | Final edit of the client summary, preview exactly as client sees it (CL-24), Share |
-
-### D. Remedies
-| ID | Screen | Content |
-|---|---|---|
-| CN-09 | Remedy builder | Left: 38 flowers by 7 groups, search, recently used · Right: the blend — flowers, private reason per flower 🔒, drops × times a day, duration, bottle size · Duplicate last blend · Use template |
-| CN-10 | Preview as client | Exactly what CL-25/CL-26 will show (names, gentle descriptions, ritual). No reasons/notes |
-| CN-11 | Approve & send | Confirmation sheet: client, blend, version, price/included → "Approve & send to office" → success with "Share summary" |
-| CN-12 | Blend templates | Saved starting blends (e.g. "Exam season", "Big change"), create / edit |
-| CN-13 | Blends awaiting action | Drafts not yet approved, sent-to-office status (preparing / dispatched / delivered) |
-
-### E. Clients
-| ID | Screen | Content |
-|---|---|---|
-| CN-14 | Clients | Search (name / phone / ID), filters (Upcoming, Follow-up due, New, All), rows with avatar, last & next session, latest feeling face |
-| CN-15 | Client profile | Header (name, ID, age, city, since) + tabs: **Overview** (next session, current blend, feelings trend, latest feedback) · **Sessions** · **Feelings** (journal, if shared) · **Remedies** (versions) · **Feedback** (her notes & ratings) · **Notes** 🔒 |
-| CN-16 | Past session | Date, private notes, shared summary, blend given, her feedback for that session |
-| CN-17 | Book for client | Pick type, mode, slot; payment link sent to client (or mark paid offline) |
-
-### F. Calendar
-| ID | Screen | Content |
-|---|---|---|
-| CN-18 | Calendar | Day / week views, sessions as soft blocks coloured by mode, tap → session prep |
-| CN-19 | Availability | Weekly hours per day, online / in person per block, buffer between sessions, booking window |
-| CN-20 | Time off | Block dates / half-days, affected sessions listed with "Reschedule & notify" |
-| CN-21 | Reschedule | Move a session, client notified automatically |
-
-### G. Follow-ups & listening
-| ID | Screen | Content |
-|---|---|---|
-| CN-22 | Follow-ups | Due / Overdue / Upcoming; each: client, last session, blend end date · WhatsApp nudge · Book for client |
-| CN-23 | Client notes & feedback | Inbox of notes and ratings clients left after sessions (CL-23); mark read; open client |
-
-### H. Library
-| ID | Screen | Content |
-|---|---|---|
-| CN-24 | Bach Flower library | 38 flowers in 7 groups, soft 3D/illustrated flower, search |
-| CN-25 | Flower detail | Approved description (shown to clients) · **his own notes** 🔒 · used in N active blends |
-
-### I. Me
-| ID | Screen | Content |
-|---|---|---|
-| CN-26 | My profile | What clients see on CL-12: portrait, approach, years, languages, quote — edit & preview |
-| CN-27 | Settings | Video link, session reminders, notification preferences, app lock, sign out |
-| CN-28 | My month | Gentle stats: sessions held, returning clients, average session rating, blends sent |
-
-### J. States
-| ID | Screen | Content |
-|---|---|---|
-| CN-29 | Empty & states | No sessions today (calm free day), no follow-ups, offline (notes saved locally, encrypted, sync later) |
-
-## Proposed additions (expert recommendations — owner to confirm)
-1. **Session prep page** (CN-05) — everything he needs 2 minutes before a session on one calm page.
-2. **Dictation** in all note fields — speak notes between sessions instead of typing.
-3. **App lock** (CN-02) — protects sensitive notes if the iPad is shared or left open.
-4. **Blend templates** (CN-12) and **Duplicate last blend** — 30-second remedy building.
-5. **My month** (CN-28) — gentle, non-competitive stats.
-6. **Feelings tab** shows the client's owl-face journal only if the client shares it (D-15).
-
-## Open questions for the owner
-- Which device does Jitu Bhaiya use most — **iPad, laptop or phone**? (Designs are iPad-first with phone versions.)
-- Should he see **remedy payment status** (paid / not paid) for his clients? Default: yes, status only, no amounts.
-- Should he be able to **message clients** inside the app, or only via WhatsApp? Default: WhatsApp nudge only.
+## Open questions
+- D-24 main device · D-30 36 vs 38 flowers · remedy payment status visible to him (default: status only) · in-app messaging (default: WhatsApp only).

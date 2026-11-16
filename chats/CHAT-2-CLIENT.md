@@ -7,6 +7,8 @@
 
 > ⚠️ **UPDATE 2026-11-16 (owner):** The client app is now specified by **`docs/specs/client/00-CLIENT-FLOW-AND-SCREENS.md` (CL-01…CL-54)** and designed in **`design/client-v2/`** (Quiet Luxury, `design/inspiration/README.md`). It replaces C-01…C-14 below where they differ: no questionnaires (optional booking note instead), minimal journal (date/time/emotion/search), separate Goals, post-session feedback & notes (CL-23 → `scheduling.submitSessionFeedback`), floating nav Home · Remedies · (Book) · Shop · Me, font Plus Jakarta Sans.
 
+> ⚠️ **UPDATE 2026-11-16 round 2 (owner):** add **CL-55 Ask BeWise** (AI companion on the client's own data + product suggestions, `companion` module — yours) and **CL-56 progress card** (3 lines from `progress.getProgressSummary`, audience client). Board: `design/client-v2/CL-board-18-progress-ask-bewise.jpg`. New master logo 'BeWise · Holistic Wellness'.
+
 ---
 
 ## 1. Who you are and who you build for
@@ -41,7 +43,7 @@ Design feel: calm, warm, premium, generous whitespace; Cormorant Garamond headin
 | Tables | `carts`, `cart_items`, `wishlists`, `sales_orders`, `order_items`, `return_requests`, `journal_entries`, `client_goals` |
 | Functions others call | *commerce* in `docs/03-CONTRACTS.md` §5 (replace HUB stubs; keep signatures) |
 | Events you emit | `order.placed`, `order.paid`, `order.cancelled` |
-| Events you handle | `formula.sent_to_office` → `createRemedySalesOrder()` (price from `getSetting('remedy.pricing')`, `@decision(D-02)`; ₹0 → mark paid immediately); `payment.captured`/`payment.failed` (purpose sales_order); `fulfilment.stage_changed`, `shipment.dispatched`, `shipment.delivered` → order status; `payment.refunded` |
+| Events you handle | `remedy.given` → `createRemedySalesOrder()` (price from `getSetting('remedy.pricing')`, `@decision(D-02)`; ₹0 → mark paid immediately); `payment.captured`/`payment.failed` (purpose sales_order); `fulfilment.stage_changed`, `shipment.dispatched`, `shipment.delivered` → order status; `payment.refunded` |
 | PWA | Manifest polish, install prompt UX, offline page, **public-only** caching (HUB sets base service worker) |
 | Specs / tests | `docs/specs/client/**`, `tests/e2e/client/**` |
 | Log | `docs/coordination/log/client.md` |
@@ -67,7 +69,7 @@ Consultant/manager/owner routes and modules (`scheduling`, `questionnaires`, `re
 
 - MANAGER fulfilment needs **`order.paid`** with correct items/kinds (C4) — get the payload exactly right.
 - OWNER finance needs sales orders with correct line amounts, tax category per line, and `clientId` (C4).
-- CONSULTANT needs remedy orders to become paid sales orders (handler for `formula.sent_to_office`).
+- CONSULTANT needs remedy orders to become paid sales orders (handler for `remedy.given`).
 
 ## 8. Milestones (in order; one PR each)
 

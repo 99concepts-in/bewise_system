@@ -3,6 +3,7 @@
 > **Owner:** HUB (designed with the business owner). Status: **APPROVED FLOW — designs in progress.**
 > Supersedes the client part of `docs/02-FLOWS-AND-SCREENS.md` (C-01…C-14 → CL-01…CL-54).
 > Visual direction: `design/inspiration/README.md` (Quiet Luxury). Boards: `design/client-v2/`.
+> Round 2 (2026-11-16): + CL-55 Ask BeWise chatbot, + CL-56 progress card. Boards: `design/client-v2/CL-board-18-progress-ask-bewise.jpg`.
 > Screen IDs `CL-xx` are stable — use them in code headers, PRs and logs.
 
 ## Owner changes (2026-11-16)
@@ -120,6 +121,14 @@ ME           Me → Personal details · Addresses · Goals · Reminders & notifi
 | CL-49 | Reminders & notifications | Channels & reminder types |
 | CL-50 | Privacy & data | Consents, journal sharing with consultant, download data, delete account |
 | CL-51 | Help | FAQs, WhatsApp us, policies |
+
+### K. Ask BeWise & progress (added 2026-11-16, round 2)
+| ID | Screen | Content |
+|---|---|---|
+| CL-55 | Ask BeWise (chat) | AI companion: answers from the client's own data (appointments, current blend & ritual, journal emotions, orders, payments) and the product catalogue; quick replies; can set reminders and suggest products with **Add to bag** (client taps to confirm). Caption "Not medical advice · for your blend, ask Jitu Bhaiya". Entry: owl-chat icon on Home header + Help |
+| CL-56 | Progress card | "Since your blend began" — 3 AI lines on Home (CL-08) and My Remedies (CL-26); client-safe inputs only |
+
+**Ask BeWise guardrails:** never diagnoses, never changes or recommends Bach remedies (that is the consultant's role), never shows staff notes, never makes cure claims; suggests booking a follow-up when the client describes ongoing difficulty; urgent-distress language → shows helpline + "contact us" immediately; every conversation logged; client can clear history.
 
 ### J. System states
 | ID | Screen | Content |

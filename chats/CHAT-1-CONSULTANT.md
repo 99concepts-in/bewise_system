@@ -7,6 +7,8 @@
 
 > ⚠️ **UPDATE 2026-11-16 (owner):** No questionnaires in the client flow — **K3 is now optional/P3**. Instead: (1) store the optional booking note `appointments.client_note` (CL-15) and show it in K-01/K-04/K-05; (2) add **`session_feedback`** (rating, tags, notes for consultant) with `submitSessionFeedback()` / `listSessionFeedback()` and event `session_feedback.submitted` — show it on the client timeline (K-04) and Today (K-01). Client journal = emotion + time only (8 emotions). See `docs/03-CONTRACTS.md` and `docs/specs/client/00-CLIENT-FLOW-AND-SCREENS.md`.
 
+> ⚠️ **UPDATE 2026-11-16 round 2 (owner):** Your workspace is now specified by **`docs/specs/consultant/00-CONSULTANT-FLOW-AND-SCREENS.md` (CN-01…CN-27)** and designed in **`design/consultant-v2/`**. Key changes: **no approval workflow** — "Give remedy" sends straight to client + office (`remedy.given`, FormulaStatus draft·given·superseded); client summary optional; **troubling emotions** per session (`progress` module); **3-line AI progress summary** for client + consultant (`getProgressSummary`); configurable Bach library (D-30). These override K4/K5 details below.
+
 ---
 
 ## 1. Who you are and who you build for
@@ -45,7 +47,7 @@ Run `git fetch origin main && git merge --no-edit origin/main`, then open `docs/
 | Modules | `src/modules/scheduling`, `src/modules/questionnaires`, `src/modules/consultation`, `src/modules/remedies` |
 | Tables | `consultation_types`, `availability_rules`, `availability_exceptions`, `appointments`, `appointment_history`, `questionnaire_*`, `consultation_records`, `practitioner_notes` 🔒, `client_summaries`, `follow_ups`, `bach_remedies`, `formula_templates`, `formulas`, `formula_versions`, `formula_items`, `remedy_orders`; view `v_prep_sheet` |
 | Functions others call | everything under *scheduling*, *questionnaires*, *consultation & remedies* in `docs/03-CONTRACTS.md` §5 — replace HUB's stubs with real implementations, keep signatures |
-| Events you emit | `appointment.held/confirmed/rescheduled/cancelled/completed/no_show`, `questionnaire.assigned/submitted`, `formula.approved`, `formula.sent_to_office`, `client_summary.shared`, `followup.due` |
+| Events you emit | `appointment.held/confirmed/rescheduled/cancelled/completed/no_show`, `questionnaire.assigned/submitted`, `formula.approved`, `remedy.given`, `client_summary.shared`, `followup.due` |
 | Events you handle | `payment.captured` & `payment.failed` (appointment purpose → confirm / release hold), `shipment.delivered` (remedy order → start follow-up clock), `appointment.confirmed` (auto-assign questionnaire) |
 | Specs / tests | `docs/specs/consultant/**`, `tests/e2e/consultant/**`, unit tests next to your modules |
 | Log | `docs/coordination/log/consultant.md` |
@@ -62,12 +64,12 @@ Other chats' routes and modules (`(client)`, `(public)`, `(manager)`, `(owner)`,
 | Payment for bookings (`payment.captured`) | OWNER (O2) | In dev, a `@stub` "mark paid" action behind flag `booking` (never in production) |
 | Notifications (confirmations, reminders) | OWNER (O3) via events | Just emit events; don't send messages yourself |
 | Client identity & contact | `crm.getClient()` (HUB/MANAGER) | Use the HUB implementation |
-| Remedy sales order creation | CLIENT (C4) handles `formula.sent_to_office` | Your side is complete once the event is emitted with the right payload |
+| Remedy sales order creation | CLIENT (C4) handles `remedy.given` | Your side is complete once the event is emitted with the right payload |
 
 ## 7. Who depends on you — ship these first
 
 1. **`getAvailableSlots()` + `holdAppointment()` + payment handler** → CLIENT booking (C2). This is on the critical path. Deliver in K1.
-2. **`formula.sent_to_office` + `getPrepSheet()`** → CLIENT remedy order (C4) and MANAGER prep queue (M2). Deliver in K4.
+2. **`remedy.given` + `getPrepSheet()`** → CLIENT remedy order (C4) and MANAGER prep queue (M2). Deliver in K4.
 3. **`getCurrentRemedyForClient()` + `listClientSummaries()`** → CLIENT My Remedies (C5).
 4. **Questionnaire APIs** → CLIENT questionnaire filling (C3).
 
@@ -100,7 +102,7 @@ Other chats' routes and modules (`(client)`, `(public)`, `(manager)`, `(owner)`,
 - Formula: per client; versions v1, v2…; items (remedy, drops, private rationale 🔒), dosage (drops × times/day), duration, bottle size, client instructions, label text.
 - State machine: `draft → in_review → approved → sent_to_office`; new version supersedes previous; approved versions are immutable (edit = new version). Duplicate from previous / from template.
 - **Preview client summary** (K-10) shows exactly what C-06 will show: remedy names, plain-language description, instructions, duration, consultant name, date. Never rationale/notes.
-- **Approve & send to office** creates `remedy_orders` row and emits `formula.sent_to_office` (payload per contracts). Expose `getPrepSheet()` / `v_prep_sheet` for MANAGER.
+- **Approve & send to office** creates `remedy_orders` row and emits `remedy.given` (payload per contracts). Expose `getPrepSheet()` / `v_prep_sheet` for MANAGER.
 - Board reference: `06-consultant-remedy-builder.jpg` — keep the banner "Supports your professional judgement — the system never prescribes."
 
 ### K5 — Session screen, notes, summaries, follow-ups (K-05, K-09)

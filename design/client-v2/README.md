@@ -25,6 +25,7 @@
 | `CL-board-15-payments-invoice-details.jpg` | CL-44 Payments · CL-45 Invoice · CL-47 Personal details |
 | `CL-board-16-addresses-reminders-help.jpg` | CL-48 Addresses · CL-49 Reminders & notifications · CL-51 Help |
 | `CL-board-17-empty-payment-issue-offline.jpg` | CL-52 Empty state · CL-53 Payment issue · CL-54 Offline |
+| `CL-board-18-progress-ask-bewise.jpg` | CL-08 Home with progress card (CL-56) · CL-55 Ask BeWise chat · Ask BeWise product suggestions |
 
 ## Real assets to build with
 | Asset | File | Use |

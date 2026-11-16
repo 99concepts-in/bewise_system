@@ -24,7 +24,7 @@ Legend: 🟢 Client · 🔵 Consultant · 🟠 Manager · 🟣 Owner · ⚙️ S
 | 8 | 🟢 | C-05 | Fills pre-consultation questionnaire (save & resume) | `questionnaire.submitted` |
 | 9 | 🔵 | K-01 → K-04 | Sees booking on Today; opens client profile; reviews questionnaire | |
 | 10 | 🔵 | K-05 | Runs session (online link / in person). Writes **private notes** and a **client-shareable summary** | `consultation_records` |
-| 11 | 🔵 | K-06 | Builds formula from the 38-remedy library, adds rationale (private), dosage & duration → **Approve & send to office** | `formula.approved`, `formula.sent_to_office` |
+| 11 | 🔵 | K-06 | Builds formula from the 38-remedy library, adds rationale (private), dosage & duration → **Approve & send to office** | `formula.approved`, `remedy.given` |
 | 12 | ⚙️ | — | Remedy order created for the client (price per settings; ₹0 if included in fee — D-02) | `remedy_order.created` → sales order (kind=remedy) |
 | 13 | 🟢 | C-06 / C-09 | Sees "Your remedy blend is ready" → pays (can add store products to the **same order**) | `order.paid` |
 | 14 | 🟠 | M-02 | Remedy prep task appears with **prep sheet only** (remedy names, drops, bottle size — no notes) → Preparing → QC | `fulfilment_task` |

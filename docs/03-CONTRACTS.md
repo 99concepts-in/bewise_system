@@ -36,7 +36,9 @@
 | scheduling | CONSULTANT | `consultation_types`¹, `availability_rules`, `availability_exceptions`, `appointments` (+ `client_note`), `appointment_history`, `session_feedback` |
 | questionnaires | CONSULTANT | `questionnaire_templates`, `questionnaire_versions`, `questionnaire_assignments`, `questionnaire_responses` |
 | consultation | CONSULTANT | `consultation_records`, `practitioner_notes` 🔒, `client_summaries`, `follow_ups` |
-| remedies | CONSULTANT | `bach_remedies`, `formula_templates`, `formulas`, `formula_versions`, `formula_items`, `remedy_orders` |
+| remedies | CONSULTANT | `bach_remedies` (configurable, hideable), `formula_templates`, `formulas`, `formula_versions`, `formula_items`, `remedy_orders` |
+| progress | CONSULTANT | `concern_catalog` (editable troubling emotions), `session_concerns`, `progress_summaries` (audience client/consultant) |
+| companion | CLIENT | `companion_conversations`, `companion_messages`, `companion_actions` (Ask BeWise chatbot, CL-55) |
 | journal | CLIENT | `journal_entries` (emotion + logged_at only), `client_goals` (separate from journal) |
 | commerce | CLIENT | `carts`, `cart_items`, `wishlists`, `sales_orders`, `order_items`, `return_requests` |
 | catalog | MANAGER | `collections`, `products`, `product_variants`, `product_images` |
@@ -68,7 +70,7 @@ export type AppointmentMode = 'online' | 'in_person'
 
 export type QuestionnaireAssignmentStatus = 'assigned' | 'in_progress' | 'submitted' | 'reviewed'
 
-export type FormulaStatus = 'draft' | 'in_review' | 'approved' | 'sent_to_office' | 'superseded'
+export type FormulaStatus = 'draft' | 'given' | 'superseded'   // owner 2026-11-16: no approval step; 'given' = sent to client + office
 
 export type SalesOrderKind = 'store' | 'remedy' | 'combined'
 export type SalesOrderStatus =
@@ -120,8 +122,7 @@ Emit with `emitEvent(type, payload, { tx })` inside the same DB transaction as t
 | `appointment.no_show` | scheduling | `appointmentId` | notifications |
 | `questionnaire.assigned` | questionnaires | `assignmentId, clientId, appointmentId?` | notifications |
 | `questionnaire.submitted` | questionnaires | `assignmentId, clientId` | consultant Today (K-01), notifications |
-| `formula.approved` | remedies | `formulaVersionId, clientId` | — |
-| `formula.sent_to_office` | remedies | `formulaVersionId, remedyOrderId, clientId, bottleSizeMl` | commerce (create remedy sales order), notifications |
+| `remedy.given` | remedies | `formulaVersionId, remedyOrderId, clientId, bottleSizeMl` (no approval step) | commerce (create remedy sales order), notifications |
 | `client_summary.shared` | consultation | `summaryId, clientId` | notifications |
 | `followup.due` | consultation (cron) | `followUpId, clientId, consultantId, dueOn` | notifications |
 | `order.placed` | commerce | `salesOrderId, clientId, kind, totalPaise` | — |
@@ -177,12 +178,29 @@ getCurrentRemedyForClient(clientId: string): Promise<ClientRemedyView | null>  /
 getPrepSheet(remedyOrderId: string): Promise<PrepSheet>                // MANAGER: remedies + drops + bottle + label text only
 listFollowUps(q: FollowUpQuery): Promise<Paged<FollowUp>>
 ```
+### progress (CONSULTANT)
+```ts
+listConcernCatalog(): Promise<Concern[]>                                    // editable list: anger, insecurity, loneliness, ...
+setSessionConcerns(input: { appointmentId: string; concernKeys: string[] }): Promise<Result<void>>
+getProgressSummary(input: { clientId: string; audience: 'client' | 'consultant' }): Promise<ProgressSummary | null>
+  // { lines: [string, string, string], since: string, generatedAt: string } — AI-generated, cached; client audience never uses private notes
+```
+Event: `progress_summary.refreshed` (clientId, audience).
+
+### companion (CLIENT) — Ask BeWise
+```ts
+sendCompanionMessage(input: { conversationId?: string; text: string }): Promise<Result<{ conversationId: string; reply: CompanionReply }>>
+  // CompanionReply = { text; quickReplies?: string[]; productSuggestions?: ProductCard[]; actions?: ProposedAction[] }
+confirmCompanionAction(actionId: string): Promise<Result<void>>  // e.g. add_to_bag, set_ritual_reminder — only after the client taps
+```
+Tools the model may call (read-only unless confirmed): my appointments, my current blend & ritual, my journal (emotions), my orders & payments, catalog search, progress summary. Uses the Claude API server-side; load the `claude-api` skill before implementing.
+
 ### commerce (CLIENT)
 ```ts
 getCart(): Promise<Cart>
 addToCart(input: { variantId?: string; remedyOrderId?: string; qty: number }): Promise<Result<Cart>>
 createOrderFromCart(input: { addressId: string; notes?: string }): Promise<Result<{ salesOrderId: string; totalPaise: Paise }>>
-createRemedySalesOrder(input: { remedyOrderId: string; clientId: string; pricePaise: Paise }): Promise<Result<{ salesOrderId: string }>>  // handler of formula.sent_to_office
+createRemedySalesOrder(input: { remedyOrderId: string; clientId: string; pricePaise: Paise }): Promise<Result<{ salesOrderId: string }>>  // handler of remedy.given
 getOrder(id: string): Promise<SalesOrder | null>
 listOrders(q: OrderQuery): Promise<Paged<SalesOrderSummary>>
 setOrderStatusFromFulfilment(input: { salesOrderId: string; status: SalesOrderStatus }): Promise<Result<void>>  // internal: called by commerce's own event handler
@@ -252,7 +270,10 @@ Checked by `requirePermission()` server-side and mirrored in RLS via `has_permis
 | Questionnaire responses | own | ✅ assigned | ❌ | ✅ (D-03) |
 | **Practitioner private notes / formula rationale** | ❌ | ✅ author | ❌ | ❌ by default (D-03) |
 | Client summaries (shareable) | own approved | ✅ | ❌ | view |
-| Formula approve / send to office | — | ✅ | — | — |
+| Give remedy (sends to client + office) | — | ✅ | — | — |
+| Troubling emotions per session | — | ✅ | ❌ | aggregate only |
+| Progress summary | own (client version) | ✅ (consultant version) | ❌ | ❌ |
+| Ask BeWise conversations | own | ❌ | ❌ | aggregate/safety review only |
 | Prep sheet (remedy names, drops, bottle) | — | ✅ | ✅ | ✅ |
 | Client journal (emotions) | own | ✅ if client shares (default on, toggle in CL-50) | ❌ | ❌ |
 | Session feedback & notes for consultant | own (write/edit) | ✅ for own appointments | ❌ | rating only |
