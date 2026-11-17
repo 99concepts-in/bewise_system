@@ -2,6 +2,10 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-17 — Auto-deploy to Hostinger on every commit · branch claude/new-session-94881h
+**Status:** Workflow ready — activates when the owner adds FTP secrets (or the hPanel Git webhook secret)
+**Done:** workflow "Client app → Pages & Hostinger": typecheck → Hostinger build → zip artifact → `hostinger-build` branch → FTP sync of changed files (secrets `HOSTINGER_FTP_SERVER/USERNAME/PASSWORD`, vars `HOSTINGER_FTP_DIR/PROTOCOL/BASE_PATH`) → optional hPanel webhook (`HOSTINGER_WEBHOOK_URL`); deploys queue (no cancel mid-upload); FTP step skips cleanly without secrets. Guide updated.
+
 ## 2026-11-17 — Hostinger hosting package · branch claude/new-session-94881h
 **Status:** Ready — owner hosting on Hostinger 2026-11-18
 **Done:** `pnpm export:hostinger` → `dist/bewise-client-hostinger.zip` (static export + `.htaccess`: https redirect, pretty URLs, 404, gzip, security headers incl. camera permission, noindex, caching); workflow job publishes branch `hostinger-build` + zip artifact for hPanel Git auto-deploy; guide `apps/client/hosting/HOSTINGER.md`. Verified on Apache 2.4 (routes, headers, caching, full browser journey incl. camera, 0 errors)

@@ -1,8 +1,12 @@
-# @owner CLIENT · Publishes the client app preview (apps/client) as a static site to the gh-pages branch.
-# Live at https://<owner>.github.io/bewise_system/ once Settings → Pages → "Deploy from a branch" → gh-pages / (root).
-# Job 2 builds the same app for Hostinger (domain root, .htaccess included) → branch `hostinger-build` + zip artifact.
-# Preview only: on-device demo data, simulated OTP / payments / AI. Not the production deploy (that is Vercel, D-01).
-name: Client preview → GitHub Pages
+# @owner CLIENT · Builds the client app (apps/client) on every commit and deploys it.
+#   Job "pages"     → static export under /<repo>/ → branch gh-pages (GitHub Pages, if enabled)
+#   Job "hostinger" → static export for a domain root + .htaccess →
+#                       1. zip artifact (manual upload)          — always
+#                       2. branch hostinger-build (hPanel Git)    — always
+#                       3. FTP sync to Hostinger                  — when secrets HOSTINGER_FTP_SERVER/USERNAME/PASSWORD exist
+#                       4. ping Hostinger Git auto-deploy webhook — when secret HOSTINGER_WEBHOOK_URL exists
+# Setup: apps/client/hosting/HOSTINGER.md. Preview only: on-device demo data, simulated OTP / payments / AI.
+name: Client app → Pages & Hostinger
 
 on:
   push:
@@ -13,43 +17,38 @@ on:
 permissions:
   contents: write
 
+# deploys queue instead of cancelling each other (a cancelled FTP sync could leave a half-updated site)
 concurrency:
-  group: client-preview-pages
-  cancel-in-progress: true
+  group: client-deploy-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build-and-publish:
+  pages:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/client
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
         with:
           version: 10
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
           cache-dependency-path: apps/client/pnpm-lock.yaml
-
       - run: pnpm install --frozen-lockfile
-
       - run: pnpm typecheck
-
-      - name: Static export
+      - name: Static export (GitHub Pages path)
         run: pnpm build
         env:
           STATIC_EXPORT: '1'
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          NEXT_PUBLIC_NOINDEX: '1'
           NEXT_TELEMETRY_DISABLED: '1'
-
       # GitHub Pages runs Jekyll by default, which drops the `_next/` folder
       - run: touch out/.nojekyll
-
       - name: Publish to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -64,23 +63,27 @@ jobs:
     defaults:
       run:
         working-directory: apps/client
+    env:
+      FTP_SERVER: ${{ secrets.HOSTINGER_FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+      WEBHOOK_URL: ${{ secrets.HOSTINGER_WEBHOOK_URL }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
         with:
           version: 10
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
           cache-dependency-path: apps/client/pnpm-lock.yaml
-
       - run: pnpm install --frozen-lockfile
 
-      - name: Build for Hostinger (domain root)
+      - name: Build for Hostinger
         run: pnpm export:hostinger
+        env:
+          BASE_PATH: ${{ vars.HOSTINGER_BASE_PATH }}
 
       - name: Zip for manual upload (Actions → this run → Artifacts)
         uses: actions/upload-artifact@v4
@@ -89,8 +92,7 @@ jobs:
           path: apps/client/dist/bewise-client-hostinger.zip
           retention-days: 30
 
-      # Hostinger hPanel → Advanced → Git can pull this branch straight into public_html
-      - name: Publish to hostinger-build branch
+      - name: Publish to hostinger-build branch (for hPanel → Advanced → Git)
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -99,3 +101,28 @@ jobs:
           force_orphan: true
           enable_jekyll: true
           commit_message: 'Hostinger build ${{ github.sha }}'
+
+      - name: Deploy to Hostinger over FTP (only changed files)
+        if: env.FTP_SERVER != '' && env.FTP_USERNAME != '' && env.FTP_PASSWORD != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_SERVER }}
+          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          protocol: ${{ vars.HOSTINGER_FTP_PROTOCOL || 'ftps' }}
+          port: ${{ vars.HOSTINGER_FTP_PORT || 21 }}
+          local-dir: apps/client/out/
+          server-dir: ${{ vars.HOSTINGER_FTP_DIR || './' }}
+
+      - name: Trigger Hostinger Git auto-deploy
+        if: env.WEBHOOK_URL != ''
+        run: curl -fsS -X POST "$WEBHOOK_URL" -o /dev/null && echo "Hostinger deploy triggered"
+
+      - name: Summary
+        run: |
+          {
+            echo "### BeWise client → Hostinger"
+            if [ -n "$FTP_SERVER" ]; then echo "- ✅ FTP sync to Hostinger (\`${{ vars.HOSTINGER_FTP_DIR || './' }}\`)"; else echo "- ⏭️ FTP deploy skipped — add secrets HOSTINGER_FTP_SERVER / _USERNAME / _PASSWORD (see apps/client/hosting/HOSTINGER.md)"; fi
+            if [ -n "$WEBHOOK_URL" ]; then echo "- ✅ Hostinger Git webhook pinged"; fi
+            echo "- 📦 Zip artifact + branch \`hostinger-build\` updated"
+          } >> "$GITHUB_STEP_SUMMARY"
