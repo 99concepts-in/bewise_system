@@ -79,6 +79,10 @@ ME        My profile (what clients see) · Settings · My month
 | CN-30 | Business (read-only) | Sales this month vs last, consultations / remedies / shop split, to collect, daily sales chart | phone-11 |
 | CN-31 | Best sellers | Shop vs remedies, product sales & units | phone-11 |
 | CN-32 | Orders & stock (read-only) | Preparing / dispatched / delivered counts, running-low items — managed by Haresh | phone-11 |
+| CN-33 | Session prep + AI case summary | Midnight card (4 lines), safety banner, flags (alcohol-free, allergy, meds), questions to explore | intake-06 |
+| CN-34 | Her answers | Tabs Summary · Answers · Changes; body map; intensities | intake-06 |
+| CN-35 | Flowers to consider | Deterministic reference list with reasons, + Add to blend; never shown to client (D-37) | intake-06 |
+| CN-36 | Safety alert · intake-prefilled Troubling · Since last time | Priority notification, chips tagged 'from intake', AI progress note from check-in | intake-07 |
 | CN-29 | Me (phone hub) | Avatar (real photo), tiles: Library, Follow-ups, Templates, My month, Calendar sync, My profile; Settings, Help, Sign out | phone-10 |
 
 ## Progress summary (both sides) — rules

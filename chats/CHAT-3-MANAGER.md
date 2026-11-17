@@ -6,6 +6,8 @@
 
 > ⚠️ **UPDATE 2026-11-16 (owner):** Your app is now specified by **`docs/specs/manager/00-MANAGER-FLOW-AND-SCREENS.md` (MG-01…MG-31)** and designed in **`design/manager-v2/`** — **phone first + desktop for products**. Decisions: Haresh does production & purchases; courier = **Shiprocket** (rates, create shipment, labels, pickups, tracking webhook); **no refunds** anywhere → replacement orders; he sees all money (collect, pay, expenses). Overrides M-01…M-16 details below.
 
+> ⚠️ **UPDATE 2026-11-17:** prep sheet must show **ALCOHOL-FREE BASE** when `intake.getIntakeFlagsForPrep()` says so.
+
 ---
 
 ## 1. Who you are and who you build for

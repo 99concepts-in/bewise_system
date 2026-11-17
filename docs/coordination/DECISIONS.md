@@ -20,7 +20,7 @@
 | D-13 | Chart of accounts, GST treatment, inventory valuation method | Draft CoA by OWNER chat, validated by a qualified accountant before go-live | O2 | OPEN |
 | D-14 | Multiple consultants in future? | Data model supports N consultants; v1 UI assumes one (Jitu) with consultant picker hidden | K1 | OPEN |
 | D-15 | Client journal shared with consultant by default? | Yes, toggle in Privacy & data (CL-50) | C5, K2 | OPEN |
-| D-18 | Questionnaires in client flow? | **DECIDED 2026-11-16: No.** Optional booking note instead (CL-15). Questionnaire module → P3 | K3, C3 | ✅ DECIDED |
+| D-18 | Questionnaires in client flow? | **SUPERSEDED by D-35 (2026-11-17).** Was: No. Optional booking note instead (CL-15). Questionnaire module → P3 | K3, C3 | ✅ DECIDED |
 | D-19 | Journal scope | **DECIDED: minimal** — date, time, emotion (8 owl faces) + search. Goals separate | C5 | ✅ DECIDED |
 | D-20 | Post-session feedback | **DECIDED: yes** — rating + tags + notes for consultant after every appointment (CL-23), consultant can read | K2, C3 | ✅ DECIDED |
 | D-21 | UI font | **DECIDED: Plus Jakarta Sans** (UI) + Cormorant Garamond (display). Owner approved | Phase 0 | ✅ DECIDED |
@@ -40,3 +40,8 @@
 | D-33 | Consultant sees business sales | **DECIDED: yes**, read-only (sales, splits, best sellers, orders & stock) — CN-30…32 | K | ✅ DECIDED |
 | D-34 | Design v3 "Luxe" (Fraunces + Satoshi, midnight cards, custom Wise Line icons) | **PROPOSED** — applied to Owner module; on approval becomes system-wide via tokens | All | OPEN — owner to approve |
 | D-17 | (see above) Owner name & personal finance / payroll timing / accountant login | Asked in owner spec | O | OPEN |
+| D-35 | Intake / case-taking before booking | **DECIDED 2026-11-17: yes** — full intake before first booking (≈5 min, save & resume), 2-min check-in before follow-ups; emotional (Bach-mapped nuance), physical (body map), sleep/energy, life changes, safety (meds, pregnancy, alcohol-free, allergies), self-harm check, goals | C, K | ✅ DECIDED |
+| D-36 | AI case summary for consultant | **DECIDED: yes** — Claude server-side, consultant-only, consent-based, verify label, never in client view | K | ✅ DECIDED |
+| D-37 | "Flowers to consider" for consultant | **PROPOSED default ON** — deterministic mapping with reasons, reference only, his judgement decides, never shown to client (PRD §6/§15: system must not autonomously prescribe) | K | OPEN — owner to confirm |
+| D-38 | Self-harm question + helpline | **PROPOSED** — Tele-MANAS 14416 / 112; priority flag to consultant; wording reviewed by Jitu Bhaiya (+ professional) before launch; verify numbers | C, K | OPEN |
+

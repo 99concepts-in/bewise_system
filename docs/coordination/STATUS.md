@@ -14,6 +14,7 @@
 | Manager v2 designs | ✅ | 31 phone + 2 desktop screens, Shiprocket, no-refund policy — `design/manager-v2` |
 | Owner designs (v3 Luxe) | 🟨 | Flow drafted + 2 anchor boards; waiting for owner answers |
 | Design v3 Luxe + BeWise icon library (36 SVG) | 🟨 | Proposed — `design/v3-luxe` |
+| Intake & case-taking + AI case summary | ✅ designed | 21 screens — `design/intake-v3`, spec `docs/specs/client/01-INTAKE-CASE-TAKING.md` |
 | Design boards (12) + motion (splash, hero) | ✅ | `design/boards`, `design/motion` |
 | Next.js/Supabase scaffold, UI kit, shells, auth, spine tables, events, contract stubs, seed, PWA, CI | ⬜ | HUB — next step |
 

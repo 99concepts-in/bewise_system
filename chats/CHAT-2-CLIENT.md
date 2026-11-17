@@ -11,6 +11,8 @@
 
 > ⚠️ **UPDATE 2026-11-16 round 3 (owner): NO REFUNDS.** CL-22 cancel → reschedule only; CL-43 return → request replacement (photo); remove refund wording everywhere. See client spec section M.
 
+> ⚠️ **UPDATE 2026-11-17 (owner): INTAKE BEFORE BOOKING.** Build IN-01…IN-12 from `docs/specs/client/01-INTAKE-CASE-TAKING.md` (designs `design/intake-v3/`) using `intake.*` functions; first booking inserts the intake after 'Choose consultation'; follow-ups get the 2-min check-in. Safety screen (IN-09) must show the helpline immediately.
+
 ---
 
 ## 1. Who you are and who you build for

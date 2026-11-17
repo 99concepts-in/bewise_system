@@ -136,6 +136,9 @@ ME           Me → Personal details · Addresses · Goals · Reminders & notifi
 - CL-53 payment issues unaffected (failed payments are never charged).
 - Remove all "Refund" wording from CL-16, CL-17, CL-21, CL-51 policies; policy pages state no refunds, replacement for damaged/wrong items.
 
+### N. Intake before booking (owner, 2026-11-17) — replaces "no questionnaire"
+Full spec: **`01-INTAKE-CASE-TAKING.md`** (IN-01…IN-12). First booking: Choose consultation → **Intake** → Online/In person → Date & time → Review & pay. Follow-up: **2-min check-in** first. CL-15 "Anything you'd like to share?" is folded into IN-02b. Boards: `design/intake-v3/`.
+
 ### L. Later (owner, 2026-11-16)
 | ID | Screen | Content |
 |---|---|---|

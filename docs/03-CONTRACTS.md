@@ -37,6 +37,7 @@
 | questionnaires | CONSULTANT | `questionnaire_templates`, `questionnaire_versions`, `questionnaire_assignments`, `questionnaire_responses` |
 | consultation | CONSULTANT | `consultation_records`, `practitioner_notes` 🔒, `client_summaries`, `follow_ups` |
 | remedies | CONSULTANT | `bach_remedies` (configurable, hideable), `formula_templates`, `formulas`, `formula_versions`, `formula_items`, `remedy_orders` |
+| intake | CONSULTANT (data, AI, mapping) · CLIENT (IN-xx UI) | `intake_templates` (versioned), `intake_responses` 🔒 (encrypted), `intake_checkins`, `intake_flags` (safety, alcohol_free, pregnancy, allergy, medication, minor), `intake_mapping` (statement→flower, editable by consultant), `case_summaries` (AI, consultant-only) |
 | progress | CONSULTANT | `concern_catalog` (editable troubling emotions), `session_concerns`, `progress_summaries` (audience client/consultant) |
 | companion | CLIENT | `companion_conversations`, `companion_messages`, `companion_actions` (Ask BeWise chatbot, CL-55) |
 | journal | CLIENT | `journal_entries` (emotion + logged_at only), `client_goals` (separate from journal) |
@@ -181,6 +182,18 @@ getCurrentRemedyForClient(clientId: string): Promise<ClientRemedyView | null>  /
 getPrepSheet(remedyOrderId: string): Promise<PrepSheet>                // MANAGER: remedies + drops + bottle + label text only
 listFollowUps(q: FollowUpQuery): Promise<Paged<FollowUp>>
 ```
+### intake (CONSULTANT owns data/AI; CLIENT builds IN-01…IN-12) — spec `docs/specs/client/01-INTAKE-CASE-TAKING.md`
+```ts
+getIntakeForm(input: { clientId: string; kind: 'first' | 'followup'; forDependentId?: string }): Promise<IntakeForm>   // pre-filled from last answers
+saveIntakeDraft(input: { intakeId: string; answers: IntakeAnswers }): Promise<Result<void>>
+submitIntake(input: { intakeId: string; answers: IntakeAnswers; consent: { shareWithConsultant: true; aiSummary: boolean } }): Promise<Result<{ intakeId: string; flags: IntakeFlag[] }>>
+attachIntakeToAppointment(input: { intakeId: string; appointmentId: string }): Promise<Result<void>>   // called by booking after hold
+getCaseSummary(appointmentId: string): Promise<CaseSummary | null>      // CONSULTANT only: { summary[4], flags[], questionsToExplore[3], progressNote?[3] }
+getFlowersToConsider(appointmentId: string): Promise<{ flowerId: string; reasons: string[]; intensity: 'mild'|'moderate'|'strong' }[]>  // deterministic from intake_mapping
+getIntakeFlagsForPrep(remedyOrderId: string): Promise<{ alcoholFree: boolean }>   // MANAGER prep sheet
+```
+Events: `intake.submitted` (intakeId, clientId, appointmentId?), `intake.safety_flagged` (clientId, level 'sometimes'|'often') → notifications (consultant priority + owner safety contact if 'often'), `intake.checkin_submitted`.
+
 ### progress (CONSULTANT)
 ```ts
 listConcernCatalog(): Promise<Concern[]>                                    // editable list: anger, insecurity, loneliness, ...
@@ -281,6 +294,8 @@ Checked by `requirePermission()` server-side and mirrored in RLS via `has_permis
 | Client journal (emotions) | own | ✅ if client shares (default on, toggle in CL-50) | ❌ | ❌ |
 | Session feedback & notes for consultant | own (write/edit) | ✅ for own appointments | ❌ | rating only |
 | Booking note (CL-15) | own | ✅ | ❌ | ❌ |
+| Intake answers & AI case summary | own answers (no AI text) | ✅ | ❌ (only `alcoholFree` via prep sheet) | ❌ (aggregate stats only) |
+| Safety flag | — | ✅ priority | ❌ | safety contact only (if 'often') |
 | Catalogue edit | — | — | ✅ | ✅ |
 | Aroma product formulas 🔒 | — | — | ✅ (manufacturing perm) | ✅ |
 | Fulfilment, shipments, inventory, manufacturing, procurement | — | — | ✅ | ✅ |

@@ -46,7 +46,7 @@ PRODUCTION  Production batches → Batch (request → materials → produce → 
 |---|---|---|
 | MG-04 | Orders | Search, type filter (Remedy · Store · Combined), stage pills with counts, rows with due time |
 | MG-05 | Order detail | Client (first name, city, phone/WhatsApp), items, payment status, stage timeline, next action |
-| MG-06 | Prepare remedy | Prep sheet: flowers + drops, bottle, label text; checklist; print/share sheet; Send to QC |
+| MG-06 | Prepare remedy | Prep sheet: flowers + drops, bottle, label text, **ALCOHOL-FREE BASE banner when the client asked for it (intake)**; checklist; print/share sheet; Send to QC |
 | MG-07 | Quality check | Checklist, optional photo, pass / redo with note |
 | MG-08 | Pick & pack | Pick list (products + remedy bottle), packing checklist, parcel weight |
 | MG-09 | Dispatch | Courier pills, AWB (type or **scan**), charge, WhatsApp tracking toggle, print label, Mark dispatched |

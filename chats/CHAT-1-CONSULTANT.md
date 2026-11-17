@@ -9,6 +9,8 @@
 
 > ⚠️ **UPDATE 2026-11-16 round 2 (owner):** Your workspace is now specified by **`docs/specs/consultant/00-CONSULTANT-FLOW-AND-SCREENS.md` (CN-01…CN-27)** and designed in **`design/consultant-v2/`**. Key changes: **no approval workflow** — "Give remedy" sends straight to client + office (`remedy.given`, FormulaStatus draft·given·superseded); client summary optional; **troubling emotions** per session (`progress` module); **3-line AI progress summary** for client + consultant (`getProgressSummary`); configurable Bach library (D-30). These override K4/K5 details below. **Round 3:** phone-first (boards `design/consultant-v2/CN-phone-*`), **calendar sync** Google two-way + Apple CalDAV + ICS feed (`connectCalendar`, `syncCalendar`, `external_busy_blocks` subtracted in slot engine), Me hub CN-29.
 
+> ⚠️ **UPDATE 2026-11-17 (owner): INTAKE & AI CASE SUMMARY.** You own the `intake` module data, the statement→flower mapping (editable), the Claude-powered case summary (server-side, load `claude-api` skill), flags, safety priority alerts and CN-33…CN-36. Spec: `docs/specs/client/01-INTAKE-CASE-TAKING.md`. The questionnaire module (K3) is replaced by this.
+
 ---
 
 ## 1. Who you are and who you build for
