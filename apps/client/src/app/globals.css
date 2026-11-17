@@ -1,0 +1,99 @@
+/**
+ * @module   client-shell
+ * @owner    CLIENT
+ * Purpose:  v4 "Soft Bloom" tokens (design/tokens.json → v4) as Tailwind v4 theme + base styles.
+ */
+@import 'tailwindcss';
+@import '@fontsource-variable/plus-jakarta-sans';
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --color-navy: #182957;
+  --color-navy-2: #243d91;
+  --color-peri: #5e7fb8;
+  --color-peri-50: #eef1fb;
+  --color-peri-100: #dce2f5;
+  --color-ivory: #faf9f5;
+  --color-sage: #82977e;
+  --color-sage-text: #4f6249;
+  --color-sage-100: #dce7d9;
+  --color-beige: #ede5d9;
+  --color-gold: #b89b64;
+  --color-ink: #1b2238;
+  --color-muted: #5b6275;
+  --color-soft: #8a90a0;
+  --color-line: #e9ebf2;
+  --color-rose: #c0475b;
+  --color-rose-50: #fdeef0;
+
+  --color-mood-calm: #bfd8c2;
+  --color-mood-joyful: #f6de8d;
+  --color-mood-grateful: #f4c2c8;
+  --color-mood-hopeful: #b9cbf2;
+  --color-mood-tired: #d6cbef;
+  --color-mood-anxious: #bfe0f2;
+  --color-mood-sad: #c3ccd8;
+  --color-mood-irritated: #f3b1a4;
+
+  --radius-card: 28px;
+  --radius-xl2: 22px;
+  --shadow-card: 0 8px 24px rgba(24, 41, 87, 0.06);
+  --shadow-float: 0 18px 40px rgba(24, 41, 87, 0.18);
+  --shadow-cta: 0 10px 24px rgba(24, 41, 87, 0.28);
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+  body {
+    @apply font-sans text-ink antialiased;
+    background: #faf9f5;
+    overscroll-behavior-y: none;
+  }
+  /* the fixed gradient wash lives behind every screen (cards stay pure white) */
+  .bw-wash {
+    background: linear-gradient(180deg, #dce2f5 0%, #eef0fa 22%, #faf9f5 52%, #e6eee3 100%);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-navy);
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+  button { cursor: pointer; }
+  input, textarea { font: inherit; }
+}
+
+@layer components {
+  .card { @apply rounded-[28px] bg-white shadow-[var(--shadow-card)]; }
+  .h-duo { @apply text-[30px] font-extrabold leading-[1.08] tracking-[-0.02em] text-navy; }
+  .h-duo em { @apply not-italic text-soft; }
+  .h-section { @apply text-[19px] font-bold tracking-[-0.01em] text-navy; }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .safe-b { padding-bottom: max(env(safe-area-inset-bottom), 12px); }
+  .safe-t { padding-top: max(env(safe-area-inset-top), 10px); }
+  .cta-sheen { position: relative; overflow: hidden; isolation: isolate; }
+  .cta-sheen::after {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.22) 50%, transparent 70%);
+    transform: translateX(-120%);
+    animation: sheen 3.6s var(--ease-soft) infinite 1.2s;
+  }
+  .multiply { mix-blend-mode: multiply; }
+}
+
+@keyframes sheen { 0% { transform: translateX(-120%) } 45%, 100% { transform: translateX(120%) } }
+@keyframes floaty { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+@keyframes breathe { 0%, 100% { transform: scale(1); opacity: .55 } 50% { transform: scale(1.06); opacity: .9 } }
+.animate-floaty { animation: floaty 5s ease-in-out infinite; }
+.animate-breathe { animation: breathe 4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
