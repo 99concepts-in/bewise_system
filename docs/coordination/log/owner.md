@@ -2,6 +2,18 @@
 
 > Only the OWNER chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-17 — Owner app v4 design prototype (branch claude/new-session-k130h4)
+**Status:** Design prototype ready for owner review — still waiting for `FOUNDATION: ✅` before O1
+**Done:** `docs/specs/owner/prototype/` — clickable v4 "Soft Bloom" prototype of the Owner app, desktop first + phone
+(floating navy pill nav). Layout from the owner's reference (mood-tracker dashboard): last 7 days as mood pebbles, daily sales
+bars with tooltip, Waiting for you / Alerts list, Ask BeWise owl card, daily insight. 13 screens: home, sales, operations,
+cash & dues, expenses, P&L, reports & GST, approvals (approve/reject works), Ask BeWise, team & permissions + invite
+accountant, business settings, integrations, activity. Light + dark. Sample data only.
+**Contracts changed:** none · **Events:** none · **Migrations:** none
+**Needs from others:** HUB: v4 restyle of owner boards can use this prototype as the reference
+**Breaking changes:** none
+**Next:** owner feedback on the prototype → O1 once the foundation lands
+
 ## 2026-11-17 — Pre-foundation specs: finance engine & admin (branch claude/new-session-k130h4)
 **Status:** Specs drafted — waiting for `FOUNDATION: ✅` before O1
 **Done:** `docs/specs/owner/01…07` — chart of accounts (system keys, tax codes, accountant questions), posting rules per
