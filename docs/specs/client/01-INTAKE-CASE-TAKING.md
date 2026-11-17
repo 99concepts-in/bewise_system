@@ -42,7 +42,9 @@ UPDATE          Client can edit intake answers until 2 h before the session (App
 
 ## 4. Nuance statements → Bach flower mapping (reference for the consultant)
 
-Shown to the client as plain statements; each maps to the flower(s) Dr Bach described for that state. Jitu Bhaiya may edit wording and mapping (`intake_mapping` table, versioned). **Content to be approved by Jitu Bhaiya (D-10).**
+Shown to the client as plain statements; each maps to the flower(s) Dr Bach described for that state. Jitu Bhaiya may edit wording and mapping (`intake_mapping` table, versioned).
+
+> ✅ **Owner decision 2026-11-17:** "Flowers to consider" stays — **visible to Jitu Bhaiya only**. ⏳ **Jitu Bhaiya to review and approve every statement and flower below before launch** (CONTENT-CHECKLIST #4b). Build the mapping as editable data so his changes need no code.
 
 | Feeling chip | Client statement ("which feels closest?") | Flower(s) |
 |---|---|---|
@@ -96,8 +98,8 @@ Shown to the client as plain statements; each maps to the flower(s) Dr Bach desc
 
 ## 6. Safety protocol (IN-09)
 - **No:** continue. **Sometimes / Often:** immediately show the support card (Tele-MANAS **14416**, free, 24×7 — *verify number before launch*), plus "If you are in immediate danger call **112**"; client can continue booking.
-- Creates a **priority flag** for Jitu Bhaiya (notification + rose banner on session prep) and, if "Often", an email to the owner-designated safety contact. The answer is visible only to the consultant (and safety contact).
-- Wording reviewed by Jitu Bhaiya and, ideally, a mental-health professional before launch (D-38).
+- Creates a **priority flag for Jitu Bhaiya only** (push notification + rose banner on session prep) — owner decision 2026-11-17: nobody else is alerted. The answer is visible only to him.
+- Wording reviewed and approved by Jitu Bhaiya before launch (D-38).
 
 ## 7. Cross-module effects
 | Data | Used by |

@@ -42,6 +42,6 @@
 | D-17 | (see above) Owner name & personal finance / payroll timing / accountant login | Asked in owner spec | O | OPEN |
 | D-35 | Intake / case-taking before booking | **DECIDED 2026-11-17: yes** — full intake before first booking (≈5 min, save & resume), 2-min check-in before follow-ups; emotional (Bach-mapped nuance), physical (body map), sleep/energy, life changes, safety (meds, pregnancy, alcohol-free, allergies), self-harm check, goals | C, K | ✅ DECIDED |
 | D-36 | AI case summary for consultant | **DECIDED: yes** — Claude server-side, consultant-only, consent-based, verify label, never in client view | K | ✅ DECIDED |
-| D-37 | "Flowers to consider" for consultant | **PROPOSED default ON** — deterministic mapping with reasons, reference only, his judgement decides, never shown to client (PRD §6/§15: system must not autonomously prescribe) | K | OPEN — owner to confirm |
-| D-38 | Self-harm question + helpline | **PROPOSED** — Tele-MANAS 14416 / 112; priority flag to consultant; wording reviewed by Jitu Bhaiya (+ professional) before launch; verify numbers | C, K | OPEN |
+| D-37 | "Flowers to consider" for consultant | **DECIDED: ON for Jitu Bhaiya only** — deterministic mapping with reasons, reference only, his judgement decides, never shown to client (PRD §6/§15: system must not autonomously prescribe) | K | ✅ DECIDED 2026-11-17: **yes, Jitu Bhaiya only** |
+| D-38 | Self-harm question + helpline | **DECIDED 2026-11-17:** keep the question; client sees Tele-MANAS 14416 / 112 immediately; **alert goes to Jitu Bhaiya only** (no owner/other contact); Jitu Bhaiya reviews wording; verify numbers before launch | C, K | ✅ DECIDED |
 

@@ -192,7 +192,7 @@ getCaseSummary(appointmentId: string): Promise<CaseSummary | null>      // CONSU
 getFlowersToConsider(appointmentId: string): Promise<{ flowerId: string; reasons: string[]; intensity: 'mild'|'moderate'|'strong' }[]>  // deterministic from intake_mapping
 getIntakeFlagsForPrep(remedyOrderId: string): Promise<{ alcoholFree: boolean }>   // MANAGER prep sheet
 ```
-Events: `intake.submitted` (intakeId, clientId, appointmentId?), `intake.safety_flagged` (clientId, level 'sometimes'|'often') → notifications (consultant priority + owner safety contact if 'often'), `intake.checkin_submitted`.
+Events: `intake.submitted` (intakeId, clientId, appointmentId?), `intake.safety_flagged` (clientId, level 'sometimes'|'often') → notifications (**consultant only**, priority — D-38), `intake.checkin_submitted`.
 
 ### progress (CONSULTANT)
 ```ts
@@ -295,7 +295,7 @@ Checked by `requirePermission()` server-side and mirrored in RLS via `has_permis
 | Session feedback & notes for consultant | own (write/edit) | ✅ for own appointments | ❌ | rating only |
 | Booking note (CL-15) | own | ✅ | ❌ | ❌ |
 | Intake answers & AI case summary | own answers (no AI text) | ✅ | ❌ (only `alcoholFree` via prep sheet) | ❌ (aggregate stats only) |
-| Safety flag | — | ✅ priority | ❌ | safety contact only (if 'often') |
+| Safety flag | — | ✅ priority (only him) | ❌ | ❌ |
 | Catalogue edit | — | — | ✅ | ✅ |
 | Aroma product formulas 🔒 | — | — | ✅ (manufacturing perm) | ✅ |
 | Fulfilment, shipments, inventory, manufacturing, procurement | — | — | ✅ | ✅ |
