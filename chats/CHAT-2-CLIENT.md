@@ -13,6 +13,8 @@
 
 > ⚠️ **UPDATE 2026-11-17 (owner): INTAKE BEFORE BOOKING.** Build IN-01…IN-12 from `docs/specs/client/01-INTAKE-CASE-TAKING.md` (designs `design/intake-v3/`) using `intake.*` functions; first booking inserts the intake after 'Choose consultation'; follow-ups get the 2-min check-in. Safety screen (IN-09) must show the helpline immediately.
 
+> 🆕 **UPDATE 2026-11-17: visual design is now v4 "Soft Bloom"** — boards `design/client-v4/`, rules `design/v4-soft-bloom/README.md`, assets `design/assets/v4/` (owl mascot, mood characters, illustrations). Flows/IDs unchanged.
+
 ---
 
 ## 1. Who you are and who you build for

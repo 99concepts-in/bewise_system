@@ -15,7 +15,8 @@
 | Owner designs (v2) | ✅ | 24 phone + 3 computer screens — `design/owner-v2` (personal finance & payroll later) |
 | Design v3 Luxe | ❌ | Rejected by owner — v2 stays |
 | Intake & case-taking + AI case summary | ✅ designed (v2) | `design/intake-v2`, spec `docs/specs/client/01-INTAKE-CASE-TAKING.md` |
-| **ALL 4 MODULES DESIGNED** | ✅ | Next: Phase 0 foundation build (HUB) |
+| **ALL 4 MODULES DESIGNED** (v2) | ✅ | |
+| Client v4 "Soft Bloom" redesign (owner refs) | ✅ designed, awaiting approval | 66 screens — `design/client-v4`; consultant v4 next |
 | Design boards (12) + motion (splash, hero) | ✅ | `design/boards`, `design/motion` |
 | Next.js/Supabase scaffold, UI kit, shells, auth, spine tables, events, contract stubs, seed, PWA, CI | ⬜ | HUB — next step |
 

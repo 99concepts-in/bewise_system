@@ -48,4 +48,5 @@
 | D-40 | Personal finance | **DECIDED: later phase** (not in first release) | O | ✅ DECIDED |
 | D-41 | Payroll | **DECIDED: later phase** | O | ✅ DECIDED |
 | D-42 | Owner greeting name | Pending — app says "Good morning" until the owner gives a name | O | OPEN |
+| D-43 | Design v4 "Soft Bloom" (owner references: Sintelly mobile + mood-tracker dashboard) | **IN PROGRESS 2026-11-17** — client app fully redesigned (`design/client-v4`), 3D owl mascot + 8 mood characters + illustrations; consultant preview done; owner to approve, then consultant/manager/owner follow | All | OPEN — owner to approve |
 
