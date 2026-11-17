@@ -37,11 +37,15 @@
 | D-30 | Bach library size: owner said 36; standard is 38 + Rescue | Configurable library seeded with 38, hideable | K | OPEN |
 | D-31 | Calendar sync | **DECIDED: yes** — Google two-way (OAuth; push sessions, pull busy times), Apple via iCloud CalDAV, private ICS feed for any app; clients get Add-to-calendar. Needs Google Cloud OAuth client (credential) | K1, CN-28 | ✅ DECIDED |
 | D-32 | Apple Health / Google Health Connect | **DECIDED: later phase** — requires native wrapper (Capacitor) since a PWA can't access them; consent per data type | Client P3 | ✅ DECIDED (later) |
-| D-33 | Consultant sees business sales | **DECIDED: yes**, read-only (sales, splits, best sellers, orders & stock) — CN-30…32 | K | ✅ DECIDED |
-| D-34 | Design v3 "Luxe" (Fraunces + Satoshi, midnight cards, custom Wise Line icons) | **PROPOSED** — applied to Owner module; on approval becomes system-wide via tokens | All | OPEN — owner to approve |
+| D-33 | Consultant & manager see business numbers | **DECIDED: yes, sales AND profit** (owner 2026-11-17) — read-only for Jitu Bhaiya (CN-30…32), in reports for Haresh | K, M | ✅ DECIDED |
+| D-34 | Design v3 "Luxe" | **REJECTED 2026-11-17** ("last one was nice, this is basic"). **v2 Quiet Luxury stays** for the whole app (Cormorant Garamond + Plus Jakarta Sans, tone-on-tone cards, no dark hero cards). The custom icon SVGs remain available as an optional asset only | All | ❌ REJECTED |
 | D-17 | (see above) Owner name & personal finance / payroll timing / accountant login | Asked in owner spec | O | OPEN |
 | D-35 | Intake / case-taking before booking | **DECIDED 2026-11-17: yes** — full intake before first booking (≈5 min, save & resume), 2-min check-in before follow-ups; emotional (Bach-mapped nuance), physical (body map), sleep/energy, life changes, safety (meds, pregnancy, alcohol-free, allergies), self-harm check, goals | C, K | ✅ DECIDED |
 | D-36 | AI case summary for consultant | **DECIDED: yes** — Claude server-side, consultant-only, consent-based, verify label, never in client view | K | ✅ DECIDED |
 | D-37 | "Flowers to consider" for consultant | **DECIDED: ON for Jitu Bhaiya only** — deterministic mapping with reasons, reference only, his judgement decides, never shown to client (PRD §6/§15: system must not autonomously prescribe) | K | ✅ DECIDED 2026-11-17: **yes, Jitu Bhaiya only** |
 | D-38 | Self-harm question + helpline | **DECIDED 2026-11-17:** keep the question; client sees Tele-MANAS 14416 / 112 immediately; **alert goes to Jitu Bhaiya only** (no owner/other contact); Jitu Bhaiya reviews wording; verify numbers before launch | C, K | ✅ DECIDED |
+| D-39 | Accountant / CA login | **DECIDED 2026-11-17: yes** — role `accountant`: view & export reports, invoices, bills, ledgers, GST; no edits; no consultation or intake data | O | ✅ DECIDED |
+| D-40 | Personal finance | **DECIDED: later phase** (not in first release) | O | ✅ DECIDED |
+| D-41 | Payroll | **DECIDED: later phase** | O | ✅ DECIDED |
+| D-42 | Owner greeting name | Pending — app says "Good morning" until the owner gives a name | O | OPEN |
 

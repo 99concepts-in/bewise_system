@@ -61,7 +61,7 @@
 ## 3. Shared enums (Postgres enums + `src/lib/enums.ts`)
 
 ```ts
-export type AppRole = 'client' | 'consultant' | 'manager' | 'owner'
+export type AppRole = 'client' | 'consultant' | 'manager' | 'owner' | 'accountant'   // accountant: D-39, read-only finance
   // future: 'prep_staff' | 'manufacturing_staff' | 'accounts' | 'support' | 'inventory'
 
 export type AppointmentStatus =
@@ -303,7 +303,8 @@ Checked by `requirePermission()` server-side and mirrored in RLS via `has_permis
 | Refunds | ❌ none (policy) | ❌ | ❌ | ❌ (credit note for corrections only) |
 | Replacement order (damaged/wrong/RTO) | request | — | ✅ | ✅ |
 | Expense/bill approval | — | — | submit | ✅ approve |
-| Business sales overview (read-only) | — | ✅ (CN-30…32) | ✅ | ✅ |
+| Business sales **and profit** (read-only) | — | ✅ (CN-30…32) | ✅ | ✅ |
+| Accountant (role): reports, invoices, bills, ledgers, GST — view & export only | — | — | — | ✅ invites |
 | Accounting, journals, period close, reports (financial) | — | — | ❌ (ops reports only) | ✅ |
 | People & payroll | — | own payslip (future) | ❌ | ✅ |
 | Personal finance | — | — | ❌ | ✅ only |

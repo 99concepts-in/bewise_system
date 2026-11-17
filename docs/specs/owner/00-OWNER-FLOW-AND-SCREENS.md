@@ -1,8 +1,8 @@
 # Owner Command Centre — Flow & Screen List (v1 draft)
 
-> **Owner:** HUB (designed with the business owner). Status: **DRAFT — waiting for owner feedback.**
+> **Owner:** HUB (designed with the business owner). Status: **APPROVED FLOW (owner answers 2026-11-17) — designs in `design/owner-v2/` (v2 Quiet Luxury).**
 > Supersedes O-01…O-12 in `docs/02-FLOWS-AND-SCREENS.md` once approved. Screen IDs `OW-xx` are stable.
-> **Phone first** (owner, 2026-11-16), computer for deep reports. **Design v3 "Luxe"** (`design/v3-luxe/README.md`). Boards: `design/owner-v2/`.
+> **Phone first** (owner, 2026-11-16), computer for deep reports. **Design v2 Quiet Luxury** (v3 rejected). Boards: `design/owner-v2/`.
 
 ## Design intent
 The owner checks the business several times a day, usually on the phone. In **10 seconds** they should know:
@@ -90,7 +90,26 @@ SETUP       Settings → business & GST, fees & policies, products tax · Integr
 | OW-26 | Command centre (desktop) | All Home + Insights at once |
 | OW-27 | Financial reports (desktop) | P&L / Balance sheet / GST with drill-down, export |
 
-## Open questions for the owner
+## Owner answers (2026-11-17)
+- v3 rejected → v2 Quiet Luxury. Greeting: "Good morning" until a name is given (D-42).
+- **Personal finance → later** (OW-19…21 deferred). **Payroll → later** (OW-18 deferred).
+- **Accountant login → yes** (OW-28 invite, OW-30 accountant desktop view; read-only + export).
+- **Jitu Bhaiya and Haresh see sales and profit** (read-only).
+
+## Added / final screens (first release)
+| ID | Screen | Board |
+|---|---|---|
+| OW-01 Sign in · OW-02 Home · OW-03 Notifications | | owner-01 |
+| OW-04 Sales · OW-05 Clients & sessions · OW-06 Products & stock | | owner-02 |
+| OW-07 Operations · OW-08 Money · OW-09 To collect / To pay | | owner-03 |
+| OW-10 Expenses · OW-11 Profit & loss · OW-12 Reports | | owner-04 |
+| OW-13 Approvals · OW-14 Approval detail · OW-15 Ask BeWise | | owner-05 |
+| OW-16 Team · OW-17 Member permissions · OW-28 Invite accountant | | owner-06 |
+| OW-22 More · OW-23 Business settings · OW-24 Integrations | | owner-07 |
+| OW-25 Activity log · OW-29 GST summary · Quiet day | | owner-08 |
+| OW-26 Command centre (computer) · OW-27 P&L report (computer) · OW-30 Accountant view (computer) | | owner-desktop-09/10/11 |
+
+## (Answered) Open questions
 1. **Your name** for greetings (and is the owner also a consultant)? (D-17)
 2. Do you want **personal finance** in the first release, or later?
 3. **Payroll** now (salaries for Haresh & staff), or later?

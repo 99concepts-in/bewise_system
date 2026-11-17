@@ -1,3 +1,5 @@
+> ❌ **SUPERSEDED** — v3 style rejected. Use **`design/intake-v2/`** (same screens in v2 Quiet Luxury).
+
 # Intake & case-taking — design boards (v3 Luxe, phone)
 
 > Spec: `docs/specs/client/01-INTAKE-CASE-TAKING.md` (IN-01…IN-12 client · CN-33…CN-36 consultant).

@@ -92,7 +92,7 @@ PRODUCTION  Production batches → Batch (request → materials → produce → 
 | ID | Screen | Content |
 |---|---|---|
 | MG-27 | Me hub | Tiles: Appointments, Clients, Products, Stock, Production, Purchases, Reports; Settings, Sign out |
-| MG-28 | Reports | Simple: orders this week, average prep time, courier performance, stock value |
+| MG-28 | Reports | Orders this week, average prep time, courier performance, stock value, **sales & profit** (D-33) |
 | MG-29 | Empty & states | All caught up, offline, failed sync |
 
 ## Owner answers (2026-11-16)

@@ -6,6 +6,8 @@
 
 > ⚠️ **UPDATE 2026-11-16 (owner):** **No refunds** (D-16) — remove refund flows/approvals; credit notes only for owner accounting corrections. Consultant gets read-only business sales views (CN-30…32) — expose `analytics` read functions for them. Shiprocket costs/wallet top-ups appear as supplier/recurring payables.
 
+> ⚠️ **UPDATE 2026-11-17 (owner):** Your screens are now **`docs/specs/owner/00-OWNER-FLOW-AND-SCREENS.md` (OW-xx)**, designs **`design/owner-v2/`** in **v2 Quiet Luxury** (v3 rejected). **Personal finance and payroll are LATER** (skip O6/O7 personal parts). Add role **`accountant`** (read-only reports/invoices/ledgers/GST + export, desktop OW-30). Consultant & manager may see **sales and profit** — expose read-only analytics for them.
+
 ---
 
 ## 1. Who you are and who you build for

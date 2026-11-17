@@ -12,9 +12,10 @@
 | Plan, design system, flows, contracts, protocol, chat briefs | ✅ | **`main` created 2026-11-16** (same as `claude/bewise-wellness-design-6xcg8x`) |
 | Client v2 (54+ screens) · Consultant v2 (phone + iPad) designs | ✅ | `design/client-v2`, `design/consultant-v2` |
 | Manager v2 designs | ✅ | 31 phone + 2 desktop screens, Shiprocket, no-refund policy — `design/manager-v2` |
-| Owner designs (v3 Luxe) | 🟨 | Flow drafted + 2 anchor boards; waiting for owner answers |
-| Design v3 Luxe + BeWise icon library (36 SVG) | 🟨 | Proposed — `design/v3-luxe` |
-| Intake & case-taking + AI case summary | ✅ designed | 21 screens — `design/intake-v3`, spec `docs/specs/client/01-INTAKE-CASE-TAKING.md` |
+| Owner designs (v2) | ✅ | 24 phone + 3 computer screens — `design/owner-v2` (personal finance & payroll later) |
+| Design v3 Luxe | ❌ | Rejected by owner — v2 stays |
+| Intake & case-taking + AI case summary | ✅ designed (v2) | `design/intake-v2`, spec `docs/specs/client/01-INTAKE-CASE-TAKING.md` |
+| **ALL 4 MODULES DESIGNED** | ✅ | Next: Phase 0 foundation build (HUB) |
 | Design boards (12) + motion (splash, hero) | ✅ | `design/boards`, `design/motion` |
 | Next.js/Supabase scaffold, UI kit, shells, auth, spine tables, events, contract stubs, seed, PWA, CI | ⬜ | HUB — next step |
 

@@ -1,8 +1,8 @@
 # Intake & Case-Taking (before booking) — spec v1
 
-> **Owner:** HUB (designed with the business owner, 2026-11-17). Status: **APPROVED IN PRINCIPLE — designs in `design/intake-v3/`**.
+> **Owner:** HUB (designed with the business owner, 2026-11-17). Status: **APPROVED IN PRINCIPLE — designs in `design/intake-v2/` (v2 Quiet Luxury)**.
 > Supersedes D-18 ("no questionnaire"). Client screens **IN-01…IN-12** (client chat builds UI), data + AI + consultant views
-> **CN-33…CN-36** (consultant chat). Design language: v3 Luxe.
+> **CN-33…CN-36** (consultant chat). Design language: v2 Quiet Luxury.
 
 ## 1. Why
 Jitu Bhaiya needs a proper case before he meets someone: what is troubling them emotionally, how it shows up in the body,

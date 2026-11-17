@@ -1,6 +1,8 @@
 # Design v3 "Luxe" — richer typography, custom icons, midnight moments
 
-> **Owner:** HUB. Status: **PROPOSED 2026-11-16 (owner asked: "make design better, fonts look bland, create our own icon library")** — first applied to the Owner module (`design/owner-v2/`). Once approved it applies to **all four modules via tokens**; earlier client/consultant/manager boards keep their layouts and pick up v3 type, icons and hero cards at build time.
+> ❌ **REJECTED by the owner 2026-11-17 — do NOT use v3 typography, midnight cards or texture.** Kept for record. The individual icon SVGs may be used only if the owner later approves them.
+>
+> **Owner:** HUB. Former status: PROPOSED 2026-11-16 (owner asked: "make design better, fonts look bland, create our own icon library")** — first applied to the Owner module (`design/owner-v2/`). Once approved it applies to **all four modules via tokens**; earlier client/consultant/manager boards keep their layouts and pick up v3 type, icons and hero cards at build time.
 
 ## What changes vs v2
 | | v2 (Quiet Luxury) | v3 (Luxe) |

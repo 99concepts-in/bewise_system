@@ -76,7 +76,7 @@ ME        My profile (what clients see) · Settings · My month
 | CN-26 | My month | Sessions, returning clients, rating, remedies given, top troubling emotions | 15 |
 | CN-27 | Empty & states | Quiet day, offline (notes saved encrypted, sync later) | 15 |
 | CN-28 | Calendar sync | Google (connected account, add sessions, block busy times), Apple/iCloud connect, subscribe link, privacy note | phone-07 |
-| CN-30 | Business (read-only) | Sales this month vs last, consultations / remedies / shop split, to collect, daily sales chart | phone-11 |
+| CN-30 | Business (read-only) | Sales **and profit** this month vs last (D-33), consultations / remedies / shop split, to collect, daily sales chart | phone-11 |
 | CN-31 | Best sellers | Shop vs remedies, product sales & units | phone-11 |
 | CN-32 | Orders & stock (read-only) | Preparing / dispatched / delivered counts, running-low items — managed by Haresh | phone-11 |
 | CN-33 | Session prep + AI case summary | Midnight card (4 lines), safety banner, flags (alcohol-free, allergy, meds), questions to explore | intake-06 |
