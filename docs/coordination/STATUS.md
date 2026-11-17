@@ -20,6 +20,9 @@
 | Design boards (12) + motion (splash, hero) | ✅ | `design/boards`, `design/motion` |
 | Next.js/Supabase scaffold, UI kit, shells, auth, spine tables, events, contract stubs, seed, PWA, CI | ⬜ | HUB — next step |
 
+## Chat briefs
+**v2 briefs ready (2026-11-17):** `chats/CHAT-1-CONSULTANT.md`, `CHAT-2-CLIENT.md`, `CHAT-3-MANAGER.md`, `CHAT-4-OWNER.md` — consolidate every decision D-01…D-43 (fees ₹1,000 / ₹800 incl. remedy, no refunds, intake, Shiprocket, accountant, v4 design).
+
 ## Modules
 
 | Milestone | Chat | Status | PR | Live | Notes |

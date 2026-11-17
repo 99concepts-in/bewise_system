@@ -6,14 +6,14 @@
 | ID | Question | Default used until decided | Needed by | Status |
 |---|---|---|---|---|
 | D-01 | Tech stack & hosting | Next.js 15 + TypeScript + Tailwind + shadcn/ui · Supabase (Mumbai) · Vercel · Razorpay | Phase 0 | **OPEN — recommend approve** |
-| D-02 | Is the remedy blend charged separately or included in the consultation fee? | Separate remedy order; price from setting `remedy.pricing` (placeholder ₹0 → configurable) | K4, C4 | OPEN |
+| D-02 | Remedy charged separately? | **DECIDED 2026-11-17: remedy INCLUDED in the consultation fee** — remedy given after a paid session creates a ₹0 remedy order; **reorders** are charged at `remedy.reorder_price` (owner to set) | K4, C4 | ✅ DECIDED |
 | D-03 | Can the owner read practitioner private notes & questionnaire answers? | **No** by default; break-glass permission with audit | K2 | OPEN |
 | D-04 | Client sign-in method | Phone OTP (+91) primary, email fallback; staff email + password | Phase 0 | OPEN — needs SMS provider (MSG91/Twilio) |
 | D-05 | Payment account | Razorpay test keys in dev; live keys at go-live; GSTIN & legal entity name for invoices | O2 | OPEN — credentials needed |
 | D-06 | Courier partner | **DECIDED: Shiprocket** (multiple couriers, rates, labels, pickups, tracking); manual AWB fallback. Needs Shiprocket API credentials | M2 | ✅ DECIDED |
 | D-07 | WhatsApp provider | Meta WhatsApp Cloud API (or BSP like Interakt/AiSensy); templates need Meta approval | O3 | OPEN |
 | D-08 | Cancellation / reschedule policy | **No refunds** (D-16). Default: reschedule free ≥24h before; <24h one reschedule; no-show forfeits — owner to confirm the reschedule window | K1, C2 | PARTLY DECIDED |
-| D-09 | Consultation types, durations, fees, online meeting tool | First consultation 60 min, Follow-up 30 min, fees placeholder; consultant's fixed Google Meet/Zoom link | K1, O1 | OPEN |
+| D-09 | Consultation types & fees | **DECIDED 2026-11-17: First consultation ₹1,000 · Follow-up ₹800 — both include the remedy blend.** Durations default 60 / 30 min (confirm); online link = consultant's Google Meet/Zoom | K1, O1 | ✅ DECIDED (fees) |
 | D-10 | Source & approval of Bach Flower library content | Names + 7 groups seeded; descriptions written/approved by Jitu Bhaiya before go-live | K4 | OPEN |
 | D-11 | Manager scope (Haresh) | **DECIDED:** office ops, catalogue (phone + **computer**), inventory, **production & purchases**, all money follow-ups (collect + pay + expenses); no accounting/approvals | Phase 0 | ✅ DECIDED |
 | D-12 | Domain, email sender, brand email | e.g. bewisewellness.in, `care@` sender | Go-live | OPEN |
@@ -48,5 +48,5 @@
 | D-40 | Personal finance | **DECIDED: later phase** (not in first release) | O | ✅ DECIDED |
 | D-41 | Payroll | **DECIDED: later phase** | O | ✅ DECIDED |
 | D-42 | Owner greeting name | Pending — app says "Good morning" until the owner gives a name | O | OPEN |
-| D-43 | Design v4 "Soft Bloom" (owner references: Sintelly mobile + mood-tracker dashboard) | **IN PROGRESS 2026-11-17** — client app fully redesigned (`design/client-v4`), 3D owl mascot + 8 mood characters + illustrations; consultant preview done; owner to approve, then consultant/manager/owner follow | All | OPEN — owner to approve |
+| D-43 | Design v4 "Soft Bloom" (owner refs: Sintelly mobile + mood-tracker dashboard) | **ACCEPTED 2026-11-17 for the client app; v4 is the visual language for the whole build** (tokens `design/tokens.json` → `v4`, rules `design/v4-soft-bloom/README.md`). Consultant/manager/owner boards to be restyled in v4; until then build their layouts from v2 boards with v4 tokens | All | ✅ DECIDED |
 

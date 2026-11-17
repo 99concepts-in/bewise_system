@@ -11,8 +11,8 @@
 | 3a | **Website: www.jitendrakhimlani.com** | CL-12 "Visit website" link, CN-24 profile field, public site about/footer | ✅ added 2026-11-16 | Social: @jitubhaiyajgd (Instagram, Facebook, X) |
 | 4 | Bach Flower library: 36 or 38? + approved descriptions | CN-22/23, CL-27 | ⏳ D-30, D-10 | |
 | 4b | **Jitu Bhaiya: review the 38 intake statements → flowers** and the self-harm question wording | Intake IN-04, IN-09 · CN-35 | ⏳ **REMIND OWNER** | Table in `docs/specs/client/01-INTAKE-CASE-TAKING.md` §4 and §6 |
-| 5 | Consultation fees & durations, cancellation policy | CL-11, CL-16 | ⏳ D-08, D-09 | |
-| 6 | Real product photos, ingredients, sizes, prices | Shop | ⏳ | Brand guide §6: real photography for the live store |
+| 5 | Consultation fees & durations, cancellation policy | CL-11, CL-16 | ✅ fees ₹1,000 / ₹800 incl. remedy (durations & reschedule window to confirm) — D-08, D-09 | |
+| 6 | Real product photos, ingredients, sizes, prices | Shop | ⏳ **Owner sending product list 2026-11-18** — also set remedy reorder price | Brand guide §6: real photography for the live store |
 | 7 | Studio address & map (in-person sessions) | CL-13, CL-19 | ⏳ | |
 | 8 | Logo SVG master ("Holistic Wellness") | Everywhere | ⏳ D-23 | Designer to vectorise |
 | 8a | Google Cloud OAuth client (Calendar API) + Apple ID app-specific password for iCloud calendar | CN-28 calendar sync | ⏳ | Credentials, set up at build time |
