@@ -15,6 +15,7 @@ import { AppHeader } from '@/components/shell'
 import { IconBtn, Item, Reveal, buzz, cx, spring } from '@/components/ui'
 import { COLLECTIONS, PRODUCTS } from '@/lib/data'
 import { useApp } from '@/lib/store'
+import { BP } from '@/lib/asset'
 
 export default function Shop() {
   const router = useRouter()
@@ -57,8 +58,8 @@ export default function Shop() {
         {!q && (
           <Item>
             <Link href="/app/shop/sleep-oil" className="relative block h-[190px] overflow-hidden rounded-[30px] bg-[linear-gradient(135deg,#e9e4fb,#f8eef3_60%,#fbf3dc)] p-6 shadow-[var(--shadow-card)]">
-              <motion.img src="/img/moon.webp" alt="" aria-hidden className="absolute -right-6 -top-4 h-[120px] opacity-90" animate={{ y: [0, -6, 0] }} transition={{ duration: 6, repeat: Infinity }} />
-              <motion.img src="/img/p-dropper.webp" alt="" aria-hidden className="absolute bottom-4 right-10 h-[140px] drop-shadow-[0_16px_16px_rgba(24,41,87,.2)]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ ...spring, delay: 0.2 }} />
+              <motion.img src={`${BP}/img/moon.webp`} alt="" aria-hidden className="absolute -right-6 -top-4 h-[120px] opacity-90" animate={{ y: [0, -6, 0] }} transition={{ duration: 6, repeat: Infinity }} />
+              <motion.img src={`${BP}/img/p-dropper.webp`} alt="" aria-hidden className="absolute bottom-4 right-10 h-[140px] drop-shadow-[0_16px_16px_rgba(24,41,87,.2)]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ ...spring, delay: 0.2 }} />
               <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-peri">The evening ritual</p>
               <p className="mt-1 max-w-[180px] text-[24px] font-extrabold leading-tight tracking-[-0.02em] text-navy">Wind down, <span className="text-soft">gently</span></p>
               <span className="mt-4 inline-flex h-10 items-center rounded-full bg-navy px-5 text-[14px] font-semibold text-white">Explore</span>
@@ -72,7 +73,7 @@ export default function Shop() {
               {COLLECTIONS.map((c, i) => (
                 <motion.button key={c.key} onClick={() => tile(c.key)} whileTap={{ scale: 0.95 }} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 + i * 0.04 }}
                   className={cx('relative flex h-[118px] flex-col justify-end overflow-hidden rounded-[24px] p-2.5 text-left shadow-[var(--shadow-card)]', col === c.key && 'ring-2 ring-navy')} style={{ background: c.tint }}>
-                  <img src={`/img/${c.img}.webp`} alt="" aria-hidden className="multiply absolute inset-x-0 top-0 h-[84px] w-full object-cover object-top" loading="lazy" />
+                  <img src={`${BP}/img/${c.img}.webp`} alt="" aria-hidden className="multiply absolute inset-x-0 top-0 h-[84px] w-full object-cover object-top" loading="lazy" />
                   <span className="relative rounded-full bg-white/85 px-2.5 py-1 text-center text-[12px] font-bold text-navy backdrop-blur">{c.label}</span>
                 </motion.button>
               ))}
@@ -104,7 +105,7 @@ export default function Shop() {
           </div>
           {list.length === 0 ? (
             <div className="card p-8 text-center">
-              <img src="/img/owl-read.webp" alt="" className="mx-auto h-24" />
+              <img src={`${BP}/img/owl-read.webp`} alt="" className="mx-auto h-24" />
               <p className="mt-3 text-[15px] font-semibold text-navy">{saved ? 'Tap ♡ on anything you love — it’ll wait here.' : q ? `Nothing found for “${q}”` : 'Nothing here yet'}</p>
             </div>
           ) : (

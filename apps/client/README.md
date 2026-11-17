@@ -17,6 +17,17 @@ pnpm assets         # re-cut sprites from design/assets (Python 3 + Pillow + num
 ```
 Demo sign-in code: **246810** (no SMS is sent). Me → **Explore with sample data** loads a returning-client journey.
 
+## Live preview (GitHub Pages)
+`.github/workflows/client-preview-pages.yml` builds a static export on every push to this branch (or `main`) that touches
+`apps/client/**` and publishes it to the **`gh-pages`** branch. Turn it on once: **Settings → Pages → Build and deployment →
+Source: Deploy from a branch → `gh-pages` / `(root)`**. URL: `https://exceptionalappstudios-ship-it.github.io/bewise_system/`.
+The repo is private, so Pages needs a plan that includes Pages for private repositories (GitHub Pro / Team / Enterprise).
+Local equivalent:
+```bash
+STATIC_EXPORT=1 NEXT_PUBLIC_BASE_PATH=/bewise_system pnpm build   # → out/
+```
+In export mode, session/order detail pages use `?id=` URLs (ids are created on the device) and product pages are pre-rendered.
+
 ## Stack
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 (v4 "Soft Bloom" tokens in `src/app/globals.css`) ·
 Motion (`motion/react`) for springs, shared-layout pills, sheets, page reveals · zustand (on-device store) ·

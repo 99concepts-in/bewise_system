@@ -19,6 +19,7 @@ import { emptyIntake, useApp, type Appointment, type IntakeAnswers } from '@/lib
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
 import { downloadIcs, googleCalUrl, sessionIcs } from '@/lib/ics'
 import * as I from './intake'
+import { BP } from '@/lib/asset'
 
 const INTAKE = ['intro', 'who', 'feelings', 'nuance', 'body', 'sleep', 'life', 'safety', 'gentle', 'goals', 'review', 'saved'] as const
 const COUNTED = ['who', 'feelings', 'nuance', 'body', 'sleep', 'life', 'safety', 'gentle']
@@ -205,7 +206,7 @@ function Choose({ type, setType, canFollow, onMeet }: { type: ConsultationId | n
         )
       })}
       <motion.button onClick={onMeet} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="card flex w-full items-center gap-4 p-4 text-left">
-        <img src="/img/jitu.webp" alt="" className="size-14 rounded-full object-cover ring-4 ring-peri-50" />
+        <img src={`${BP}/img/jitu.webp`} alt="" className="size-14 rounded-full object-cover ring-4 ring-peri-50" />
         <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Meet Jitu Bhaiya</span><span className="text-[13px] text-muted">{CONSULTANT.title} · {CONSULTANT.stats[0]}</span></span>
         <ChevronRight className="size-5 text-soft" />
       </motion.button>
@@ -218,7 +219,7 @@ function MeetSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Sheet open={open} onClose={onClose} title="Meet your consultant" tall>
       <div className="relative -mx-5 -mt-3 h-[300px] overflow-hidden">
-        <img src="/img/jitu-portrait.webp" alt="Jitu Bhaiya, smiling" className="h-full w-full object-cover object-[50%_20%]" />
+        <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitu Bhaiya, smiling" className="h-full w-full object-cover object-[50%_20%]" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white to-transparent" />
       </div>
       <h2 className="h-duo -mt-6 text-[28px]">Jitu <em>Bhaiya</em></h2>
@@ -247,8 +248,8 @@ function Saved() {
 
 function Mode({ mode, setMode }: { mode?: 'online' | 'in_person'; setMode: (m: 'online' | 'in_person') => void }) {
   const opts = [
-    { v: 'online' as const, icon: <Laptop className="size-7" />, t: 'Online', d: 'Video call · link shared in the app', img: '/img/cat-calm.webp' },
-    { v: 'in_person' as const, icon: <MapPin className="size-7" />, t: 'In person', d: 'BeWise studio, Vadodara · address shared after booking', img: '/img/cat-consult.webp' },
+    { v: 'online' as const, icon: <Laptop className="size-7" />, t: 'Online', d: 'Video call · link shared in the app', img: `${BP}/img/cat-calm.webp` },
+    { v: 'in_person' as const, icon: <MapPin className="size-7" />, t: 'In person', d: 'BeWise studio, Vadodara · address shared after booking', img: `${BP}/img/cat-consult.webp` },
   ]
   return (
     <div className="space-y-4">
@@ -348,7 +349,7 @@ function Review({ c, slot, mode, holdUntil, onExpire }: { c: (typeof CONSULTATIO
       <h1 className="h-duo">Review & <em>pay</em></h1>
       <div className="card p-5">
         <div className="flex items-center gap-4 border-b border-line pb-4">
-          <img src="/img/jitu.webp" alt="" className="size-16 rounded-full object-cover" />
+          <img src={`${BP}/img/jitu.webp`} alt="" className="size-16 rounded-full object-cover" />
           <div><p className="text-[19px] font-extrabold text-navy">Jitu Bhaiya</p><p className="text-[13px] text-muted">{CONSULTANT.title}</p></div>
         </div>
         {[
@@ -394,7 +395,7 @@ function Booked({ a }: { a: Appointment }) {
       </motion.div>
       <p className="mt-3 text-center text-[13px] text-muted">Receipt {a.code} is in Payments. Jitu Bhaiya will read your answers before you meet.</p>
       <div className="mt-auto space-y-3 pb-3 pt-6 safe-b">
-        <Btn full onClick={() => router.replace(`/app/sessions/${a.id}`)}>View appointment</Btn>
+        <Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View appointment</Btn>
         <Btn full variant="white" onClick={() => setCal(true)}><CalendarPlus className="size-5" /> Add to calendar</Btn>
       </div>
       <Sheet open={cal} onClose={() => setCal(false)} title="Add to calendar">

@@ -1,17 +1,19 @@
 'use client'
 /** @module commerce-ux @owner CLIENT @screens CL-42 Order tracking · CL-43 Request a replacement (no refunds, D-16) */
-import { useParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
 import { Camera, Check, Package, Truck } from 'lucide-react'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { AppHeader } from '@/components/shell'
 import { Btn, Chip, Sheet, cx, ease, toast } from '@/components/ui'
 import { useApp } from '@/lib/store'
 import { addDays, fmtDay, formatINR } from '@/lib/format'
 import { STAGES, stageOf } from '@/lib/orders'
 
-export default function OrderDetail() {
-  const { id } = useParams<{ id: string }>()
+export default function Page() { return <Suspense><OrderDetail /></Suspense> }
+
+function OrderDetail() {
+  const id = useSearchParams().get('id') ?? ''
   const o = useApp((s) => s.orders.find((x) => x.id === id))
   const [rep, setRep] = useState(false)
   if (!o) return <main className="px-5"><AppHeader back /><p className="mt-10 text-center text-muted">Order not found.</p></main>

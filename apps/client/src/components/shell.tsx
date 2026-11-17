@@ -15,6 +15,7 @@ import { Btn, Chrome, IconBtn, Sheet, buzz, spring, toast, useChrome } from './u
 import { MOODS, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { fmtTime, fmtDay } from '@/lib/format'
+import { BP } from '@/lib/asset'
 
 export const useUi = create<{ navHidden: boolean; setNavHidden: (v: boolean) => void }>((set) => ({ navHidden: false, setNavHidden: (v) => set({ navHidden: v }) }))
 
@@ -117,7 +118,7 @@ function NoticeSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
     <Sheet open={open} onClose={onClose} title="Updates">
       <h2 className="h-duo mt-1 text-[26px]">Your <em>updates</em></h2>
       {notices.length === 0 ? (
-        <div className="py-10 text-center"><img src="/img/owl-sleep.webp" alt="" className="mx-auto h-28" /><p className="mt-3 text-[14px] text-muted">All quiet for now. We’ll let you know when something needs you.</p></div>
+        <div className="py-10 text-center"><img src={`${BP}/img/owl-sleep.webp`} alt="" className="mx-auto h-28" /><p className="mt-3 text-[14px] text-muted">All quiet for now. We’ll let you know when something needs you.</p></div>
       ) : (
         <ul className="mt-4 space-y-2">
           {notices.map((n, i) => (

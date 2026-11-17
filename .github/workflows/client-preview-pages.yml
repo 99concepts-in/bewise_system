@@ -1,0 +1,59 @@
+# @owner CLIENT · Publishes the client app preview (apps/client) as a static site to the gh-pages branch.
+# Live at https://<owner>.github.io/bewise_system/ once Settings → Pages → "Deploy from a branch" → gh-pages / (root).
+# Preview only: on-device demo data, simulated OTP / payments / AI. Not the production deploy (that is Vercel, D-01).
+name: Client preview → GitHub Pages
+
+on:
+  push:
+    branches: [claude/new-session-94881h, main]
+    paths: ['apps/client/**', '.github/workflows/client-preview-pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: client-preview-pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/client
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: apps/client/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm typecheck
+
+      - name: Static export
+        run: pnpm build
+        env:
+          STATIC_EXPORT: '1'
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          NEXT_TELEMETRY_DISABLED: '1'
+
+      # GitHub Pages runs Jekyll by default, which drops the `_next/` folder
+      - run: touch out/.nojekyll
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: apps/client/out
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: 'Client preview build ${{ github.sha }}'

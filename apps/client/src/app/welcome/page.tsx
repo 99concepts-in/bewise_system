@@ -9,6 +9,7 @@ import { AnimatePresence, motion, type PanInfo } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { LogoMark, Mascot, MoodImg } from '@/components/brand'
 import { Btn, ease, cx } from '@/components/ui'
+import { BP } from '@/lib/asset'
 
 const SLIDES = [
   { lead: 'A gentle conversation about how you', em: 'feel', sub: 'Talk with Jitu Bhaiya — online or in person. No rush, no judgement.' },
@@ -132,7 +133,7 @@ function ArtTalk() {
       </Float>
       <Float className="bottom-[14%] right-[7%]" delay={0.5} dy={8}>
         <div className="flex items-center gap-2 rounded-[20px] rounded-br-md bg-navy px-4 py-2.5 text-[14px] font-semibold text-white shadow-[var(--shadow-float)]">
-          <img src="/img/jitu.webp" alt="" className="size-7 rounded-full object-cover" />Take your time.
+          <img src={`${BP}/img/jitu.webp`} alt="" className="size-7 rounded-full object-cover" />Take your time.
         </div>
       </Float>
       <Float className="right-[10%] top-[12%]" delay={0.7}><MoodImg mood="hopeful" size={48} /></Float>
@@ -147,10 +148,10 @@ function ArtEssence() {
   return (
     <div className="relative h-full">
       <Halo size={240} />
-      <Float className="left-[6%] top-[14%]" delay={0.1} dy={6}><img src="/img/f-rose.webp" alt="" className="h-[92px] w-auto" /></Float>
-      <Float className="right-[4%] top-[8%]" delay={0.25} dy={8}><img src="/img/f-mimulus.webp" alt="" className="h-[118px] w-auto" /></Float>
+      <Float className="left-[6%] top-[14%]" delay={0.1} dy={6}><img src={`${BP}/img/f-rose.webp`} alt="" className="h-[92px] w-auto" /></Float>
+      <Float className="right-[4%] top-[8%]" delay={0.25} dy={8}><img src={`${BP}/img/f-mimulus.webp`} alt="" className="h-[118px] w-auto" /></Float>
       <div className="absolute left-1/2 top-[8%] -translate-x-1/2">
-        <motion.img src="/img/p-dropper.webp" alt="" className="h-[150px] w-auto drop-shadow-[0_14px_16px_rgba(24,41,87,.2)]"
+        <motion.img src={`${BP}/img/p-dropper.webp`} alt="" className="h-[150px] w-auto drop-shadow-[0_14px_16px_rgba(24,41,87,.2)]"
           initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease }} />
         {[0, 1, 2].map((k) => (
           <motion.span key={k} className="absolute left-1/2 top-[150px] block size-3 -translate-x-1/2 rounded-[50%_50%_50%_50%/60%_60%_40%_40%] bg-[linear-gradient(180deg,#e7b768,#b77a2c)]"

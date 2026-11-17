@@ -2,9 +2,9 @@
 /**
  * @module   scheduling-ux
  * @owner    CLIENT
- * @screens  CL-19 Appointment detail · CL-20 Waiting room · CL-21/22 Can't make it? (reschedule only, D-08/D-16) · CL-23 Feedback · CL-58 calendar
+ * @screens  (route /app/sessions/view?id=…) CL-19 Appointment detail · CL-20 Waiting room · CL-21/22 Can't make it? (reschedule only, D-08/D-16) · CL-23 Feedback · CL-58 calendar
  */
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
 import { CalendarPlus, Check, Clock, Droplets, FileText, Headphones, Laptop, MapPin, Sun, Video } from 'lucide-react'
 import { Suspense, useEffect, useState } from 'react'
@@ -15,12 +15,13 @@ import { CONSULTATIONS, istDate, slotsFor, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { addDays, fmtDay, fmtLongDay, fmtTime, formatINR, startOfDay } from '@/lib/format'
 import { downloadIcs, sessionIcs } from '@/lib/ics'
+import { BP } from '@/lib/asset'
 
 export default function Page() { return <Suspense><Detail /></Suspense> }
 
 function Detail() {
-  const { id } = useParams<{ id: string }>()
   const params = useSearchParams()
+  const id = params.get('id') ?? ''
   const router = useRouter()
   const a = useApp((s) => s.appointments.find((x) => x.id === id))
   const now = useNow(1000)
@@ -54,7 +55,7 @@ function Detail() {
 
       <div className="mt-4 space-y-3">
         <div className="card divide-y divide-line px-5">
-          <Row icon={<img src="/img/jitu.webp" alt="" className="size-10 rounded-full object-cover" />} t="Jitu Bhaiya" d="Bach Remedy Therapist" />
+          <Row icon={<img src={`${BP}/img/jitu.webp`} alt="" className="size-10 rounded-full object-cover" />} t="Jitu Bhaiya" d="Bach Remedy Therapist" />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{a.mode === 'online' ? <Laptop className="size-5" /> : <MapPin className="size-5" />}</span>} t={`${c.name} · ${c.minutes} min`} d={a.mode === 'online' ? 'Online video call' : 'BeWise studio, Vadodara'} />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><FileText className="size-5" /></span>} t={`Paid ${formatINR(a.amountPaise)}`} d="Remedy blend included · receipt in Payments" />
         </div>
@@ -97,7 +98,7 @@ function Detail() {
       )}
 
       <RescheduleSheet open={move} onClose={() => setMove(false)} id={a.id} startsAt={a.startsAt} used={a.rescheduled ?? 0} />
-      <FeedbackSheet open={fb} onClose={() => { setFb(false); if (params.get('feedback')) router.replace(`/app/sessions/${a.id}`) }} id={a.id} />
+      <FeedbackSheet open={fb} onClose={() => { setFb(false); if (params.get('feedback')) router.replace(`/app/sessions/view?id=${a.id}`) }} id={a.id} />
     </main>
   )
 }

@@ -133,7 +133,7 @@ export const useApp = create<State>()(
         const seq = get().seq + 1
         const appt: Appointment = { ...a, id: uid(), code: `BW-A-${String(seq).padStart(5, '0')}`, createdAt: new Date().toISOString(), status: 'confirmed' }
         set((s) => ({ appointments: [...s.appointments, appt], seq }))
-        get().notify({ title: 'You’re booked', body: 'Jitu Bhaiya will read your answers before you meet.', href: `/app/sessions/${appt.id}` })
+        get().notify({ title: 'You’re booked', body: 'Jitu Bhaiya will read your answers before you meet.', href: `/app/sessions/view?id=${appt.id}` })
         return appt
       },
       reschedule: (id, startsAt) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, startsAt, rescheduled: (a.rescheduled ?? 0) + 1 } : a)) })),
@@ -167,7 +167,7 @@ export const useApp = create<State>()(
           address: s.addresses.find((a) => a.id === addressId)!, placedAt: new Date().toISOString(), stage: 0,
         }
         set({ orders: [order, ...s.orders], cart: [], seq })
-        get().notify({ title: 'Order placed', body: `${order.code} — we’ll let you know when it ships.`, href: `/app/orders/${order.id}` })
+        get().notify({ title: 'Order placed', body: `${order.code} — we’ll let you know when it ships.`, href: `/app/orders/view?id=${order.id}` })
         return order
       },
       pushChat: (m) => set((s) => ({ chat: [...s.chat, { ...m, id: uid(), at: new Date().toISOString() }].slice(-80) })),

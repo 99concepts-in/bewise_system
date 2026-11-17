@@ -14,6 +14,7 @@ import { MOOD_LIFT, moodOf } from '@/lib/data'
 import { useApp, type JournalEntry } from '@/lib/store'
 import { dayKey, fmtDay, fmtTime } from '@/lib/format'
 import { dailyInsight, lastNDays, weekRow } from '@/lib/insights'
+import { BP } from '@/lib/asset'
 
 export default function Journal() {
   const journal = useApp((s) => s.journal)
@@ -109,7 +110,7 @@ export default function Journal() {
         <Item>
           {groups.length === 0 ? (
             <div className="card flex flex-col items-center p-8 text-center">
-              <img src="/img/owl-read.webp" alt="" className="h-28" />
+              <img src={`${BP}/img/owl-read.webp`} alt="" className="h-28" />
               <p className="mt-3 text-[15px] font-semibold text-navy">{q ? `Nothing for “${q}”` : 'Your journal is waiting'}</p>
               <p className="mt-1 text-[14px] text-muted">{q ? 'Try a feeling like “calm” or a day like “Mon”.' : 'Tap + to log your first feeling.'}</p>
             </div>

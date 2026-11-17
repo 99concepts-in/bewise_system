@@ -16,6 +16,7 @@ import { respond, crisisCheck } from '@/lib/companion'
 import { productBySlug } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { dayKey, firstName, formatINR } from '@/lib/format'
+import { BP } from '@/lib/asset'
 
 const STARTERS = ['When should I take my drops?', 'How have I been feeling this week?', 'I’ve been struggling to sleep']
 
@@ -53,8 +54,8 @@ export default function Ask() {
     if (id === 'open-journal') return router.push('/app/journal')
     if (id === 'open-shop') return router.push('/app/shop')
     if (id === 'log') return openLog()
-    if (id.startsWith('open-session-')) return router.push(`/app/sessions/${id.slice(13)}`)
-    if (id.startsWith('open-order-')) return router.push(`/app/orders/${id.slice(11)}`)
+    if (id.startsWith('open-session-')) return router.push(`/app/sessions/view?id=${id.slice(13)}`)
+    if (id.startsWith('open-order-')) return router.push(`/app/orders/view?id=${id.slice(11)}`)
     if (/whatsapp/i.test(label)) return toast('WhatsApp opens here once the business number is added')
     if (/book/i.test(label)) return router.push('/app/book')
   }
@@ -97,7 +98,7 @@ export default function Ask() {
               <motion.div key={m.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease }} className="space-y-2.5">
                 {m.safety && <SafetyCard />}
                 <div className="flex items-end gap-2">
-                  <img src="/img/owl-wave.webp" alt="" className="mb-1 size-9 shrink-0 rounded-full bg-white object-contain p-0.5 shadow-[var(--shadow-card)]" />
+                  <img src={`${BP}/img/owl-wave.webp`} alt="" className="mb-1 size-9 shrink-0 rounded-full bg-white object-contain p-0.5 shadow-[var(--shadow-card)]" />
                   <p className="max-w-[82%] rounded-[24px] rounded-bl-md bg-white px-5 py-3.5 text-[15px] leading-6 text-ink shadow-[var(--shadow-card)]">
                     {last && reveal ? <Typewriter key={reveal} text={m.text} /> : m.text}
                   </p>
@@ -109,7 +110,7 @@ export default function Ask() {
                     <motion.div key={slug} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.1 }} className="card ml-11 flex items-center gap-3 p-3">
                       <ProductArt product={p} size="sm" className="w-[84px] shrink-0" />
                       <div className="flex-1"><p className="text-[16px] font-bold text-navy">{p.name}</p><p className="text-[13px] text-muted">{v.label} · {formatINR(v.pricePaise)}</p>
-                        <button onClick={(e) => { s.addToCart(v.id); flyToBag(e.currentTarget.getBoundingClientRect(), `/img/${p.art}.webp`); toast(`${p.name} added to your bag`) }} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white"><ShoppingBag className="size-3.5" /> Add to bag</button>
+                        <button onClick={(e) => { s.addToCart(v.id); flyToBag(e.currentTarget.getBoundingClientRect(), `${BP}/img/${p.art}.webp`); toast(`${p.name} added to your bag`) }} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white"><ShoppingBag className="size-3.5" /> Add to bag</button>
                       </div>
                     </motion.div>
                   )
@@ -129,7 +130,7 @@ export default function Ask() {
           <AnimatePresence>
             {typing && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-end gap-2">
-                <img src="/img/owl-wave.webp" alt="" className="mb-1 size-9 rounded-full bg-white object-contain p-0.5 shadow-[var(--shadow-card)]" />
+                <img src={`${BP}/img/owl-wave.webp`} alt="" className="mb-1 size-9 rounded-full bg-white object-contain p-0.5 shadow-[var(--shadow-card)]" />
                 <span className="flex gap-1.5 rounded-[24px] rounded-bl-md bg-white px-5 py-4 shadow-[var(--shadow-card)]" aria-label="BeWise is typing">
                   {[0, 1, 2].map((k) => <motion.span key={k} className="size-2 rounded-full bg-peri" animate={{ y: [0, -5, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 0.9, repeat: Infinity, delay: k * 0.15 }} />)}
                 </span>

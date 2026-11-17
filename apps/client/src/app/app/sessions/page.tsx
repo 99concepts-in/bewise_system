@@ -34,7 +34,7 @@ export default function Sessions() {
           const d = new Date(a.startsAt)
           return (
             <motion.div key={a.id} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, duration: 0.4, ease }}>
-              <Link href={`/app/sessions/${a.id}`} className="card flex items-center gap-4 p-4">
+              <Link href={`/app/sessions/view?id=${a.id}`} className="card flex items-center gap-4 p-4">
                 <span className={`flex size-16 shrink-0 flex-col items-center justify-center rounded-[20px] ${tab === 'up' ? 'bg-navy text-white' : 'bg-peri-50 text-navy'}`}>
                   <span className="text-[22px] font-extrabold leading-none">{d.getDate()}</span><span className="text-[12px] font-semibold uppercase opacity-80">{d.toLocaleDateString('en-IN', { month: 'short' })}</span>
                 </span>

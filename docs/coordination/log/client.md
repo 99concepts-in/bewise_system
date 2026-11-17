@@ -2,6 +2,12 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-17 — Client preview on GitHub Pages · branch claude/new-session-94881h
+**Status:** Workflow added — waiting for the owner to switch on Pages (Settings → Pages → gh-pages)
+**Done:** static-export mode for `apps/client` (`STATIC_EXPORT=1`, base path, `?id=` detail routes, pre-rendered products); `.github/workflows/client-preview-pages.yml` (typecheck → export → publish to `gh-pages`); verified locally under `/bewise_system/` — full journey incl. camera, 0 errors, 0 broken assets
+**Shared files touched:** new `.github/workflows/client-preview-pages.yml` (additive, scoped to `apps/client/**`) — HUB please fold into CI when the foundation lands
+**Next:** PR `[CLIENT] Client app preview` for review
+
 ## 2026-11-17 — Client app built (standalone preview, owner request) · branch claude/new-session-94881h
 **Status:** Built & pushed — preview app in `apps/client/` (foundation still ⬜, so self-contained; see request `20261117-client-to-hub-standalone-client-app.md`)
 **Done:** 22 routes, Next.js 16 + Tailwind v4 + Motion: splash/story, phone OTP (demo), about you, **onboarding photo (live camera, flip, retake, gallery)**, privacy, you're in · Home (one contextual card, tap-to-log moods, ritual drops, Ask BeWise, progress, insight) · journal + goals · booking wizard with full intake IN-01…IN-11 (voice note, body map, safety card 14416/112) + follow-up check-in IN-12, IST slots, 15-min hold, Razorpay-style pay sheet, booked + calendar · sessions (countdown, reschedule-only, feedback) · remedies (blend, flowers, drops ritual, reminders, progress, reorder) · shop/product (allergy warnings) /bag/checkout/orders/tracking/replacement · Ask BeWise (on-device responder with spec guardrails) · Me (photo, details, reminders, privacy export/delete, sample data). Assets cut from design sheets by `apps/client/scripts/cut_assets.py`.

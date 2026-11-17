@@ -9,9 +9,10 @@ import { useMemo, type CSSProperties } from 'react'
 import type { Emotion, Product } from '@/lib/data'
 import { moodOf } from '@/lib/data'
 import { cx } from './ui'
+import { BP } from '@/lib/asset'
 
 export function LogoMark({ size = 40, white }: { size?: number; white?: boolean }) {
-  return <img src={white ? '/img/logo-mark-white.png' : '/img/logo-mark.png'} width={size} height={size} alt="" aria-hidden className="shrink-0" draggable={false} />
+  return <img src={white ? `${BP}/img/logo-mark-white.png` : `${BP}/img/logo-mark.png`} width={size} height={size} alt="" aria-hidden className="shrink-0" draggable={false} />
 }
 export function Logo({ white, compact }: { white?: boolean; compact?: boolean }) {
   return (
@@ -31,7 +32,7 @@ export function Mascot({ pose = 'wave', height = 160, float = true, className, p
   const [w, h] = poseSize[pose]
   return (
     <div className={cx('relative', float && 'animate-floaty', className)} style={{ height, width: (w / h) * height, ...style }}>
-      <img src={`/img/owl-${pose}.webp`} alt="" aria-hidden width={w} height={h} draggable={false}
+      <img src={`${BP}/img/owl-${pose}.webp`} alt="" aria-hidden width={w} height={h} draggable={false}
         loading={priority ? 'eager' : 'lazy'} decoding="async" fetchPriority={priority ? 'high' : 'low'}
         className="h-full w-full object-contain drop-shadow-[0_14px_18px_rgba(24,41,87,.18)]" />
     </div>
@@ -39,7 +40,7 @@ export function Mascot({ pose = 'wave', height = 160, float = true, className, p
 }
 
 export function MoodImg({ mood, size = 56, className }: { mood: Emotion; size?: number; className?: string }) {
-  return <img src={`/img/mood-${mood}.webp`} alt="" aria-hidden width={size} height={size} draggable={false} loading="lazy" decoding="async"
+  return <img src={`${BP}/img/mood-${mood}.webp`} alt="" aria-hidden width={size} height={size} draggable={false} loading="lazy" decoding="async"
     className={cx('object-contain drop-shadow-[0_6px_8px_rgba(24,41,87,.10)]', className)} style={{ width: size, height: size }} />
 }
 
@@ -89,10 +90,10 @@ export function ProductArt({ product, size = 'md', className }: { product: Pick<
     <div className={cx('relative overflow-hidden rounded-[24px]', h, className)} style={{ background: `linear-gradient(150deg, ${product.tint[0]}, ${product.tint[1]})` }}>
       <span className="absolute -bottom-6 left-1/2 h-10 w-[70%] -translate-x-1/2 rounded-[50%] bg-[#182957]/10 blur-md" />
       {product.accent && size !== 'sm' && (
-        <img src={`/img/${product.accent}.webp`} alt="" aria-hidden loading="lazy" decoding="async"
+        <img src={`${BP}/img/${product.accent}.webp`} alt="" aria-hidden loading="lazy" decoding="async"
           className={cx('absolute object-contain opacity-95', size === 'lg' ? '-right-6 bottom-6 h-[150px]' : '-right-4 bottom-3 h-[84px]')} />
       )}
-      <img src={`/img/${product.art}.webp`} alt={product.name} loading="lazy" decoding="async" draggable={false}
+      <img src={`${BP}/img/${product.art}.webp`} alt={product.name} loading="lazy" decoding="async" draggable={false}
         className={cx('absolute left-1/2 -translate-x-1/2 object-contain drop-shadow-[0_12px_14px_rgba(24,41,87,.18)]', size === 'lg' ? 'bottom-4 h-[200px]' : size === 'md' ? 'bottom-3 h-[118px]' : 'bottom-1.5 h-[70px]')} />
     </div>
   )

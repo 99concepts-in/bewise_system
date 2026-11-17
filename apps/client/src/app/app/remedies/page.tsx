@@ -14,6 +14,7 @@ import { moodOf, REORDER_PRICE_PAISE } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { dayKey, fmtDay, formatINR } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
+import { BP } from '@/lib/asset'
 
 // @decision(D-10) generic Bach descriptions — Jitu Bhaiya approves final wording before launch. Never the reason it was chosen.
 const ABOUT: Record<string, string> = {
@@ -54,7 +55,7 @@ export default function Remedies() {
   const mix = moodMix(journal)
   const reorder = () => {
     addToCart('remedy-reorder'); buzz(12)
-    const r = reorderRef.current?.getBoundingClientRect(); if (r) flyToBag(r, '/img/p-dropper.webp')
+    const r = reorderRef.current?.getBoundingClientRect(); if (r) flyToBag(r, `${BP}/img/p-dropper.webp`)
     toast(`Blend added to your bag · ${formatINR(REORDER_PRICE_PAISE)}`)
   }
 
@@ -65,8 +66,8 @@ export default function Remedies() {
         <Item><h1 className="h-duo pt-2">My <em>remedies</em></h1></Item>
         <Item>
           <section className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(150deg,#fbf3dc_0%,#f6efe4_45%,#eef1fb_100%)] p-6 shadow-[var(--shadow-card)]">
-            <motion.img src="/img/f-mimulus.webp" alt="" aria-hidden className="absolute -right-10 top-2 h-[150px] opacity-80" animate={{ rotate: [0, 4, 0] }} transition={{ duration: 6, repeat: Infinity }} />
-            <motion.img src="/img/p-dropper.webp" alt="" aria-hidden className="absolute bottom-3 right-6 h-[170px] drop-shadow-[0_18px_18px_rgba(24,41,87,.22)]" initial={{ y: 30, opacity: 0 }} animate={{ y: [0, -8, 0], opacity: 1 }} transition={{ y: { duration: 5, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.6 } }} />
+            <motion.img src={`${BP}/img/f-mimulus.webp`} alt="" aria-hidden className="absolute -right-10 top-2 h-[150px] opacity-80" animate={{ rotate: [0, 4, 0] }} transition={{ duration: 6, repeat: Infinity }} />
+            <motion.img src={`${BP}/img/p-dropper.webp`} alt="" aria-hidden className="absolute bottom-3 right-6 h-[170px] drop-shadow-[0_18px_18px_rgba(24,41,87,.22)]" initial={{ y: 30, opacity: 0 }} animate={{ y: [0, -8, 0], opacity: 1 }} transition={{ y: { duration: 5, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.6 } }} />
             <p className="text-[13px] font-semibold text-[#8a6a2c]">Since {fmtDay(blend.startedOn)}</p>
             <h2 className="relative mt-1 max-w-[62%] text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">{blend.name} <span className="text-soft">v{blend.version}</span></h2>
             <p className="relative mt-1 max-w-[62%] text-[14px] text-muted">{blend.drops} drops · {blend.timesPerDay}× a day{blend.alcoholFree ? ' · alcohol-free' : ''}</p>
@@ -84,7 +85,7 @@ export default function Remedies() {
               {blend.flowers.map((f, i) => (
                 <motion.button key={f} onClick={() => setFlower(f)} whileTap={{ scale: 0.95 }} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 + i * 0.05 }}
                   className="inline-flex h-11 items-center gap-2 rounded-full bg-[#f6f1e8] pl-1.5 pr-4 text-[14px] font-semibold text-navy">
-                  <img src={`/img/${FLOWER_IMG[i % 2]}.webp`} alt="" className="size-8 rounded-full bg-white object-contain p-0.5" />{f}
+                  <img src={`${BP}/img/${FLOWER_IMG[i % 2]}.webp`} alt="" className="size-8 rounded-full bg-white object-contain p-0.5" />{f}
                 </motion.button>
               ))}
             </div>
@@ -141,7 +142,7 @@ export default function Remedies() {
       <Sheet open={!!flower} onClose={() => setFlower(null)} title={flower ?? 'Flower'}>
         {flower && (
           <div className="pb-2">
-            <motion.img src={`/img/${FLOWER_IMG[blend.flowers.indexOf(flower) % 2]}.webp`} alt="" className="mx-auto h-[180px]" initial={{ scale: 0.7, rotate: -8, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 16 }} />
+            <motion.img src={`${BP}/img/${FLOWER_IMG[blend.flowers.indexOf(flower) % 2]}.webp`} alt="" className="mx-auto h-[180px]" initial={{ scale: 0.7, rotate: -8, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 16 }} />
             <h2 className="h-duo mt-2 text-[28px]">{flower}</h2>
             <p className="mt-3 text-[15px] leading-6 text-ink">{ABOUT[flower] ?? 'One of Dr Bach’s 38 flower essences.'}</p>
             <p className="mt-4 rounded-[18px] bg-[#f6f1e8] p-3 text-[13px] font-semibold text-[#8a6a2c]">In your blend since {fmtDay(blend.startedOn)}</p>

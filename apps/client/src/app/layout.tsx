@@ -5,13 +5,14 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { Providers } from '@/components/providers'
+import { BP } from '@/lib/asset'
 
 export const metadata: Metadata = {
   title: { default: 'BeWise · Holistic Wellness', template: '%s · BeWise' },
   description: 'Bach flower remedy consultations with Jitu Bhaiya, your personal blend, mood journal and gentle aromatherapy rituals.',
   applicationName: 'BeWise',
-  manifest: '/manifest.webmanifest',
-  icons: { icon: '/img/logo-mark.png', apple: '/icon-192.png' },
+  manifest: `${BP}/manifest.webmanifest`,
+  icons: { icon: `${BP}/img/logo-mark.png`, apple: `${BP}/icon-192.png` },
   appleWebApp: { capable: true, title: 'BeWise', statusBarStyle: 'default' },
   formatDetection: { telephone: false },
 }

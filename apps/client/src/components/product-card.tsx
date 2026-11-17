@@ -9,6 +9,7 @@ import { buzz, toast, useChrome } from './ui'
 import type { Product } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { formatINR } from '@/lib/format'
+import { BP } from '@/lib/asset'
 
 export const allergyHit = (p: Product, allergies: string[]) => p.allergens.find((a) => allergies.some((x) => x.includes(a) || a.includes(x)))
 
@@ -35,7 +36,7 @@ export function ProductCard({ p, i = 0, wide }: { p: Product; i?: number; wide?:
       <div className="mt-auto flex items-center justify-between px-1.5 pb-0.5 pt-2">
         <span className="text-[16px] font-extrabold text-navy tnum">{p.variants.length > 1 ? 'from ' : ''}{formatINR(p.variants[0].pricePaise)}</span>
         <motion.button whileTap={{ scale: 0.85 }} aria-label={`Add ${p.name} to bag`} onClick={() => {
-          add(v.id); buzz(12); const r = ref.current?.getBoundingClientRect(); if (r) flyToBag(r, `/img/${p.art}.webp`); toast(`${p.name} added to your bag`)
+          add(v.id); buzz(12); const r = ref.current?.getBoundingClientRect(); if (r) flyToBag(r, `${BP}/img/${p.art}.webp`); toast(`${p.name} added to your bag`)
         }} className="grid size-10 place-items-center rounded-full bg-navy text-white shadow-[var(--shadow-cta)]"><ShoppingBag className="size-[18px]" /></motion.button>
       </div>
       <motion.button whileTap={{ scale: 0.8 }} aria-label={wish ? 'Remove from saved' : 'Save for later'} aria-pressed={wish} onClick={() => { toggleWish(p.slug); buzz(6) }}

@@ -49,7 +49,7 @@ export default function Checkout() {
         <div><p className="text-[16px] font-bold text-navy">Arriving by {fmtDay(eta)}</p><p className="text-[13px] text-muted">We’ll message you when it ships.</p></div>
       </motion.div>
       <div className="mt-auto space-y-3 pb-3 pt-6 safe-b">
-        <Btn full onClick={() => router.replace(`/app/orders/${done.id}`)}>Track order</Btn>
+        <Btn full onClick={() => router.replace(`/app/orders/view?id=${done.id}`)}>Track order</Btn>
         <Btn full variant="ghost" size="md" onClick={() => router.replace('/app/shop')}>Continue browsing</Btn>
       </div>
     </main>

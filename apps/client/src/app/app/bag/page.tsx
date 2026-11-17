@@ -10,6 +10,7 @@ import { Btn, BtnLink, toast } from '@/components/ui'
 import { useApp } from '@/lib/store'
 import { FREE_SHIP_PAISE, useBagTotals } from '@/lib/bag'
 import { formatINR } from '@/lib/format'
+import { BP } from '@/lib/asset'
 
 export default function Bag() {
   const router = useRouter()
@@ -23,7 +24,7 @@ export default function Bag() {
       <h1 className="h-duo pt-2">Your <em>bag</em></h1>
       {lines.length === 0 ? (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card mt-6 flex flex-col items-center p-8 text-center">
-          <img src="/img/owl-bottle.webp" alt="" className="h-36" />
+          <img src={`${BP}/img/owl-bottle.webp`} alt="" className="h-36" />
           <p className="mt-3 text-[18px] font-extrabold text-navy">Your bag is empty</p>
           <p className="mt-1 text-[14px] text-muted">Little rituals are waiting.</p>
           <BtnLink href="/app/shop" size="md" className="mt-5">Explore the shop</BtnLink>
