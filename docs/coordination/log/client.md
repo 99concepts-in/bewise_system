@@ -2,6 +2,12 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-17 — Hostinger hosting package · branch claude/new-session-94881h
+**Status:** Ready — owner hosting on Hostinger 2026-11-18
+**Done:** `pnpm export:hostinger` → `dist/bewise-client-hostinger.zip` (static export + `.htaccess`: https redirect, pretty URLs, 404, gzip, security headers incl. camera permission, noindex, caching); workflow job publishes branch `hostinger-build` + zip artifact for hPanel Git auto-deploy; guide `apps/client/hosting/HOSTINGER.md`. Verified on Apache 2.4 (routes, headers, caching, full browser journey incl. camera, 0 errors)
+**Note:** preview only — data stays on the visitor's device; not for real clients until the foundation/backend lands
+**Next:** owner picks the (sub)domain; HUB to fold hosting into D-01/D-12 decisions (planned prod host was Vercel)
+
 ## 2026-11-17 — Client preview on GitHub Pages · branch claude/new-session-94881h
 **Status:** Workflow added — waiting for the owner to switch on Pages (Settings → Pages → gh-pages)
 **Done:** static-export mode for `apps/client` (`STATIC_EXPORT=1`, base path, `?id=` detail routes, pre-rendered products); `.github/workflows/client-preview-pages.yml` (typecheck → export → publish to `gh-pages`); verified locally under `/bewise_system/` — full journey incl. camera, 0 errors, 0 broken assets

@@ -1,5 +1,6 @@
 # @owner CLIENT · Publishes the client app preview (apps/client) as a static site to the gh-pages branch.
 # Live at https://<owner>.github.io/bewise_system/ once Settings → Pages → "Deploy from a branch" → gh-pages / (root).
+# Job 2 builds the same app for Hostinger (domain root, .htaccess included) → branch `hostinger-build` + zip artifact.
 # Preview only: on-device demo data, simulated OTP / payments / AI. Not the production deploy (that is Vercel, D-01).
 name: Client preview → GitHub Pages
 
@@ -57,3 +58,44 @@ jobs:
           publish_branch: gh-pages
           force_orphan: true
           commit_message: 'Client preview build ${{ github.sha }}'
+
+  hostinger:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/client
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: apps/client/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build for Hostinger (domain root)
+        run: pnpm export:hostinger
+
+      - name: Zip for manual upload (Actions → this run → Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bewise-client-hostinger
+          path: apps/client/dist/bewise-client-hostinger.zip
+          retention-days: 30
+
+      # Hostinger hPanel → Advanced → Git can pull this branch straight into public_html
+      - name: Publish to hostinger-build branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: apps/client/out
+          publish_branch: hostinger-build
+          force_orphan: true
+          enable_jekyll: true
+          commit_message: 'Hostinger build ${{ github.sha }}'

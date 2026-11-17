@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   icons: { icon: `${BP}/img/logo-mark.png`, apple: `${BP}/icon-192.png` },
   appleWebApp: { capable: true, title: 'BeWise', statusBarStyle: 'default' },
   formatDetection: { telephone: false },
+  ...(process.env.NEXT_PUBLIC_NOINDEX === '1' ? { robots: { index: false, follow: false } } : {}),
 }
 export const viewport: Viewport = {
   width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#dce2f5',

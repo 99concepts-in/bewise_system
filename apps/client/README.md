@@ -17,6 +17,9 @@ pnpm assets         # re-cut sprites from design/assets (Python 3 + Pillow + num
 ```
 Demo sign-in code: **246810** (no SMS is sent). Me → **Explore with sample data** loads a returning-client journey.
 
+## Hosting on Hostinger
+See **[hosting/HOSTINGER.md](hosting/HOSTINGER.md)** — `pnpm export:hostinger` → `dist/bewise-client-hostinger.zip` (upload & extract in `public_html`), or Hostinger Git auto-deploy from branch `hostinger-build`.
+
 ## Live preview (GitHub Pages)
 `.github/workflows/client-preview-pages.yml` builds a static export on every push to this branch (or `main`) that touches
 `apps/client/**` and publishes it to the **`gh-pages`** branch. Turn it on once: **Settings → Pages → Build and deployment →

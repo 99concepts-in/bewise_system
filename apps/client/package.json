@@ -2,13 +2,14 @@
   "name": "@bewise/client",
   "private": true,
   "version": "0.1.0",
-  "description": "BeWise · Holistic Wellness — client app (CLIENT chat). Standalone preview until the HUB foundation lands.",
+  "description": "BeWise \u00b7 Holistic Wellness \u2014 client app (CLIENT chat). Standalone preview until the HUB foundation lands.",
   "scripts": {
     "dev": "next dev -p 3100",
     "build": "next build",
     "start": "next start -p 3100",
     "typecheck": "tsc --noEmit",
-    "assets": "python3 -I scripts/cut_assets.py ../.."
+    "assets": "python3 -I scripts/cut_assets.py ../..",
+    "export:hostinger": "bash scripts/build-hostinger.sh"
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "5.3.0",
