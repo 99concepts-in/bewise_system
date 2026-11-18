@@ -21,7 +21,9 @@ export interface Order {
   id: string; code: string; clientId: string; kind: OrderKind; items: OrderItem[]
   totalPaise: number; paidAt: number; dueAt: number; stage: Stage; delivery: DeliveryMethod
   alcoholFree: boolean
-  prep?: { blend: string; bottleMl: number; flowers: Flower[]; label: string }
+  /** consultation.getPrepSheet() shape (accepted 2026-11-18). All blends are alcohol-free (owner 2026-11-18). */
+  prep?: { blend: string; bottleMl: number; flowers: Flower[]; label: string; dosage: { drops: number; timesPerDay: number; weeks: number }; base: 'alcohol_free' }
+  remedyOrderId?: string
   checks: Record<string, boolean>
   qc?: { result: 'pass' | 'redo'; note?: string; photo?: string }
   pack?: { weightG: number; box: string }
@@ -31,9 +33,13 @@ export interface Order {
   history: { stage: Stage; at: number; note?: string }[]
 }
 
+export type Pronoun = 'she' | 'he' | 'they'
+export const pron = (p: Pronoun) => (p === 'she' ? { obj: 'her', poss: 'her' } : p === 'he' ? { obj: 'him', poss: 'his' } : { obj: 'them', poss: 'their' })
+
 export interface Client {
   id: string; code: string; name: string; city: string; phone: string; email?: string
   address: string; pincode: string; since: number
+  pronoun: Pronoun   // she | he | they — default they (consultant request 2026-11-18)
 }
 
 export interface Variant { id: string; label: string; sku: string; mrpPaise: number; pricePaise: number; costPaise: number; weightG: number; active: boolean; stockId: string }
@@ -77,7 +83,8 @@ export interface Expense { id: string; code: string; amountPaise: number; catego
 
 export interface Appointment {
   id: string; clientId: string; startsAt: number; minutes: number; type: 'First consultation' | 'Follow-up'
-  mode: 'in_person' | 'online'; status: 'confirmed' | 'checked_in' | 'completed'
+  mode: 'in_person' | 'online'; status: 'awaiting_payment' | 'confirmed' | 'checked_in' | 'completed'
+  invoiceId?: string; greeting?: string
 }
 export interface Note { id: string; title: string; body: string; at: number; read: boolean; tone: 'info' | 'good' | 'bad' | 'warn'; route?: Route }
 
@@ -86,3 +93,6 @@ export type RouteName =
   | 'production' | 'purchases' | 'reports' | 'notifications'
   | 'order' | 'client' | 'product' | 'stockItem' | 'batch' | 'po' | 'invoice'
 export interface Route { name: RouteName; id?: string; intent?: string }
+
+/** Outbox events the real build emits (docs/03-CONTRACTS.md §4) — logged in the prototype so the flow is visible. */
+export interface DomainEvent { id: string; type: string; at: number; payload: Record<string, unknown> }

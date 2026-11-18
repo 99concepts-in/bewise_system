@@ -6,7 +6,7 @@
 import { motion } from 'motion/react'
 import {
   Home, Package, Plus, Wallet, UserRound, Truck, CalendarDays, Users, Sparkles, Boxes, FlaskConical, ShoppingCart, BarChart3,
-  Receipt, IndianRupee, SlidersHorizontal, UserPlus, Bell, Link2,
+  Receipt, IndianRupee, UserPlus, Bell, Link2, Zap,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useStore } from '../lib/store'
@@ -120,10 +120,10 @@ export function QuickActions() {
   const setRoot = useStore((s) => s.setRoot)
   const items: { label: string; sub: string; icon: ReactNode; run: () => void }[] = [
     { label: 'Share booking link', sub: 'Send on WhatsApp or copy', icon: <Link2 size={20} />, run: () => setRoot('today', 'share') },
-    { label: 'Walk-in booking', sub: 'Book a slot and take payment', icon: <UserPlus size={20} />, run: () => setRoot('appointments', 'walkin') },
-    { label: 'Record payment', sub: 'Cash, UPI, card or bank', icon: <IndianRupee size={20} />, run: () => setRoot('money', 'collect') },
+    { label: 'Express booking', sub: 'Next free time, greet and confirm', icon: <Zap size={20} />, run: () => setRoot('today', 'express') },
+    { label: 'Add client', sub: 'Name, mobile, city', icon: <UserPlus size={20} />, run: () => setRoot('clients', 'add') },
+    { label: 'Record payment', sub: 'Paid at the desk or by bank', icon: <IndianRupee size={20} />, run: () => setRoot('money', 'collect') },
     { label: 'Add expense', sub: 'Photo of the receipt for approval', icon: <Receipt size={20} />, run: () => setRoot('money', 'expense') },
-    { label: 'Adjust stock', sub: 'Count correction, spill, damage', icon: <SlidersHorizontal size={20} />, run: () => setRoot('stock') },
     { label: 'New batch', sub: 'Make oils, sprays or salts', icon: <FlaskConical size={20} />, run: () => setRoot('production', 'new') },
   ]
   return (

@@ -5,8 +5,8 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 import { seed, bachId } from './seed'
-import type { Expense, Movement, MovementType, Order, Product, Route, RouteName, Shipment, Stage, StockItem } from './types'
-import { dateKey, uid } from './format'
+import type { Appointment, Client, DomainEvent, Expense, Movement, MovementType, Order, Pronoun, Product, Route, RouteName, Shipment, Stage, StockItem } from './types'
+import { dateKey, firstName, uid } from './format'
 
 type Data = ReturnType<typeof seed>
 export type Toast = { id: string; text: string; tone: 'good' | 'info' | 'bad' }
@@ -57,8 +57,16 @@ interface Actions {
   receivePO: (id: string, received: Record<string, number>, billPaise: number) => void
   createPO: (stockId: string) => string
 
+  /** scheduling.checkInAppointment() — shared with Jitu Bhaiya's Today: confirmed → checked_in */
   checkIn: (apptId: string) => void
-  walkIn: (input: { name: string; phone: string; type: 'First consultation' | 'Follow-up'; minutes: number; startsAt: number; method: string; amountPaise: number }) => void
+  /** crm.findClientByPhone() — duplicate check */
+  findClientByPhone: (phone: string) => Client | undefined
+  /** crm.createClient() */
+  createClient: (input: { name: string; phone: string; city: string; pronoun: Pronoun }) => Client
+  /** Express booking → greet and confirm. BeWise then sends the payment link automatically. */
+  book: (input: { clientId: string; startsAt: number; type: Appointment['type']; mode: Appointment['mode']; greeting: string }) => void
+  /** Client paid at the desk instead of using the link BeWise sent */
+  paidAtDesk: (apptId: string, method: string) => void
   readNotes: () => void
 }
 export type State = Data & UI & Actions
@@ -82,7 +90,22 @@ function move(stock: StockItem[], id: string, m: Movement, reservedDelta = 0) {
 const stamp = (o: Order, stage: Stage, note?: string): Order => ({ ...o, stage, history: [...o.history, { stage, at: Date.now(), note }] })
 
 export const useStore = create<State>()(persist((set, get) => {
-  const patchOrder = (id: string, fn: (o: Order) => Order) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? fn(o) : o)) }))
+  const emit = (type: string, payload: Record<string, unknown>): DomainEvent => ({ id: uid(), type, at: Date.now(), payload })
+  /** Every stage move emits fulfilment.stage_changed (+ remedyOrderId for remedy orders) and shipment.* — consultant tracker reads these. */
+  const patchOrder = (id: string, fn: (o: Order) => Order) => set((s) => {
+    const before = s.orders.find((o) => o.id === id)!
+    const after = fn(before)
+    const ev: DomainEvent[] = []
+    let from = before.stage
+    for (const h of after.history.slice(before.history.length)) {
+      ev.push(emit('fulfilment.stage_changed', { taskId: 'FT-' + after.code, salesOrderId: after.id, remedyOrderId: after.remedyOrderId, from, to: h.stage }))
+      if (h.stage === 'dispatched') ev.push(emit('shipment.dispatched', { salesOrderId: after.id, remedyOrderId: after.remedyOrderId, courier: after.shipment?.courier ?? 'Studio pickup', awb: after.shipment?.awb, freightPaise: after.shipment?.freightPaise ?? 0 }))
+      if (h.stage === 'delivered') ev.push(emit('shipment.delivered', { salesOrderId: after.id, remedyOrderId: after.remedyOrderId, deliveredAt: new Date(h.at).toISOString() }))
+      if (h.stage === 'failed_delivery') ev.push(emit('shipment.failed', { salesOrderId: after.id, reason: after.problem }))
+      from = h.stage
+    }
+    return { orders: s.orders.map((o) => (o.id === id ? after : o)), events: [...ev.reverse(), ...s.events].slice(0, 200) }
+  })
   const order = (id: string) => get().orders.find((o) => o.id === id)!
   return {
     ...seed(),
@@ -115,7 +138,7 @@ export const useStore = create<State>()(persist((set, get) => {
         const ref = o.code
         for (const f of o.prep.flowers) stock = move(stock, bachId(f.name), mv('remedy_prep_consume', -(f.drops / 20), ref, `${f.drops} drops`))
         const flowerMl = o.prep.flowers.reduce((s, f) => s + f.drops / 20, 0)
-        stock = move(stock, o.alcoholFree ? 'rm-glycerine' : 'rm-brandy', mv('remedy_prep_consume', -+(o.prep.bottleMl - flowerMl).toFixed(2), ref, 'Base fill'))
+        stock = move(stock, 'rm-glycerine', mv('remedy_prep_consume', -+(o.prep.bottleMl - flowerMl).toFixed(2), ref, 'Base fill'))
         stock = move(stock, 'pk-drop30', mv('remedy_prep_consume', -1, ref))
         stock = move(stock, 'pk-label', mv('remedy_prep_consume', -1, ref))
       }
@@ -247,28 +270,53 @@ export const useStore = create<State>()(persist((set, get) => {
       return id
     },
 
-    checkIn: (id) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, status: 'checked_in' } : a)) })),
-    walkIn: (x) => set((s) => {
-      let client = s.clients.find((c) => c.phone.replace(/\D/g, '').endsWith(x.phone.replace(/\D/g, '').slice(-10)))
-      let clients = s.clients
-      let seq = s.seq
-      if (!client) {
-        const n = s.seq.client + 1
-        client = { id: uid(), code: `BW-C-${String(n).padStart(5, '0')}`, name: x.name, city: 'Vadodara', phone: x.phone, address: '', pincode: '', since: Date.now() }
-        clients = [client, ...clients]
-        seq = { ...seq, client: n }
-      }
-      const n = seq.inv + 1
+    checkIn: (id) => set((s) => {
+      const a = s.appointments.find((x) => x.id === id)
+      if (!a || a.status !== 'confirmed') return {}
       return {
-        clients, seq: { ...seq, inv: n },
-        appointments: [...s.appointments, { id: uid(), clientId: client.id, startsAt: x.startsAt, minutes: x.minutes, type: x.type, mode: 'in_person' as const, status: 'confirmed' as const }].sort((a, b) => a.startsAt - b.startsAt),
-        invoices: [{ id: uid(), code: `INV/2026-27/${String(n).padStart(4, '0')}`, clientId: client.id, label: `${x.type} (walk-in)`, totalPaise: x.amountPaise, paidPaise: x.amountPaise, issuedOn: dateKey(0), dueOn: dateKey(0), reminders: [], payments: [{ at: Date.now(), amountPaise: x.amountPaise, method: x.method }] }, ...s.invoices],
+        appointments: s.appointments.map((x) => (x.id === id ? { ...x, status: 'checked_in' as const } : x)),
+        events: [emit('appointment.checked_in', { appointmentId: id, by: 'manager' }), ...s.events],
+      }
+    }),
+    findClientByPhone: (phone) => {
+      const d = phone.replace(/\D/g, '').slice(-10)
+      return d.length === 10 ? get().clients.find((c) => c.phone.replace(/\D/g, '').endsWith(d)) : undefined
+    },
+    createClient: ({ name, phone, city, pronoun }) => {
+      const s = get()
+      const n = s.seq.client + 1
+      const d = phone.replace(/\D/g, '').slice(-10)
+      const clean = name.trim().replace(/\s+/g, ' ').replace(/\b\w/g, (ch) => ch.toUpperCase())
+      const client: Client = { id: uid(), code: `BW-C-${String(n).padStart(5, '0')}`, name: clean, city: city || 'Vadodara', phone: `+91 ${d.slice(0, 5)} ${d.slice(5)}`, address: '', pincode: '', since: Date.now(), pronoun }
+      set({ clients: [client, ...s.clients], seq: { ...s.seq, client: n }, events: [emit('client.created', { clientId: client.id }), ...s.events] })
+      return client
+    },
+    book: ({ clientId, startsAt, type, mode, greeting }) => set((s) => {
+      const fee = type === 'First consultation' ? 100000 : 80000   // D-09, remedy included
+      const n = s.seq.inv + 1
+      const invId = uid()
+      const apptId = uid()
+      const c = s.clients.find((x) => x.id === clientId)!
+      return {
+        seq: { ...s.seq, inv: n },
+        appointments: [...s.appointments, { id: apptId, clientId, startsAt, minutes: type === 'First consultation' ? 60 : 30, type, mode, status: 'awaiting_payment' as const, invoiceId: invId, greeting }].sort((a, b) => a.startsAt - b.startsAt),
+        invoices: [{ id: invId, code: `INV/2026-27/${String(n).padStart(4, '0')}`, clientId, label: type, totalPaise: fee, paidPaise: 0, issuedOn: dateKey(0), dueOn: dateKey(0), reminders: [], payments: [] }, ...s.invoices],
+        notes: [{ id: uid(), title: `Payment link sent automatically to ${firstName(c.name)}`, body: `${type} · BeWise will remind ${firstName(c.name)} if it isn't paid`, at: Date.now(), read: false, tone: 'info' as const }, ...s.notes],
+        events: [emit('appointment.held', { appointmentId: apptId, clientId }), ...s.events],
+      }
+    }),
+    paidAtDesk: (id, method) => set((s) => {
+      const a = s.appointments.find((x) => x.id === id)!
+      return {
+        appointments: s.appointments.map((x) => (x.id === id ? { ...x, status: 'confirmed' as const } : x)),
+        invoices: s.invoices.map((i) => (i.id === a.invoiceId ? { ...i, paidPaise: i.totalPaise, payments: [...i.payments, { at: Date.now(), amountPaise: i.totalPaise - i.paidPaise, method }] } : i)),
+        events: [emit('payment.captured', { appointmentId: id, method }), emit('appointment.confirmed', { appointmentId: id }), ...s.events],
       }
     }),
     readNotes: () => set((s) => ({ notes: s.notes.map((n) => ({ ...n, read: true })) })),
   }
 }, {
-  name: 'bewise-ops-demo-v1',
+  name: 'bewise-ops-demo-v2',
   storage: createJSONStorage(() => safeStorage),
   partialize: (s) => {
     const { stack: _s, toasts: _t, bloom: _b, quickOpen: _q, root: _r, intent: _i, ...rest } = s
