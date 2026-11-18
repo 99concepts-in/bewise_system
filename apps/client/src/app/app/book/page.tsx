@@ -8,13 +8,13 @@
  */
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { CalendarPlus, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Info, Laptop, MapPin, Sparkles, Video } from 'lucide-react'
+import { CalendarPlus, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Info, Laptop, MapPin, Quote, Sparkles, Video } from 'lucide-react'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Mascot, Petals } from '@/components/brand'
 import { PaySheet } from '@/components/pay-sheet'
 import { AppHeader, useUi } from '@/components/shell'
 import { Btn, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, useStableCallback } from '@/components/ui'
-import { CONSULTANT, CONSULTATIONS, NUANCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
+import { CONSULTANT, CONSULTATIONS, NUANCE, TESTIMONIALS, TESTIMONIALS_SOURCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
 import { emptyIntake, useApp, type Appointment, type IntakeAnswers } from '@/lib/store'
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
 import { downloadIcs, googleCalUrl, sessionIcs } from '@/lib/ics'
@@ -48,6 +48,7 @@ function Book() {
   const [paying, setPaying] = useState(false)
   const [booked, setBooked] = useState<Appointment>()
   const [meet, setMeet] = useState(false)
+  const [stories, setStories] = useState(false)
   const [holdUntil, setHoldUntil] = useState(0)
 
   // decided once per visit: submitting the intake mid-flow must not remove the steps we're standing on
@@ -123,7 +124,7 @@ function Book() {
       <div className={cx('relative flex-1 pt-2', step === 'choose' ? 'pb-48' : 'pb-36')}>
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div key={step} custom={dir} initial={{ opacity: 0, x: dir * 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -40 }} transition={{ duration: 0.32, ease }}>
-            {step === 'choose' && <Choose type={type} setType={setType} canFollow={hasHistory} onMeet={() => setMeet(true)} />}
+            {step === 'choose' && <Choose type={type} setType={setType} canFollow={hasHistory} onMeet={() => setMeet(true)} onStories={() => setStories(true)} />}
             {step === 'intro' && <I.IntakeIntro />}
             {step === 'who' && <I.StepWho a={answers} set={setA} />}
             {step === 'feelings' && <I.StepFeelings a={answers} set={setA} />}
@@ -163,6 +164,7 @@ function Book() {
 
       <PaySheet open={paying} amountPaise={c.feePaise} purpose={`${c.name} · ${slot ? fmtTime(slot) : ''}`} onClose={() => setPaying(false)} onPaid={confirmPaid} />
       <MeetSheet open={meet} onClose={() => setMeet(false)} />
+      <StoriesSheet open={stories} onClose={() => setStories(false)} />
     </main>
   )
 }
@@ -183,18 +185,21 @@ function Stepper({ at }: { at: number }) {
   )
 }
 
-function Choose({ type, setType, canFollow, onMeet }: { type: ConsultationId | null; setType: (t: ConsultationId) => void; canFollow: boolean; onMeet: () => void }) {
+function Choose({ type, setType, canFollow, onMeet, onStories }: { type: ConsultationId | null; setType: (t: ConsultationId) => void; canFollow: boolean; onMeet: () => void; onStories: () => void }) {
+  // returning clients who met Jitu Bhaiya before the app have no history here — offer follow-up quietly (owner 2026-11-18)
+  const [showFollow, setShowFollow] = useState(type === 'followup')
+  const follow = canFollow || showFollow
   return (
     <div className="space-y-4">
       <h1 className="h-duo pt-2">Book a <em>session</em></h1>
-      {CONSULTATIONS.filter((c) => c.id === 'first' || canFollow).map((c, i) => {
+      {CONSULTATIONS.filter((c) => c.id === 'first' || follow).map((c, i) => {
         const on = type === c.id
         return (
           <motion.button key={c.id} onClick={() => { buzz(); setType(c.id) }} aria-pressed={on} whileTap={{ scale: 0.98 }}
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.08, ease, duration: 0.5 }}
             className={cx('relative w-full overflow-hidden rounded-[28px] p-5 text-left transition-shadow', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white shadow-[var(--shadow-card)]')}>
             {c.id === 'first' && <span className={cx('absolute right-4 top-4 rounded-full px-2.5 py-1 text-[11px] font-bold', on ? 'bg-white/15 text-white' : 'bg-[#fbf3dc] text-[#8a6a2c]')}>Start here</span>}
-            <p className={cx('text-[13px] font-semibold', on ? 'text-white/70' : 'text-peri')}>{c.minutes} min</p>
+            <p className={cx('text-[13px] font-semibold', on ? 'text-white/70' : 'text-peri')}>Online or in person</p>
             <p className="mt-1 text-[22px] font-extrabold tracking-[-0.02em]">{c.name}</p>
             <p className={cx('mt-1 max-w-[80%] text-[14px] leading-5', on ? 'text-white/80' : 'text-muted')}>{c.blurb}</p>
             <div className="mt-4 flex items-end justify-between">
@@ -205,9 +210,22 @@ function Choose({ type, setType, canFollow, onMeet }: { type: ConsultationId | n
           </motion.button>
         )
       })}
+      {!follow && (
+        <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} onClick={() => { buzz(); setShowFollow(true); setType('followup') }}
+          className="mx-auto -mt-1 block rounded-full px-4 py-2 text-[14px] text-muted">
+          Seen Jitu Bhaiya before? <span className="font-semibold text-navy underline underline-offset-4">Book a follow-up · ₹800</span>
+        </motion.button>
+      )}
       <motion.button onClick={onMeet} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="card flex w-full items-center gap-4 p-4 text-left">
         <img src={`${BP}/img/jitu.webp`} alt="" className="size-14 rounded-full object-cover ring-4 ring-peri-50" />
         <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Meet Jitu Bhaiya</span><span className="text-[13px] text-muted">{CONSULTANT.title} · {CONSULTANT.stats[0]}</span></span>
+        <ChevronRight className="size-5 text-soft" />
+      </motion.button>
+      <motion.button onClick={onStories} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.36 }} className="card flex w-full items-center gap-4 p-4 text-left">
+        <span className="relative grid size-14 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,#fbf3dc,#fbe9ee)] ring-4 ring-peri-50">
+          <Quote className="size-6 text-gold" aria-hidden />
+        </span>
+        <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Client stories</span><span className="text-[13px] text-muted">{TESTIMONIALS.length ? `View ${TESTIMONIALS.length} testimonials` : 'View testimonials'}</span></span>
         <ChevronRight className="size-5 text-soft" />
       </motion.button>
       <p className="px-2 text-center text-[13px] text-muted">Online or in person — you choose next. Sessions are non-refundable, but you can reschedule.</p>
@@ -215,14 +233,57 @@ function Choose({ type, setType, canFollow, onMeet }: { type: ConsultationId | n
   )
 }
 
+/** Testimonials — swipeable quote cards; real, consented quotes only (TESTIMONIALS in lib/data.ts). */
+function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [k, setK] = useState(0)
+  useEffect(() => { if (open) setK(0) }, [open])
+  const n = TESTIMONIALS.length
+  const t = TESTIMONIALS[k]
+  return (
+    <Sheet open={open} onClose={onClose} title="Client stories">
+      <h2 className="h-duo text-[26px]">Client <em>stories</em></h2>
+      <p className="mt-1 text-[14px] text-muted">In their own words — shared with permission.</p>
+      {n ? (
+        <>
+          <div className="relative mt-5 min-h-[210px]">
+            <AnimatePresence mode="wait">
+              <motion.figure key={k} drag="x" dragConstraints={{ left: 0, right: 0 }} onDragEnd={(_, i) => { if (i.offset.x < -50) setK((k + 1) % n); else if (i.offset.x > 50) setK((k - 1 + n) % n) }}
+                initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.35, ease }}
+                className="rounded-[26px] bg-[linear-gradient(140deg,#fbf3dc,#f6efe4_55%,#eef1fb)] p-6">
+                <Quote className="size-8 text-gold" aria-hidden />
+                {t.rating ? <p className="mt-2 text-[15px] tracking-[2px] text-gold" aria-label={`${t.rating} out of 5`}>{'★'.repeat(t.rating)}</p> : null}
+                <blockquote className="mt-3 text-[17px] font-semibold leading-7 text-navy">“{t.quote}”</blockquote>
+                <figcaption className="mt-4 text-[14px] text-muted">— {t.name}{t.city ? `, ${t.city}` : ''}</figcaption>
+              </motion.figure>
+            </AnimatePresence>
+          </div>
+          {n > 1 && (
+            <div className="mt-4 flex items-center justify-between">
+              <button aria-label="Previous story" onClick={() => setK((k - 1 + n) % n)} className="grid size-11 place-items-center rounded-full bg-peri-50 text-navy"><ChevronLeft className="size-5" /></button>
+              <div className="flex gap-1.5">{TESTIMONIALS.map((_, j) => <span key={j} className={cx('h-2 rounded-full transition-all', j === k ? 'w-6 bg-navy' : 'w-2 bg-[#c7cde0]')} />)}</div>
+              <button aria-label="Next story" onClick={() => setK((k + 1) % n)} className="grid size-11 place-items-center rounded-full bg-peri-50 text-navy"><ChevronRight className="size-5" /></button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="mt-5 rounded-[26px] bg-[linear-gradient(140deg,#fbf3dc,#eef1fb)] p-6 text-center">
+          <Quote className="mx-auto size-8 text-gold" aria-hidden />
+          <p className="mt-3 text-[16px] font-bold text-navy">Stories are on their way</p>
+          <p className="mt-1 text-[14px] leading-5 text-muted">We’re gathering words from clients who’ve kindly agreed to share their experience.</p>
+          <a href={TESTIMONIALS_SOURCE} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-navy underline underline-offset-4">Read stories on Jitu Bhaiya’s website <ExternalLink className="size-4" /></a>
+        </div>
+      )}
+    </Sheet>
+  )
+}
+
 function MeetSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Sheet open={open} onClose={onClose} title="Meet your consultant" tall>
-      <div className="relative -mx-5 -mt-3 h-[300px] overflow-hidden">
+      <div className="relative mt-1 h-[280px] overflow-hidden rounded-[24px] bg-peri-50">
         <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitu Bhaiya, smiling" className="h-full w-full object-cover object-[50%_20%]" />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white to-transparent" />
       </div>
-      <h2 className="h-duo -mt-6 text-[28px]">Jitu <em>Bhaiya</em></h2>
+      <h2 className="h-duo mt-4 text-[28px]">Jitu <em>Bhaiya</em></h2>
       <p className="text-[14px] font-semibold text-peri">{CONSULTANT.fullName} · {CONSULTANT.title}</p>
       <p className="mt-3 text-[15px] leading-6 text-ink">{CONSULTANT.approach}</p>
       <div className="mt-4 grid grid-cols-2 gap-2">{CONSULTANT.stats.map((s) => <div key={s} className="rounded-[18px] bg-peri-50 p-3 text-[13px] font-semibold text-navy">{s}</div>)}</div>
@@ -355,7 +416,7 @@ function Review({ c, slot, mode, holdUntil, onExpire }: { c: (typeof CONSULTATIO
         {[
           { i: <Sparkles className="size-5" />, t: c.name },
           { i: <Clock className="size-5" />, t: `${fmtLongDay(slot)} · ${fmtTime(slot)}` },
-          { i: mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: `${mode === 'online' ? 'Online' : 'In person'} · ${c.minutes} min` },
+          { i: mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: mode === 'online' ? 'Online · video call' : 'In person · BeWise studio' },
         ].map((r, k) => (
           <motion.div key={k} className="flex items-center gap-3 border-b border-line py-3.5 last:border-0" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + k * 0.06 }}>
             <span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{r.i}</span><span className="text-[15px] font-semibold text-ink">{r.t}</span>

@@ -7,11 +7,11 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowRight, BookOpen, ChevronRight, Lightbulb, Sparkles, Video } from 'lucide-react'
+import { ArrowRight, BookOpen, Check, ChevronRight, Lightbulb, Sparkles, Video } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Mascot, MoodButton, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
-import { Btn, BtnLink, Item, Reveal, buzz, spring, toast, useChrome, useNow } from '@/components/ui'
+import { Btn, BtnLink, Item, Reveal, Ring, buzz, spring, toast, useChrome, useNow } from '@/components/ui'
 import { CONSULTATIONS, QUICK_MOODS, moodOf, type Emotion } from '@/lib/data'
 import { useApp, type Appointment } from '@/lib/store'
 import { dayKey, firstName, fmtDay, fmtTime } from '@/lib/format'
@@ -23,7 +23,7 @@ export default function Home() {
   const journal = useApp((s) => s.journal)
   const logMood = useApp((s) => s.logMood)
   const blend = useApp((s) => s.blend)
-  const { openLog } = useChrome()
+  const { openLog, openEntry } = useChrome()
   const [burst, setBurst] = useState<{ mood: Emotion; n: number } | null>(null)
   const todays = journal.filter((e) => dayKey(e.at) === dayKey(new Date()))
   const lastToday = todays[0]
@@ -57,7 +57,8 @@ export default function Home() {
               <AnimatePresence mode="wait">
                 {lastToday ? (
                   <motion.p key={lastToday.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-[13px] text-muted">
-                    Logged <b className="text-navy">{moodOf(lastToday.emotion).label}</b> at {fmtTime(lastToday.at)}{todays.length > 1 ? ` · ${todays.length} today` : ''}
+                    Logged <b className="text-navy">{moodOf(lastToday.emotion).label}</b> at {fmtTime(lastToday.at)} ·{' '}
+                    <button onClick={() => openEntry(lastToday.id)} className="font-semibold text-navy underline underline-offset-2">{lastToday.note ? 'Edit note' : 'Add a note'}</button>
                   </motion.p>
                 ) : <motion.p key="none" className="text-[13px] text-muted">Nothing logged yet today</motion.p>}
               </AnimatePresence>
@@ -72,6 +73,8 @@ export default function Home() {
         <Item><ContextCard /></Item>
 
         {blend && <Item><RitualCard /></Item>}
+
+        <GoalsCard />
 
         <Item>
           <Link href="/app/ask" className="card group relative block overflow-hidden p-5 pr-[42%]">
@@ -125,7 +128,7 @@ function ContextCard() {
     return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitu Bhaiya." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} img={`${BP}/img/mood-grateful.webp`} />
   if (blend && any)
     return <Ctx tone="sage" kicker="Check in" title="Time for your follow-up" body="See how you’re doing and refresh your blend · ₹800, blend included." cta="Book follow-up" href="/app/book?type=followup" img={`${BP}/img/owl-bottle.webp`} />
-  return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm hour with Jitu Bhaiya · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" img={`${BP}/img/cat-consult.webp`} wide />
+  return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm, unhurried conversation with Jitu Bhaiya · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" img={`${BP}/img/cat-consult.webp`} wide />
 }
 
 const TONES = { peri: 'bg-[linear-gradient(135deg,#ffffff_40%,#e9edfa)]', navy: 'bg-[linear-gradient(135deg,#182957,#3c5596)] text-white', rose: 'bg-[linear-gradient(135deg,#fff_40%,#fbe9ee)]', sage: 'bg-[linear-gradient(135deg,#fff_40%,#e5efe2)]' }
@@ -210,5 +213,37 @@ function ProgressCompact() {
       </div>
       <p className="mt-3 flex items-center gap-1.5 text-[12px] text-soft"><BookOpen className="size-3.5" /> From your journal · not medical advice</p>
     </Link>
+  )
+}
+
+/** Goals the client set (CL-31) — shown on Home once there is at least one (owner 2026-11-18). */
+function GoalsCard() {
+  const goals = useApp((s) => s.goals)
+  const upd = useApp((s) => s.updateGoal)
+  if (!goals.length) return null
+  return (
+    <Item>
+      <section className="card p-5" aria-labelledby="goals-h">
+        <div className="flex items-center justify-between">
+          <h2 id="goals-h" className="h-section">Your goals</h2>
+          <Link href="/app/goals" className="inline-flex items-center gap-0.5 text-[13px] font-semibold text-navy">All<ChevronRight className="size-4" /></Link>
+        </div>
+        <ul className="mt-3 space-y-2.5">
+          {goals.map((g) => (
+            <li key={g.id} className="flex items-center gap-3">
+              <Ring value={g.progress / 100} size={44} stroke={5} color={g.done ? '#82977e' : '#182957'}>
+                {g.done ? <Check className="size-4 text-sage" strokeWidth={3} /> : <span className="text-[11px] font-bold text-navy tnum">{g.progress}</span>}
+              </Ring>
+              <span className={`flex-1 text-[15px] font-semibold ${g.done ? 'text-sage-text line-through decoration-sage/50' : 'text-navy'}`}>{g.title}</span>
+              {!g.done && (
+                <motion.button whileTap={{ scale: 0.88 }} aria-label={`Add progress to ${g.title}`}
+                  onClick={() => { const n = Math.min(100, g.progress + 10); buzz(8); upd(g.id, { progress: n, done: n === 100 }); if (n === 100) toast('Goal complete — well done') }}
+                  className="h-9 rounded-full bg-peri-50 px-3 text-[13px] font-bold text-navy">+10%</motion.button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    </Item>
   )
 }

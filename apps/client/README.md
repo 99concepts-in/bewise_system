@@ -15,7 +15,7 @@ pnpm build && pnpm start
 pnpm typecheck
 pnpm assets         # re-cut sprites from design/assets (Python 3 + Pillow + numpy)
 ```
-Demo sign-in code: **246810** (no SMS is sent). Me → **Explore with sample data** loads a returning-client journey.
+Demo sign-in code: **2468** (no SMS is sent). Me → **Explore with sample data** loads a returning-client journey.
 
 ## Hosting on Hostinger
 See **[hosting/HOSTINGER.md](hosting/HOSTINGER.md)** — `pnpm export:hostinger` → `dist/bewise-client-hostinger.zip` (upload & extract in `public_html`), or Hostinger Git auto-deploy from branch `hostinger-build`.

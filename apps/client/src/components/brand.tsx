@@ -40,8 +40,9 @@ export function Mascot({ pose = 'wave', height = 160, float = true, className, p
 }
 
 export function MoodImg({ mood, size = 56, className }: { mood: Emotion; size?: number; className?: string }) {
-  return <img src={`${BP}/img/mood-${mood}.webp`} alt="" aria-hidden width={size} height={size} draggable={false} loading="lazy" decoding="async"
-    className={cx('object-contain drop-shadow-[0_6px_8px_rgba(24,41,87,.10)]', className)} style={{ width: size, height: size }} />
+  const m = moodOf(mood)
+  return <img src={`${BP}/img/mood-${m.sprite}.webp`} alt="" aria-hidden width={size} height={size} draggable={false} loading="lazy" decoding="async"
+    className={cx('object-contain drop-shadow-[0_6px_8px_rgba(24,41,87,.10)]', className)} style={{ width: size, height: size, filter: m.filter }} />
 }
 
 /** Tap-to-log mood character with squash bounce + sparkle burst. */

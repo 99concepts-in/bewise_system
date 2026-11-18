@@ -145,7 +145,7 @@ export function Sheet({ open, onClose, children, title, tall }: { open: boolean;
             className={cx('relative w-full max-w-[480px] rounded-t-[32px] bg-white px-5 pt-3 shadow-[0_-12px_40px_rgba(24,41,87,.18)] outline-none safe-b', tall ? 'max-h-[92dvh]' : 'max-h-[86dvh]')}
           >
             <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-[#dfe2ec]" />
-            <button onClick={onClose} aria-label="Close" className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-peri-50 text-navy"><X className="size-4" /></button>
+            <button onClick={onClose} aria-label="Close" className="absolute right-4 top-4 z-20 grid size-9 place-items-center rounded-full bg-white/90 text-navy shadow-[var(--shadow-card)] backdrop-blur"><X className="size-4" /></button>
             <div className="no-scrollbar max-h-[calc(86dvh-40px)] overflow-y-auto overscroll-contain pb-2">{children}</div>
           </motion.div>
         </div>
@@ -213,8 +213,8 @@ export function Toaster() {
 }
 
 // ---------- Simple context for one-sheet-at-a-time app chrome (log feeling, notifications) ----------
-type ChromeCtx = { openLog: () => void; openNotices: () => void; flyToBag: (from: DOMRect, img: string) => void }
-export const Chrome = createContext<ChromeCtx>({ openLog: () => {}, openNotices: () => {}, flyToBag: () => {} })
+type ChromeCtx = { openLog: () => void; openNotices: () => void; openEntry: (id: string) => void; flyToBag: (from: DOMRect, img: string) => void }
+export const Chrome = createContext<ChromeCtx>({ openLog: () => {}, openNotices: () => {}, openEntry: () => {}, flyToBag: () => {} })
 export const useChrome = () => useContext(Chrome)
 
 export function useNow(intervalMs = 30_000) {

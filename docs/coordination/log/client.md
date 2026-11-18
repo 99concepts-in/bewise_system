@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — Owner review round 1 (preview) · branch claude/new-session-94881h
+**Status:** Pushed — auto-deploys via "Client app → Pages & Hostinger"
+**Done:** welcome story rewritten (Welcome to BeWise Wellness · Book with Jitendra Khimlani · Bach flower remedy benefits · "Let's begin"); decorative rings contained (no overlap with text); all cut-out art re-made with neural background removal (no floor patches); mood characters normalised to one box/baseline; **31 feelings** incl. Happy with search in the log sheet; **journal notes** (add/edit/search); **goals on Home**; 4-digit OTP; no session durations shown; photo copy rewritten; WhatsApp + offers consents default on (owner); subtle focus ring; bottom nav fixed for trailing-slash URLs on static hosting; Meet sheet layout fixed; "Client stories" testimonials section (empty until consented quotes); follow-up path for returning clients
+**Verified:** Apache 2.4 + static export, full journeys, 0 errors / 0 broken assets
+**Contracts changed:** proposals in `20261117-client-to-hub-contract-drift.md` §9 (journal note, Emotion enum, OTP length)
+**Needs from owner:** consented testimonials (Monika, Mitul Shah, Dhaval Gohil, Shivam S. + more); counsel view on pre-ticked consents
+
 ## 2026-11-17 — Auto-deploy to Hostinger on every commit · branch claude/new-session-94881h
 **Status:** Workflow ready — activates when the owner adds FTP secrets (or the hPanel Git webhook secret)
 **Done:** workflow "Client app → Pages & Hostinger": typecheck → Hostinger build → zip artifact → `hostinger-build` branch → FTP sync of changed files (secrets `HOSTINGER_FTP_SERVER/USERNAME/PASSWORD`, vars `HOSTINGER_FTP_DIR/PROTOCOL/BASE_PATH`) → optional hPanel webhook (`HOSTINGER_WEBHOOK_URL`); deploys queue (no cancel mid-upload); FTP step skips cleanly without secrets. Guide updated.

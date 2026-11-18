@@ -2,7 +2,7 @@
 /**
  * @module   onboarding
  * @owner    CLIENT
- * @screens  CL-01 Splash · CL-02 Welcome story (3 slides; slide 2 = how Bach remedies work)
+ * @screens  CL-01 Splash · CL-02 Welcome story — owner copy 2026-11-18: welcome · book with Jitendra Khimlani · Bach flower benefits
  */
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion, type PanInfo } from 'motion/react'
@@ -11,11 +11,12 @@ import { LogoMark, Mascot, MoodImg } from '@/components/brand'
 import { Btn, ease, cx } from '@/components/ui'
 import { BP } from '@/lib/asset'
 
+// Copy rule: no cure / medical claims — "gently support emotional balance" (design system §10)
 const SLIDES = [
-  { lead: 'A gentle conversation about how you', em: 'feel', sub: 'Talk with Jitu Bhaiya — online or in person. No rush, no judgement.' },
-  { lead: 'Flower essences, chosen for your emotions, help you find your way back to', em: 'balance', sub: 'Dr Bach’s 38 flower essences, blended just for you.' },
-  { lead: 'A personal blend, a few drops a', em: 'day', sub: 'Gentle reminders, a mood journal and a companion that knows your ritual.' },
-]
+  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A calm, private space for your emotional wellbeing — guided by Jitu Bhaiya and the gentle wisdom of Bach flower remedies.' },
+  { lead: 'Book your appointment with', em: 'Jitendra Khimlani', sub: 'Jitu Bhaiya, Bach Remedy Therapist. Online or in person — your personal remedy blend is included.' },
+  { lead: 'Bach flower remedy', em: 'benefits', sub: '38 natural flower essences that gently support emotional balance — chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'A few drops a day'] },
+] as { lead: string; em: string; sub: string; chips?: string[] }[]
 
 export default function Welcome() {
   const router = useRouter()
@@ -67,21 +68,32 @@ export default function Welcome() {
             </header>
 
             <motion.div className="relative flex flex-1 touch-pan-y flex-col" drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.18} onDragEnd={onDragEnd}>
-              <div className="relative h-[44dvh] min-h-[290px]">
+              {/* art box is clipped and its lower edge fades out, so decoration never crosses the text below */}
+              <div className="relative h-[44dvh] min-h-[290px] overflow-hidden [mask-image:linear-gradient(to_bottom,#000_88%,transparent)]">
                 <AnimatePresence mode="popLayout" custom={dir} initial={false}>
                   <motion.div key={i} custom={dir} className="absolute inset-0"
                     initial={{ opacity: 0, x: dir * 70 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -70 }} transition={{ duration: 0.5, ease }}>
-                    {i === 0 ? <ArtTalk /> : i === 1 ? <ArtEssence /> : <ArtRitual />}
+                    {i === 0 ? <ArtWelcome /> : i === 1 ? <ArtBook /> : <ArtEssence />}
                   </motion.div>
                 </AnimatePresence>
               </div>
-              <div className="px-6">
+              <div className="relative z-10 mt-3 px-6">
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div key={i} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35, ease }}>
                     <h1 className="text-[28px] font-extrabold leading-[1.12] tracking-[-0.025em] text-navy">
                       {SLIDES[i].lead} <span className="text-soft">{SLIDES[i].em}</span>
                     </h1>
                     <p className="mt-3 text-[15px] leading-6 text-muted">{SLIDES[i].sub}</p>
+                    {SLIDES[i].chips && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {SLIDES[i].chips!.map((c, k) => (
+                          <motion.span key={c} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + k * 0.08 }}
+                            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">
+                            <span className="size-1.5 rounded-full bg-sage" />{c}
+                          </motion.span>
+                        ))}
+                      </div>
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -95,7 +107,7 @@ export default function Welcome() {
                   </button>
                 ))}
               </div>
-              <Btn variant="gradient" full onClick={() => (i < 2 ? go(i + 1) : router.push('/sign-in'))}>{i < 2 ? 'Next' : 'Begin'}</Btn>
+              <Btn variant="gradient" full onClick={() => (i < 2 ? go(i + 1) : router.push('/sign-in'))}>{i < 2 ? 'Next' : 'Let’s begin'}</Btn>
               <Btn variant="ghost" full size="md" onClick={() => router.push('/sign-in?returning=1')}>I have an account</Btn>
             </footer>
           </motion.div>
@@ -105,12 +117,13 @@ export default function Welcome() {
   )
 }
 
-function Halo({ size = 260 }: { size?: number }) {
+/** Soft halo behind the art. Sized from the art box's height (not fixed px) so it can never reach the headline. */
+function Halo({ inner = 0.76 }: { inner?: number }) {
   return (
-    <>
-      <span className="animate-breathe absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/70" style={{ width: size, height: size }} />
-      <span className="animate-breathe absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white" style={{ width: size * 1.28, height: size * 1.28, animationDelay: '1s' }} />
-    </>
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
+      <span className="animate-breathe absolute aspect-square rounded-full bg-white/70" style={{ height: `${inner * 100}%` }} />
+      <span className="animate-breathe absolute aspect-square rounded-full border border-white/80" style={{ height: '92%', animationDelay: '1s' }} />
+    </div>
   )
 }
 
@@ -123,21 +136,38 @@ function Float({ children, className, delay = 0, dy = 10 }: { children: React.Re
   )
 }
 
-function ArtTalk() {
+function ArtWelcome() {
   return (
     <div className="relative h-full">
       <Halo />
-      <div className="absolute inset-0 grid place-items-center"><Mascot pose="wave" height={230} priority /></div>
-      <Float className="left-[9%] top-[16%]" delay={0.25}>
-        <div className="rounded-[20px] rounded-bl-md bg-white px-4 py-2.5 text-[14px] font-semibold text-navy shadow-[var(--shadow-card)]">How have you been feeling?</div>
+      <div className="absolute inset-0 grid place-items-center"><Mascot pose="wave" height={220} priority /></div>
+      <Float className="left-[7%] top-[12%]" delay={0.2} dy={6}><img src={`${BP}/img/f-rose.webp`} alt="" className="h-[78px] w-auto" /></Float>
+      <Float className="right-[6%] top-[8%]" delay={0.35} dy={8}><img src={`${BP}/img/f-mimulus.webp`} alt="" className="h-[96px] w-auto" /></Float>
+      <Float className="bottom-[16%] left-[11%]" delay={0.55} dy={6}><MoodImg mood="calm" size={46} /></Float>
+      <Float className="bottom-[20%] right-[12%]" delay={0.7} dy={7}><MoodImg mood="happy" size={50} /></Float>
+    </div>
+  )
+}
+
+function ArtBook() {
+  return (
+    <div className="relative h-full">
+      <Halo inner={0.74} />
+      <div className="absolute inset-0 grid place-items-center">
+        <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+          className="relative aspect-square h-[62%] overflow-hidden rounded-full bg-white p-1.5 shadow-[var(--shadow-float)]">
+          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani — Jitu Bhaiya" className="h-full w-full rounded-full object-cover object-[50%_18%]" />
+        </motion.div>
+      </div>
+      <Float className="left-[6%] top-[14%]" delay={0.3} dy={6}>
+        <div className="rounded-[18px] rounded-bl-md bg-white px-3.5 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Bach Remedy Therapist</div>
       </Float>
-      <Float className="bottom-[14%] right-[7%]" delay={0.5} dy={8}>
-        <div className="flex items-center gap-2 rounded-[20px] rounded-br-md bg-navy px-4 py-2.5 text-[14px] font-semibold text-white shadow-[var(--shadow-float)]">
-          <img src={`${BP}/img/jitu.webp`} alt="" className="size-7 rounded-full object-cover" />Take your time.
-        </div>
+      <Float className="right-[6%] top-[30%]" delay={0.45} dy={7}>
+        <div className="rounded-[18px] rounded-br-md bg-navy px-3.5 py-2 text-[13px] font-semibold text-white shadow-[var(--shadow-float)]">Online · In person</div>
       </Float>
-      <Float className="right-[10%] top-[12%]" delay={0.7}><MoodImg mood="hopeful" size={48} /></Float>
-      <Float className="bottom-[20%] left-[12%]" delay={0.9} dy={6}><MoodImg mood="calm" size={42} /></Float>
+      <Float className="bottom-[12%] left-[10%]" delay={0.6} dy={5}>
+        <div className="flex items-center gap-1.5 rounded-full bg-sage-100 px-3.5 py-2 text-[13px] font-semibold text-sage-text shadow-[var(--shadow-card)]">✓ Remedy blend included</div>
+      </Float>
     </div>
   )
 }
@@ -147,7 +177,7 @@ function ArtEssence() {
   useEffect(() => { const t = setInterval(() => setCalm((c) => !c), 2400); return () => clearInterval(t) }, [])
   return (
     <div className="relative h-full">
-      <Halo size={240} />
+      <Halo inner={0.72} />
       <Float className="left-[6%] top-[14%]" delay={0.1} dy={6}><img src={`${BP}/img/f-rose.webp`} alt="" className="h-[92px] w-auto" /></Float>
       <Float className="right-[4%] top-[8%]" delay={0.25} dy={8}><img src={`${BP}/img/f-mimulus.webp`} alt="" className="h-[118px] w-auto" /></Float>
       <div className="absolute left-1/2 top-[8%] -translate-x-1/2">
@@ -167,30 +197,6 @@ function ArtEssence() {
         </AnimatePresence>
         <motion.span className="absolute -right-16 top-1/2 -translate-y-1/2 rounded-full bg-white px-2.5 py-1 text-[12px] font-semibold text-navy shadow-[var(--shadow-card)]" key={'l' + calm} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{calm ? 'Calm' : 'Anxious'}</motion.span>
       </div>
-    </div>
-  )
-}
-
-function ArtRitual() {
-  const [n, setN] = useState(0)
-  useEffect(() => { const t = setInterval(() => setN((x) => (x + 1) % 5), 700); return () => clearInterval(t) }, [])
-  return (
-    <div className="relative h-full">
-      <Halo />
-      <div className="absolute inset-0 grid place-items-center"><Mascot pose="bottle" height={220} /></div>
-      <Float className="bottom-[8%] left-1/2 -translate-x-1/2" delay={0.3} dy={4}>
-        <div className="flex items-center gap-3 rounded-full bg-white px-4 py-2.5 shadow-[var(--shadow-card)]">
-          <span className="text-[13px] font-semibold text-navy">Today</span>
-          {[0, 1, 2, 3].map((k) => (
-            <motion.span key={k} className="block size-4 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]" animate={{ backgroundColor: k < n ? '#c48a3a' : '#e6e8f0', scale: k === n - 1 ? [1, 1.35, 1] : 1 }} transition={{ duration: 0.35 }} />
-          ))}
-        </div>
-      </Float>
-      {(['joyful', 'grateful', 'calm'] as const).map((m, k) => (
-        <Float key={m} className={['left-[8%] top-[18%]', 'right-[9%] top-[22%]', 'right-[16%] bottom-[30%]'][k]} delay={0.2 + k * 0.2} dy={7 + k * 2}>
-          <MoodImg mood={m} size={44 + k * 4} />
-        </Float>
-      ))}
     </div>
   )
 }

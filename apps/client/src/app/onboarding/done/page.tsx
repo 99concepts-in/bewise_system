@@ -16,7 +16,7 @@ export default function Done() {
       <Petals />
       <div className="relative mx-auto mt-14 grid size-[220px] place-items-center">
         {[0, 1, 2].map((k) => (
-          <motion.span key={k} className="absolute inset-0 rounded-full border-2 border-white" initial={{ scale: 0.6, opacity: 0.9 }} animate={{ scale: 1.5 + k * 0.2, opacity: 0 }} transition={{ duration: 2.2, delay: 0.3 + k * 0.35, repeat: Infinity, repeatDelay: 0.6, ease: 'easeOut' }} />
+          <motion.span key={k} className="absolute inset-0 rounded-full border-2 border-white" initial={{ scale: 0.6, opacity: 0.9 }} animate={{ scale: 1.18 + k * 0.08, opacity: 0 }} transition={{ duration: 2.2, delay: 0.3 + k * 0.35, repeat: Infinity, repeatDelay: 0.6, ease: 'easeOut' }} />
         ))}
         <motion.div initial={{ scale: 0.3, rotate: -12, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 14, delay: 0.15 }}>
           {profile?.photo ? <Avatar photo={profile.photo} name={profile.name} size={176} ring /> : <Mascot pose="wave" height={200} priority />}
