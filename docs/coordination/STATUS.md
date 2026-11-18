@@ -6,11 +6,11 @@
 ## 🚀 Live previews (GitHub Pages, from `main`) — updated 2026-11-18 by HUB
 | App | Link | Includes |
 |---|---|---|
-| All apps (landing) | https://exceptionalappstudios-ship-it.github.io/bewise_system/ | |
-| Client app | https://exceptionalappstudios-ship-it.github.io/bewise_system/preview/client/ | CLIENT up to `7980628` (blend bottle on Home, studio address & maps, alcohol-free remedies) |
-| Consultant (Jitu Bhaiya) | https://exceptionalappstudios-ship-it.github.io/bewise_system/preview/consultant/ | CONSULTANT up to `10eec57` (share booking link + QR, today's appointments & check-in, month calendar) |
-| Manager (Haresh) | https://exceptionalappstudios-ship-it.github.io/bewise_system/preview/manager/ | MANAGER up to `11da981` (simpler Today, share booking link) |
-| Owner | https://exceptionalappstudios-ship-it.github.io/bewise_system/preview/owner/ | OWNER up to `54dd340` |
+| All apps (landing) | https://99concepts-in.github.io/bewise_system/ | |
+| Client app | https://99concepts-in.github.io/bewise_system/preview/client/ | CLIENT up to `7980628` (blend bottle on Home, studio address & maps, alcohol-free remedies) |
+| Consultant (Jitu Bhaiya) | https://99concepts-in.github.io/bewise_system/preview/consultant/ | CONSULTANT up to `10eec57` (share booking link + QR, today's appointments & check-in, month calendar) |
+| Manager (Haresh) | https://99concepts-in.github.io/bewise_system/preview/manager/ | MANAGER up to `11da981` (simpler Today, share booking link) |
+| Owner | https://99concepts-in.github.io/bewise_system/preview/owner/ | OWNER up to `54dd340` |
 
 Prototypes with sample data only — no real payments, OTP or messages. Rebuild: `bash preview/build.sh` on `main`, commit `preview/`.
 

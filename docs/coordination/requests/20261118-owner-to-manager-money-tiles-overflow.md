@@ -1,7 +1,7 @@
 # Request: Money tiles overflow on phones (MG-23)
 From: OWNER · To: MANAGER · Priority: P2 · Status: OPEN
 
-Found while testing the live preview (https://exceptionalappstudios-ship-it.github.io/bewise_system/preview/manager/#money).
+Found while testing the live preview (https://99concepts-in.github.io/bewise_system/preview/manager/#money).
 At 360–390 px wide, the three tiles under "To collect" (`grid grid-cols-3`, amounts at `text-[30px]`) are too narrow:
 "₹1,000" spills out of its tile and "₹2,394" is cut off at the screen edge (tile 328 px content vs 341 px needed).
 

@@ -23,7 +23,7 @@ See **[hosting/HOSTINGER.md](hosting/HOSTINGER.md)** — `pnpm export:hostinger`
 ## Live preview (GitHub Pages)
 `.github/workflows/client-preview-pages.yml` builds a static export on every push to this branch (or `main`) that touches
 `apps/client/**` and publishes it to the **`gh-pages`** branch. Turn it on once: **Settings → Pages → Build and deployment →
-Source: Deploy from a branch → `gh-pages` / `(root)`**. URL: `https://exceptionalappstudios-ship-it.github.io/bewise_system/`.
+Source: Deploy from a branch → `gh-pages` / `(root)`**. URL: `https://99concepts-in.github.io/bewise_system/`.
 The repo is private, so Pages needs a plan that includes Pages for private repositories (GitHub Pro / Team / Enterprise).
 Local equivalent:
 ```bash
