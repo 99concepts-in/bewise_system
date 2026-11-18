@@ -78,7 +78,8 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .brand .mark{width:44px;height:44px;border-radius:50%;background:#F7F7F9;overflow:hidden;display:grid;place-items:center;flex:none}
 .brand .mark img{width:100%;height:100%;object-fit:cover}
 .brand b{display:block;font-size:18px;letter-spacing:-.01em}
-.brand span{font-size:12px;color:var(--ink-2)}
+.brand span{font-size:12px;color:var(--ink-2);display:block;line-height:1.35}
+.brand > div{min-width:0}
 .navgroup{display:flex;flex-direction:column;gap:2px}
 .navhead{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;border:0;background:none;color:var(--ink-2);font-weight:600;text-align:left;width:100%}
 .navhead.open{background:var(--accent-soft);color:var(--accent-ink)}
@@ -153,14 +154,15 @@ main{min-width:0;padding:10px 6px 30px}
 .tabs button[aria-pressed="true"]{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow)}
 
 /* home specifics */
-.big{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.big{font-size:clamp(30px,3vw,40px);overflow-wrap:anywhere;font-weight:800;letter-spacing:-.03em;line-height:1.1}
 .mid{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
 .lead{color:var(--ink-2);font-size:14px}
 .lead b{color:var(--accent-ink)}
-.mini-split{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px}
-.mini-split div{min-width:0;background:var(--surface-2);border-radius:var(--r-md);padding:10px 12px}
-.mini-split small{display:block;color:var(--ink-2);font-size:12px}
-.mini-split b{font-size:15px}
+.todaycard{display:flex;flex-direction:column}
+.splits{margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:6px}
+.splits div{display:flex;align-items:center;gap:10px;background:var(--surface-2);border-radius:var(--r-md);padding:10px 14px;min-width:0}
+.splits span{color:var(--ink-2);font-size:13px;font-weight:600;min-width:0}
+.splits b{margin-left:auto;font-size:15px;white-space:nowrap}
 .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:6px}
 .day{display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;padding:6px 0;border-radius:var(--r-md)}
 .day:hover{background:var(--surface-2)}
@@ -175,7 +177,7 @@ main{min-width:0;padding:10px 6px 30px}
 .month > div{padding:0 18px;border-left:1px solid var(--line);min-width:0}
 .month > div:first-child{border-left:0;padding-left:0}
 .month small{display:block;color:var(--ink-2);font-size:13px;font-weight:600;margin-bottom:4px}
-.month .val{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.month .val{font-size:clamp(20px,1.9vw,26px);font-weight:800;letter-spacing:-.02em;overflow-wrap:anywhere}
 .month .foot{font-size:12px;color:var(--ink-2);margin-top:2px}
 
 /* chart */
@@ -189,16 +191,20 @@ main{min-width:0;padding:10px 6px 30px}
 .axis{fill:var(--ink-2);font-size:11px;font-family:var(--font)}
 
 /* list items (like the reference's activity list) */
-.items{display:flex;flex-direction:column;gap:12px}
+.items{display:flex;flex-direction:column;gap:12px;container-type:inline-size}
 .item{display:flex;align-items:center;gap:14px;padding:12px;border-radius:var(--r-lg);background:var(--surface);border:1.5px solid var(--line);text-align:left;width:100%}
 .item:hover{border-color:var(--accent-soft)}
 .item.sel{border-color:var(--accent);box-shadow:0 10px 26px rgba(94,127,184,.18)}
 .item .ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;flex:none}
-.item .ico.a{background:var(--accent-soft);color:var(--accent-ink)}
-.item .ico.s{background:var(--sage-soft);color:var(--sage)}
-.item .ico.g{background:var(--gold-soft);color:var(--gold)}
-.item .ico.r{background:var(--bad-soft);color:var(--bad)}
+.ico-sq{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;flex:none}
+.ico-sq.a,.item .ico.a{background:var(--accent-soft);color:var(--accent-ink)}
+.ico-sq.s,.item .ico.s{background:var(--sage-soft);color:var(--sage)}
+.ico-sq.g,.item .ico.g{background:var(--gold-soft);color:var(--gold)}
+.ico-sq.r,.item .ico.r{background:var(--bad-soft);color:var(--bad)}
 .item .t{min-width:0;flex:1}
+.item .amt,.item .go,.item .ico{flex:none}
+@container (max-width:380px){.item{gap:10px;padding:10px}.item .go{display:none}.item .ico{width:40px;height:40px;border-radius:12px}}
+@container (max-width:290px){.item .ico{display:none}}
 .item .t b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px;line-height:1.35}
 .item .t small{display:block;color:var(--ink-2);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item .amt{font-weight:700;white-space:nowrap}
@@ -220,6 +226,7 @@ tr.subtotal td{font-weight:700;background:var(--surface-2)}
 .row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
 .row .grow{flex:1;min-width:0}
+.row > b,.row > .chip,.row > .toggle,.row > .btn{flex:none}
 .row small{display:block;color:var(--ink-2);font-size:12px}
 .meter{height:10px;border-radius:999px;background:var(--bar);overflow:hidden;display:flex}
 .meter span{display:block;height:100%}
@@ -269,6 +276,7 @@ label.f{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-b
 small svg.i,.hint svg.i{width:13px;height:13px;vertical-align:-2px}
 .member > svg.i{transform:rotate(-90deg);color:var(--ink-3)}
 .member.sel{border-color:var(--accent);background:var(--surface-2)}
+.member .grow b,.member .grow small{overflow-wrap:anywhere}
 .member .av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:700;flex:none;color:#fff}
 
 /* toast */
@@ -283,14 +291,24 @@ small svg.i,.hint svg.i{width:13px;height:13px;vertical-align:-2px}
 .sheet .panel a{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;border-radius:20px;background:var(--surface-2);text-decoration:none;color:var(--ink);font-size:13px;font-weight:600;text-align:center}
 .sheet .panel h3{grid-column:1/-1;font-size:16px;margin:0 0 4px}
 
-@media (max-width:1180px){
+/* ---------- responsive ----------
+   ≥1321  full desktop: 268px sidebar, 3-up rows
+   1024–1320  small laptop / iPad landscape: 232px sidebar, two-column rows, sidebar stays
+   641–1023  tablet: no sidebar, floating pill nav, two-column rows where they fit
+   ≤640  phone: single column */
+@media (max-width:1320px){
+  .shell{grid-template-columns:232px minmax(0,1fr);gap:20px;padding:18px}
   .g-home-1{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .g-home-1 .weekcard{grid-column:1/-1;order:-1}
   .month{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:18px}
   .month > div:nth-child(4){border-left:0;padding-left:0}
+  .g3{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ask{grid-template-columns:1fr}
 }
-@media (max-width:900px){
+@media (max-width:1180px){
+  .g-home-3,.g-1-2,.g-2-1{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:1023px){
   body{padding-block:0 110px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
   .shell{display:block;background:none;border:0;box-shadow:none;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .side{display:none}
@@ -300,18 +318,10 @@ small svg.i,.hint svg.i{width:13px;height:13px;vertical-align:-2px}
   .mtop .mark img{width:100%;height:100%;object-fit:cover}
   .mtop .sp{margin-left:auto;display:flex;gap:8px}
   .pagehead .right{display:none}
-  .pagehead h1{font-size:26px}
-  .g-home-1,.g-home-3,.g2,.g3,.g-1-2,.g-2-1{grid-template-columns:minmax(0,1fr)}
-  .card{padding:20px;border-radius:28px}
-  .big{font-size:34px}
-  .month{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .month > div{padding:0 14px}
-  .month > div:nth-child(odd){border-left:0;padding-left:0}
-  .month > div:nth-child(4){border-left:1px solid var(--line);padding-left:14px}
-  .month .val{font-size:22px}
+  .pagehead h1{font-size:28px}
+  .card{padding:22px;border-radius:28px}
   .insight{flex-wrap:wrap}
   .insight p{margin:0;text-align:left;flex-basis:100%}
-  .form{grid-template-columns:1fr}
   .mnav{display:flex;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--nav);height:64px;border-radius:999px;padding:0 10px;gap:4px;align-items:center;box-shadow:var(--shadow-lg);width:min(420px,calc(100% - 32px));justify-content:space-between}
   .mnav a,.mnav button{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:var(--nav-ink);opacity:.8;border:0;background:none;text-decoration:none}
   .mnav .on{background:#fff;color:#182957;opacity:1}
@@ -319,10 +329,25 @@ small svg.i,.hint svg.i{width:13px;height:13px;vertical-align:-2px}
   .mnav .owl img{width:46px;height:46px;object-fit:contain;margin-top:6px}
   .msg{max-width:90%}
 }
+@media (max-width:640px){
+  .pagehead h1{font-size:26px}
+  .g-home-1,.g2,.g3{grid-template-columns:minmax(0,1fr)}
+  .card{padding:20px}
+  .month{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .month > div{padding:0 14px}
+  .month > div:nth-child(odd){border-left:0;padding-left:0}
+  .month > div:nth-child(4){border-left:1px solid var(--line);padding-left:14px}
+  .month .val{font-size:22px}
+  .form{grid-template-columns:1fr}
+  .kv dd{text-align:left}
+  .kv{grid-template-columns:1fr}
+  .kv dt{margin-top:6px}
+}
 @media (max-width:420px){
   .week{gap:2px}
   .day small{font-size:10px}
   .tabs button{padding:0 10px}
+  .month .val{font-size:20px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .fade{animation:fade .35s ease both}
@@ -331,7 +356,7 @@ small svg.i,.hint svg.i{width:13px;height:13px;vertical-align:-2px}
 
 <div class="shell">
   <aside class="side" aria-label="Owner navigation">
-    <div class="brand"><div class="mark"><img src="%%LOGO%%" alt=""></div><div><b>BeWise</b><span>Holistic Wellness · Owner</span></div></div>
+    <div class="brand"><div class="mark"><img src="%%LOGO%%" alt=""></div><div><b>BeWise</b><span>Owner · Holistic Wellness</span></div></div>
     <div class="navgroup">
       <button class="navhead open" data-group="dash" aria-expanded="true"><svg class="i"><use href="#i-grid"/></svg>Dashboard<svg class="i chev"><use href="#i-chev"/></svg></button>
       <div class="sub" id="g-dash">
@@ -494,8 +519,8 @@ const dayKind=d=>d.dow==='Sun'&&d.total<6000?'closed':d.total>avg7*1.15?'great':
 /* ---------- charts ---------- */
 function niceStep(x){const p=Math.pow(10,Math.floor(Math.log10(x)));const n=x/p;return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p;}
 function scale(v){const step=niceStep(v/4);const max=Math.ceil(v/step)*step;const ticks=[];for(let t=0;t<=max+1e-9;t+=step)ticks.push(t);return {max,ticks};}
-function barChart({id,data,keys,colors,labels,h=230,hi=-1,tipFn,yFmt=short}){
-  const W=760,H=h,pl=46,pr=8,pt=14,pb=28;
+function barChart({id,data,keys,colors,labels,h=230,hi=-1,tipFn,yFmt=short,w=760}){
+  const W=Math.max(280,Math.round(w)),H=h,pl=46,pr=8,pt=14,pb=28;
   const tot=data.map(d=>keys.reduce((s,k)=>s+d[k],0));
   const {max,ticks}=scale(Math.max(...tot));
   const iw=(W-pl-pr)/data.length, bw=Math.min(34,iw*.58);
@@ -508,7 +533,8 @@ function barChart({id,data,keys,colors,labels,h=230,hi=-1,tipFn,yFmt=short}){
     s+=`<rect x="${pl+iw*i}" y="${pt}" width="${iw}" height="${H-pt-pb}" fill="transparent"/>`;
     keys.forEach((k,j)=>{const v=d[k]; if(!v) return; const y1=y(acc+v), hgt=y(acc)-y1; acc+=v;
       s+=`<rect x="${x}" y="${y1}" width="${bw}" height="${Math.max(hgt,0)}" rx="${j===keys.length-1?Math.min(10,bw/2):2}" fill="${keys.length===1?(i===hi?'var(--bar-hi)':'var(--bar)'):colors[j]}"/>`;});
-    s+=`<text class="axis" x="${x+bw/2}" y="${H-8}" text-anchor="middle">${labels.x(d,i)}</text></g>`;
+    const every=Math.ceil(22/iw); if(i%every===0||i===data.length-1&&(data.length-1)%every>=every/2) s+=`<text class="axis" x="${x+bw/2}" y="${H-8}" text-anchor="middle">${labels.x(d,i)}</text>`;
+    s+='</g>';
   });
   s+='</svg>';
   return `<div class="chart" id="${id}">${s}<div class="tip" hidden></div></div>`;
@@ -550,14 +576,14 @@ V.home=()=>{
   const best=last7.reduce((a,b)=>b.total>a.total?b:a);
   return `${header('Good morning','Here is your business today, Tuesday 17 November.',sampleTag)}
   <div class="grid g-home-1">
-    <section class="card">
+    <section class="card todaycard">
       <h2>Today so far</h2>
       <p class="lead"><b>${pct(TODAY.total,LAST_TUE_SAME_TIME)>=0?'+':''}${pct(TODAY.total,LAST_TUE_SAME_TIME)}%</b> vs last Tuesday by this time.</p>
       <div class="big num" style="margin-top:14px">${inr(TODAY.total)}</div>
-      <div class="mini-split">
-        <div><small>Sessions</small><b class="num">${TODAY.sessions}</b></div>
-        <div><small>Orders</small><b class="num">${TODAY.orders}</b></div>
-        <div><small>Shop</small><b class="num">${short(TODAY.shop)}</b></div>
+      <div class="splits">
+        <div><span>Sessions</span><b class="num">${TODAY.sessions}</b></div>
+        <div><span>Orders</span><b class="num">${TODAY.orders}</b></div>
+        <div><span>Shop sales</span><b class="num">${inr(TODAY.shop)}</b></div>
       </div>
     </section>
     <section class="card weekcard">
@@ -600,9 +626,10 @@ V.home=()=>{
     <p>Saturday was your best day in a month (${inr(days[13].total)}), mostly shop orders. Sleep Oil 30 ml is down to 6 bottles, and Haresh has a production request ready.</p></section>`;
 };
 V.home.after=()=>{
-  const draw=k=>{$('#dailyWrap').innerHTML=barChart({id:'daily',data:days,keys:[k],colors:['var(--bar-hi)'],hi:16,h:300,labels:{aria:'Daily sales, 1 to 17 November',x:d=>String(d.d).padStart(2,'0')}});
+  let cur='total';
+  const draw=(k=cur)=>{cur=k;const W=$('#dailyWrap').clientWidth;$('#dailyWrap').innerHTML=barChart({id:'daily',w:W,data:days,keys:[k],colors:['var(--bar-hi)'],hi:16,h:W<500?240:300,labels:{aria:'Daily sales, 1 to 17 November',x:d=>String(d.d).padStart(2,'0')}});
     wireChart('daily',days,d=>`<b>${d.dow} ${d.d} Nov · ${inr(d[k])}</b><br>${d.sessions} sessions · ${d.orders} orders`,16);};
-  draw('total');
+  draw('total'); onResize(()=>draw());
   $('#streamTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...e.currentTarget.children].forEach(x=>x.setAttribute('aria-pressed',x===b));draw(b.dataset.k);});
   const alerts=[{t:'Sleep Oil 30 ml running low',d:'6 left · reorder level 20',ic:'box',tone:'g'},{t:'1 failed delivery',d:'BW-00371 · Shiprocket RTO started',ic:'truck',tone:'r'},{t:'Payments are in test mode',d:'Add live Razorpay keys before launch',ic:'plug',tone:'a'}];
   const side=t=>{$('#sideList').innerHTML= t==='w' ? APPROVALS.slice(0,3).map((a,i)=>listItem(a,i===2)).join('')+`<a class="link" href="#approvals">All approvals ${ic('arrow')}</a>`
@@ -619,7 +646,7 @@ V.sales=()=>{
   <section class="card"><div class="chead"><div><h2>Sales by stream</h2><p class="sub-t">1–17 November · ${inr(MTD)} incl. GST</p></div>
     <div class="act"><div class="tabs" role="group" aria-label="Period"><button aria-pressed="false">Today</button><button aria-pressed="false">Week</button><button aria-pressed="true">Month</button><button aria-pressed="false">Year</button></div></div></div>
     <div class="legend" style="margin-bottom:10px">${streams.map(s=>`<span><i style="background:${s[2]}"></i>${s[0]} · <b class="num">${inr(s[1])}</b></span>`).join('')}</div>
-    ${barChart({id:'stack',data:days,keys:['consult','remedies','shop'],colors:streams.map(s=>s[2]),labels:{aria:'Sales by stream per day',x:d=>d.d}})}
+    <div id="stackWrap"></div>
   </section>
   <div class="grid g3" style="margin-top:20px">
     <section class="card"><h3>Share of sales</h3><div class="meter" style="margin:16px 0 14px;height:14px">${streams.map(s=>`<span style="width:${s[1]/MTD*100}%;background:${s[2]}"></span>`).join('')}</div>
@@ -638,7 +665,8 @@ V.sales=()=>{
     ${[['Sleep Oil 30 ml',58,31842,'61%',['warn','6 left']],['Abundance Spray 100 ml',34,16966,'58%',['good','42']],['Aura Salt 250 g',29,11571,'66%',['good','55']],['Remedy reorder (30 ml blend)',sum(NOV.reorder),MTD_R,'72%',['neutral','made to order']],['Bath Salt 500 g',17,8483,'54%',['good','23']]].map(r=>`<tr><td>${r[0]}</td><td class="r num">${r[1]}</td><td class="r num">${inr(r[2])}</td><td class="r num">${r[3]}</td><td><span class="chip ${r[4][0]}">${r[4][1]}</span></td></tr>`).join('')}
     </tbody></table></div></section>`;
 };
-V.sales.after=()=>wireChart('stack',days,d=>`<b>${d.dow} ${d.d} Nov · ${inr(d.total)}</b><br>Consultations ${inr(d.consult)}<br>Remedies ${inr(d.remedies)} · Shop ${inr(d.shop)}`);
+V.sales.after=()=>{const draw=()=>{const W=$('#stackWrap').clientWidth;$('#stackWrap').innerHTML=barChart({id:'stack',w:W,h:W<500?220:240,data:days,keys:['consult','remedies','shop'],colors:['var(--bar-hi)','var(--bar-2)','var(--bar-3)'],labels:{aria:'Sales by stream per day',x:d=>d.d}});
+  wireChart('stack',days,d=>`<b>${d.dow} ${d.d} Nov · ${inr(d.total)}</b><br>Consultations ${inr(d.consult)}<br>Remedies ${inr(d.remedies)} · Shop ${inr(d.shop)}`);}; draw(); onResize(draw);};
 
 V.operations=()=>`${header('Operations','Orders from payment to doorstep. Haresh runs this; you just watch.',sampleTag)}
   <div class="grid g3">
@@ -662,7 +690,7 @@ V.money=()=>{
   <div class="grid g-1-2">
     <section class="card"><div class="chead"><div><h2>Cash &amp; bank</h2><p class="sub-t">All accounts</p></div></div>
       <div class="big num">${inr(CASH_T)}</div>
-      <div style="margin-top:12px">${CASH.map(c=>`<div class="row"><span class="item" style="padding:0;border:0;width:auto"><span class="ico a" style="width:40px;height:40px">${ic(c.ic)}</span></span><span class="grow"><b>${c.n}</b><small>${c.sub}</small></span><b class="num">${inr(c.v)}</b></div>`).join('')}</div>
+      <div style="margin-top:12px">${CASH.map(c=>`<div class="row"><span class="ico-sq a" style="width:40px;height:40px">${ic(c.ic)}</span><span class="grow"><b>${c.n}</b><small>${c.sub}</small></span><b class="num">${inr(c.v)}</b></div>`).join('')}</div>
     </section>
     <section class="card"><div class="chead"><div><h2>To collect</h2><p class="sub-t">${COLLECT.length} invoices · ${inr(COLLECT_T)}</p></div><div class="act"><button class="btn sm ghost" data-toast="Haresh has been asked to follow up on 3 overdue invoices">Nudge Haresh</button></div></div>
       <div class="ageing">${b.map((v,i)=>`<div class="${i>0&&v?'hot':''}" style="height:${Math.max(4,v/bm*100)}%"><span class="num">${short(v)}</span></div>`).join('')}</div>
@@ -692,17 +720,21 @@ V.expenses=()=>`${header('Expenses','Where the money goes. Haresh submits, you a
   </div>`;
 
 V.pnl=()=>{
-  const n=FY[7]; const inc=n[1], cogs=Math.round(inc*0.22), opex=n[2]-cogs, prof=inc-n[2];
-  const cI=Math.round(MTD_C/1.18), rI=Math.round(MTD_R/1.18), sI=inc-cI-rI;
   return `${header('Profit &amp; loss','Income and costs, excluding GST. FY 2026-27.',`${sampleTag} ${draftTag}`)}
   <section class="card"><div class="chead"><div><h2>Month by month</h2><p class="sub-t">Income vs costs · * November to date</p></div>
     <div class="act"><div class="legend"><span><i style="background:var(--bar-hi)"></i>Income</span><span><i style="background:var(--bar-3)"></i>Costs</span></div></div></div>
-    ${(()=>{const W=760,H=240,pl=50,pt=12,pb=28,{max,ticks}=scale(Math.max(...FY.map(f=>f[1]))),iw=(W-pl-8)/FY.length,bw=Math.min(26,iw*.3),y=v=>pt+(H-pt-pb)*(1-v/max);
+    <div id="fyWrap"></div>
+  </section>`+pnlRest();
+};
+function fyChart(w){{const W=Math.max(280,Math.round(w)),H=w<500?210:240,pl=50,pt=12,pb=28,{max,ticks}=scale(Math.max(...FY.map(f=>f[1]))),iw=(W-pl-8)/FY.length,bw=Math.min(26,iw*.3),y=v=>pt+(H-pt-pb)*(1-v/max);
       let s=`<div class="chart" id="fy"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Income and costs by month">`;
       ticks.forEach(t=>{s+=`<line x1="${pl}" x2="${W-8}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)"/><text class="axis" x="${pl-8}" y="${y(t)+4}" text-anchor="end">${short(t)}</text>`;});
       FY.forEach((f,i)=>{const x=pl+iw*i+iw/2;s+=`<g class="bar" data-i="${i}"><rect x="${pl+iw*i}" y="${pt}" width="${iw}" height="${H-pt-pb}" fill="transparent"/><rect x="${x-bw-2}" y="${y(f[1])}" width="${bw}" height="${y(0)-y(f[1])}" rx="8" fill="var(--bar-hi)"/><rect x="${x+2}" y="${y(f[2])}" width="${bw}" height="${y(0)-y(f[2])}" rx="8" fill="var(--bar-3)"/><text class="axis" x="${x}" y="${H-8}" text-anchor="middle">${f[0]}</text></g>`;});
-      return s+'</svg><div class="tip" hidden></div></div>';})()}
-  </section>
+      return s+'</svg><div class="tip" hidden></div></div>';}}
+function pnlRest(){
+  const n=FY[7]; const inc=n[1], cogs=Math.round(inc*0.22), opex=n[2]-cogs, prof=inc-n[2];
+  const cI=Math.round(MTD_C/1.18), rI=Math.round(MTD_R/1.18), sI=inc-cI-rI;
+  return `
   <div class="grid g-2-1" style="margin-top:20px">
     <section class="card"><div class="chead"><div><h2>November to date</h2><p class="sub-t">1–17 Nov 2026</p></div><div class="act"><a class="btn sm ghost" href="#reports">${ic('down')}Export</a></div></div>
       <div class="tablewrap"><table><tbody>
@@ -720,11 +752,11 @@ V.pnl=()=>{
       <a class="link" href="#ask">Ask BeWise about this ${ic('arrow')}</a></section>
   </div>`;
 };
-V.pnl.after=()=>wireChart('fy',FY,f=>`<b>${f[0].replace('*',' (to date)')}</b><br>Income ${inr(f[1])} · Costs ${inr(f[2])}<br>Profit ${inr(f[1]-f[2])}`);
+V.pnl.after=()=>{const draw=()=>{$('#fyWrap').innerHTML=fyChart($('#fyWrap').clientWidth);wireChart('fy',FY,f=>`<b>${f[0].replace('*',' (to date)')}</b><br>Income ${inr(f[1])} · Costs ${inr(f[2])}<br>Profit ${inr(f[1]-f[2])}`);}; draw(); onResize(draw);};
 
 V.reports=()=>`${header('Reports &amp; GST','Download for your records or share with your accountant.',`${sampleTag} ${draftTag}`)}
   <div class="grid g3">
-    ${[['Profit &amp; loss','Income, costs and profit for any period','chart'],['Balance sheet','What the business owns and owes','bank'],['Cash flow','Money in and out by month','wallet'],['Trial balance','Every account, debits = credits','file'],['GST summary','Output, input and net payable per month','receipt'],['Ledgers','Clients, suppliers, staff and every account','users']].map(r=>`<section class="card"><span class="item" style="padding:0;border:0;width:auto;background:none"><span class="ico a">${ic(r[2])}</span></span><h3 style="margin-top:14px">${r[0]}</h3><p class="sub-t">${r[1]}</p><div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap"><button class="btn sm dark" data-toast="Prototype: the real app creates this PDF with a 'Generated' timestamp">PDF</button><button class="btn sm ghost" data-toast="Prototype: the real app creates this Excel file">Excel</button></div></section>`).join('')}
+    ${[['Profit &amp; loss','Income, costs and profit for any period','chart'],['Balance sheet','What the business owns and owes','bank'],['Cash flow','Money in and out by month','wallet'],['Trial balance','Every account, debits = credits','file'],['GST summary','Output, input and net payable per month','receipt'],['Ledgers','Clients, suppliers, staff and every account','users']].map(r=>`<section class="card"><span class="ico-sq a">${ic(r[2])}</span><h3 style="margin-top:14px">${r[0]}</h3><p class="sub-t">${r[1]}</p><div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap"><button class="btn sm dark" data-toast="Prototype: the real app creates this PDF with a 'Generated' timestamp">PDF</button><button class="btn sm ghost" data-toast="Prototype: the real app creates this Excel file">Excel</button></div></section>`).join('')}
   </div>
   <section class="card" style="margin-top:20px"><div class="chead"><div><h2>GST summary — October 2026</h2><p class="sub-t">For GSTR-1 and GSTR-3B. Your accountant files the returns.</p></div><div class="act"><span class="chip warn">Due 20 Nov</span></div></div>
     <div class="tablewrap"><table><thead><tr><th></th><th class="r">Taxable value</th><th class="r">CGST</th><th class="r">SGST</th><th class="r">IGST</th></tr></thead><tbody>
@@ -857,7 +889,7 @@ V.business.after=()=>{document.querySelector('[data-save]').addEventListener('su
 
 V.integrations=()=>`${header('Integrations','Connections to payment, delivery and messaging services. Shown exactly as they are.',sampleTag)}
   <div class="grid g3">
-    ${[['Razorpay','Online payments: UPI, cards, netbanking','warn','Test mode','Add live keys and run a ₹1 test payment','wallet'],['Shiprocket','Courier rates, labels, pickups, tracking','neutral','Not set up','Haresh needs the API login','truck'],['WhatsApp Business','Booking confirmations and reminders','neutral','Not set up','Choose a provider; templates need Meta approval','send'],['Google Calendar','Jitu Bhaiya\'s sessions and busy times','neutral','Not set up','Jitu Bhaiya connects his own calendar','cal'],['Email','Invoices and receipts by email','neutral','Not set up','Needs your domain, e.g. care@bewise…','file'],['Accountant access','Read-only reports for your CA','neutral','Not invited','Invite from Team & roles','users']].map(c=>`<section class="card"><div class="chead"><span class="item" style="padding:0;border:0;width:auto;background:none"><span class="ico a">${ic(c[5])}</span></span><div class="act"><span class="chip ${c[2]}">${c[3]}</span></div></div><h3>${c[0]}</h3><p class="sub-t">${c[1]}</p><p class="hint" style="margin-top:12px">${c[4]}</p></section>`).join('')}
+    ${[['Razorpay','Online payments: UPI, cards, netbanking','warn','Test mode','Add live keys and run a ₹1 test payment','wallet'],['Shiprocket','Courier rates, labels, pickups, tracking','neutral','Not set up','Haresh needs the API login','truck'],['WhatsApp Business','Booking confirmations and reminders','neutral','Not set up','Choose a provider; templates need Meta approval','send'],['Google Calendar','Jitu Bhaiya\'s sessions and busy times','neutral','Not set up','Jitu Bhaiya connects his own calendar','cal'],['Email','Invoices and receipts by email','neutral','Not set up','Needs your domain, e.g. care@bewise…','file'],['Accountant access','Read-only reports for your CA','neutral','Not invited','Invite from Team & roles','users']].map(c=>`<section class="card"><div class="chead"><span class="ico-sq a">${ic(c[5])}</span><div class="act"><span class="chip ${c[2]}">${c[3]}</span></div></div><h3>${c[0]}</h3><p class="sub-t">${c[1]}</p><p class="hint" style="margin-top:12px">${c[4]}</p></section>`).join('')}
   </div>`;
 
 V.activity=()=>`${header('Activity log','Who did what, and when.',sampleTag)}
@@ -868,7 +900,10 @@ V.activity=()=>`${header('Activity log','Who did what, and when.',sampleTag)}
 /* ---------- router ---------- */
 const TITLE_MAP={home:'dash',sales:'dash',operations:'dash',money:'money',expenses:'money',pnl:'money',reports:'money'};
 function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,2600);}
+let RESIZE=[]; const onResize=f=>RESIZE.push(f);
+let _rz; window.addEventListener('resize',()=>{clearTimeout(_rz);_rz=setTimeout(()=>RESIZE.forEach(f=>f()),120);});
 function route(){
+  RESIZE=[];
   const name=(location.hash||'#home').slice(1); const v=V[name]?name:'home';
   $('#view').innerHTML=`<div class="fade">${V[v]()}</div>`; V[v].after&&V[v].after();
   document.querySelectorAll('.side .navlink').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+v));
