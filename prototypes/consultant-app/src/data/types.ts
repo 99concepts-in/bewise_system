@@ -14,12 +14,18 @@ export interface Person {
   id: string
   name: string
   first: string
-  pronoun: 'she' | 'he'
+  pronoun: 'she' | 'he' | 'they'
   city: string
   phone: string
   joinedAt: number
   moods: { day: number; mood: Mood }[] // journal entries (shared with him), newest last
   checkin?: { at: number; better: string[]; same: string[]; harder: string[] }
+  drops?: { day: number; taken: boolean }[] // client ticks "took my drops" in their app (CL-26); missing day = not logged
+}
+
+/** Object / possessive forms — "they" is the default when a person is added without a pronoun. */
+export function pron(p: Pick<Person, 'pronoun'>) {
+  return p.pronoun === 'she' ? { obj: 'her', poss: 'her' } : p.pronoun === 'he' ? { obj: 'him', poss: 'his' } : { obj: 'them', poss: 'their' }
 }
 
 export interface Appt {
@@ -35,7 +41,11 @@ export interface Appt {
   remedy?: { flowers: string[]; stage: RemedyStage; givenAt: number }
   rating?: number
   feedback?: string
+  benefits?: string[] // what the client said they felt after the session (feedback tags, client's words)
   followUpWeeks?: number
+  privateNote?: string // 🔒 only him
+  sharedSummary?: string // optional summary shared with the client (D-26)
+  greeting?: string // the WhatsApp greeting he sent when booking
 }
 
 export interface Notice {

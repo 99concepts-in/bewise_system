@@ -2,6 +2,13 @@
 
 > Only the CONSULTANT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — Consultant prototype v2: impact, live session, suggested flowers, adherence, add person, express booking (branch claude/new-session-1j1y0u)
+**Status:** Prototype (demo data)
+**Done:** "Your impact" on top of Today + Growth (milestones, people helped, % felt better, what people said they felt) · live session route `#/session/:id` (summary → troubling → private notes → flowers to consider → End session → Give remedy) · suggested flowers with reasons in the remedy sheet (D-37, reference only) · "Taking the remedy" adherence card + "Missing drops" group + insight · New person form + Express booking · **owner rule 2026-11-18: booking = greet + confirm first, payment link sent automatically after; he never sends a link himself** · Sessions redesigned (summary, actionable chips, inline Remind / Give remedy / Book, next 7 days only, past rows show what people felt)
+**Contracts changed:** none (prototype). For real build: CLIENT needs a daily "took my drops" log (CL-26) and feedback benefit tags (CL-23); OWNER notifications must send the payment link automatically after the consultant's greeting/confirmation
+**Breaking changes:** none
+**Next:** request files for the drops log + booking greeting flow when FOUNDATION ✅
+
 ## 2026-11-17 — Interactive consultant app prototype (owner request) (branch claude/new-session-1j1y0u)
 **Status:** Prototype done (demo data) · not wired to the foundation
 **Done:** `prototypes/consultant-app/` — standalone Vite + React + motion app (own package.json, NOT under `src/`, so no clash with the HUB scaffold). Today (bloom of today's sessions, next session, swipeable data-driven "Needs you" insights, timeline, weekly goal, client kind words), Sessions (upcoming + past, search, filters, session sheet, reschedule with K1 slot rules, give remedy, book), People (128 demo, buckets, search, sort, profile with progress, mood week, troubling grid, blend tracker), Growth (month vs last, weekly bars, booking heatmap, top troubling, milestone), Updates feed. Screenshots + README in the folder.

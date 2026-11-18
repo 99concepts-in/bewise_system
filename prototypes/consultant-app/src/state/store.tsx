@@ -19,11 +19,15 @@ interface State {
 type Action =
   | { type: 'giveRemedy'; apptId: string; flowers: string[]; now: number }
   | { type: 'reschedule'; apptId: string; start: number }
-  | { type: 'book'; personId: string; start: number; kind: Kind; mode: Mode; id: string; now: number }
+  | { type: 'book'; personId: string; start: number; kind: Kind; mode: Mode; id: string; now: number; greeting: string }
   | { type: 'start'; apptId: string }
   | { type: 'dismiss'; key: string }
   | { type: 'readAll'; now: number }
   | { type: 'saturday'; on: boolean }
+  | { type: 'addPerson'; person: Person }
+  | { type: 'setTroubling'; apptId: string; troubling: string[] }
+  | { type: 'setNote'; apptId: string; note: string }
+  | { type: 'endSession'; apptId: string; outcome: 'completed' | 'no_show'; followUpWeeks?: number; shareSummary?: string }
   | { type: 'reset'; now: number }
 
 const KEY = 'bewise.consult.v1'
@@ -54,8 +58,14 @@ function reducer(s: State, a: Action): State {
       return { ...s, appts, notices: p ? [{ id: `n${Date.now()}`, at: Date.now(), kind: 'rescheduled', text: `You moved ${s.people.find((q) => q.id === p.personId)?.first}'s session`, personId: p.personId, seen: true }, ...s.notices] : s.notices }
     }
     case 'book': {
-      const appt: Appt = { id: a.id, personId: a.personId, start: a.start, durationMin: a.kind === 'first' ? 60 : 30, kind: a.kind, mode: a.mode, status: 'awaiting_payment' }
-      return { ...s, appts: [...s.appts, appt].sort((x, y) => x.start - y.start) }
+      // Flow (owner 2026-11-18): greet + confirm first; the payment link then goes out automatically from BeWise.
+      const appt: Appt = { id: a.id, personId: a.personId, start: a.start, durationMin: a.kind === 'first' ? 60 : 30, kind: a.kind, mode: a.mode, status: 'awaiting_payment', greeting: a.greeting }
+      const first = s.people.find((q) => q.id === a.personId)?.first ?? 'Client'
+      const n = (k: 'booked' | 'payment', text: string, d: number) => ({ id: `n${a.id}${k}`, at: a.now + d, kind: k, text, personId: a.personId, seen: true })
+      return {
+        ...s, appts: [...s.appts, appt].sort((x, y) => x.start - y.start),
+        notices: [n('payment', `Payment link sent automatically to ${first}`, 2000), n('booked', `You booked ${first} and sent your greeting`, 0), ...s.notices],
+      }
     }
     case 'start':
       return { ...s, appts: s.appts.map((x) => x.id === a.apptId ? { ...x, status: 'in_session' } : x) }
@@ -65,6 +75,14 @@ function reducer(s: State, a: Action): State {
       return { ...s, readUpTo: a.now }
     case 'saturday':
       return { ...s, saturdayMorning: a.on }
+    case 'setTroubling':
+      return { ...s, appts: s.appts.map((x) => x.id === a.apptId ? { ...x, troubling: a.troubling } : x) }
+    case 'setNote':
+      return { ...s, appts: s.appts.map((x) => x.id === a.apptId ? { ...x, privateNote: a.note } : x) }
+    case 'endSession':
+      return { ...s, appts: s.appts.map((x) => x.id === a.apptId ? { ...x, status: a.outcome, followUpWeeks: a.followUpWeeks, sharedSummary: a.shareSummary } : x) }
+    case 'addPerson':
+      return { ...s, people: [a.person, ...s.people], notices: [{ id: `n${a.person.id}`, at: a.person.joinedAt, kind: 'booked', text: `You added ${a.person.first}`, personId: a.person.id, seen: true }, ...s.notices] }
     case 'reset':
       return fresh(a.now)
   }

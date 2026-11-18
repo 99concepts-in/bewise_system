@@ -1,12 +1,14 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat } from 'lucide-react'
+import { Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { Avatar, Chip, Segmented, Sheet, go, spring, useToast } from '../ui/kit'
+import { Avatar, Chip, Segmented, Sheet, go, softSpring, spring, useToast } from '../ui/kit'
 import { dayLabel, fmtDay, fmtShort, fmtTime, relative, inr } from '../lib/time'
-import { nextDays, slotsForDay } from '../lib/slots'
+import { nextDays, nextFree, slotsForDay } from '../lib/slots'
 import { CONCERNS, FLOWERS, MIN, startOfDay } from '../data/seed'
-import type { Appt, Kind, Mode } from '../data/types'
+import { suggestFlowers } from '../lib/derive'
+import { Suggestions } from '../ui/care'
+import { pron, type Appt, type Kind, type Mode, type Person } from '../data/types'
 
 type Open =
   | { k: 'session'; id: string }
@@ -14,6 +16,8 @@ type Open =
   | { k: 'slots'; mode: 'book'; personId: string }
   | { k: 'remedy'; apptId: string }
   | { k: 'notices' }
+  | { k: 'add'; then: 'profile' | 'express' }
+  | { k: 'express'; personId?: string }
   | null
 
 interface Api {
@@ -22,6 +26,8 @@ interface Api {
   book: (personId: string) => void
   remedy: (apptId: string) => void
   notices: () => void
+  addPerson: (then?: 'profile' | 'express') => void
+  express: (personId?: string) => void
 }
 const C = createContext<Api | null>(null)
 export const useSheets = () => useContext(C)!
@@ -35,6 +41,10 @@ export const STATUS_LABEL: Record<Appt['status'], string> = {
 export function waLink(phone: string, text: string) {
   return `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`
 }
+/** A warm payment reminder — he never sends the link himself; BeWise already did. */
+export function reminderText(first: string, start: number | undefined, now: number) {
+  return `Namaste ${first} 🙏 Just checking you got the BeWise message about your session${start ? ` on ${dayLabel(start, now).toLowerCase()} at ${fmtTime(start)}` : ''}. The payment link is in that chat. Looking forward to seeing you. Jitu Bhaiya`
+}
 
 export function SheetsProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<Open>(null)
@@ -45,6 +55,8 @@ export function SheetsProvider({ children }: { children: ReactNode }) {
     book: (personId) => setOpen({ k: 'slots', mode: 'book', personId }),
     remedy: (apptId) => setOpen({ k: 'remedy', apptId }),
     notices: () => setOpen({ k: 'notices' }),
+    addPerson: (then = 'profile') => setOpen({ k: 'add', then }),
+    express: (personId) => setOpen({ k: 'express', personId }),
   }), [])
   return (
     <C.Provider value={api}>
@@ -61,15 +73,20 @@ export function SheetsProvider({ children }: { children: ReactNode }) {
       <Sheet open={open?.k === 'notices'} onClose={close} label="Updates">
         {open?.k === 'notices' && <NoticesBody close={close} />}
       </Sheet>
+      <Sheet open={open?.k === 'add'} onClose={close} label="Add a person">
+        {open?.k === 'add' && <AddPersonBody then={open.then} close={close} api={api} />}
+      </Sheet>
+      <Sheet open={open?.k === 'express'} onClose={close} label="Express booking">
+        {open?.k === 'express' && <ExpressBody key={open.personId ?? 'pick'} personId={open.personId} close={close} api={api} />}
+      </Sheet>
     </C.Provider>
   )
 }
 
 // ---------------------------------------------------------------- session details
 function SessionBody({ id, close, api }: { id: string; close: () => void; api: Api }) {
-  const { s, dispatch, now } = useStore()
+  const { s, now } = useStore()
   const { person } = useIndex()
-  const toast = useToast()
   const a = s.appts.find((x) => x.id === id)
   if (!a) return null
   const p = person.get(a.personId)!
@@ -96,7 +113,7 @@ function SessionBody({ id, close, api }: { id: string; close: () => void; api: A
       {a.note && <blockquote className="quote-note">“{a.note}”<cite>{p.first}'s note when booking</cite></blockquote>}
 
       {a.troubling && (
-        <section className="sd-sec"><h4>What was troubling {p.pronoun === 'she' ? 'her' : 'him'}</h4>
+        <section className="sd-sec"><h4>What was troubling {pron(p).obj}</h4>
           <div className="chips-wrap">{a.troubling.map((t) => <span key={t} className="tag">{t}</span>)}</div></section>
       )}
       {a.remedy && (
@@ -111,7 +128,7 @@ function SessionBody({ id, close, api }: { id: string; close: () => void; api: A
 
       <div className="sd-actions">
         {upcoming && <>
-          <button className="btn btn-primary" disabled={!startsSoon} onClick={() => { dispatch({ type: 'start', apptId: a.id }); toast(`Session with ${p.first} started`); close() }}>
+          <button className="btn btn-primary" disabled={!startsSoon} onClick={() => { close(); go(`/session/${a.id}`) }}>
             <Play size={16} /> {startsSoon ? 'Start session' : `Starts ${relative(a.start, now)}`}
           </button>
           <div className="btn-row">
@@ -145,18 +162,19 @@ function SlotBody({ o, close }: { o: Extract<Open, { k: 'slots' }>; close: () =>
   const [day, setDay] = useState(days[Math.max(0, firstOpen)])
   const slots = useMemo(() => slotsForDay(day, duration, s.appts, s, now, appt?.id), [day, duration, s, now, appt?.id])
   const [pick, setPick] = useState<number | null>(null)
+  const [review, setReview] = useState(false)
 
   const confirm = () => {
     if (pick === null) return
-    if (appt) { dispatch({ type: 'reschedule', apptId: appt.id, start: pick }); toast(`Moved to ${dayLabel(pick, now)}, ${fmtTime(pick)}. ${p.first} will be told.`) }
-    else { dispatch({ type: 'book', personId, start: pick, kind, mode, id: `b${Date.now()}`, now }); toast(`Booked. Payment link sent to ${p.first}.`) }
-    close()
+    if (appt) { dispatch({ type: 'reschedule', apptId: appt.id, start: pick }); toast(`Moved to ${dayLabel(pick, now)}, ${fmtTime(pick)}. ${p.first} will be told.`); close() }
+    else setReview(true)
   }
+  if (review && pick !== null && !appt) return <ConfirmBooking p={p} start={pick} kind={kind} mode={mode} onBack={() => setReview(false)} close={close} />
 
   return (
     <div className="slots">
       <h3 className="sheet-title">{appt ? `Move ${p.first}'s session` : `Book ${p.first}`}</h3>
-      {appt && <p className="muted small">Currently {dayLabel(appt.start, now).toLowerCase()} at {fmtTime(appt.start)}. Moving it doesn't use up {p.pronoun === 'she' ? 'her' : 'his'} free reschedules.</p>}
+      {appt && <p className="muted small">Currently {dayLabel(appt.start, now).toLowerCase()} at {fmtTime(appt.start)}. Moving it doesn't use up {pron(p).poss} free reschedules.</p>}
       {!appt && (
         <div className="slots-opts">
           <Segmented id="kind" value={kind} onChange={(v) => { setKind(v); setPick(null) }} options={[{ value: 'followup', label: 'Follow-up ₹800' }, { value: 'first', label: 'First ₹1,000' }]} />
@@ -182,7 +200,7 @@ function SlotBody({ o, close }: { o: Extract<Open, { k: 'slots' }>; close: () =>
         </m.div>
       </AnimatePresence>
       <button className="btn btn-primary btn-block" disabled={pick === null} onClick={confirm}>
-        {pick === null ? 'Pick a time' : appt ? `Move to ${fmtTime(pick)}` : `Book ${fmtTime(pick)} and send payment link`}
+        {pick === null ? 'Pick a time' : appt ? `Move to ${fmtTime(pick)}` : `Continue with ${fmtTime(pick)}`}
       </button>
     </div>
   )
@@ -198,12 +216,16 @@ function RemedyBody({ apptId, close }: { apptId: string; close: () => void }) {
   const last = [...(byPerson.get(p.id) ?? [])].reverse().find((x) => x.remedy && x.id !== a.id)
   const [picked, setPicked] = useState<string[]>(last?.remedy?.flowers ?? [])
   const [q, setQ] = useState('')
+  const history = (byPerson.get(p.id) ?? []).filter((x) => x.id !== a.id && x.start < a.start)
+  const suggestions = useMemo(() => suggestFlowers(p, history, a.troubling ?? []), [p, history.length, a.troubling]) // eslint-disable-line react-hooks/exhaustive-deps
   const list = FLOWERS.filter((f) => f.toLowerCase().includes(q.toLowerCase()))
   const toggle = (f: string) => setPicked((x) => x.includes(f) ? x.filter((y) => y !== f) : [...x, f])
   return (
     <div className="remedy">
-      <h3 className="sheet-title">{p.first}'s blend</h3>
+      <h3 className="sheet-title">Give {p.first}'s remedy</h3>
       <p className="muted small">Session {dayLabel(a.start, now).toLowerCase()} at {fmtTime(a.start)}. Included in the {inr(FEE[a.kind])} fee.{last ? ' Started from the last blend.' : ''}</p>
+      <Suggestions first={p.first} items={suggestions} picked={picked} onToggle={toggle} onAddAll={() => setPicked((x) => [...new Set([...x, ...suggestions.slice(0, 5).map((s) => s.flower)])])} />
+      <h4 className="blend-head">{p.first}'s blend{picked.length ? `, ${picked.length} ${picked.length === 1 ? 'flower' : 'flowers'}` : ''}</h4>
       <div className="blend">
         <AnimatePresence initial={false}>
           {picked.map((f) => (
@@ -213,12 +235,12 @@ function RemedyBody({ apptId, close }: { apptId: string; close: () => void }) {
         {picked.length === 0 && <span className="muted small">Tap flowers below to add them.</span>}
       </div>
       <p className="dosage"><b>4 drops, 4 times a day</b> for 3 weeks, 30 ml bottle</p>
-      <input className="search" placeholder="Search 38 flowers and Rescue Remedy" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search flowers" />
+      <input className="search" placeholder="Add any other flower: search 38 and Rescue Remedy" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search flowers" />
       <div className="flower-list">
         {list.map((f) => <Chip key={f} active={picked.includes(f)} onClick={() => toggle(f)}>{f}</Chip>)}
       </div>
       <button className="btn btn-primary btn-block" disabled={!picked.length} onClick={() => { dispatch({ type: 'giveRemedy', apptId, flowers: picked, now: Date.now() }); toast(`Remedy given. The office is preparing ${p.first}'s bottle.`); close() }}>
-        <Leaf size={16} /> Give remedy · {picked.length} {picked.length === 1 ? 'flower' : 'flowers'}
+        <Leaf size={16} /> Give remedy with {picked.length} {picked.length === 1 ? 'flower' : 'flowers'}
       </button>
     </div>
   )
@@ -247,6 +269,180 @@ function NoticesBody({ close }: { close: () => void }) {
           )
         })}
       </ul>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- add a person
+const CITY_OPTIONS = ['Vadodara', 'Ahmedabad', 'Surat', 'Anand', 'Rajkot', 'Mumbai', 'Pune']
+function AddPersonBody({ then, close, api }: { then: 'profile' | 'express'; close: () => void; api: Api }) {
+  const { s, dispatch } = useStore()
+  const toast = useToast()
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [city, setCity] = useState('Vadodara')
+  const [pronoun, setPronoun] = useState<Person['pronoun']>('they')
+  const [touched, setTouched] = useState(false)
+  const digits = phone.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '')
+  const nameErr = name.trim().length < 2 ? 'Enter their name.' : null
+  const phoneErr = !/^[6-9]\d{9}$/.test(digits) ? 'Enter a 10-digit mobile number.' : null
+  const dup = !phoneErr ? s.people.find((p) => p.phone.replace(/\D/g, '').endsWith(digits)) : undefined
+
+  const save = (next: 'profile' | 'express') => {
+    setTouched(true)
+    if (nameErr || phoneErr || dup) return
+    const clean = name.trim().replace(/\s+/g, ' ')
+    const person: Person = {
+      id: `n${Date.now()}`, name: clean.replace(/\b\w/g, (c) => c.toUpperCase()), first: clean.split(' ')[0].replace(/^\w/, (c) => c.toUpperCase()),
+      pronoun, city: city.trim() || 'Vadodara', phone: `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`, joinedAt: Date.now(), moods: [],
+    }
+    dispatch({ type: 'addPerson', person })
+    if (next === 'express') { api.express(person.id) } else { toast(`${person.first} added`); close(); go(`/people/${person.id}`) }
+  }
+
+  return (
+    <form className="form" onSubmit={(e) => { e.preventDefault(); save(then) }} noValidate>
+      <h3 className="sheet-title">Add a person</h3>
+      <p className="muted small">They'll get a WhatsApp invite to fill their intake before the first session.</p>
+      <label className="field"><span>Full name</span>
+        <input autoFocus value={name} onChange={(e) => setName(e.target.value)} onBlur={() => setTouched(true)} placeholder="e.g. Priya Shah" autoComplete="name" aria-invalid={touched && !!nameErr} />
+        {touched && nameErr && <small className="err">{nameErr}</small>}
+      </label>
+      <label className="field"><span>Mobile number</span>
+        <div className="phone"><b>+91</b><input inputMode="numeric" value={phone} onChange={(e) => setPhone(e.target.value)} onBlur={() => setTouched(true)} placeholder="98765 43210" autoComplete="tel-national" aria-invalid={touched && (!!phoneErr || !!dup)} /></div>
+        {touched && phoneErr && <small className="err">{phoneErr}</small>}
+        {dup && <small className="err">Already registered as {dup.name}. <button type="button" className="link" onClick={() => { close(); go(`/people/${dup.id}`) }}>Open profile</button></small>}
+      </label>
+      <div className="field"><span>City</span>
+        <div className="chips-wrap tight">{CITY_OPTIONS.map((c) => <Chip key={c} active={city === c} onClick={() => setCity(c)}>{c}</Chip>)}</div>
+        <input value={CITY_OPTIONS.includes(city) ? '' : city} onChange={(e) => setCity(e.target.value)} placeholder="Another city" aria-label="Another city" />
+      </div>
+      <div className="field"><span>How to refer to them</span>
+        <Segmented id="pronoun" value={pronoun} onChange={setPronoun} options={[{ value: 'she', label: 'She' }, { value: 'he', label: 'He' }, { value: 'they', label: 'They' }]} />
+      </div>
+      <div className="form-actions">
+        <button type="button" className="btn btn-quiet" onClick={() => save('profile')}><UserPlus size={16} /> Save</button>
+        <button type="button" className="btn btn-primary" onClick={() => save('express')}><Zap size={16} /> Save and book</button>
+      </div>
+    </form>
+  )
+}
+
+// ---------------------------------------------------------------- greet & confirm (payment link follows automatically)
+function greetingFor(p: Person, start: number, kind: Kind, mode: Mode, now: number) {
+  const when = `${dayLabel(start, now) === 'Today' || dayLabel(start, now) === 'Tomorrow' ? dayLabel(start, now).toLowerCase() + ', ' + fmtShort(start) : fmtDay(start)} at ${fmtTime(start)}`
+  return [
+    `Namaste ${p.first} 🙏`,
+    `This is Jitu Bhaiya from BeWise. Your ${KIND_LABEL[kind].toLowerCase()} is booked for ${when}, ${mode === 'online' ? 'online (the video link comes with your reminder)' : 'at the studio in Vadodara'}.`,
+    kind === 'first' ? 'Before we meet, please fill the short intake form so I can understand you better.' : 'Looking forward to hearing how you have been.',
+  ].join('\n\n')
+}
+
+function ConfirmBooking({ p, start, kind, mode, onBack, close }: { p: Person; start: number; kind: Kind; mode: Mode; onBack: () => void; close: () => void }) {
+  const { dispatch, now } = useStore()
+  const [msg, setMsg] = useState(() => greetingFor(p, start, kind, mode, now))
+  const [stage, setStage] = useState<'review' | 'sending' | 'done'>('review')
+  const send = () => {
+    dispatch({ type: 'book', personId: p.id, start, kind, mode, id: `b${Date.now()}`, now: Date.now(), greeting: msg })
+    setStage('sending')
+    setTimeout(() => setStage('done'), 1500)
+  }
+  const steps = [
+    { label: `Greeting sent to ${p.first} on WhatsApp`, on: stage !== 'review' },
+    { label: `Booking confirmed for ${dayLabel(start, now).toLowerCase()}, ${fmtTime(start)}`, on: stage !== 'review' },
+    { label: stage === 'done' ? 'Payment link sent automatically' : 'Sending the payment link automatically', on: stage === 'done' },
+  ]
+  if (stage !== 'review') return (
+    <div className="confirm-done">
+      <m.div className="done-badge" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={softSpring}><img src="./img/owl-wave.webp" width={96} height={96} alt="" /></m.div>
+      <h3 className="sheet-title">{p.first} is booked</h3>
+      <ol className="done-steps">
+        {steps.map((st, i) => (
+          <m.li key={i} className={st.on ? 'on' : ''} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ ...spring, delay: 0.1 + i * 0.12 }}>
+            <span className="ds-dot">{st.on ? <Check size={13} strokeWidth={3} /> : <span className="ds-spin" />}</span>{st.label}
+          </m.li>
+        ))}
+      </ol>
+      <p className="muted small">You don't need to send anything else. BeWise sends the payment link and the reminders.</p>
+      <button className="btn btn-primary btn-block" onClick={close}>Done</button>
+    </div>
+  )
+  return (
+    <div className="confirm">
+      <button className="link back-link" onClick={onBack}><ArrowLeft size={15} /> Change time</button>
+      <h3 className="sheet-title">Greet and confirm</h3>
+      <div className="confirm-summary">
+        <Avatar name={p.name} size={44} />
+        <span><b>{p.name}</b><small>{KIND_LABEL[kind]}, {dayLabel(start, now)} at {fmtTime(start)}, {mode === 'online' ? 'online' : 'in person'}</small></span>
+        <span className="confirm-fee">{inr(FEE[kind])}</span>
+      </div>
+      <label className="field"><span>Your greeting on WhatsApp</span>
+        <textarea className="wa-bubble" value={msg} onChange={(e) => setMsg(e.target.value)} rows={7} />
+      </label>
+      <p className="auto-note"><IndianRupee size={14} /> After you confirm, BeWise sends {p.first} the payment link automatically. Nothing to send yourself.</p>
+      <button className="btn btn-primary btn-block" disabled={msg.trim().length < 5} onClick={send}><MessageCircle size={16} /> Confirm booking and greet {p.first}</button>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- express booking: person → next free time → done
+function ExpressBody({ personId, close, api }: { personId?: string; close: () => void; api: Api }) {
+  const { s, now } = useStore()
+  const { person, byPerson } = useIndex()
+  const [pid, setPid] = useState(personId)
+  const [q, setQ] = useState('')
+  const p = pid ? person.get(pid) : undefined
+  const returning = p ? (byPerson.get(p.id) ?? []).some((a) => a.status === 'completed') : false
+  const [kind, setKind] = useState<Kind>(returning ? 'followup' : 'first')
+  const [mode, setMode] = useState<Mode>('online')
+  const effKind: Kind = p && !returning ? 'first' : kind
+  const free = useMemo(() => nextFree(effKind === 'first' ? 60 : 30, s.appts, s, now, 6), [effKind, s, now])
+  const [picked, setPicked] = useState<number | null>(null)
+
+  if (!p) {
+    const ql = q.trim().toLowerCase()
+    const matches = (ql ? s.people.filter((x) => x.name.toLowerCase().includes(ql) || x.phone.replace(/\s/g, '').includes(ql.replace(/\s/g, ''))) : s.people.slice(0, 0)).slice(0, 6)
+    return (
+      <div className="express">
+        <h3 className="sheet-title"><Zap size={20} /> Express booking</h3>
+        <p className="muted small">Pick who it's for. The next free times come up straight away.</p>
+        <div className="search-wrap"><Search size={18} aria-hidden /><input className="search" placeholder="Search name or phone" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search people" /></div>
+        <ul className="pick-list">
+          {matches.map((x) => (
+            <li key={x.id}><button className="row" onClick={() => { setPid(x.id); setKind((byPerson.get(x.id) ?? []).some((a) => a.status === 'completed') ? 'followup' : 'first') }}>
+              <Avatar name={x.name} size={38} /><span className="row-main"><b>{x.name}</b><small>{x.city}, {x.phone}</small></span><ChevronRight size={16} /></button></li>
+          ))}
+          {ql && matches.length === 0 && <li className="muted small pad">No one matches “{q}”.</li>}
+        </ul>
+        <button className="btn btn-quiet btn-block" onClick={() => api.addPerson('express')}><UserPlus size={16} /> Add someone new</button>
+      </div>
+    )
+  }
+
+  if (picked !== null) return <ConfirmBooking p={p} start={picked} kind={effKind} mode={mode} onBack={() => setPicked(null)} close={close} />
+  return (
+    <div className="express">
+      <h3 className="sheet-title"><Zap size={20} /> Book {p.first}</h3>
+      {!personId && <button className="link" onClick={() => setPid(undefined)}>Change person</button>}
+      <div className="slots-opts">
+        {returning
+          ? <Segmented id="x-kind" value={kind} onChange={setKind} options={[{ value: 'followup', label: 'Follow-up ₹800' }, { value: 'first', label: 'First ₹1,000' }]} />
+          : <p className="pill-note">First consultation, 60 min, ₹1,000 incl. remedy</p>}
+        <Segmented id="x-mode" value={mode} onChange={setMode} options={[{ value: 'online', label: 'Online' }, { value: 'in_person', label: 'In person' }]} />
+      </div>
+      <h4 className="x-head">Next free times</h4>
+      {free.length === 0 && <p className="muted small">No free times in the next 3 weeks. Open more hours in availability.</p>}
+      <ul className="x-list">
+        {free.map((t, i) => (
+          <m.li key={t} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: i * 0.04 }}>
+            <button className={'x-slot' + (i === 0 ? ' is-first' : '')} onClick={() => setPicked(t)}>
+              <span><b>{dayLabel(t, now)}</b><small>{fmtTime(t)}</small></span>
+              <span className="x-cta">{i === 0 ? 'Book earliest' : 'Book'}</span>
+            </button>
+          </m.li>
+        ))}
+      </ul>
+      <button className="btn btn-quiet btn-block" onClick={() => api.book(p.id)}><CalendarClock size={16} /> Pick another day</button>
     </div>
   )
 }

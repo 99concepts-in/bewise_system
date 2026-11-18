@@ -6,9 +6,10 @@ import { AnimatePresence, m, useMotionValue, useTransform, animate } from 'motio
 import { Bell, MapPin, Video, Play, NotebookPen, Sparkles, ChevronRight, MessageCircle } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
 import { Avatar, CountUp, Empty, go, softSpring, spring, useToast } from '../ui/kit'
-import { useSheets, KIND_LABEL, waLink } from './Sheets'
+import { useSheets, KIND_LABEL, waLink, reminderText } from './Sheets'
+import { ImpactCard } from './Impact'
 import { insights, personView, growth, WEEK_GOAL, LIFETIME_REACH, type Insight, type PersonView } from '../lib/derive'
-import { fmtTime, greeting, relative, dayLabel } from '../lib/time'
+import { fmtTime, greeting, relative } from '../lib/time'
 import { MIN, startOfDay, DAY } from '../data/seed'
 import type { Appt } from '../data/types'
 
@@ -45,6 +46,8 @@ export default function Today() {
       </header>
 
       <h1 className="hello"><span>{greeting(now)}, Jitu Bhaiya.</span><span className="hello-sub">{sub}</span></h1>
+
+      <ImpactCard />
 
       <section className="bloom-row" aria-label="Today's sessions">
         <Bloom appts={todays} now={now} onPetal={(a) => sheets.session(a.id)} />
@@ -156,9 +159,6 @@ function Bloom({ appts, now, onPetal }: { appts: Appt[]; now: number; onPetal: (
 // ---------------------------------------------------------------- next session
 function NextCard({ a, now }: { a: Appt; now: number }) {
   const { person } = useIndex()
-  const { dispatch } = useStore()
-  const sheets = useSheets()
-  const toast = useToast()
   const p = person.get(a.personId)!
   const live = a.status === 'in_session'
   const soon = a.start - now < 30 * MIN
@@ -173,7 +173,7 @@ function NextCard({ a, now }: { a: Appt; now: number }) {
       {a.note && <p className="next-note">“{a.note}”</p>}
       <div className="btn-row">
         <button className="btn btn-quiet" onClick={() => go(`/people/${p.id}`)}><NotebookPen size={16} /> Prepare</button>
-        <button className="btn btn-primary" disabled={!soon && !live} onClick={() => { if (!live) { dispatch({ type: 'start', apptId: a.id }); toast(`Session with ${p.first} started`) } else sheets.session(a.id) }}>
+        <button className="btn btn-primary" disabled={!soon && !live} onClick={() => go(`/session/${a.id}`)}>
           <Play size={16} /> {live ? 'Open session' : soon ? 'Start' : `Start at ${fmtTime(a.start)}`}
         </button>
       </div>
@@ -200,7 +200,7 @@ function InsightDeck({ items, views }: { items: Insight[]; views: Map<string, Pe
     if (a.kind === 'whatsapp' && a.target) {
       const p = s.people.find((x) => x.id === a.target)!
       const v = views.get(p.id)
-      window.open(waLink(p.phone, `Namaste ${p.first}, your session${v?.next ? ` on ${dayLabel(v.next.start, now)} at ${fmtTime(v.next.start)}` : ''} is held for you. Here's the payment link to confirm it.`), '_blank', 'noopener')
+      window.open(waLink(p.phone, reminderText(p.first, v?.next?.start, now)), '_blank', 'noopener')
       dispatch({ type: 'dismiss', key: i.key })
     }
     force((x) => x + 1)

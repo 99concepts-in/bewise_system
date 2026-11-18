@@ -1,114 +1,196 @@
 /**
- * @screens CN-16 / CN-14 — every appointment in one place: Upcoming and Past, searchable, grouped by day.
+ * @screens CN-16 / CN-14 — Sessions, calm by default: a short summary, what needs you (with inline actions),
+ *          the next 7 days, everything else folded away. Past shows what people said they felt.
  */
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { useDeferredValue, useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { MapPin, Search, Star, Video, X } from 'lucide-react'
+import { CalendarPlus, ChevronDown, Leaf, MapPin, MessageCircle, Search, Star, Video, X, Zap } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { Avatar, Chip, Empty, Segmented } from '../ui/kit'
-import { useSheets, KIND_LABEL, STATUS_LABEL } from './Sheets'
-import { dayLabel, fmtTime } from '../lib/time'
-import { MIN, startOfDay } from '../data/seed'
+import { Avatar, Empty, Segmented, softSpring, spring } from '../ui/kit'
+import { useSheets, reminderText, waLink } from './Sheets'
+import { personView } from '../lib/derive'
+import { nextFree } from '../lib/slots'
+import { dayLabel, fmtMonth, fmtTime, relative } from '../lib/time'
+import { DAY, MIN, startOfDay } from '../data/seed'
 import type { Appt } from '../data/types'
 
 type Tab = 'upcoming' | 'past'
-type Filter = 'all' | 'first' | 'followup' | 'online' | 'in_person' | 'unpaid' | 'no_show'
+type Focus = 'all' | 'action' | 'first' | 'remedy' | 'followup' | 'noshow'
+type Act = { label: string; icon: 'remind' | 'remedy' | 'book'; run: () => void }
 
 export default function Sessions() {
   const { s, now } = useStore()
-  const { person } = useIndex()
+  const { person, byPerson } = useIndex()
   const sheets = useSheets()
   const [tab, setTab] = useState<Tab>('upcoming')
-  const [filter, setFilter] = useState<Filter>('all')
+  const [focus, setFocus] = useState<Focus>('all')
+  const [searching, setSearching] = useState(false)
   const [q, setQ] = useState('')
   const dq = useDeferredValue(q.trim().toLowerCase())
+  const [showLater, setShowLater] = useState(false)
+  const [pastDays, setPastDays] = useState(14)
 
   const isPast = (a: Appt) => a.status === 'completed' || a.status === 'no_show' || (a.start + a.durationMin * MIN < now && a.status !== 'in_session')
   const upcoming = useMemo(() => s.appts.filter((a) => !isPast(a)), [s.appts, now]) // eslint-disable-line react-hooks/exhaustive-deps
   const past = useMemo(() => s.appts.filter(isPast).reverse(), [s.appts, now]) // eslint-disable-line react-hooks/exhaustive-deps
-  const base = tab === 'upcoming' ? upcoming : past
 
+  // what each row asks of him
+  const latestDone = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const p of s.people) { const v = personView(p, byPerson.get(p.id), now); if (v.buckets.includes('due') && v.last) m.set(v.last.id, p.id) }
+    return m
+  }, [s.people, byPerson, now])
+  const actionFor = (a: Appt): Act | null => {
+    const p = person.get(a.personId)!
+    if (a.status === 'awaiting_payment') return { label: 'Remind', icon: 'remind', run: () => window.open(waLink(p.phone, reminderText(p.first, a.start, now)), '_blank', 'noopener') }
+    if (a.status === 'completed' && !a.remedy) return { label: 'Give remedy', icon: 'remedy', run: () => sheets.remedy(a.id) }
+    if (latestDone.has(a.id)) return { label: 'Book', icon: 'book', run: () => sheets.express(a.personId) }
+    return null
+  }
+  const sessionNo = (a: Appt) => (byPerson.get(a.personId) ?? []).filter((x) => x.start <= a.start && x.status !== 'no_show').length
+
+  // ---- summary numbers
+  const weekEnd = startOfDay(now) + 7 * DAY
+  const week = upcoming.filter((a) => a.start < weekEnd)
+  const unpaid = upcoming.filter((a) => a.status === 'awaiting_payment')
+  const firsts = week.filter((a) => a.kind === 'first')
+  const open = useMemo(() => nextFree(30, s.appts, s, now, 40, 7).length, [s, now])
+  const remedyDue = past.filter((a) => a.status === 'completed' && !a.remedy)
+  const followDue = past.filter((a) => latestDone.has(a.id))
+  const noShows = past.filter((a) => a.status === 'no_show' && a.start > now - 30 * DAY)
+  const month0 = new Date(now); month0.setDate(1); month0.setHours(0, 0, 0, 0)
+  const pastMonth = past.filter((a) => a.status === 'completed' && a.start >= month0.getTime())
+  const felt = pastMonth.filter((a) => a.benefits?.length).length
+
+  const focusOptions: { v: Focus; label: string; n: number }[] = tab === 'upcoming'
+    ? [{ v: 'all', label: 'All', n: upcoming.length }, { v: 'action', label: 'Awaiting payment', n: unpaid.length }, { v: 'first', label: 'First visits', n: upcoming.filter((a) => a.kind === 'first').length }]
+    : [{ v: 'all', label: 'All', n: past.length }, { v: 'remedy', label: 'Remedy to give', n: remedyDue.length }, { v: 'followup', label: 'Follow-up not booked', n: followDue.length }, { v: 'noshow', label: 'No-shows', n: noShows.length }]
+
+  const base = tab === 'upcoming' ? upcoming : past
   const list = useMemo(() => base.filter((a) => {
-    if (filter === 'first' && a.kind !== 'first') return false
-    if (filter === 'followup' && a.kind !== 'followup') return false
-    if (filter === 'online' && a.mode !== 'online') return false
-    if (filter === 'in_person' && a.mode !== 'in_person') return false
-    if (filter === 'unpaid' && a.status !== 'awaiting_payment') return false
-    if (filter === 'no_show' && a.status !== 'no_show') return false
+    if (focus === 'action' && a.status !== 'awaiting_payment') return false
+    if (focus === 'first' && a.kind !== 'first') return false
+    if (focus === 'remedy' && !(a.status === 'completed' && !a.remedy)) return false
+    if (focus === 'followup' && !latestDone.has(a.id)) return false
+    if (focus === 'noshow' && a.status !== 'no_show') return false
     if (dq) { const p = person.get(a.personId)!; if (!p.name.toLowerCase().includes(dq) && !p.city.toLowerCase().includes(dq)) return false }
     return true
-  }), [base, filter, dq, person])
+  }), [base, focus, dq, person, latestDone])
 
-  // incremental rendering — keeps long histories instant
-  const [limit, setLimit] = useState(40)
-  useEffect(() => setLimit(40), [tab, filter, dq])
-  const sentinel = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const el = sentinel.current
-    if (!el) return
-    const io = new IntersectionObserver((e) => { if (e[0].isIntersecting) setLimit((l) => l + 40) }, { rootMargin: '600px' })
-    io.observe(el)
-    return () => io.disconnect()
-  }, [list.length])
-
+  // ---- grouping: upcoming = days within 7, rest folded · past = days within N, then months
+  const filtered = focus !== 'all' || !!dq
   const groups = useMemo(() => {
-    const out: { day: number; items: Appt[] }[] = []
-    for (const a of list.slice(0, limit)) {
+    const out: { key: string; title: string; items: Appt[] }[] = []
+    const push = (key: string, title: string, a: Appt) => { const g = out.at(-1); if (g && g.key === key) g.items.push(a); else out.push({ key, title, items: [a] }) }
+    for (const a of list) {
       const d = startOfDay(a.start)
-      const g = out.at(-1)
-      if (g && g.day === d) g.items.push(a); else out.push({ day: d, items: [a] })
+      if (tab === 'upcoming') {
+        if (!filtered && !showLater && d >= weekEnd) continue
+        push(String(d), dayLabel(d, now), a)
+      } else {
+        if (!filtered && d < startOfDay(now) - pastDays * DAY) continue
+        push(String(d), dayLabel(d, now), a)
+      }
     }
     return out
-  }, [list, limit])
-
-  const filters: { v: Filter; label: string }[] = tab === 'upcoming'
-    ? [{ v: 'all', label: 'All' }, { v: 'first', label: 'First' }, { v: 'followup', label: 'Follow-up' }, { v: 'online', label: 'Online' }, { v: 'in_person', label: 'In person' }, { v: 'unpaid', label: 'Awaiting payment' }]
-    : [{ v: 'all', label: 'All' }, { v: 'first', label: 'First' }, { v: 'followup', label: 'Follow-up' }, { v: 'online', label: 'Online' }, { v: 'in_person', label: 'In person' }, { v: 'no_show', label: 'No-show' }]
+  }, [list, tab, filtered, showLater, weekEnd, pastDays, now])
+  const hiddenLater = tab === 'upcoming' && !filtered && !showLater ? list.filter((a) => a.start >= weekEnd).length : 0
+  const hiddenPast = tab === 'past' && !filtered ? list.filter((a) => startOfDay(a.start) < startOfDay(now) - pastDays * DAY).length : 0
 
   return (
-    <div className="screen">
-      <h1 className="page-title">Sessions</h1>
-      <Segmented id="sessions-tab" value={tab} onChange={(v) => { setTab(v); setFilter('all') }}
-        options={[{ value: 'upcoming', label: 'Upcoming', count: upcoming.length }, { value: 'past', label: 'Past', count: past.length }]} />
-      <div className="search-wrap">
-        <Search size={18} aria-hidden />
-        <input className="search" placeholder="Search by name or city" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search sessions" />
-        {q && <button className="icon-btn sm" onClick={() => setQ('')} aria-label="Clear search"><X size={16} /></button>}
+    <div className="screen sessions">
+      <div className="title-row">
+        <h1 className="page-title">Sessions</h1>
+        <div className="title-actions">
+          <button className="icon-btn" aria-label={searching ? 'Close search' : 'Search'} aria-expanded={searching} onClick={() => { setSearching((x) => !x); setQ('') }}>{searching ? <X size={19} /> : <Search size={19} />}</button>
+          <button className="sort-btn" onClick={() => sheets.express()}><Zap size={16} /> Express</button>
+        </div>
       </div>
-      <div className="chips-scroll">{filters.map((f) => <Chip key={f.v} active={filter === f.v} onClick={() => setFilter(f.v)}>{f.label}</Chip>)}</div>
-
-      <AnimatePresence mode="wait" initial={false}>
-        <m.div key={tab + filter} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.16 }}>
-          {list.length === 0 && (
-            <Empty img="owl-read" title={dq ? `No sessions match “${q}”` : 'Nothing here'} body={dq ? 'Check the spelling or search by city.' : tab === 'upcoming' ? 'No upcoming sessions with this filter.' : 'No past sessions with this filter.'} />
-          )}
-          {groups.map((g) => (
-            <section key={g.day} className="day-group">
-              <h2 className="day-head"><span>{dayLabel(g.day, now)}</span><small>{g.items.length} {g.items.length === 1 ? 'session' : 'sessions'}</small></h2>
-              <ul className="rows">
-                {g.items.map((a) => {
-                  const p = person.get(a.personId)!
-                  return (
-                    <li key={a.id}>
-                      <button className="row" onClick={() => sheets.session(a.id)}>
-                        <span className="row-time">{fmtTime(a.start)}<small>{a.durationMin} min</small></span>
-                        <Avatar name={p.name} size={40} />
-                        <span className="row-main"><b>{p.name}</b><small>{KIND_LABEL[a.kind]}</small></span>
-                        <span className="row-end">
-                          {a.rating ? <span className="mini-rating"><Star size={12} />{a.rating}</span> : null}
-                          {a.status !== 'completed' && a.status !== 'confirmed' && <span className={`st st-${a.status}`}>{STATUS_LABEL[a.status]}</span>}
-                          <span className="mode-ic" aria-label={a.mode === 'online' ? 'Online' : 'In person'}>{a.mode === 'online' ? <Video size={15} /> : <MapPin size={15} />}</span>
-                        </span>
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            </section>
-          ))}
-          {limit < list.length && <div ref={sentinel} className="sentinel" aria-hidden />}
-        </m.div>
+      <AnimatePresence initial={false}>
+        {searching && (
+          <m.div className="search-wrap" initial={{ height: 0, opacity: 0, marginTop: 0 }} animate={{ height: 50, opacity: 1, marginTop: 4 }} exit={{ height: 0, opacity: 0, marginTop: 0 }} transition={spring} style={{ overflow: 'visible' }}>
+            <Search size={18} aria-hidden />
+            <input className="search" autoFocus placeholder="Search by name or city" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search sessions" />
+          </m.div>
+        )}
       </AnimatePresence>
+
+      <div className="tab-gap"><Segmented id="sessions-tab" value={tab} onChange={(v) => { setTab(v); setFocus('all') }}
+        options={[{ value: 'upcoming', label: 'Upcoming', count: upcoming.length }, { value: 'past', label: 'Past', count: past.length }]} /></div>
+
+      {/* one-line insight, then three numbers that can be tapped */}
+      <m.section key={tab} className="sum card" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={softSpring}>
+        {tab === 'upcoming' ? <>
+          <p className="sum-line">{unpaid.length ? <><b>{unpaid.length} {unpaid.length === 1 ? 'booking is' : 'bookings are'} waiting for payment.</b> A reminder from you usually does it.</> : <><b>Everyone this week has paid.</b> Nothing to chase.</>}</p>
+          <div className="sum-stats">
+            <button onClick={() => setFocus('all')}><b>{week.length}</b><span>sessions in the next 7 days</span></button>
+            <button onClick={() => setFocus('first')}><b>{firsts.length}</b><span>first visits</span></button>
+            <button onClick={() => sheets.express()}><b>{open}</b><span>open slots left</span></button>
+          </div>
+        </> : <>
+          <p className="sum-line">{remedyDue.length ? <><b>{remedyDue.length} {remedyDue.length === 1 ? 'remedy' : 'remedies'} still to give.</b> The office is waiting.</> : followDue.length ? <><b>{followDue.length} people are due a follow-up</b> and haven't booked yet.</> : <><b>All caught up.</b> Every session has its remedy.</>}</p>
+          <div className="sum-stats">
+            <button onClick={() => setFocus('all')}><b>{pastMonth.length}</b><span>sessions this month</span></button>
+            <button onClick={() => setFocus('followup')}><b>{followDue.length}</b><span>follow-ups to book</span></button>
+            <button onClick={() => setFocus('all')}><b>{felt}</b><span>said they felt better</span></button>
+          </div>
+        </>}
+      </m.section>
+
+      <div className="chips-scroll">
+        {focusOptions.filter((o) => o.v === 'all' || o.n > 0).map((o) => (
+          <button key={o.v} className={'chip' + (focus === o.v ? ' is-on' : '') + (o.v !== 'all' && o.v !== 'first' ? ' chip-attn' : '')} aria-pressed={focus === o.v} onClick={() => setFocus(o.v)}>
+            {o.label}<span className="chip-count">{o.n}</span>
+          </button>
+        ))}
+      </div>
+
+      {list.length === 0 && <Empty img="owl-read" title={dq ? `No sessions match “${q}”` : 'Nothing here'} body={dq ? 'Check the spelling or search by city.' : 'Nothing needs you in this group.'} />}
+
+      {groups.map((g) => (
+        <section key={g.key} className="day-group">
+          <h2 className="day-head"><span>{g.title}</span><small>{g.items.length} {g.items.length === 1 ? 'session' : 'sessions'}</small></h2>
+          <ul className="rows">
+            {g.items.map((a) => <Row key={a.id} a={a} act={actionFor(a)} n={sessionNo(a)} past={tab === 'past'} />)}
+          </ul>
+        </section>
+      ))}
+
+      {hiddenLater > 0 && (
+        <button className="fold" onClick={() => setShowLater(true)}><ChevronDown size={18} />Show {hiddenLater} later {hiddenLater === 1 ? 'session' : 'sessions'}, up to {fmtMonth(list.at(-1)!.start)} {new Date(list.at(-1)!.start).getDate()}</button>
+      )}
+      {hiddenPast > 0 && (
+        <button className="fold" onClick={() => setPastDays((d) => d + 30)}><ChevronDown size={18} />Show the 30 days before</button>
+      )}
     </div>
+  )
+}
+
+function Row({ a, act, n, past }: { a: Appt; act: Act | null; n: number; past: boolean }) {
+  const { person } = useIndex()
+  const { now } = useStore()
+  const sheets = useSheets()
+  const p = person.get(a.personId)!
+  const soon = !past && a.start - now < 2 * 60 * MIN && a.start > now - 30 * MIN
+  let sub: string
+  if (past) sub = a.status === 'no_show' ? 'Did not come' : a.benefits?.length ? `Felt ${a.benefits.slice(0, 2).join(', ').toLowerCase()}` : a.rating ? 'Left a rating' : 'No feedback yet'
+  else sub = a.kind === 'first' ? 'First visit' : `Follow-up, session ${n}`
+  const Icon = act?.icon === 'remind' ? MessageCircle : act?.icon === 'remedy' ? Leaf : CalendarPlus
+  return (
+    <li>
+      <div className={'row' + (soon ? ' is-soon' : '')} role="button" tabIndex={0} onClick={() => sheets.session(a.id)} onKeyDown={(e) => { if (e.key === 'Enter') sheets.session(a.id) }}>
+        <span className="row-time">{fmtTime(a.start)}<small>{soon ? relative(a.start, now) : `${a.durationMin} min`}</small></span>
+        <Avatar name={p.name} size={40} />
+        <span className="row-main"><b>{p.name}</b><small className={past && a.benefits?.length ? 'felt' : a.status === 'no_show' ? 'warn' : ''}>{sub}</small></span>
+        <span className="row-end">
+          {past && a.rating ? <span className="mini-rating"><Star size={12} />{a.rating}</span> : null}
+          {act ? (
+            <m.button className={`act act-${act.icon}`} whileTap={{ scale: 0.94 }} onClick={(e) => { e.stopPropagation(); act.run() }}>
+              <Icon size={14} />{act.label}
+            </m.button>
+          ) : !past && <span className="mode-ic" aria-label={a.mode === 'online' ? 'Online' : 'In person'}>{a.mode === 'online' ? <Video size={15} /> : <MapPin size={15} />}</span>}
+        </span>
+      </div>
+    </li>
   )
 }

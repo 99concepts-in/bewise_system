@@ -3,10 +3,11 @@
  */
 import { useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { Award, TrendingDown, TrendingUp } from 'lucide-react'
+import { TrendingDown, TrendingUp } from 'lucide-react'
 import { useStore } from '../state/store'
 import { CountUp, softSpring } from '../ui/kit'
 import { growth } from '../lib/derive'
+import { ImpactPanel } from './Impact'
 import { fmtMonth, fmtShort } from '../lib/time'
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -17,7 +18,6 @@ export default function Growth() {
   const g = useMemo(() => growth(s.appts, s.people, now), [s.appts, s.people, now])
   const delta = g.month - g.lastMonth
   const Trend = delta >= 0 ? TrendingUp : TrendingDown
-  const milestone = Math.ceil((g.total + 1) / 100) * 100
   const busiest = useMemo(() => {
     let best = { d: 0, h: 0, v: -1 }
     g.grid.forEach((row, d) => row.forEach((v, h) => { if (v > best.v) best = { d, h, v } }))
@@ -27,6 +27,9 @@ export default function Growth() {
   return (
     <div className="screen growth">
       <h1 className="page-title">Growth</h1>
+      <h2 className="sec-title">Your impact</h2>
+      <ImpactPanel />
+      <h2 className="sec-title">This month</h2>
       <section className="g-hero">
         <p className="muted">{fmtMonth(now)} so far</p>
         <p className="g-big"><CountUp to={g.month} /><span>sessions</span></p>
@@ -58,14 +61,6 @@ export default function Growth() {
         <HBars rows={g.top} />
       </section>
 
-      <section className="card milestone">
-        <Award size={22} />
-        <div>
-          <b>{milestone - g.total} sessions to your {milestone.toLocaleString('en-IN')}th on BeWise</b>
-          <p className="muted small">{g.total.toLocaleString('en-IN')} sessions so far, {g.newPeople} new {g.newPeople === 1 ? 'person' : 'people'} this month.</p>
-          <div className="bar-track"><m.div className="bar-fill" initial={{ width: 0 }} animate={{ width: `${100 - (milestone - g.total)}%` }} transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.3 }} /></div>
-        </div>
-      </section>
     </div>
   )
 }

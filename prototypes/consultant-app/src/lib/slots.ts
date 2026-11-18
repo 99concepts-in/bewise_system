@@ -47,3 +47,12 @@ export function weekLoad(appts: Appt[], av: Availability, now: number) {
   }
   return open ? booked / open : 0
 }
+
+/** Express booking: the next `count` free start times from now, across the booking window. */
+export function nextFree(durationMin: number, appts: Appt[], av: Availability, now: number, count = 4, days = 21) {
+  const out: number[] = []
+  for (const day of nextDays(now, days)) {
+    for (const s of slotsForDay(day, durationMin, appts, av, now)) { out.push(s); if (out.length >= count) return out }
+  }
+  return out
+}
