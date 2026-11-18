@@ -1,0 +1,212 @@
+/**
+ * @module   prototype/consultant-app
+ * @owner    CONSULTANT
+ * Purpose:  Deterministic demo data generated relative to "now", so every state (done / now / next / quiet) is real.
+ *           Names, quotes and numbers are illustrative only.
+ */
+import type { Appt, Kind, Mode, Mood, Notice, Person } from './types'
+
+export const FLOWERS = [
+  'Agrimony', 'Aspen', 'Beech', 'Centaury', 'Cerato', 'Cherry Plum', 'Chestnut Bud', 'Chicory', 'Clematis',
+  'Crab Apple', 'Elm', 'Gentian', 'Gorse', 'Heather', 'Holly', 'Honeysuckle', 'Hornbeam', 'Impatiens', 'Larch',
+  'Mimulus', 'Mustard', 'Oak', 'Olive', 'Pine', 'Red Chestnut', 'Rock Rose', 'Rock Water', 'Scleranthus',
+  'Star of Bethlehem', 'Sweet Chestnut', 'Vervain', 'Vine', 'Walnut', 'Water Violet', 'White Chestnut',
+  'Wild Oat', 'Wild Rose', 'Willow', 'Rescue Remedy',
+]
+export const CONCERNS = [
+  'Anxiety', 'Fear', 'Overthinking', 'Sadness', 'Loneliness', 'Anger', 'Insecurity', 'Exhaustion', 'Grief',
+  'Indecision', 'Overwhelm', 'Guilt',
+]
+const CONCERN_FLOWERS: Record<string, string[]> = {
+  Anxiety: ['Aspen', 'Mimulus', 'Red Chestnut'], Fear: ['Mimulus', 'Rock Rose', 'Aspen'],
+  Overthinking: ['White Chestnut', 'Vervain'], Sadness: ['Mustard', 'Gentian'], Loneliness: ['Heather', 'Water Violet'],
+  Anger: ['Holly', 'Impatiens', 'Willow'], Insecurity: ['Larch', 'Cerato', 'Centaury'], Exhaustion: ['Olive', 'Hornbeam', 'Oak'],
+  Grief: ['Star of Bethlehem', 'Honeysuckle'], Indecision: ['Scleranthus', 'Wild Oat'], Overwhelm: ['Elm', 'Vervain'],
+  Guilt: ['Pine', 'Crab Apple'],
+}
+const FEMALE = ['Priya', 'Ananya', 'Kavya', 'Meera', 'Nisha', 'Heena', 'Pooja', 'Riya', 'Sneha', 'Aditi', 'Tanvi', 'Zoya',
+  'Simran', 'Jasmine', 'Ishita', 'Khushi', 'Bhavna', 'Dimple', 'Hetal', 'Komal', 'Mansi', 'Nidhi', 'Rupal', 'Shreya',
+  'Trupti', 'Urvi', 'Vaishali', 'Yashvi', 'Aarti', 'Devanshi', 'Falguni', 'Gauri', 'Jinal', 'Krupa', 'Leena', 'Payal']
+const MALE = ['Rohan', 'Dhruv', 'Arjun', 'Ishaan', 'Karan', 'Vikram', 'Neel', 'Farhan', 'Harsh', 'Jay', 'Kunal', 'Manan',
+  'Parth', 'Raj', 'Sagar', 'Tejas', 'Utsav', 'Viraj', 'Yash', 'Aakash', 'Chirag', 'Deep', 'Gaurav', 'Hitesh']
+const LAST = ['Shah', 'Mehta', 'Rao', 'Patel', 'Desai', 'Joshi', 'Trivedi', 'Bhatt', 'Parikh', 'Modi', 'Vyas', 'Pandya',
+  'Iyer', 'Malhotra', 'Kulkarni', 'Chauhan', 'Gandhi', 'Thakkar', 'Khan', 'Sheikh', 'Kaur', "D'Souza", 'Soni', 'Dave',
+  'Raval', 'Amin', 'Nair', 'Kapoor', 'Jain', 'Doshi']
+const CITIES = ['Vadodara', 'Vadodara', 'Vadodara', 'Vadodara', 'Ahmedabad', 'Ahmedabad', 'Surat', 'Anand', 'Rajkot',
+  'Mumbai', 'Pune', 'Bengaluru', 'Dubai', 'London']
+const NOTES = [
+  'Sleep is better, but still anxious about the project deadline.',
+  'My exams start next month and I freeze when I sit to study.',
+  'Since Papa passed, evenings are the hardest.',
+  'I keep saying yes to everyone at work and I am tired.',
+  'Feeling much calmer. Want to talk about the next step.',
+  'Arguments at home have reduced. Still get angry quickly.',
+  'New city, new job. Everything feels too much right now.',
+  'Booking for my daughter (11). She is scared of school.',
+  'I want to stop overthinking every small decision.',
+  'The drops are going well. A few heavy days this week.',
+]
+export const KIND_WORDS = [
+  'Felt lighter walking out of the session than I have in months.',
+  'He listened without rushing me. First time I felt heard.',
+  'I finally said no at work without feeling guilty.',
+  'Calmer mornings this week. My family noticed before I did.',
+  'Thank you for the patience with all my questions.',
+  'My daughter reminds me about her drops every morning.',
+  'I could talk about Papa today without breaking down.',
+  'Small steps, but I am sleeping on time again.',
+  'Clear, kind and practical. Exactly what I needed.',
+  'I left with a plan instead of a knot in my stomach.',
+]
+const FEEDBACK_OK = ['Good session, a lot to think about.', 'Helpful, would like a longer follow-up next time.', 'Nice talk.']
+
+export const HOUR = 3_600_000
+export const DAY = 24 * HOUR
+export const MIN = 60_000
+
+function mulberry32(seed: number) {
+  return () => {
+    seed |= 0; seed = (seed + 0x6d2b79f5) | 0
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+export function startOfDay(t: number) { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime() }
+function at(day: number, h: number, m = 0) { return day + h * HOUR + m * MIN }
+
+export interface Seed { people: Person[]; appts: Appt[]; notices: Notice[] }
+
+export function makeSeed(now: number): Seed {
+  const r = mulberry32(20261117)
+  const pick = <T,>(xs: T[]) => xs[Math.floor(r() * xs.length)]
+  const pickN = <T,>(xs: T[], n: number) => { const c = [...xs]; const o: T[] = []; while (o.length < n && c.length) o.push(c.splice(Math.floor(r() * c.length), 1)[0]); return o }
+  const today = startOfDay(now)
+  const people: Person[] = []
+  const appts: Appt[] = []
+  const used = new Set<string>()
+  const N = 128
+  let aid = 1
+
+  for (let i = 0; i < N; i++) {
+    const female = r() < 0.66
+    let first = '', name = ''
+    do { first = pick(female ? FEMALE : MALE); name = `${first} ${pick(LAST)}` } while (used.has(name))
+    used.add(name)
+    const joinedDaysAgo = Math.floor(Math.pow(r(), 1.6) * 520) + 3
+    const p: Person = {
+      id: `p${i + 1}`, name, first, pronoun: female ? 'she' : 'he', city: pick(CITIES),
+      phone: `+91 9${Math.floor(r() * 9e8 + 1e8)}`.replace(/(\d{5})(\d{5})$/, '$1 $2'),
+      joinedAt: today - joinedDaysAgo * DAY + Math.floor(r() * 10) * HOUR, moods: [],
+    }
+    people.push(p)
+    const mainConcerns = pickN(CONCERNS, 1 + Math.floor(r() * 3))
+    // past sessions: first, then follow-ups every 3–6 weeks
+    let t = startOfDay(p.joinedAt) + 2 * DAY
+    let k = 0
+    const maxSessions = 1 + Math.floor(r() * 7)
+    let lastFlowers: string[] = []
+    while (t < today - DAY && k < maxSessions) {
+      const day = startOfDay(t)
+      const dow = new Date(day).getDay()
+      if (dow === 0) { t += DAY; continue }
+      const slotH = pick([10, 11, 12, 16, 17, 18])
+      const kind: Kind = k === 0 ? 'first' : 'followup'
+      const noShow = k > 0 && r() < 0.05
+      const troubling = pickN([...mainConcerns, ...pickN(CONCERNS, 1)], 1 + Math.floor(r() * 3))
+      const flowers = noShow ? [] : (k > 0 && r() < 0.35 && lastFlowers.length ? lastFlowers : pickN(troubling.flatMap((c) => CONCERN_FLOWERS[c]), 3 + Math.floor(r() * 3)))
+      if (!noShow) lastFlowers = flowers
+      const rated = !noShow && r() < 0.78
+      const rating = rated ? (r() < 0.72 ? 5 : r() < 0.85 ? 4 : 3) : undefined
+      appts.push({
+        id: `a${aid++}`, personId: p.id, start: at(day, slotH, r() < 0.5 ? 0 : 30), durationMin: kind === 'first' ? 60 : 30,
+        kind, mode: r() < 0.62 ? 'online' : 'in_person', status: noShow ? 'no_show' : 'completed',
+        note: r() < 0.5 ? pick(NOTES) : undefined, troubling: noShow ? undefined : troubling,
+        remedy: noShow ? undefined : { flowers, stage: 'delivered', givenAt: at(day, slotH + 1) },
+        rating, feedback: rating ? (rating === 5 ? pick(KIND_WORDS) : pick(FEEDBACK_OK)) : undefined,
+        followUpWeeks: pick([3, 4, 4, 6]),
+      })
+      k++
+      t = day + (21 + Math.floor(r() * 24)) * DAY
+    }
+    // journal moods (only for people in care recently)
+    const last = appts.filter((a) => a.personId === p.id).at(-1)
+    if (last && today - last.start < 60 * DAY) {
+      const bias: Mood[] = r() < 0.6 ? ['calm', 'hopeful', 'joyful', 'grateful', 'calm', 'tired', 'anxious'] : ['anxious', 'tired', 'sad', 'calm', 'irritated', 'hopeful']
+      for (let d = 13; d >= 0; d--) if (r() < 0.7) p.moods.push({ day: today - d * DAY, mood: pick(bias) })
+      if (r() < 0.35) {
+        const tr = last.troubling ?? []
+        p.checkin = { at: today - Math.floor(r() * 5) * DAY - 3 * HOUR, better: tr.slice(0, 1), same: tr.slice(1, 2), harder: r() < 0.45 ? ['Sleep'] : [] }
+      }
+    }
+  }
+
+  // ---- today: anchored to now so the demo always has done / now / next
+  const nowH = new Date(now).getHours() + new Date(now).getMinutes() / 60
+  const anchor = today + Math.min(18, Math.max(11, nowH)) * HOUR
+  const round15 = (x: number) => Math.round(x / (15 * MIN)) * 15 * MIN
+  const todayPlan: [number, Kind, Mode][] = [
+    [-3 * HOUR, 'followup', 'in_person'], [-90 * MIN, 'first', 'online'], [18 * MIN, 'followup', 'online'],
+    [150 * MIN, 'followup', 'in_person'], [270 * MIN, 'first', 'online'],
+  ]
+  const inCare = people.filter((p) => appts.some((a) => a.personId === p.id && a.status === 'completed'))
+  const fresh = people.filter((p) => !appts.some((a) => a.personId === p.id))
+  const todayPeople = [inCare[0], fresh[0] ?? inCare[9], inCare[1], inCare[2], fresh[1] ?? inCare[10]]
+  todayPlan.forEach(([off, kind, mode], i) => {
+    const start = round15(anchor + off)
+    const end = start + (kind === 'first' ? 60 : 30) * MIN
+    const p = todayPeople[i]
+    const status = end <= now ? 'completed' : start <= now ? 'in_session' : 'confirmed'
+    const done = status === 'completed'
+    appts.push({
+      id: `a${aid++}`, personId: p.id, start, durationMin: kind === 'first' ? 60 : 30, kind, mode, status,
+      note: NOTES[i * 2 % NOTES.length], troubling: done ? pickN(CONCERNS, 2) : undefined,
+      // the most recent finished session has no remedy yet → drives an insight
+      remedy: done && i === 0 ? { flowers: ['White Chestnut', 'Mimulus', 'Elm', 'Walnut'], stage: 'preparing', givenAt: end + 5 * MIN } : undefined,
+      rating: done && i === 0 ? 5 : undefined, feedback: done && i === 0 ? KIND_WORDS[0] : undefined,
+    })
+  })
+
+  // ---- upcoming 3 weeks
+  const upcomingPool = inCare.slice(3)
+  let u = 0
+  for (let d = 1; d <= 21; d++) {
+    const day = today + d * DAY
+    const dow = new Date(day).getDay()
+    if (dow === 0) continue
+    const load = d <= 7 ? 4 + Math.floor(r() * 3) : Math.max(0, 4 - Math.floor((d - 7) / 4) + Math.floor(r() * 2) - 1)
+    const hours = pickN([10, 11, 12, 16, 17, 18, 19], Math.min(load, 6)).sort((a, b) => a - b)
+    for (const h of hours) {
+      const isFirst = r() < 0.22
+      const p = isFirst && fresh[2 + u % 10] ? fresh[2 + u % 10] : upcomingPool[u % upcomingPool.length]
+      u++
+      if (appts.some((a) => a.personId === p.id && a.start > now)) continue
+      appts.push({
+        id: `a${aid++}`, personId: p.id, start: at(day, h, h === 12 || r() < 0.3 ? 0 : 0), durationMin: isFirst ? 60 : 30,
+        kind: isFirst ? 'first' : 'followup', mode: r() < 0.6 ? 'online' : 'in_person',
+        status: d === 1 && u % 5 === 0 ? 'awaiting_payment' : 'confirmed', note: r() < 0.5 ? pick(NOTES) : undefined,
+      })
+    }
+  }
+  // one hold awaiting payment today-ish (drives an insight)
+  const holdP = fresh[12] ?? inCare[20]
+  appts.push({ id: `a${aid++}`, personId: holdP.id, start: today + 2 * DAY + 17 * HOUR, durationMin: 60, kind: 'first', mode: 'online', status: 'awaiting_payment', note: NOTES[6] })
+
+  appts.sort((a, b) => a.start - b.start)
+
+  // ---- notices
+  const notices: Notice[] = []
+  const nx = (minsAgo: number, kind: Notice['kind'], text: string, personId?: string) =>
+    notices.push({ id: `n${notices.length + 1}`, at: now - minsAgo * MIN, kind, text, personId })
+  const up = appts.filter((a) => a.start > now && a.status === 'confirmed')
+  const nameOf = (id: string) => people.find((p) => p.id === id)!.first
+  if (up[3]) nx(12, 'booked', `${nameOf(up[3].personId)} booked a follow-up`, up[3].personId)
+  nx(40, 'feedback', `${todayPeople[0].first} rated today's session 5 stars`, todayPeople[0].id)
+  if (up[6]) nx(95, 'rescheduled', `${nameOf(up[6].personId)} moved their session to a new time`, up[6].personId)
+  nx(180, 'delivered', `${inCare[5].first}'s remedy was delivered`, inCare[5].id)
+  const ck = people.find((p) => p.checkin?.harder.length)
+  if (ck) nx(260, 'checkin', `${ck.first} filled the check-in before their follow-up`, ck.id)
+  nx(26 * 60, 'payment', `${holdP.first} started booking a first consultation`, holdP.id)
+  return { people, appts, notices }
+}
