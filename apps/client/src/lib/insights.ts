@@ -45,12 +45,12 @@ export function weekRow(journal: JournalEntry[]) {
 
 export function dailyInsight(journal: JournalEntry[]): string {
   const days = lastNDays(journal, 14).filter((d) => d.mood)
-  if (!journal.length) return 'Log how you feel once a day — patterns appear after about a week.'
+  if (!journal.length) return 'Log how you feel once a day, patterns appear after about a week.'
   let streak = 0
   for (let i = days.length - 1; i >= 0; i--) { if (days[i].mood && MOOD_LIFT[days[i].mood!] >= 4) streak++; else break }
   if (streak >= 3) return `You’ve felt ${moodOf(days[days.length - 1].mood!).label.toLowerCase()} or brighter ${streak} days in a row. Lovely.`
   const evenings = journal.filter((e) => new Date(e.at).getHours() >= 19)
-  if (evenings.length >= 3 && evenings.filter((e) => e.emotion === 'tired').length / evenings.length > 0.5) return 'Evenings often feel tired — a slower wind-down might help.'
+  if (evenings.length >= 3 && evenings.filter((e) => e.emotion === 'tired').length / evenings.length > 0.5) return 'Evenings often feel tired, a slower wind-down might help.'
   const last = journal[0]
   return last ? `Your last check-in: ${moodOf(last.emotion).label.toLowerCase()}. Thank you for noticing.` : 'One tap a day is enough.'
 }
@@ -68,9 +68,9 @@ export function progressLines(journal: JournalEntry[], since?: string): { mood: 
   const tired = count(second, ['tired'])
   const out: { mood: Emotion; text: string }[] = [
     { mood: 'calm', text: `You’ve felt calm or brighter on ${calm} of ${all.length} days.` },
-    anxB < anxA ? { mood: 'anxious', text: `Anxious days dropped from ${anxA} to ${anxB}.` } : { mood: 'hopeful', text: 'Keep logging — the picture gets clearer each week.' },
+    anxB < anxA ? { mood: 'anxious', text: `Anxious days dropped from ${anxA} to ${anxB}.` } : { mood: 'hopeful', text: 'Keep logging, the picture gets clearer each week.' },
   ]
-  if (tired >= 2) out.push({ mood: 'tired', text: 'Tiredness still shows up — worth sharing at your follow-up.' })
+  if (tired >= 2) out.push({ mood: 'tired', text: 'Tiredness still shows up, worth sharing at your follow-up.' })
   else out.push({ mood: 'grateful', text: 'Small rituals add up. Your consistency shows.' })
   return out
 }

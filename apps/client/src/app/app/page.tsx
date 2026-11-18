@@ -10,13 +10,16 @@ import { AnimatePresence, motion } from 'motion/react'
 import { ArrowRight, BookOpen, Check, ChevronRight, Lightbulb, Sparkles, Video } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Mascot, MoodButton, MoodImg } from '@/components/brand'
+import { LaunchBanner } from '@/components/launch-offer'
+import { GoalCheck } from '@/components/goal-check'
+import { doneToday, kindOf, streak } from '@/lib/goals'
 import { AppHeader } from '@/components/shell'
 import { ConsultInviteArt, SessionDateArt } from '@/components/session-art'
 import { BlendBottleCard } from '@/components/blend-bottle'
 import { Btn, BtnLink, Item, Reveal, Ring, buzz, spring, toast, useChrome, useNow } from '@/components/ui'
 import { CONSULTATIONS, QUICK_MOODS, moodOf, type Emotion } from '@/lib/data'
 import { useApp, type Appointment } from '@/lib/store'
-import { dayKey, firstName, fmtDay, fmtTime } from '@/lib/format'
+import { dayKey, firstName, fmtDay, fmtTime, formatINR } from '@/lib/format'
 import { dailyInsight, progressLines } from '@/lib/insights'
 import { BP } from '@/lib/asset'
 
@@ -39,7 +42,8 @@ export default function Home() {
     <main className="px-5 pb-32">
       <AppHeader />
       <Reveal className="space-y-4">
-        <Item className="pt-3">
+        <Item className="pt-2"><LaunchBanner /></Item>
+        <Item>
           <h1 className="text-[34px] font-extrabold leading-[1.05] tracking-[-0.03em] text-navy">Hi {firstName(profile?.name)}</h1>
           <p className="mt-1 text-[24px] font-bold leading-tight tracking-[-0.02em] text-soft">how are you feeling today?</p>
         </Item>
@@ -50,9 +54,9 @@ export default function Home() {
               <h2 id="mood-h" className="h-section">Today’s mood</h2>
               <p className="mt-0.5 text-[13px] text-muted">Tap once to reflect. Takes 3 seconds.</p>
             </div>
-            <div className="mt-3 flex justify-between">
+            <div className="mt-3 grid grid-cols-5 gap-0.5">
               {QUICK_MOODS.map((m) => (
-                <MoodButton key={m} mood={m} size={54} burstKey={burst?.mood === m ? burst.n : undefined} selected={lastToday?.emotion === m} onPick={() => tapMood(m)} />
+                <MoodButton key={m} mood={m} size={54} fluid burstKey={burst?.mood === m ? burst.n : undefined} selected={lastToday?.emotion === m} onPick={() => tapMood(m)} />
               ))}
             </div>
             <div className="mt-2 flex min-h-9 items-center justify-between px-2">
@@ -82,7 +86,7 @@ export default function Home() {
           <Link href="/app/ask" className="card group relative block overflow-hidden p-5 pr-[42%]">
             <span className="absolute -right-6 -top-6 size-44 rounded-full bg-[radial-gradient(circle,#dce2f5_0%,transparent_70%)]" />
             <h2 className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">Ask <span className="text-soft">BeWise</span></h2>
-            <p className="mt-1.5 text-[14px] leading-5 text-muted">Your wise companion — answers about your remedy, journal and orders.</p>
+            <p className="mt-1.5 text-[14px] leading-5 text-muted">Your wise companion for questions about your remedy, journal and orders.</p>
             <span className="mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-navy px-5 text-[14px] font-semibold text-white shadow-[var(--shadow-cta)]"><Sparkles className="size-4" /> Start a chat</span>
             <div className="absolute bottom-2 right-3"><Mascot pose="wave" height={150} /></div>
           </Link>
@@ -93,7 +97,7 @@ export default function Home() {
         <Item>
           <div className="card flex items-start gap-3 p-5">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#fbf3dc] text-gold"><Lightbulb className="size-5" /></span>
-            <p className="text-[14px] leading-6 text-ink"><b className="text-navy">Your daily insight</b> — {dailyInsight(journal)}</p>
+            <p className="text-[14px] leading-6 text-ink"><b className="text-navy">Your daily insight</b>, {dailyInsight(journal)}</p>
           </div>
         </Item>
       </Reveal>
@@ -118,6 +122,13 @@ function ContextCard() {
   const { upcoming, needsFeedback, any, now } = useNextAppointment()
   const router = useRouter()
 
+  const appts = useApp.getState().appointments
+  const toPay = appts.find((x) => x.needsNewTime || ((x.status === 'awaiting_payment' || x.status === 'expired') && !x.paidAt))
+  if (toPay?.needsNewTime)
+    return <Ctx tone="sage" kicker={toPay.payLater ? 'Almost booked' : 'Payment received'} title={toPay.status === 'expired' ? 'Pick a new time' : 'Choose your preferred time'} body={toPay.status === 'expired' ? 'The held time was released before your payment arrived. Choose any time at no extra cost.' : 'Pick a time that suits you. Jitu Bhaiya or Haresh bhai will confirm it.'} cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
+  if (toPay)
+    return <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitu Bhaiya'} title="Complete your booking" body={`${fmtDay(toPay.startsAt)} · ${fmtTime(toPay.startsAt)}, pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
+
   if (intake && !intake.submittedAt && intake.step > 0)
     return <Ctx tone="peri" kicker="Almost there" title="Your answers are saved" body="Finish in about 3 minutes, then pick a time." cta="Continue" href="/app/book?resume=1" img={`${BP}/img/owl-read.webp`} />
 
@@ -127,7 +138,7 @@ function ContextCard() {
     return <NextSession a={upcoming} onOpen={() => router.push(`/app/sessions/view?id=${upcoming.id}`)} />
   }
   if (needsFeedback)
-    return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitu Bhaiya." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} img={`${BP}/img/mood-grateful.webp`} />
+    return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitu Bhaiya." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} art={<div className="absolute bottom-4 right-4"><MoodImg mood="grateful" size={84} /></div>} />
   if (blend && any) return null // the "Your blend" card carries the follow-up pre-book (owner 2026-11-18)
   return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm, unhurried conversation with Jitu Bhaiya · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" art={<ConsultInviteArt />} wide />
 }
@@ -181,7 +192,7 @@ function ProgressCompact() {
         <MoodImg mood={lines[0].mood} size={44} />
         <p className="text-[14px] leading-5 text-ink">{lines[0].text}</p>
       </div>
-      <p className="mt-3 flex items-center gap-1.5 text-[12px] text-soft"><BookOpen className="size-3.5" /> From your journal · not medical advice</p>
+      <p className="mt-3 flex items-center gap-1.5 text-[12px] text-muted"><BookOpen className="size-3.5" /> From your journal · not medical advice</p>
     </Link>
   )
 }
@@ -189,29 +200,31 @@ function ProgressCompact() {
 /** Goals the client set (CL-31) — shown on Home once there is at least one (owner 2026-11-18). */
 function GoalsCard() {
   const goals = useApp((s) => s.goals)
-  const upd = useApp((s) => s.updateGoal)
   if (!goals.length) return null
+  const left = goals.filter((g) => kindOf(g) === 'daily' && !doneToday(g)).length
   return (
     <Item>
       <section className="card p-5" aria-labelledby="goals-h">
         <div className="flex items-center justify-between">
-          <h2 id="goals-h" className="h-section">Your goals</h2>
+          <div>
+            <h2 id="goals-h" className="h-section">Today’s check-in</h2>
+            <p className="text-[12px] text-muted">{left ? `${left} daily goal${left > 1 ? 's' : ''} to tick` : 'All daily goals done. Lovely 🌿'}</p>
+          </div>
           <Link href="/app/goals" className="inline-flex items-center gap-0.5 text-[13px] font-semibold text-navy">All<ChevronRight className="size-4" /></Link>
         </div>
         <ul className="mt-3 space-y-2.5">
-          {goals.map((g) => (
-            <li key={g.id} className="flex items-center gap-3">
-              <Ring value={g.progress / 100} size={44} stroke={5} color={g.done ? '#82977e' : '#182957'}>
-                {g.done ? <Check className="size-4 text-sage" strokeWidth={3} /> : <span className="text-[11px] font-bold text-navy tnum">{g.progress}</span>}
-              </Ring>
-              <span className={`flex-1 text-[15px] font-semibold ${g.done ? 'text-sage-text line-through decoration-sage/50' : 'text-navy'}`}>{g.title}</span>
-              {!g.done && (
-                <motion.button whileTap={{ scale: 0.88 }} aria-label={`Add progress to ${g.title}`}
-                  onClick={() => { const n = Math.min(100, g.progress + 10); buzz(8); upd(g.id, { progress: n, done: n === 100 }); if (n === 100) toast('Goal complete — well done') }}
-                  className="h-9 rounded-full bg-peri-50 px-3 text-[13px] font-bold text-navy">+10%</motion.button>
-              )}
-            </li>
-          ))}
+          {goals.map((g) => {
+            const once = kindOf(g) === 'once', s = streak(g)
+            return (
+              <li key={g.id} className="flex items-center gap-3">
+                <GoalCheck g={g} size="sm" />
+                <span className="min-w-0 flex-1">
+                  <span className={`block text-[15px] font-semibold ${once && g.done ? 'text-sage-text line-through decoration-sage/50' : 'text-navy'}`}>{g.title}</span>
+                  <span className="text-[12px] text-muted">{once ? (g.done ? '🎯 Achieved' : '🎯 Long-term') : s ? `☀️ Daily · 🔥 ${s}-day streak` : '☀️ Daily'}</span>
+                </span>
+              </li>
+            )
+          })}
         </ul>
       </section>
     </Item>

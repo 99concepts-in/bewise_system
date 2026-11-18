@@ -13,7 +13,7 @@ import { Mascot, ProductArt } from '@/components/brand'
 import { Btn, IconBtn, Sheet, buzz, ease, spring, toast, useChrome } from '@/components/ui'
 import { SafetyCard } from '../book/intake'
 import { respond, crisisCheck } from '@/lib/companion'
-import { productBySlug } from '@/lib/data'
+import { productBySlug, productTitle } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { dayKey, firstName, formatINR } from '@/lib/format'
 import { BP } from '@/lib/asset'
@@ -36,7 +36,7 @@ export default function Ask() {
     buzz(6); setText(''); s.pushChat({ role: 'user', text: m })
     const crisis = crisisCheck(m)
     setTyping(true)
-    const reply = respond(m, { name: firstName(s.profile?.name), blend: s.blend, ritualToday: s.ritual[dayKey(new Date())] ?? 0, journal: s.journal, appointments: s.appointments, orders: s.orders, allergies: s.profile?.allergies ?? [] })
+    const reply = respond(m, { name: firstName(s.profile?.name), blend: s.blend, droppedToday: s.drops[dayKey(new Date())], journal: s.journal, appointments: s.appointments, orders: s.orders, allergies: s.profile?.allergies ?? [] })
     setTimeout(() => {
       setTyping(false)
       s.pushChat({ role: 'bot', text: reply.text, products: reply.products, actions: [...(reply.actions ?? []), ...((reply.quick ?? []).map((q) => ({ id: `q:${q}`, label: q })))], safety: reply.safety })
@@ -47,7 +47,7 @@ export default function Ask() {
   const act = (id: string, label: string) => {
     buzz(8)
     if (id.startsWith('q:')) return send(id.slice(2))
-    if (id.startsWith('remind-')) { const t = id.slice(7); toast(`We’ll remind you at ${t}`); s.pushChat({ role: 'bot', text: `Done — a gentle nudge at ${t}. 🌿` }); return }
+    if (id.startsWith('remind-')) { const t = id.slice(7); toast(`We’ll remind you at ${t}`); s.pushChat({ role: 'bot', text: `Done! A gentle nudge at ${t}. 🌿` }); return }
     if (id === 'book-followup') return router.push('/app/book?type=followup')
     if (id === 'book-first') return router.push('/app/book')
     if (id === 'open-remedies') return router.push('/app/remedies')
@@ -109,8 +109,8 @@ export default function Ask() {
                   return (
                     <motion.div key={slug} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.1 }} className="card ml-11 flex items-center gap-3 p-3">
                       <ProductArt product={p} size="sm" className="w-[84px] shrink-0" />
-                      <div className="flex-1"><p className="text-[16px] font-bold text-navy">{p.name}</p><p className="text-[13px] text-muted">{v.label} · {formatINR(v.pricePaise)}</p>
-                        <button onClick={(e) => { s.addToCart(v.id); flyToBag(e.currentTarget.getBoundingClientRect(), `${BP}/img/${p.art}.webp`); toast(`${p.name} added to your bag`) }} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white"><ShoppingBag className="size-3.5" /> Add to bag</button>
+                      <div className="flex-1"><p className="text-[16px] font-bold text-navy">{productTitle(p)}</p><p className="text-[13px] text-muted">{v.label} · {formatINR(v.pricePaise)}</p>
+                        <button onClick={(e) => { s.addToCart(v.id); flyToBag(e.currentTarget.getBoundingClientRect(), `${BP}/img/${p.art}.webp`); toast(`${productTitle(p)} added to cart`) }} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white"><ShoppingBag className="size-3.5" /> Add to cart</button>
                       </div>
                     </motion.div>
                   )
@@ -131,7 +131,7 @@ export default function Ask() {
             {typing && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-end gap-2">
                 <img src={`${BP}/img/owl-wave.webp`} alt="" className="mb-1 size-9 rounded-full bg-white object-contain p-0.5 shadow-[var(--shadow-card)]" />
-                <span className="flex gap-1.5 rounded-[24px] rounded-bl-md bg-white px-5 py-4 shadow-[var(--shadow-card)]" aria-label="BeWise is typing">
+                <span className="flex gap-1.5 rounded-[24px] rounded-bl-md bg-white px-5 py-4 shadow-[var(--shadow-card)]" role="status" aria-label="BeWise is typing">
                   {[0, 1, 2].map((k) => <motion.span key={k} className="size-2 rounded-full bg-peri" animate={{ y: [0, -5, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 0.9, repeat: Infinity, delay: k * 0.15 }} />)}
                 </span>
               </motion.div>
@@ -154,7 +154,7 @@ export default function Ask() {
       <Sheet open={menu} onClose={() => setMenu(false)} title="Ask BeWise">
         <h2 className="h-duo text-[24px]">How Ask BeWise <em>works</em></h2>
         <p className="mt-2 text-[14px] leading-6 text-muted">Ask BeWise reads only <b>your</b> ritual, journal, sessions and orders to answer you. It isn’t a doctor, never changes your blend, and can make mistakes. Your chats are private to you.</p>
-        <p className="mt-2 text-[12px] text-soft">Preview build: answers are generated on this device. The full AI companion connects at launch.</p>
+        <p className="mt-2 text-[12px] text-muted">Preview build: answers are generated on this device. The full AI companion connects at launch.</p>
         <Btn full variant="white" className="mt-5" onClick={() => { s.clearChat(); setMenu(false); toast('Conversation cleared') }}><Trash2 className="size-4" /> Clear conversation</Btn>
       </Sheet>
     </main>

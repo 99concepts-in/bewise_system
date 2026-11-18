@@ -1,26 +1,26 @@
 'use client'
 /** @module client-help @owner CLIENT @screens CL-51 Help — FAQs, contact, policies (drafts in docs/specs/client/legal/) */
 import { AnimatePresence, motion } from 'motion/react'
-import { ChevronDown, MessageCircle } from 'lucide-react'
+import { ChevronDown, MessageCircle, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { AppHeader } from '@/components/shell'
-import { Btn, toast } from '@/components/ui'
+import { HELPLINE, waLink } from '@/lib/offer'
 import { SafetyCard } from '../book/intake'
 
 const FAQ = [
-  ['What happens in a consultation?', 'A calm, private conversation with Jitu Bhaiya about how you’ve been feeling. Afterwards he prepares your personal blend of Bach flower essences — included in the fee.'],
+  ['What happens in a consultation?', 'A calm, private conversation with Jitu Bhaiya about how you’ve been feeling. Afterwards he prepares your personal blend of Bach flower essences, included in the fee.'],
   ['How much does it cost?', 'First consultation ₹1,000 · Follow-up ₹800. Both include your remedy blend. Reorders of the same blend are charged separately.'],
-  ['Can I cancel?', 'Sessions are non-refundable, but you can reschedule — free up to 24 hours before; within 24 hours you can move it once. A missed session can’t be moved.'],
+  ['Can I cancel?', 'Sessions are non-refundable, but you can reschedule, free up to 24 hours before; within 24 hours you can move it once. A missed session can’t be moved.'],
   ['My product arrived damaged', 'We’re sorry! Go to My orders → Request a replacement and add a photo. We don’t offer returns for change of mind.'],
   ['Is my information private?', 'Yes. Only Jitu Bhaiya sees your answers and journal. Our office team sees only what’s needed to prepare and ship your order. You can download or delete your data anytime in Me → Privacy & data.'],
-  ['Are Bach remedies medicine?', 'No. They’re a gentle, complementary wellness practice for emotional balance — not a substitute for your doctor. Please don’t stop any medicine without medical advice.'],
+  ['Are Bach remedies medicine?', 'No. They’re a gentle, complementary wellness practice for emotional balance, not a substitute for your doctor. Please don’t stop any medicine without medical advice.'],
 ]
 const POLICIES = [
   ['privacy', 'Privacy policy', 'We collect only what we need to care for you, keep it safe, and never sell it. Full policy coming before launch.'],
   ['terms', 'Terms of use', 'Using BeWise means agreeing to our terms, including our no-refund, reschedule-only policy for sessions.'],
   ['shipping', 'Shipping', 'We ship across India with trusted courier partners. Blends are prepared fresh after your session.'],
   ['replacement', 'Replacement policy', 'Damaged, leaking, wrong or missing items are replaced. No returns for change of mind.'],
-  ['disclaimer', 'Wellness disclaimer', 'BeWise offers complementary wellness support for emotional balance. It isn’t medical advice or treatment — please keep seeing your doctor.'],
+  ['disclaimer', 'Wellness disclaimer', 'BeWise offers complementary wellness support for emotional balance. It isn’t medical advice or treatment. Please keep seeing your doctor.'],
 ]
 
 export default function Help() {
@@ -40,7 +40,16 @@ export default function Help() {
           </div>
         ))}
       </div>
-      <Btn full variant="gradient" className="mt-5" onClick={() => toast('WhatsApp opens here once the business number is added')}><MessageCircle className="size-5" /> WhatsApp us</Btn>
+      <div className="mt-5 grid grid-cols-2 gap-2.5">
+        <a href={waLink('Hi BeWise, I need help with my appointment')} target="_blank" rel="noopener noreferrer" className="card flex flex-col items-start gap-1 p-4">
+          <span className="grid size-10 place-items-center rounded-full bg-sage-100 text-sage-text"><MessageCircle className="size-5" /></span>
+          <span className="mt-1 text-[15px] font-bold text-navy">WhatsApp</span><span className="text-[12px] text-muted">Appointments · 90542 20952</span>
+        </a>
+        <a href={`tel:${HELPLINE.tel}`} className="card flex flex-col items-start gap-1 p-4">
+          <span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><Phone className="size-5" /></span>
+          <span className="mt-1 text-[15px] font-bold text-navy">Helpline</span><span className="text-[12px] text-muted">{HELPLINE.name} · {HELPLINE.label}</span>
+        </a>
+      </div>
       <h2 className="h-section mt-8">Need to talk to someone now?</h2>
       <div className="mt-3"><SafetyCard /></div>
       <h2 className="h-section mt-8" id="privacy">Policies</h2>

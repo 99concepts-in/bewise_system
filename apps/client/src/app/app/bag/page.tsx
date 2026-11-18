@@ -17,7 +17,7 @@ export default function Bag() {
   const setQty = useApp((s) => s.setQty)
   const add = useApp((s) => s.addToCart)
   const allergies = useApp((s) => s.profile?.allergies ?? [])
-  const { lines, sub, ship, total } = useBagTotals()
+  const { lines, sub, ship, discount, coupon, total } = useBagTotals()
   return (
     <main className="px-5 pb-40">
       <AppHeader back />
@@ -38,7 +38,7 @@ export default function Bag() {
                 const hit = info.kind === 'product' && info.product ? allergyHit(info.product, allergies) : undefined
                 return (
                   <motion.li key={l.key} layout initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 60, height: 0, marginTop: 0 }} transition={{ duration: 0.3 }} className="card flex items-center gap-3 p-3">
-                    <ProductArt product={info.product ?? { art: 'p-dropper', tint: ['#fbf3dc', '#f6efe4'], name: info.name }} size="sm" className="w-[84px] shrink-0" />
+                    <ProductArt product={info.product ?? { art: info.art, tint: ['#e5efe2', '#f1f6ec'], name: info.name, color: '#5E8F6A' }} size="sm" className="w-[84px] shrink-0" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[15px] font-bold text-navy">{info.name} · {info.label}</p>
                       {info.kind === 'remedy' && <span className="mt-0.5 inline-block rounded-full bg-sage-100 px-2 py-0.5 text-[11px] font-bold text-sage-text">Remedy</span>}
@@ -62,6 +62,7 @@ export default function Bag() {
           </ul>
           <section className="card mt-4 space-y-3 p-5">
             <div className="flex justify-between text-[15px]"><span className="text-muted">Subtotal <span className="block text-[12px]">GST included</span></span><span className="font-bold text-navy tnum">{formatINR(sub)}</span></div>
+            {discount > 0 && <div className="flex justify-between text-[15px] font-semibold text-sage-text"><span>🎁 {coupon?.code} · {coupon?.pct}% off products</span><span className="tnum">−{formatINR(discount)}</span></div>}
             <div className="flex justify-between text-[15px]"><span className="text-muted">Delivery</span><span className={ship ? 'font-bold text-navy tnum' : 'font-bold text-sage-text'}>{ship ? formatINR(ship) : 'Free'}</span></div>
             {ship > 0 && <p className="rounded-[14px] bg-peri-50 px-3 py-2 text-[12px] text-navy">Add {formatINR(FREE_SHIP_PAISE - sub)} more for free delivery</p>}
             <div className="flex justify-between border-t border-line pt-3"><span className="text-[20px] font-extrabold text-navy">Total</span><span className="text-[26px] font-extrabold text-navy tnum">{formatINR(total)}</span></div>

@@ -6,16 +6,16 @@
  */
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion, type PanInfo } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LogoMark, Mascot, MoodImg } from '@/components/brand'
 import { Btn, ease, cx } from '@/components/ui'
 import { BP } from '@/lib/asset'
 
 // Copy rule: no cure / medical claims — "gently support emotional balance" (design system §10)
 const SLIDES = [
-  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A calm, private space for your emotional wellbeing — guided by Jitu Bhaiya and the gentle wisdom of Bach flower remedies.' },
-  { lead: 'Book your appointment with', em: 'Jitendra Khimlani', sub: 'Jitu Bhaiya, Bach Remedy Therapist. Online or in person — your personal remedy blend is included.' },
-  { lead: 'Bach flower remedy', em: 'benefits', sub: '38 natural flower essences that gently support emotional balance — chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'A few drops a day'] },
+  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A calm, private space for your emotional wellbeing, guided by Jitu Bhaiya and the gentle wisdom of Bach flower remedies.' },
+  { lead: 'Book your appointment with', em: 'Jitendra Khimlani', sub: 'Jitu Bhaiya, Bach Remedy Therapist. Online or in person, your personal remedy blend is included.' },
+  { lead: 'Bach flower remedy', em: 'benefits', sub: '38 natural flower essences that gently support emotional balance, chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'A few drops a day'] },
 ] as { lead: string; em: string; sub: string; chips?: string[] }[]
 
 export default function Welcome() {
@@ -48,7 +48,7 @@ export default function Welcome() {
                   <LogoMark size={110} />
                 </motion.div>
               </div>
-              <div className="mt-6 flex overflow-hidden text-[40px] font-extrabold tracking-[-0.03em] text-navy" aria-label="BeWise">
+              <div className="mt-6 flex overflow-hidden text-[40px] font-extrabold tracking-[-0.03em] text-navy" role="img" aria-label="BeWise">
                 {'BeWise'.split('').map((c, k) => (
                   <motion.span key={k} initial={{ y: 48, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease, delay: 0.55 + k * 0.05 }}>{c}</motion.span>
                 ))}
@@ -156,7 +156,7 @@ function ArtBook() {
       <div className="absolute inset-0 grid place-items-center">
         <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 18 }}
           className="relative aspect-square h-[62%] overflow-hidden rounded-full bg-white p-1.5 shadow-[var(--shadow-float)]">
-          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani — Jitu Bhaiya" className="h-full w-full rounded-full object-cover object-[50%_18%]" />
+          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="h-full w-full rounded-full object-cover object-[50%_18%]" />
         </motion.div>
       </div>
       <Float className="left-[6%] top-[14%]" delay={0.3} dy={6}>
@@ -172,30 +172,98 @@ function ArtBook() {
   )
 }
 
+/**
+ * Slide 3 story (owner 2026-11-18): the dropper lifts out of the bottle, moves over the mood character, four drops fall,
+ * and after the 4th the character turns from Sad to Happy — then it all resets and loops.
+ */
+const STAGE = { w: 300, h: 300 }
+type Phase = 'rest' | 'lift' | 'over' | 'drop' | 'happy' | 'back'
 function ArtEssence() {
-  const [calm, setCalm] = useState(false)
-  useEffect(() => { const t = setInterval(() => setCalm((c) => !c), 2400); return () => clearInterval(t) }, [])
+  const [phase, setPhase] = useState<Phase>('rest')
+  const [drops, setDrops] = useState(0)
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>
+    const after = (ms: number, fn: () => void) => { t = setTimeout(fn, ms) }
+    if (phase === 'rest') after(900, () => setPhase('lift'))
+    else if (phase === 'lift') after(800, () => setPhase('over'))
+    else if (phase === 'over') after(750, () => { setDrops(0); setPhase('drop') })
+    else if (phase === 'drop') after(drops === 0 ? 250 : 750, () => { if (drops < 4) setDrops((d) => d + 1); else setPhase('happy') })
+    else if (phase === 'happy') after(2600, () => setPhase('back'))
+    else if (phase === 'back') after(900, () => { setDrops(0); setPhase('rest') })
+    return () => clearTimeout(t)
+  }, [phase, drops])
+  const happy = phase === 'happy' || phase === 'back'
+  const box = useRef<HTMLDivElement>(null)
+  const [fit, setFit] = useState(1)
+  useEffect(() => {
+    const el = box.current; if (!el) return
+    const ro = new ResizeObserver(([e]) => setFit(Math.min(1, e.contentRect.height / STAGE.h, e.contentRect.width / STAGE.w)))
+    ro.observe(el); return () => ro.disconnect()
+  }, [])
+  // dropper offsets relative to its resting place in the bottle neck
+  const pos = phase === 'rest' ? { x: 0, y: 0, r: 0 } : phase === 'lift' || phase === 'back' ? { x: 0, y: -90, r: 0 } : { x: 104, y: -80, r: 6 }
   return (
-    <div className="relative h-full">
+    <div ref={box} className="relative h-full">
       <Halo inner={0.72} />
-      <Float className="left-[6%] top-[14%]" delay={0.1} dy={6}><img src={`${BP}/img/f-rose.webp`} alt="" className="h-[92px] w-auto" /></Float>
-      <Float className="right-[4%] top-[8%]" delay={0.25} dy={8}><img src={`${BP}/img/f-mimulus.webp`} alt="" className="h-[118px] w-auto" /></Float>
-      <div className="absolute left-1/2 top-[8%] -translate-x-1/2">
-        <motion.img src={`${BP}/img/p-dropper.webp`} alt="" className="h-[150px] w-auto drop-shadow-[0_14px_16px_rgba(24,41,87,.2)]"
-          initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease }} />
-        {[0, 1, 2].map((k) => (
-          <motion.span key={k} className="absolute left-1/2 top-[150px] block size-3 -translate-x-1/2 rounded-[50%_50%_50%_50%/60%_60%_40%_40%] bg-[linear-gradient(180deg,#e7b768,#b77a2c)]"
-            initial={{ y: 0, opacity: 0, scale: 0.6 }} animate={{ y: [0, 70], opacity: [0, 1, 1, 0], scale: [0.6, 1, 1, 0.4] }}
-            transition={{ duration: 1.4, delay: 0.6 + k * 0.8, repeat: Infinity, repeatDelay: 1, ease: 'easeIn' }} />
-        ))}
-      </div>
-      <div className="absolute bottom-[10%] left-1/2 grid size-[96px] -translate-x-1/2 place-items-center rounded-full bg-white shadow-[var(--shadow-card)]">
-        <AnimatePresence mode="wait">
-          <motion.div key={String(calm)} initial={{ scale: 0.5, opacity: 0, rotate: -10 }} animate={{ scale: 1, opacity: 1, rotate: 0 }} exit={{ scale: 0.6, opacity: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 18 }}>
-            <MoodImg mood={calm ? 'calm' : 'anxious'} size={74} />
-          </motion.div>
+      <Float className="left-[4%] top-[10%]" delay={0.1} dy={6}><img src={`${BP}/img/f-rose.webp`} alt="" className="h-[78px] w-auto" /></Float>
+      <Float className="right-[2%] top-[4%]" delay={0.25} dy={8}><img src={`${BP}/img/f-mimulus.webp`} alt="" className="h-[96px] w-auto" /></Float>
+      <div className="absolute left-1/2 top-1/2" style={{ width: STAGE.w, height: STAGE.h, transform: `translate(-50%, -50%) scale(${fit})` }} aria-hidden>
+        {/* open amber bottle */}
+        <svg viewBox="0 0 90 130" className="absolute" style={{ left: 46, top: 128, width: 82, height: 118 }}>
+          <defs><linearGradient id="amb" x1="0" x2="1"><stop offset="0" stopColor="#7a4312" /><stop offset=".45" stopColor="#c7832f" /><stop offset="1" stopColor="#6c3a10" /></linearGradient></defs>
+          <rect x="31" y="0" width="28" height="16" rx="4" fill="#5b3412" />
+          <path d="M22 16h46c8 0 13 6 13 14v86c0 8-6 14-14 14H23c-8 0-14-6-14-14V30c0-8 5-14 13-14Z" fill="url(#amb)" />
+          <rect x="18" y="58" width="54" height="40" rx="6" fill="#f5efe4" />
+          <text x="45" y="76" textAnchor="middle" fontSize="9" fontWeight="800" fill="#182957">BeWise</text>
+          <text x="45" y="88" textAnchor="middle" fontSize="6" fontWeight="600" fill="#5f667a">flower essences</text>
+          <path d="M16 36c0-5 3-9 7-9" stroke="#fff" strokeOpacity=".5" strokeWidth="4" strokeLinecap="round" fill="none" />
+        </svg>
+        {/* dropper: bulb + glass pipette, starts inside the neck */}
+        <motion.div className="absolute" style={{ left: 75, top: 92, width: 24, height: 118, originX: '50%', originY: '20%' }}
+          animate={{ x: pos.x, y: pos.y, rotate: pos.r }} transition={{ type: 'spring', stiffness: 90, damping: 16 }}>
+          <svg viewBox="0 0 24 118" className="h-full w-full">
+            <rect x="3" y="0" width="18" height="30" rx="9" fill="#1d1f2b" />
+            <rect x="1" y="26" width="22" height="10" rx="3" fill="#2a2e44" />
+            <path d="M8 36h8v64l-2.5 14h-3L8 100Z" fill="#dfe6f3" fillOpacity=".85" stroke="#b9c3d8" strokeWidth="1" />
+            <path d="M9.5 70h5v30l-1.6 10h-1.8L9.5 100Z" fill="#e2a24c" />
+          </svg>
+        </motion.div>
+        {/* drops: fall from the pipette tip (stage ≈ x 199, y 108) onto the mood character */}
+        <AnimatePresence>
+          {phase === 'drop' && drops > 0 && drops <= 4 && (
+            <motion.span key={drops} className="absolute block h-[14px] w-[11px] rounded-[50%_50%_50%_50%/60%_60%_40%_40%] bg-[linear-gradient(180deg,#f3c06b,#b77a2c)] shadow-[0_2px_4px_rgba(122,67,18,.3)]"
+              style={{ left: 184, top: 124 }} initial={{ y: 0, opacity: 0, scale: 0.5 }} animate={{ y: [0, 4, 78], opacity: [0, 1, 1], scale: [0.5, 1, 0.9] }} exit={{ opacity: 0, scale: 0.2 }}
+              transition={{ duration: 0.55, times: [0, 0.25, 1], ease: 'easeIn' }} />
+          )}
         </AnimatePresence>
-        <motion.span className="absolute -right-16 top-1/2 -translate-y-1/2 rounded-full bg-white px-2.5 py-1 text-[12px] font-semibold text-navy shadow-[var(--shadow-card)]" key={'l' + calm} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{calm ? 'Calm' : 'Anxious'}</motion.span>
+        {/* mood character */}
+        <div className="absolute grid size-[90px] place-items-center rounded-full bg-white shadow-[var(--shadow-card)]" style={{ left: 145, top: 198 }}>
+          <AnimatePresence>
+            {phase === 'drop' && drops > 0 && (
+              <motion.span key={'s' + drops} className="absolute left-1/2 top-[18px] h-3 w-10 -translate-x-1/2 rounded-[50%] border-2 border-[#e2a24c]" initial={{ scale: 0.3, opacity: 0.9 }} animate={{ scale: 1.6, opacity: 0 }} transition={{ duration: 0.6, delay: 0.5 }} />
+            )}
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
+            <motion.div key={happy ? 'h' : 's'} initial={{ scale: 0.5, opacity: 0, rotate: -12 }} animate={{ scale: 1, opacity: 1, rotate: 0 }} exit={{ scale: 0.6, opacity: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 15 }}>
+              <MoodImg mood={happy ? 'happy' : 'sad'} size={68} />
+            </motion.div>
+          </AnimatePresence>
+          {happy && phase === 'happy' && (
+            <span className="pointer-events-none absolute inset-0">
+              {Array.from({ length: 8 }).map((_, k) => (
+                <motion.span key={k} className="absolute left-1/2 top-1/2 block size-2 rounded-full" style={{ background: k % 2 ? '#F6DE8D' : '#BFD8C2' }}
+                  initial={{ x: 0, y: 0, opacity: 1 }} animate={{ x: Math.cos((k / 8) * 6.28) * 64, y: Math.sin((k / 8) * 6.28) * 64, opacity: 0 }} transition={{ duration: 0.9, ease: 'easeOut' }} />
+              ))}
+            </span>
+          )}
+          <motion.span key={'l' + happy} initial={{ opacity: 0, x: 4 }} animate={{ opacity: 1, x: 0 }}
+            className="absolute left-[98px] top-1/2 flex -translate-y-1/2 flex-col items-start gap-1 whitespace-nowrap rounded-[14px] bg-white px-2.5 py-1.5 text-[12px] font-semibold text-navy shadow-[var(--shadow-card)]">
+            {happy ? 'Happy' : 'Sad'}
+            <span className="flex gap-1">{[1, 2, 3, 4].map((k) => (
+              <motion.span key={k} className="block size-2 rounded-full" animate={{ backgroundColor: (phase === 'drop' && drops >= k) || happy ? '#c48a3a' : '#d9dce6', scale: phase === 'drop' && drops === k ? [1, 1.5, 1] : 1 }} transition={{ duration: 0.3 }} />
+            ))}</span>
+          </motion.span>
+        </div>
       </div>
     </div>
   )

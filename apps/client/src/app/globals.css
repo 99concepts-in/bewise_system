@@ -11,7 +11,7 @@
 
   --color-navy: #182957;
   --color-navy-2: #243d91;
-  --color-peri: #5e7fb8;
+  --color-peri: #4d6ba6;   /* text-safe periwinkle (5.2:1); gradients keep #5e7fb8 literals */
   --color-peri-50: #eef1fb;
   --color-peri-100: #dce2f5;
   --color-ivory: #faf9f5;
@@ -21,10 +21,10 @@
   --color-beige: #ede5d9;
   --color-gold: #b89b64;
   --color-ink: #1b2238;
-  --color-muted: #5b6275;
+  --color-muted: #5f667a;   /* 5.7:1 on white — AA (consultant app token) */
   --color-soft: #8a90a0;
   --color-line: #e9ebf2;
-  --color-rose: #c0475b;
+  --color-rose: #a83a4d;   /* AA on rose-50 */
   --color-rose-50: #fdeef0;
 
   --color-mood-calm: #bfd8c2;
@@ -88,6 +88,10 @@
   }
   .multiply { mix-blend-mode: multiply; }
 }
+
+/* instant skeleton shimmer (CSS only so it paints before any JS) */
+.bw-shimmer { background: linear-gradient(90deg, #e6e9f3 0%, #f3f5fa 40%, #e6e9f3 80%); background-size: 240% 100%; animation: bwshimmer 1.3s ease-in-out infinite; }
+@keyframes bwshimmer { 0% { background-position: 100% 0 } 100% { background-position: -100% 0 } }
 
 @keyframes sheen { 0% { transform: translateX(-120%) } 45%, 100% { transform: translateX(120%) } }
 @keyframes floaty { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }

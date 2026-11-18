@@ -59,7 +59,7 @@ export function PaySheet({ open, amountPaise, purpose, onClose, onPaid }: { open
                 </button>
               ))}
             </div>
-            <p className="mt-4 text-center text-[12px] text-soft">Preview build — this simulates Razorpay. No money moves.</p>
+            <p className="mt-4 text-center text-[12px] text-muted">Preview build. This simulates Razorpay. No money moves.</p>
           </motion.div>
         ) : (
           <motion.div key="progress" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center py-8 text-center" aria-live="polite">
@@ -74,7 +74,7 @@ export function PaySheet({ open, amountPaise, purpose, onClose, onPaid }: { open
               )}
             </div>
             <p className="mt-5 text-[18px] font-bold text-navy">{phase === 'waiting' ? `Approve in ${method}` : phase === 'confirming' ? 'Confirming with your bank…' : 'Payment received'}</p>
-            <p className="mt-1 text-[14px] text-muted">{phase === 'done' ? 'Thank you — one moment…' : 'Please don’t close this screen.'}</p>
+            <p className="mt-1 text-[14px] text-muted">{phase === 'done' ? 'Thank you. One moment…' : 'Please don’t close this screen.'}</p>
           </motion.div>
         )}
       </AnimatePresence>

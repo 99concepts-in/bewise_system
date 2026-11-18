@@ -40,7 +40,7 @@ export default function Journal() {
         <Item>
           <label className="flex h-14 items-center gap-3 rounded-full bg-white px-5 shadow-[var(--shadow-card)] focus-within:ring-2 focus-within:ring-navy">
             <Search className="size-5 text-navy" aria-hidden />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings, notes or dates" aria-label="Search feelings, notes or dates" className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-soft" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings, notes or dates" aria-label="Search feelings, notes or dates" className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted" />
             {q && <button aria-label="Clear search" onClick={() => setQ('')}><X className="size-4 text-muted" /></button>}
           </label>
         </Item>
@@ -50,12 +50,12 @@ export default function Journal() {
             <Item>
               <section className="card p-5">
                 <h2 className="h-section">This week</h2>
-                <div className="mt-3 flex justify-between">
+                <div className="mt-3 grid grid-cols-7 gap-1">
                   {week.map((d, i) => (
-                    <div key={i} className="flex flex-col items-center gap-1.5">
+                    <div key={i} className="flex min-w-0 flex-col items-center gap-1.5">
                       <motion.div initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...spring, delay: 0.15 + i * 0.05 }}
-                        className={`grid size-11 place-items-center rounded-full ${d.mood ? '' : 'bg-[#f0f2f8]'} ${d.today ? 'ring-2 ring-navy ring-offset-2' : ''}`}>
-                        {d.mood ? <MoodImg mood={d.mood} size={42} /> : <span className="text-[16px] text-soft">{d.future ? '' : '·'}</span>}
+                        className={`grid aspect-square w-full max-w-11 place-items-center rounded-full ${d.mood ? '' : 'bg-[#f0f2f8]'} ${d.today ? 'ring-2 ring-navy ring-offset-2' : ''}`}>
+                        {d.mood ? <MoodImg mood={d.mood} size={40} className="h-auto w-full" /> : <span className="text-[16px] text-soft">{d.future ? '' : '·'}</span>}
                       </motion.div>
                       <span className={`text-[12px] ${d.today ? 'font-bold text-navy' : 'text-muted'}`}>{d.date.toLocaleDateString('en-IN', { weekday: 'short' })}</span>
                     </div>
@@ -88,7 +88,7 @@ export default function Journal() {
                     )
                   })}
                 </div>
-                <div className="mt-2 flex justify-between px-1 text-[11px] text-soft tnum">
+                <div className="mt-2 flex justify-between px-1 text-[11px] text-muted tnum">
                   {days.map((d, i) => <span key={i} className="flex-1 text-center">{d.date.getDate()}</span>)}
                 </div>
                 <table className="sr-only"><caption>Daily mood, last 14 days</caption><tbody>{days.map((d, i) => <tr key={i}><td>{fmtDay(d.date)}</td><td>{d.mood ? moodOf(d.mood).label : 'none'}</td></tr>)}</tbody></table>
@@ -98,7 +98,7 @@ export default function Journal() {
             <Item>
               <div className="card flex items-start gap-3 p-5">
                 <Lightbulb className="mt-0.5 size-5 shrink-0 text-gold" />
-                <p className="text-[14px] leading-6"><b className="text-navy">Your daily insight</b> — {dailyInsight(journal)}</p>
+                <p className="text-[14px] leading-6"><b className="text-navy">Your daily insight</b>, {dailyInsight(journal)}</p>
               </div>
             </Item>
           </>

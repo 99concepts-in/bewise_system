@@ -8,7 +8,7 @@
  */
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { CalendarPlus, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Info, Laptop, MapPin, Quote, Sparkles, Video } from 'lucide-react'
+import { CalendarPlus, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Info, Laptop, MapPin, Phone, Quote, Sparkles, Video, CalendarCheck2 } from 'lucide-react'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Mascot, Petals } from '@/components/brand'
 import { PaySheet } from '@/components/pay-sheet'
@@ -16,15 +16,17 @@ import { AppHeader, useUi } from '@/components/shell'
 import { Btn, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, useStableCallback } from '@/components/ui'
 import { CONSULTANT, CONSULTATIONS, NUANCE, STUDIO, TESTIMONIALS, TESTIMONIALS_SOURCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
 import { InPersonArt, OnlineArt } from '@/components/mode-art'
+import { TimePicker } from '@/components/time-picker'
 import { parseIsoDay } from '@/lib/supply'
-import { emptyIntake, useApp, type Appointment, type IntakeAnswers } from '@/lib/store'
+import { emptyIntake, planLeft, useApp, type Appointment, type IntakeAnswers, type Plan } from '@/lib/store'
+import { HELPLINE, PLANS, offerLive, planFull, planPrice, planSaving, type PlanId } from '@/lib/offer'
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
 import { downloadIcs, googleCalUrl, sessionIcs } from '@/lib/ics'
 import * as I from './intake'
 import { BP } from '@/lib/asset'
 
 // owner 2026-11-18: breathe first → feelings → … → personal message later ('who' = the share/voice-note step)
-const INTAKE = ['intro', 'feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle', 'goals', 'review', 'saved'] as const
+const INTAKE = ['intro', 'feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle', 'review', 'saved'] as const // owner 2026-11-18: "How would you like to feel?" removed
 const COUNTED = ['feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle']
 const CHECKIN = ['ck-now', 'ck-changes', 'ck-news'] as const
 type Step = 'choose' | (typeof INTAKE)[number] | (typeof CHECKIN)[number] | 'mode' | 'time' | 'pay' | 'done'
@@ -39,9 +41,12 @@ function Book() {
   const saveIntake = useApp((s) => s.saveIntake)
   const submitIntake = useApp((s) => s.submitIntake)
   const book = useApp((s) => s.book)
+  const pickTime = useApp((s) => s.pickNewTime)
+  const buyPlan = useApp((s) => s.buyPlan)
+  const plan = useApp((s) => s.plan)
   const hasHistory = useApp((s) => s.appointments.length > 0 || !!s.blend)
 
-  const [type, setType] = useState<ConsultationId | null>((params.get('type') as ConsultationId) || null)
+  const [type, setType] = useState<ConsultationId | null>(() => (params.get('type') as ConsultationId) || (hasHistory ? null : 'first')) // new clients: first consultation pre-selected (owner 2026-11-18)
   const [step, setStep] = useState<Step>('choose')
   const [dir, setDir] = useState(1)
   const [answers, setAnswers] = useState<IntakeAnswers>(() => intake?.answers ?? emptyIntake())
@@ -52,14 +57,21 @@ function Book() {
   const [booked, setBooked] = useState<Appointment>()
   const [meet, setMeet] = useState(false)
   const [stories, setStories] = useState(false)
-  const [holdUntil, setHoldUntil] = useState(0)
+  const [skipAsk, setSkipAsk] = useState(false)
+  const [payWhen, setPayWhen] = useState<'now' | 'later'>('now')
+  // owner 2026-11-18: after the first consultation, offer 6 months (recommended), yearly (best value) or one time
+  const [planPick, setPlanPick] = useState<PlanPick>('half')
+  const [pending, setPending] = useState<Appointment>() // paid (or pay later) → choose a preferred time next
 
   // decided once per visit: submitting the intake mid-flow must not remove the steps we're standing on
   const [needIntake] = useState(() => !intake?.submittedAt)
+  // owner 2026-11-18: no follow-up questions for the chosen feelings (or none chosen) → skip "Tell us a little more"
+  const skipNuance = !answers.feelings.some((f) => NUANCE[f])
   const flow: Step[] = useMemo(() => {
-    if (type === 'followup') return ['choose', ...CHECKIN, 'mode', 'time', 'pay', 'done']
-    return ['choose', ...(needIntake ? INTAKE : []), 'mode', 'time', 'pay', 'done'] as Step[]
-  }, [type, needIntake])
+    // owner 2026-11-18: payment first, then a preferred time (confirmed by Jitu Bhaiya or Haresh bhai)
+    if (type === 'followup') return ['choose', ...CHECKIN, 'mode', 'pay', 'time', 'done']
+    return ['choose', ...(needIntake ? INTAKE.filter((x) => x !== 'nuance' || !skipNuance) : []), 'mode', 'pay', 'time', 'done'] as Step[]
+  }, [type, needIntake, skipNuance])
 
   useEffect(() => { setNavHidden(step !== 'choose'); return () => setNavHidden(false) }, [step, setNavHidden])
   useEffect(() => {
@@ -73,22 +85,37 @@ function Book() {
     const n = flow[idx + 1]
     if (INTAKE.includes(step as never)) saveIntake(answers, INTAKE.indexOf(step as never) + 1)
     if (step === 'review') submitIntake()
-    if (n === 'pay') setHoldUntil(Date.now() + 15 * 60_000) // scheduling.holdAppointment → holdExpiresAt
     go(n)
   }
+  // owner 2026-11-18: "Skip" replaces "Save for later"; answers so far are kept, straight on to choosing a time
+  const skipIntake = () => { saveIntake(answers, Math.max(1, INTAKE.indexOf(step as never))); setSkipAsk(false); go('mode') }
   const back = () => (idx <= 0 ? router.back() : go(flow[idx - 1], -1))
   const setA = (p: Partial<IntakeAnswers>) => setAnswers((a) => ({ ...a, ...p }))
   const c = CONSULTATIONS.find((x) => x.id === (type ?? 'first'))!
+  const inPlan = type === 'followup' && planLeft(plan) > 0
+  const pick: PlanPick = type === 'followup' && hasHistory && !inPlan ? planPick : 'once'
+  const fee = inPlan ? 0 : pick === 'once' ? c.feePaise : planPrice(pick)
+  const feeLabel = inPlan ? 'Included in your plan' : pick === 'once' ? c.name : `${PLANS[pick].name} · launch offer`
 
   // owner 2026-11-18: every intake / check-in question is optional — only mode and time are needed to book
   const can: Partial<Record<Step, boolean>> = { mode: !!mode, time: !!slot }
-  const counted = COUNTED.indexOf(step as string)
+  const steps = COUNTED.filter((x) => x !== 'nuance' || !skipNuance)
+  const counted = steps.indexOf(step as string)
   const isIntake = INTAKE.includes(step as never) && step !== 'saved'
 
-  const confirmPaid = () => {
-    if (!slot || !mode) return
-    const a = book({ type: c.id, mode, startsAt: slot.toISOString(), amountPaise: c.feePaise })
-    setPaying(false); setBooked(a); go('done')
+  // paid (or chose to pay later / covered by a plan): the booking exists, the time comes next
+  const confirmPaid = (later = false) => {
+    if (!mode) return
+    if (pick !== 'once' && !inPlan && !later) buyPlan(pick, fee)
+    const usePlan = inPlan || (pick !== 'once' && !later)
+    const a = book({ type: c.id, mode, startsAt: new Date().toISOString(), amountPaise: usePlan ? 0 : fee, needsNewTime: true,
+      ...(later ? { payLater: true } : { paidAt: new Date().toISOString() }), ...(usePlan ? { planId: pick === 'once' ? plan?.id : pick } : {}) })
+    setPaying(false); setPending(a); go('time')
+  }
+  const requestTime = () => {
+    if (!pending || !slot) return
+    pickTime(pending.id, slot.toISOString())
+    setBooked({ ...pending, startsAt: slot.toISOString(), needsNewTime: false, timeRequested: true }); go('done')
   }
 
   if (step === 'done' && booked) return <Booked a={booked} />
@@ -101,13 +128,13 @@ function Book() {
             <IconBtn label="Back" onClick={back}><ChevronLeft className="size-5" /></IconBtn>
             {isIntake ? (
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-semibold text-navy">{step === 'intro' ? 'A moment for you' : counted >= 0 ? `Step ${counted + 1} of 8` : 'Almost done'}</p>
-                <ProgressBar value={step === 'intro' ? 0.02 : counted >= 0 ? (counted + 1) / 8 : 1} className="mt-1.5" />
+                <p className="text-[13px] font-semibold text-navy">{step === 'intro' ? 'A moment for you' : counted >= 0 ? `Step ${counted + 1} of ${steps.length}` : 'Almost done'}</p>
+                <ProgressBar value={step === 'intro' ? 0.02 : counted >= 0 ? (counted + 1) / steps.length : 1} className="mt-1.5" />
               </div>
-            ) : <Stepper at={CHECKIN.includes(step as never) || INTAKE.includes(step as never) ? 0 : step === 'pay' ? 2 : 1} />}
+            ) : <Stepper at={CHECKIN.includes(step as never) || INTAKE.includes(step as never) ? 0 : step === 'time' ? 2 : 1} />}
             {isIntake && step !== 'intro' && (
-              <button onClick={() => { saveIntake(answers, Math.max(1, INTAKE.indexOf(step as never))); toast('Saved — finish anytime'); router.push('/app') }}
-                className="shrink-0 rounded-full bg-white px-3.5 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Save for later</button>
+              <button onClick={() => (hasHistory ? skipIntake() : setSkipAsk(true))}
+                className="shrink-0 rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Skip</button>
             )}
           </div>
         </header>
@@ -116,7 +143,7 @@ function Book() {
       <div className={cx('relative flex-1 pt-2', step === 'choose' ? 'pb-48' : 'pb-36')}>
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div key={step} custom={dir} initial={{ opacity: 0, x: dir * 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -40 }} transition={{ duration: 0.32, ease }}>
-            {step === 'choose' && <Choose type={type} setType={setType} canFollow={hasHistory} onMeet={() => setMeet(true)} onStories={() => setStories(true)} />}
+            {step === 'choose' && <Choose type={type} setType={setType} canFollow={hasHistory} plan={plan} planPick={planPick} setPlanPick={setPlanPick} onMeet={() => setMeet(true)} onStories={() => setStories(true)} />}
             {step === 'intro' && <I.IntakeIntro />}
             {step === 'who' && <I.StepWho a={answers} set={setA} />}
             {step === 'feelings' && <I.StepFeelings a={answers} set={setA} />}
@@ -126,15 +153,14 @@ function Book() {
             {step === 'life' && <I.StepLife a={answers} set={setA} />}
             {step === 'safety' && <I.StepSafety a={answers} set={setA} />}
             {step === 'gentle' && <I.StepGentle a={answers} set={setA} />}
-            {step === 'goals' && <I.StepGoals a={answers} set={setA} />}
             {step === 'review' && <I.StepReview a={answers} set={setA} edit={(k) => go(k as Step, -1)} />}
             {step === 'saved' && <Saved />}
             {step === 'ck-now' && <I.CheckinNow c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} />}
             {step === 'ck-changes' && <I.CheckinChanges c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} feelings={intake?.answers.feelings ?? []} />}
             {step === 'ck-news' && <I.CheckinNews c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} />}
             {step === 'mode' && <Mode mode={mode} setMode={setMode} />}
-            {step === 'time' && <TimePicker slot={slot} setSlot={setSlot} initialDay={parseIsoDay(params.get('date'))} />}
-            {step === 'pay' && slot && mode && <Review c={c} slot={slot} mode={mode} holdUntil={holdUntil} onExpire={() => { toast('Your held time was released — pick again'); go('time', -1) }} />}
+            {step === 'time' && <><TimeHead /><TimePicker slot={slot} setSlot={setSlot} initialDay={parseIsoDay(params.get('date'))} heading={false} /></>}
+            {step === 'pay' && mode && <Review c={c} mode={mode} fee={fee} feeLabel={feeLabel} inPlan={inPlan} canLater={pick === 'once' && !inPlan} payWhen={payWhen} setPayWhen={setPayWhen} />}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -144,26 +170,89 @@ function Book() {
           <Btn full variant="gradient" disabled={!type} onClick={next}>{type === 'followup' ? 'Start 2-minute check-in' : 'Continue'}</Btn>
         ) : step === 'pay' ? (
           <>
-            <Btn full variant="gradient" onClick={() => setPaying(true)}><span aria-hidden>🔒</span> Pay {formatINR(c.feePaise)}</Btn>
-            <p className="mt-2 text-center text-[12px] text-muted">Secured by Razorpay · UPI, cards, netbanking</p>
+            {inPlan ? <>
+              <Btn full variant="gradient" onClick={() => confirmPaid()}><CalendarCheck2 className="size-5" /> Continue to choose a time</Btn>
+              <p className="mt-2 text-center text-[12px] text-muted">{planLeft(plan)} sessions left in your plan</p>
+            </> : payWhen === 'now' || pick !== 'once' ? <>
+              <Btn full variant="gradient" onClick={() => setPaying(true)}><span aria-hidden>🔒</span> Pay {formatINR(fee)}</Btn>
+              <p className="mt-2 text-center text-[12px] text-muted">Secured by Razorpay · then choose your preferred time</p>
+            </> : <>
+              <Btn full variant="gradient" onClick={() => confirmPaid(true)}><CalendarCheck2 className="size-5" /> Continue to choose a time</Btn>
+              <p className="mt-2 text-center text-[12px] text-muted">Pay {formatINR(fee)} after your session</p>
+            </>}
+          </>
+        ) : step === 'time' ? (
+          <>
+            <Btn full variant={slot ? 'gradient' : 'primary'} disabled={!slot} onClick={requestTime}>Request this time</Btn>
+            <p className="mt-2 text-center text-[12px] text-muted">Jitu Bhaiya or Haresh bhai will confirm it</p>
           </>
         ) : (
           <Btn full variant={can[step] === false ? 'primary' : 'gradient'} disabled={can[step] === false} onClick={next}>
-            {step === 'intro' ? 'I’m ready — start' : step === 'goals' ? 'Review answers' : step === 'review' ? 'Save & choose a time' : step === 'saved' ? 'Choose a time' : 'Continue'}
+            {step === 'intro' ? 'I’m ready, let’s start' : step === 'gentle' ? 'Review answers' : step === 'review' ? 'Save & continue' : 'Continue'}
           </Btn>
         )}
       </div>
 
-      <PaySheet open={paying} amountPaise={c.feePaise} purpose={`${c.name} · ${slot ? fmtTime(slot) : ''}`} onClose={() => setPaying(false)} onPaid={confirmPaid} />
+      <PaySheet open={paying} amountPaise={fee} purpose={feeLabel} onClose={() => setPaying(false)} onPaid={() => confirmPaid()} />
       <MeetSheet open={meet} onClose={() => setMeet(false)} />
       <StoriesSheet open={stories} onClose={() => setStories(false)} />
+      <Sheet open={skipAsk} onClose={() => setSkipAsk(false)} title="Skip the questions?">
+        <div className="text-center">
+          <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#fbf3dc] text-[30px]" aria-hidden>🌼</span>
+          <h2 className="h-duo mt-3 text-[26px]">We <em>recommend</em> this</h2>
+          <p className="mx-auto mt-2 max-w-[300px] text-[15px] leading-6 text-muted">These few questions help Jitu Bhaiya understand you before you meet, so your first session goes deeper. It takes about 2 minutes.</p>
+        </div>
+        <div className="mt-6 flex gap-3 pb-1">
+          <Btn full variant="white" size="md" onClick={skipIntake}>Skip anyway</Btn>
+          <Btn full size="md" onClick={() => setSkipAsk(false)}>Continue</Btn>
+        </div>
+      </Sheet>
     </main>
+  )
+}
+
+/** owner 2026-11-18: after the first consultation, 6 months (recommended) or yearly (best value), or one time. */
+function PlanPicker({ pick, setPick }: { pick: PlanPick; setPick: (p: PlanPick) => void }) {
+  const live = offerLive()
+  const opts: { k: PlanPick; t: string; tag?: string; price: number; full?: number; note: string; emoji: string }[] = [
+    { k: 'half', t: '6 months', tag: 'Recommended', price: planPrice('half'), full: live ? planFull('half') : undefined, note: live ? '1 month free' : '6 consultations', emoji: '🌱' },
+    { k: 'yearly', t: 'Yearly', tag: 'Best value', price: planPrice('yearly'), full: live ? planFull('yearly') : undefined, note: live ? `2 months free · save ${formatINR(planSaving('yearly'))}` : '12 consultations', emoji: '🌳' },
+    { k: 'once', t: 'One time', price: CONSULTATIONS.find((x) => x.id === 'followup')!.feePaise, note: 'Just this session', emoji: '🌼' },
+  ]
+  return (
+    <section aria-labelledby="plan-h">
+      <h2 id="plan-h" className="px-1 text-[15px] font-bold text-navy">How would you like to continue?</h2>
+      <p className="px-1 text-[13px] text-muted">A consultation every month keeps your blend fresh.</p>
+      <div className="mt-3 space-y-2.5" role="radiogroup" aria-label="Plan">
+        {opts.map((o, i) => {
+          const on = pick === o.k
+          return (
+            <motion.button key={o.k} type="button" role="radio" aria-checked={on} onClick={() => { buzz(6); setPick(o.k) }} whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.05 }}
+              className={cx('relative flex w-full items-center gap-3 rounded-[22px] p-4 text-left transition-colors', on ? 'bg-white ring-2 ring-navy shadow-[var(--shadow-float)]' : 'bg-white shadow-[var(--shadow-card)]')}>
+              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-peri-50 text-[22px]" aria-hidden>{o.emoji}</span>
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-center gap-1.5"><span className="text-[16px] font-bold text-navy">{o.t}</span>
+                  {o.tag && <span className={cx('rounded-full px-2 py-0.5 text-[11px] font-bold', o.k === 'yearly' ? 'bg-[#fbf3dc] text-[#8a6a2c]' : 'bg-sage-100 text-sage-text')}>{o.tag}</span>}</span>
+                <span className="block text-[12px] text-muted">{o.note}</span>
+              </span>
+              <span className="text-right">
+                {o.full && <span className="block text-[12px] text-muted line-through tnum">{formatINR(o.full)}</span>}
+                <span className="block text-[17px] font-extrabold text-navy tnum">{formatINR(o.price)}</span>
+              </span>
+              <span className={cx('grid size-6 shrink-0 place-items-center rounded-full border-2', on ? 'border-navy bg-navy text-white' : 'border-[#cfd5e5]')}>{on && <Check className="size-3.5" strokeWidth={3} />}</span>
+            </motion.button>
+          )
+        })}
+      </div>
+      {live && <p className="mt-2 px-1 text-[12px] font-semibold text-[#8a6a2c]">🎁 Launch prices till 1 December</p>}
+    </section>
   )
 }
 
 function Stepper({ at }: { at: number }) {
   return (
-    <div className="flex flex-1 items-center justify-center" aria-label={`Step ${at + 1} of 3`}>
+    <div className="flex flex-1 items-center justify-center" role="group" aria-label={`Step ${at + 1} of 3`}>
       {[0, 1, 2].map((k) => (
         <div key={k} className="flex items-center">
           <motion.span className="grid size-8 place-items-center rounded-full" animate={{ backgroundColor: k <= at ? '#182957' : '#ffffff', scale: k === at ? 1.08 : 1 }} transition={spring}
@@ -177,7 +266,7 @@ function Stepper({ at }: { at: number }) {
   )
 }
 
-function Choose({ type, setType, canFollow, onMeet, onStories }: { type: ConsultationId | null; setType: (t: ConsultationId) => void; canFollow: boolean; onMeet: () => void; onStories: () => void }) {
+function Choose({ type, setType, canFollow, plan, planPick, setPlanPick, onMeet, onStories }: { type: ConsultationId | null; setType: (t: ConsultationId) => void; canFollow: boolean; plan: Plan | null; planPick: PlanPick; setPlanPick: (p: PlanPick) => void; onMeet: () => void; onStories: () => void }) {
   // returning clients who met Jitu Bhaiya before the app have no history here — offer follow-up quietly (owner 2026-11-18)
   const [showFollow, setShowFollow] = useState(type === 'followup')
   const follow = canFollow || showFollow
@@ -202,10 +291,16 @@ function Choose({ type, setType, canFollow, onMeet, onStories }: { type: Consult
           </motion.button>
         )
       })}
+      {type === 'followup' && canFollow && (planLeft(plan) > 0 ? (
+        <div className="flex items-center gap-3 rounded-[22px] bg-sage-100/80 p-4 text-[14px] text-sage-text">
+          <span className="text-[22px]" aria-hidden>{PLANS[plan!.id].emoji}</span>
+          <span className="flex-1"><b>{PLANS[plan!.id].name}</b> · {planLeft(plan)} sessions left. This one is included.</span>
+        </div>
+      ) : <PlanPicker pick={planPick} setPick={setPlanPick} />)}
       {!follow && (
         <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} onClick={() => { buzz(); setShowFollow(true); setType('followup') }}
           className="mx-auto -mt-1 block rounded-full px-4 py-2 text-[14px] text-muted">
-          Seen Jitu Bhaiya before? <span className="font-semibold text-navy underline underline-offset-4">Book a follow-up · ₹800</span>
+          <span className="font-semibold text-navy underline underline-offset-4">Book a follow-up · ₹800</span>
         </motion.button>
       )}
       <motion.button onClick={onMeet} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="card flex w-full items-center gap-4 p-4 text-left">
@@ -220,7 +315,7 @@ function Choose({ type, setType, canFollow, onMeet, onStories }: { type: Consult
         <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Client stories</span><span className="text-[13px] text-muted">{TESTIMONIALS.length ? `View ${TESTIMONIALS.length} testimonials` : 'View testimonials'}</span></span>
         <ChevronRight className="size-5 text-soft" />
       </motion.button>
-      <p className="px-2 text-center text-[13px] text-muted">Online or in person — you choose next. Sessions are non-refundable, but you can reschedule.</p>
+      <p className="px-2 text-center text-[13px] text-muted">Online or in person, you choose next. Sessions are non-refundable, but you can reschedule.</p>
     </div>
   )
 }
@@ -234,7 +329,7 @@ function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void })
   return (
     <Sheet open={open} onClose={onClose} title="Client stories">
       <h2 className="h-duo text-[26px]">Client <em>stories</em></h2>
-      <p className="mt-1 text-[14px] text-muted">In their own words — shared with permission.</p>
+      <p className="mt-1 text-[14px] text-muted">In their own words, shared with permission.</p>
       {n ? (
         <>
           <div className="relative mt-5 min-h-[210px]">
@@ -243,9 +338,9 @@ function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void })
                 initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.35, ease }}
                 className="rounded-[26px] bg-[linear-gradient(140deg,#fbf3dc,#f6efe4_55%,#eef1fb)] p-6">
                 <Quote className="size-8 text-gold" aria-hidden />
-                {t.rating ? <p className="mt-2 text-[15px] tracking-[2px] text-gold" aria-label={`${t.rating} out of 5`}>{'★'.repeat(t.rating)}</p> : null}
+                {t.rating ? <p className="mt-2 text-[15px] tracking-[2px] text-gold" role="img" aria-label={`${t.rating} out of 5`}>{'★'.repeat(t.rating)}</p> : null}
                 <blockquote className="mt-3 text-[17px] font-semibold leading-7 text-navy">“{t.quote}”</blockquote>
-                <figcaption className="mt-4 text-[14px] text-muted">— {t.name}{t.city ? `, ${t.city}` : ''}</figcaption>
+                <figcaption className="mt-4 text-[14px] text-muted">{t.name}{t.city ? `, ${t.city}` : ''}</figcaption>
               </motion.figure>
             </AnimatePresence>
           </div>
@@ -281,7 +376,7 @@ function MeetSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
       <div className="mt-4 grid grid-cols-2 gap-2">{CONSULTANT.stats.map((s) => <div key={s} className="rounded-[18px] bg-peri-50 p-3 text-[13px] font-semibold text-navy">{s}</div>)}</div>
       <div className="mt-4 rounded-[22px] bg-[linear-gradient(135deg,#fbf3dc,#eef1fb)] p-4">
         <p className="text-[15px] font-bold text-navy">How Bach remedies work</p>
-        <p className="mt-1 text-[14px] leading-5 text-muted">Dr Edward Bach described 38 flower essences, each linked to an emotional state. Your blend is chosen for how you feel — a gentle, complementary practice alongside your doctor’s care.</p>
+        <p className="mt-1 text-[14px] leading-5 text-muted">Dr Edward Bach described 38 flower essences, each linked to an emotional state. Your blend is chosen for how you feel. A gentle, complementary practice alongside your doctor’s care.</p>
       </div>
       <a href={CONSULTANT.website} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-navy underline underline-offset-4">Visit his website <ExternalLink className="size-4" /></a>
     </Sheet>
@@ -337,107 +432,63 @@ function Mode({ mode, setMode }: { mode?: 'online' | 'in_person'; setMode: (m: '
   )
 }
 
-function TimePicker({ slot, setSlot, initialDay }: { slot?: Date; setSlot: (d: Date) => void; initialDay?: Date }) {
-  const today = startOfDay()
-  const monday = addDays(today, -((today.getDay() + 6) % 7))
-  // pre-book from Home passes ?date= → open that week with that day selected
-  const [week, setWeek] = useState(() => initialDay && initialDay >= today ? Math.min(7, Math.floor((startOfDay(initialDay).getTime() - monday.getTime()) / (7 * 86_400_000))) : 0)
-  const days = Array.from({ length: 7 }, (_, i) => addDays(monday, week * 7 + i))
-  const firstOpen = days.find((d) => d >= today && slotsFor(d).length) ?? days[0]
-  const [day, setDay] = useState<Date>(slot ? startOfDay(slot) : initialDay && initialDay >= today && slotsFor(initialDay).length ? startOfDay(initialDay) : firstOpen)
-  useEffect(() => { if (!days.some((d) => +d === +day)) setDay(days.find((d) => d >= today && slotsFor(d).length) ?? days[0]) }, [week]) // eslint-disable-line react-hooks/exhaustive-deps
-  const times = day >= today ? slotsFor(day) : []
-  const groups = [
-    { t: 'Morning', f: (h: number) => h < 12 }, { t: 'Afternoon', f: (h: number) => h >= 12 && h < 17 }, { t: 'Evening', f: (h: number) => h >= 17 },
-  ]
-  const pick = (t: string) => { buzz(); setSlot(istDate(day, t)) }
+type PlanPick = 'once' | PlanId
+
+function TimeHead() {
   return (
-    <div className="space-y-4">
-      <h1 className="h-duo">Pick a <em>time</em></h1>
-      <div className="card p-4">
-        <div className="flex items-center justify-between">
-          <button aria-label="Previous week" disabled={week === 0} onClick={() => setWeek((w) => w - 1)} className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy disabled:opacity-30"><ChevronLeft className="size-5" /></button>
-          <motion.p key={week} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="text-[17px] font-bold text-navy">{fmtMonth(days[3])}</motion.p>
-          <button aria-label="Next week" disabled={week >= 7} onClick={() => setWeek((w) => w + 1)} className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy disabled:opacity-30"><ChevronRight className="size-5" /></button>
-        </div>
-        <div className="mt-3 grid grid-cols-7 gap-1 text-center">
-          {days.map((d) => {
-            const open = d >= today && slotsFor(d).length > 0
-            const on = +d === +day
-            return (
-              <button key={+d} disabled={!open} aria-pressed={on} aria-label={fmtLongDay(d)} onClick={() => { buzz(5); setDay(d) }} className="flex flex-col items-center gap-1.5 py-1 disabled:opacity-35">
-                <span className="text-[12px] font-medium text-muted">{d.toLocaleDateString('en-IN', { weekday: 'short' })}</span>
-                <span className="relative grid size-10 place-items-center text-[16px] font-bold">
-                  {on && <motion.span layoutId="day-pill" transition={spring} className="absolute inset-0 rounded-full bg-navy" />}
-                  <span className={cx('relative', on ? 'text-white' : 'text-navy')}>{d.getDate()}</span>
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-      <div className="card p-5">
-        {times.length === 0 ? <p className="py-4 text-center text-[14px] text-muted">No times this day — try another.</p> : groups.map((g) => {
-          const ts = times.filter((t) => g.f(Number(t.split(':')[0])))
-          if (!ts.length) return null
-          return (
-            <div key={g.t} className="border-b border-line py-3 first:pt-0 last:border-0 last:pb-0">
-              <p className="mb-2.5 text-[16px] font-bold text-navy">{g.t}</p>
-              <div className="grid grid-cols-3 gap-2">
-                {ts.map((t, i) => {
-                  const d = istDate(day, t)
-                  const on = slot && +slot === +d
-                  return (
-                    <motion.button key={t} onClick={() => pick(t)} aria-pressed={!!on} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.03 }}
-                      className={cx('relative h-11 rounded-full text-[14px] font-semibold', on ? 'text-white' : 'bg-peri-50/70 text-navy')}>
-                      {on && <motion.span layoutId="slot-pill" transition={spring} className="absolute inset-0 rounded-full bg-navy shadow-[0_6px_14px_rgba(24,41,87,.3)]" />}
-                      <span className="relative">{fmtTime(d)}</span>
-                    </motion.button>
-                  )
-                })}
-              </div>
-            </div>
-          )
-        })}
-        <p className="mt-3 text-[12px] text-soft">Times in IST</p>
-      </div>
+    <div className="mb-4">
+      <p className="inline-flex items-center gap-1.5 rounded-full bg-sage-100 px-3 py-1.5 text-[12px] font-bold text-sage-text"><Check className="size-3.5" strokeWidth={3} /> You’re all set</p>
+      <h1 className="h-duo mt-3">Your preferred <em>time</em></h1>
+      <p className="mt-1 text-[14px] leading-5 text-muted">Pick what suits you. Jitu Bhaiya or Haresh bhai will confirm it, or our team will call you to find a better time.</p>
     </div>
   )
 }
 
-function Review({ c, slot, mode, holdUntil, onExpire }: { c: (typeof CONSULTATIONS)[number]; slot: Date; mode: 'online' | 'in_person'; holdUntil: number; onExpire: () => void }) {
-  const [left, setLeft] = useState(Math.max(0, holdUntil - Date.now()))
-  const expire = useStableCallback(onExpire)
-  useEffect(() => { const t = setInterval(() => { const l = Math.max(0, holdUntil - Date.now()); setLeft(l); if (l === 0) { clearInterval(t); expire() } }, 1000); return () => clearInterval(t) }, [holdUntil, expire])
-  const mm = Math.floor(left / 60000), ss = Math.floor((left % 60000) / 1000)
+function Review({ c, mode, fee, feeLabel, inPlan, canLater, payWhen, setPayWhen }: { c: (typeof CONSULTATIONS)[number]; mode: 'online' | 'in_person'; fee: number; feeLabel: string; inPlan: boolean; canLater: boolean; payWhen: 'now' | 'later'; setPayWhen: (v: 'now' | 'later') => void }) {
   return (
     <div className="space-y-4">
-      <h1 className="h-duo">Review & <em>pay</em></h1>
+      <h1 className="h-duo">Review & <em>book</em></h1>
       <div className="card p-5">
         <div className="flex items-center gap-4 border-b border-line pb-4">
           <img src={`${BP}/img/jitu.webp`} alt="" className="size-16 rounded-full object-cover" />
           <div><p className="text-[19px] font-extrabold text-navy">Jitu Bhaiya</p><p className="text-[13px] text-muted">{CONSULTANT.title}</p></div>
         </div>
         {[
-          { i: <Sparkles className="size-5" />, t: c.name },
-          { i: <Clock className="size-5" />, t: `${fmtLongDay(slot)} · ${fmtTime(slot)}` },
+          { i: <Sparkles className="size-5" />, t: feeLabel === c.name ? c.name : `${c.name} · ${feeLabel}` },
           { i: mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: mode === 'online' ? 'Online · video call' : `In person · ${STUDIO.short}` },
+          { i: <Clock className="size-5" />, t: 'Preferred time: you choose next' },
         ].map((r, k) => (
           <motion.div key={k} className="flex items-center gap-3 border-b border-line py-3.5 last:border-0" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + k * 0.06 }}>
-            <span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{r.i}</span><span className="text-[15px] font-semibold text-ink">{r.t}</span>
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-peri-50 text-navy">{r.i}</span><span className="text-[15px] font-semibold text-ink">{r.t}</span>
           </motion.div>
         ))}
         <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-sage-100 px-3 py-1.5 text-[12px] font-bold text-sage-text"><Check className="size-3.5" strokeWidth={3} /> Remedy blend included</span>
       </div>
       <div className="flex items-start gap-3 rounded-[22px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
-        <Info className="mt-0.5 size-5 shrink-0" /><p>Sessions are non-refundable — you can reschedule free up to 24 h before.</p>
+        <Info className="mt-0.5 size-5 shrink-0" /><p>Sessions are non-refundable, but you can reschedule free up to 24 h before.</p>
       </div>
-      <div className="flex items-center justify-between px-1">
-        <span className="text-[14px] text-muted">We’re holding this time for <b className="tnum text-navy">{mm}:{String(ss).padStart(2, '0')}</b></span>
-      </div>
+      {canLater && (
+        <div role="radiogroup" aria-label="When would you like to pay?" className="grid grid-cols-2 gap-2.5">
+          {([
+            { k: 'now', e: '💳', t: 'Pay now', d: 'UPI, cards, netbanking' },
+            { k: 'later', e: '🤝', t: 'Pay after session', d: 'UPI, card or at the studio' },
+          ] as const).map((o) => {
+            const on = payWhen === o.k
+            return (
+              <motion.button key={o.k} type="button" role="radio" aria-checked={on} whileTap={{ scale: 0.97 }} onClick={() => { buzz(6); setPayWhen(o.k) }}
+                className={cx('relative rounded-[22px] p-4 text-left transition-colors', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
+                <span className="text-[22px]" aria-hidden>{o.e}</span>
+                <span className="mt-1.5 block text-[15px] font-bold">{o.t}</span>
+                <span className={cx('block text-[12px] leading-4', on ? 'text-white/75' : 'text-muted')}>{o.d}</span>
+                <AnimatePresence>{on && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring} className="absolute right-3 top-3 grid size-6 place-items-center rounded-full bg-white text-navy"><Check className="size-3.5" strokeWidth={3} /></motion.span>}</AnimatePresence>
+              </motion.button>
+            )
+          })}
+        </div>
+      )}
       <div className="card flex items-center justify-between p-5">
-        <span className="text-[20px] font-extrabold text-navy">Total</span>
-        <span className="text-[30px] font-extrabold tracking-[-0.02em] text-navy tnum">{formatINR(c.feePaise)}</span>
+        <span className="text-[20px] font-extrabold text-navy">{inPlan ? 'In your plan' : payWhen === 'later' && canLater ? 'Due after session' : 'Total'}</span>
+        <span className="text-[30px] font-extrabold tracking-[-0.02em] text-navy tnum">{formatINR(fee)}</span>
       </div>
     </div>
   )
@@ -447,11 +498,11 @@ function Booked({ a }: { a: Appointment }) {
   const router = useRouter()
   const [cal, setCal] = useState(false)
   const c = CONSULTATIONS.find((x) => x.id === a.type)!
-  const ev = { id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online — link in the BeWise app' : `${STUDIO.name}, ${STUDIO.full}`, description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
+  const ev = { id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online (link in the BeWise app)' : `${STUDIO.name}, ${STUDIO.full}`, description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
   return (
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       <Petals />
-      <h1 className="h-duo mt-12 text-[38px]">You’re <em>booked</em></h1>
+      <h1 className="h-duo mt-12 text-[38px]">{a.timeRequested ? <>Time <em>requested</em></> : <>You’re <em>booked</em></>}</h1>
       <motion.div className="mx-auto mt-4" initial={{ scale: 0.4, rotate: -10, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.1 }}>
         <Mascot pose="wave" height={250} priority />
       </motion.div>
@@ -459,7 +510,13 @@ function Booked({ a }: { a: Appointment }) {
         <span className="grid size-12 place-items-center rounded-full bg-peri-50 text-navy"><CalendarPlus className="size-6" /></span>
         <div><p className="text-[16px] font-bold text-navy">{fmtLongDay(a.startsAt)}</p><p className="text-[14px] text-muted">{fmtTime(a.startsAt)} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya</p></div>
       </motion.div>
-      <p className="mt-3 text-center text-[13px] text-muted">Receipt {a.code} is in Payments. Jitu Bhaiya will read your answers before you meet.</p>
+      {a.timeRequested && (
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }} className="mt-3 rounded-[22px] bg-[#fbf3dc] p-4 text-[14px] leading-5 text-[#6b5320]">
+          <p><b>Waiting for confirmation.</b> Jitu Bhaiya or Haresh bhai will confirm this time. If it doesn’t work, our team will call you.</p>
+          <a href={`tel:${HELPLINE.tel}`} className="mt-2 inline-flex items-center gap-1.5 font-semibold text-navy underline underline-offset-4"><Phone className="size-4" /> Helpline {HELPLINE.label} ({HELPLINE.name})</a>
+        </motion.div>
+      )}
+      <p className="mt-3 text-center text-[13px] text-muted">{a.payLater ? `Booking ${a.code}. You can pay ${formatINR(a.amountPaise)} after your session.` : `Receipt ${a.code} is in Payments.`} Jitu Bhaiya will read your answers before you meet.</p>
       <div className="mt-auto space-y-3 pb-3 pt-6 safe-b">
         <Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View appointment</Btn>
         <Btn full variant="white" onClick={() => setCal(true)}><CalendarPlus className="size-5" /> Add to calendar</Btn>

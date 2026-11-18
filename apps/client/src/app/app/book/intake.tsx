@@ -6,11 +6,12 @@
  * @sensitive intake answers
  */
 import { AnimatePresence, motion } from 'motion/react'
-import { Heart, Lock, Mic, Phone, Sparkles, Square, Trash2 } from 'lucide-react'
+import { Check, Heart, Lock, Mic, Phone, Plus, Sparkles, Square, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { MoodImg } from '@/components/brand'
+import { MoodFace, type FaceSpec } from '@/components/mood-face'
 import { Chip, Segmented, buzz, cx, spring } from '@/components/ui'
-import { BODY_AREAS, FEELINGS, GOAL_FEELINGS, HELPLINES, LIFE_CHANGES, NUANCE, type Emotion } from '@/lib/data'
+import { BODY_AREAS, FEELINGS, FEELINGS_COMMON, HELPLINES, LIFE_CHANGES, NUANCE, feelingIcon, type Emotion } from '@/lib/data'
 import type { IntakeAnswers } from '@/lib/store'
 
 type P = { a: IntakeAnswers; set: (p: Partial<IntakeAnswers>) => void }
@@ -82,18 +83,12 @@ export function IntakeIntro() {
 export function StepWho({ a, set }: P) {
   return (
     <div className="space-y-4">
-      <StepTitle lead="Anything you’d like to" em="share?" sub="In your own words, or record a voice note. Optional — Jitu Bhaiya will read it before you meet." />
+      <StepTitle lead="Anything you’d like to" em="share?" sub="In your own words, or record a voice note. Optional. Jitu Bhaiya will read it before you meet." />
       <Card>
         <Label>In your own words</Label>
         <textarea value={a.onMind} onChange={(e) => set({ onMind: e.target.value.slice(0, 1000) })} rows={4} placeholder="Work has felt heavy lately, and I can’t switch off at night…"
-          className="w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] leading-6 outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" aria-label="What’s been on your mind" />
+          className="w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] leading-6 outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" aria-label="What’s been on your mind" />
         <VoiceNote />
-      </Card>
-      <Card>
-        <Label>For how long?</Label>
-        <div className="grid grid-cols-4 gap-2">
-          {(['Days', 'Weeks', 'Months', 'Years'] as const).map((d) => <Chip key={d} on={a.duration === d} onClick={() => set({ duration: d })} className="justify-center px-2">{d}</Chip>)}
-        </div>
       </Card>
     </div>
   )
@@ -115,7 +110,7 @@ function VoiceNote() {
       rec.current = r; r.start(); setSecs(0); setState('rec'); buzz()
     } catch { setState('blocked') }
   }
-  if (state === 'blocked') return <p className="mt-3 text-[13px] text-muted">Voice notes need microphone access — you can type instead.</p>
+  if (state === 'blocked') return <p className="mt-3 text-[13px] text-muted">Voice notes need microphone access. You can type instead.</p>
   return (
     <div className="mt-3 flex items-center gap-3">
       {state === 'rec' ? (
@@ -138,17 +133,41 @@ function VoiceNote() {
   )
 }
 
+const SLEEP_FACES: { color: string; face: FaceSpec }[] = [
+  { color: '#C9C2E6', face: { eyes: 'tight', mouth: 'wavy', brows: 'worried', extras: ['sweat'] } },
+  { color: '#D3CDEE', face: { eyes: 'sleepy', mouth: 'smallfrown', brows: 'sad' } },
+  { color: '#D6DEF3', face: { eyes: 'open', mouth: 'flat' } },
+  { color: '#C9E2D2', face: { eyes: 'happy', mouth: 'smile' } },
+  { color: '#B9CBF2', face: { eyes: 'closed', mouth: 'smile', extras: ['blush', 'zzz'] } },
+]
+
 export function StepFeelings({ a, set }: P) {
+  const rest = FEELINGS.filter((f) => !(FEELINGS_COMMON as readonly string[]).includes(f))
+  const [more, setMore] = useState(() => a.feelings.some((f) => rest.includes(f as never)))
+  const shown = more ? [...FEELINGS_COMMON, ...rest] : [...FEELINGS_COMMON]
   return (
     <div>
       <StepTitle lead="How have you been" em="feeling?" sub="Pick all that fit. You can explain more next." />
-      <div className="flex flex-wrap gap-2">
-        {FEELINGS.map((f, i) => (
-          <motion.div key={f} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.02 }}>
-            <Chip on={a.feelings.includes(f)} onClick={() => set({ feelings: toggle(a.feelings, f) })}>{f}</Chip>
-          </motion.div>
-        ))}
+      <div className="grid grid-cols-3 gap-2.5">
+        {shown.map((f, i) => {
+          const on = a.feelings.includes(f); const ic = feelingIcon(f)
+          return (
+            <motion.button key={f} type="button" role="checkbox" aria-checked={on} onClick={() => { buzz(6); set({ feelings: toggle(a.feelings, f) }) }}
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: (i % 9) * 0.03 }} whileTap={{ scale: 0.94 }}
+              className={cx('relative flex min-h-[96px] flex-col items-center justify-center gap-1.5 rounded-[22px] px-1.5 py-2.5 text-center transition-colors duration-200',
+                on ? 'bg-navy text-white shadow-[0_8px_18px_rgba(24,41,87,.22)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
+              <MoodFace color={ic.color} face={ic.face} size={40} />
+              <span className="text-[13px] font-semibold leading-tight">{f}</span>
+              <AnimatePresence>{on && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring} className="absolute right-2 top-2 grid size-5 place-items-center rounded-full bg-white text-navy"><Check className="size-3" strokeWidth={3.5} aria-hidden /></motion.span>}</AnimatePresence>
+            </motion.button>
+          )
+        })}
       </div>
+      {!more && (
+        <button type="button" onClick={() => setMore(true)} className="mx-auto mt-4 flex h-11 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold text-navy">
+          <Plus className="size-4" /> More feelings
+        </button>
+      )}
       {a.feelings.length > 6 && <p className="mt-4 text-[13px] text-muted">That’s a lot to carry. Pick the ones that feel strongest if you like.</p>}
     </div>
   )
@@ -164,7 +183,7 @@ export function StepNuance({ a, set }: P) {
         const upd = (p: Partial<typeof v>) => set({ nuance: { ...a.nuance, [f]: { ...v, ...p } } })
         return (
           <motion.div key={f} className="card p-5" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.06 }}>
-            <p className="text-[18px] font-extrabold text-navy">{f} <span className="font-bold text-soft">— which feels closest?</span></p>
+            <p className="text-[18px] font-extrabold text-navy">{f} <span className="font-bold text-soft">,  which feels closest?</span></p>
             <div className="mt-3 space-y-2" role="group" aria-label={`${f} statements`}>
               {NUANCE[f].map((s) => {
                 const on = v.statements.includes(s)
@@ -183,7 +202,7 @@ export function StepNuance({ a, set }: P) {
           </motion.div>
         )
       })}
-      {list.length === 0 && <p className="text-[15px] text-muted">Nothing more needed here — tap Continue.</p>}
+      {list.length === 0 && <p className="text-[15px] text-muted">Nothing more needed here. Tap Continue.</p>}
     </div>
   )
 }
@@ -229,7 +248,7 @@ export function StepBody({ a, set }: P) {
             <div className="mt-4 grid grid-cols-3 gap-2">
               {['Pain', 'Stiffness', 'Tension'].map((t) => <Chip key={t} on={a.bodyTypes.includes(t)} onClick={() => set({ bodyTypes: toggle(a.bodyTypes, t) })} className="justify-center px-2">{t}</Chip>)}
             </div>
-            <p className="mt-4 text-center text-[13px] text-muted">We don’t diagnose or treat medical conditions — please keep seeing your doctor.</p>
+            <p className="mt-4 text-center text-[13px] text-muted">We don’t diagnose or treat medical conditions. Please keep seeing your doctor.</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -254,19 +273,17 @@ export function StepSleep({ a, set }: P) {
       <StepTitle lead="Sleep &" em="energy" />
       <Card>
         <Label>How well do you sleep?</Label>
-        {/* simple 5-step scale (owner 2026-11-18) — bars grow with quality */}
+        {/* simple 5-step scale (owner 2026-11-18): sleepy faces from restless to rested, in the mood-face family */}
         <div className="grid grid-cols-5 gap-1.5" role="radiogroup" aria-label="Sleep quality">
           {SLEEP.map((label, i) => {
             const v = (i + 1) as 1 | 2 | 3 | 4 | 5
             const on = a.sleepQuality === v
             return (
               <motion.button key={label} type="button" role="radio" aria-checked={on} whileTap={{ scale: 0.92 }} onClick={() => { buzz(6); set({ sleepQuality: v }) }}
-                className={cx('flex flex-col items-center gap-2 rounded-[18px] px-1 pb-2.5 pt-3 transition-colors', on ? 'bg-navy text-white shadow-[0_6px_16px_rgba(24,41,87,.25)]' : 'bg-peri-50/80 text-navy')}>
-                <span className="flex h-7 items-end gap-[3px]" aria-hidden>
-                  {[0, 1, 2, 3, 4].map((k) => (
-                    <span key={k} className={cx('w-[4px] rounded-full', k <= i ? (on ? 'bg-white' : 'bg-navy') : (on ? 'bg-white/30' : 'bg-[#cfd5e5]'))} style={{ height: 8 + k * 5 }} />
-                  ))}
-                </span>
+                className={cx('flex flex-col items-center gap-1.5 rounded-[18px] px-1 pb-2.5 pt-2.5 transition-colors', on ? 'bg-navy text-white shadow-[0_6px_16px_rgba(24,41,87,.25)]' : 'bg-peri-50/80 text-navy')}>
+                <motion.span animate={on ? { scale: [1, 1.15, 1] } : { scale: 1 }} transition={{ duration: 0.35 }} className="block" aria-hidden>
+                  <MoodFace color={SLEEP_FACES[i].color} face={SLEEP_FACES[i].face} size={36} />
+                </motion.span>
                 <span className="text-center text-[11.5px] font-semibold leading-tight">{label}</span>
               </motion.button>
             )
@@ -275,7 +292,7 @@ export function StepSleep({ a, set }: P) {
       </Card>
       <Card>
         <Label>Hours a night</Label>
-        <div className="grid grid-cols-4 gap-2">{['< 5', '5 – 6', '7 – 8', '8+'].map((h) => <Chip key={h} on={a.hours === h} onClick={() => set({ hours: h })} className="justify-center px-1">{h}</Chip>)}</div>
+        <div className="grid grid-cols-4 gap-2">{['< 5', '5 to 6', '7 to 8', '8+'].map((h) => <Chip key={h} on={a.hours === h} onClick={() => set({ hours: h })} className="justify-center px-1">{h}</Chip>)}</div>
         <div className="mt-4 flex items-center justify-between"><span className="text-[15px] font-semibold text-navy">Waking at night?</span><Segmented className="w-44" value={a.wakes === undefined ? undefined : a.wakes ? 'y' : 'n'} onChange={(v) => set({ wakes: v === 'y' })} options={[{ value: 'n', label: 'No' }, { value: 'y', label: 'Yes' }]} /></div>
       </Card>
       <Card className="space-y-6">
@@ -303,7 +320,7 @@ export function StepLife({ a, set }: P) {
         })}
       </div>
       <input value={a.lifeOther} onChange={(e) => set({ lifeOther: e.target.value.slice(0, 300) })} placeholder="Anything else you’d like to share" aria-label="Anything else you’d like to share"
-        className="h-14 w-full rounded-[22px] bg-white px-5 text-[15px] shadow-[var(--shadow-card)] outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" />
+        className="h-14 w-full rounded-[22px] bg-white px-5 text-[15px] shadow-[var(--shadow-card)] outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
     </div>
   )
 }
@@ -325,9 +342,6 @@ export function StepSafety({ a, set }: P) {
   return (
     <div>
       <StepTitle lead="For your" em="safety" sub="Helps us prepare your remedy and suggest products safely." />
-      <p className="mb-3 flex items-center gap-2 rounded-[18px] bg-sage-100/80 px-4 py-3 text-[14px] font-semibold text-sage-text">
-        <span aria-hidden>🌿</span> All BeWise remedy blends are alcohol-free.
-      </p>
       <div className="card divide-y divide-line px-5">
         <YesNo label="Seeing a doctor or therapist?" value={s.doctor} onChange={(doctor) => up({ doctor })} />
         <YesNo label="Taking any medicines?" value={s.medicines} onChange={(medicines) => up({ medicines })}>
@@ -348,7 +362,7 @@ export function SafetyCard() {
       className="rounded-[28px] bg-[linear-gradient(135deg,#e9edfa,#dce2f5)] p-5" role="region" aria-label="Support">
       <div className="flex items-start gap-3">
         <motion.span animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 1.6, repeat: Infinity }} className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-navy"><Heart className="size-5" /></motion.span>
-        <div><p className="text-[18px] font-extrabold text-navy">You’re not alone.</p><p className="text-[14px] leading-5 text-muted">Talk to someone now — free and confidential.</p></div>
+        <div><p className="text-[18px] font-extrabold text-navy">You’re not alone.</p><p className="text-[14px] leading-5 text-muted">Talk to someone now. It’s free and confidential.</p></div>
       </div>
       <div className="mt-4 space-y-2">
         {HELPLINES.map((h) => (
@@ -379,22 +393,6 @@ export function StepGentle({ a, set }: P) {
   )
 }
 
-export function StepGoals({ a, set }: P) {
-  return (
-    <div className="space-y-4">
-      <StepTitle lead="How would you" em="like to feel?" />
-      <div className="card grid grid-cols-2 gap-2.5 p-4">
-        {GOAL_FEELINGS.map((g) => <Chip key={g} on={a.goals.includes(g)} onClick={() => set({ goals: toggle(a.goals, g) })} className="justify-center">{g}</Chip>)}
-      </div>
-      <div className="card p-5">
-        <p className="mb-2 text-[14px] text-muted">In your own words —</p>
-        <input value={a.goalText} onChange={(e) => set({ goalText: e.target.value.slice(0, 200) })} placeholder="Able to switch off and sleep well" aria-label="Your goal in your own words"
-          className="h-12 w-full rounded-full bg-peri-50 px-4 text-[15px] outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" />
-      </div>
-    </div>
-  )
-}
-
 export function StepReview({ a, set, edit }: P & { edit: (step: string) => void }) {
   const rows = [
     { k: 'who', icon: '💭', t: 'On your mind', d: [a.onMind.slice(0, 48) + (a.onMind.length > 48 ? '…' : ''), a.duration?.toLowerCase()].filter(Boolean).join(' · ') },
@@ -402,7 +400,6 @@ export function StepReview({ a, set, edit }: P & { edit: (step: string) => void 
     { k: 'body', icon: '🌿', t: 'Body', d: a.bodyAny === undefined ? '' : a.bodyAny ? a.body.join(', ').toLowerCase() : 'nothing noted' },
     { k: 'sleep', icon: '🌙', t: 'Sleep', d: a.hours || a.sleepQuality ? [a.sleepQuality && SLEEP[a.sleepQuality - 1].toLowerCase(), a.hours && `${a.hours} h`, `energy ${a.energy}/5`, `stress ${a.stress}/5`].filter(Boolean).join(' · ') : '' },
     { k: 'safety', icon: '🛡️', t: 'Safety', d: [a.safety.allergies && a.safety.allergiesText && `${a.safety.allergiesText} allergy`, a.safety.pregnant && 'pregnant'].filter(Boolean).join(' · ') || 'nothing to flag' },
-    { k: 'goals', icon: '✨', t: 'You’d like to feel', d: [...a.goals, a.goalText].filter(Boolean).join(' · ').toLowerCase() || '—' },
   ]
   return (
     <div className="space-y-3">
@@ -410,14 +407,14 @@ export function StepReview({ a, set, edit }: P & { edit: (step: string) => void 
       {rows.map((r, i) => (
         <motion.div key={r.k} className="card flex items-center gap-3 p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
           <span className="grid size-11 shrink-0 place-items-center rounded-full bg-peri-50 text-[18px]" aria-hidden>{r.icon}</span>
-          <div className="min-w-0 flex-1"><p className="text-[15px] font-bold text-navy">{r.t}</p><p className="truncate text-[13px] text-muted">{r.d && r.d !== '—' ? r.d : 'Skipped'}</p></div>
+          <div className="min-w-0 flex-1"><p className="text-[15px] font-bold text-navy">{r.t}</p><p className="truncate text-[13px] text-muted">{r.d && r.d !== '' ? r.d : 'Skipped'}</p></div>
           <button onClick={() => edit(r.k)} className="text-[14px] font-semibold text-navy underline underline-offset-4">Edit</button>
         </motion.div>
       ))}
       {/* owner 2026-11-18: sharing + AI summary are part of the service — stated plainly, not toggles */}
       <div className="card space-y-3 p-5">
-        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Lock className="mt-0.5 size-5 shrink-0 text-navy" /><span>Your answers go <b className="text-navy">privately to Jitu Bhaiya</b> so he can prepare for your session.</span></p>
-        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Sparkles className="mt-0.5 size-5 shrink-0 text-navy" /><span>A secure AI assistant prepares a short summary for him. <b className="text-navy">Only he sees it</b> — it never decides your remedy.</span></p>
+        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Lock className="mt-0.5 size-5 shrink-0 text-navy" /><span>Your answers are <b className="text-navy">kept discreet</b> and never shared with anyone except Jitu Bhaiya, your consultant.</span></p>
+        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Sparkles className="mt-0.5 size-5 shrink-0 text-navy" /><span>A secure AI assistant prepares a short summary for him. <b className="text-navy">Only he sees it</b> and it never decides your remedy.</span></p>
       </div>
     </div>
   )
@@ -457,8 +454,8 @@ export function CheckinNews({ c, set }: { c: Checkin; set: (p: Partial<Checkin>)
   return (
     <div className="space-y-4">
       <StepTitle lead="Anything" em="new?" />
-      <textarea value={c.news} onChange={(e) => set({ news: e.target.value.slice(0, 800) })} rows={4} placeholder="Optional — anything you’d like Jitu Bhaiya to know" aria-label="Anything new"
-        className="card w-full resize-none p-5 text-[15px] outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" />
+      <textarea value={c.news} onChange={(e) => set({ news: e.target.value.slice(0, 800) })} rows={4} placeholder="Optional. Anything you’d like Jitu Bhaiya to know" aria-label="Anything new"
+        className="card w-full resize-none p-5 text-[15px] outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
       <div className="card p-5">
         <Label>I took my drops</Label>
         <div className="grid grid-cols-2 gap-2">{['Every day', 'Most days', 'Sometimes', 'Rarely'].map((d) => <Chip key={d} on={c.drops === d} onClick={() => set({ drops: d })} className="justify-center">{d}</Chip>)}</div>

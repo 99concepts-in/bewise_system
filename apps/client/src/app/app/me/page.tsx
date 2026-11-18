@@ -66,8 +66,17 @@ export default function Me() {
           <div className="flex-1"><p className="text-[15px] font-semibold text-navy">Explore with sample data</p><p className="text-[12px] text-muted">Preview a returning client: blend, sessions, journal, orders</p></div>
           <Btn size="sm" variant="sage" onClick={() => { s.loadDemo(); toast('Sample journey loaded'); router.push('/app') }}>Load</Btn>
         </Item>
+        <Item className="card p-4">
+          <p className="text-[13px] font-bold uppercase tracking-[0.1em] text-muted">Preview tools</p>
+          <p className="mt-1 text-[12px] text-muted">See what a client receives when Jitu Bhaiya or Haresh books for them.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(); router.push(`/app/pay?appointment=${a.id}`) }}>Booking from Jitu Bhaiya</Btn>
+            <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(true); router.push(`/app/pay?appointment=${a.id}`) }}>…paid after hold expired</Btn>
+            <Btn size="sm" variant="white" onClick={() => { const a = s.appointments.find((x) => x.timeRequested); if (a) { s.confirmTime(a.id); toast('Time confirmed by the team') } else toast('No time waiting for confirmation') }}>Team confirms my time</Btn>
+          </div>
+        </Item>
         <Item><Btn full variant="ghost" size="md" onClick={() => setSheet('signout')}><LogOut className="size-4" /> Sign out</Btn></Item>
-        <Item><p className="pb-2 text-center text-[11px] text-soft">BeWise · Holistic Wellness · preview build</p></Item>
+        <Item><p className="pb-2 text-center text-[11px] text-muted">BeWise · Holistic Wellness · preview build</p></Item>
       </Reveal>
 
       <Sheet open={sheet === 'photo'} onClose={() => setSheet(null)} title="Your photo" tall>
@@ -140,7 +149,7 @@ function PrivacySheet({ open, onClose }: { open: boolean; onClose: () => void })
     <Sheet open={open} onClose={() => { setConfirm(false); onClose() }} title="Privacy & data" tall>
       <h2 className="h-duo text-[26px]">Privacy & <em>data</em></h2>
       <div className="mt-3 divide-y divide-line">
-        <div className="flex items-center gap-3 py-4"><div className="flex-1"><p className="text-[15px] font-semibold text-navy">Share my journal with Jitu Bhaiya</p><p className="text-[13px] text-muted">Emotions and times only — helps your sessions</p></div><Toggle label="Share journal" on={share} onChange={setShare} /></div>
+        <div className="flex items-center gap-3 py-4"><div className="flex-1"><p className="text-[15px] font-semibold text-navy">Share my journal with Jitu Bhaiya</p><p className="text-[13px] text-muted">Emotions and times only. Helps your sessions</p></div><Toggle label="Share journal" on={share} onChange={setShare} /></div>
         <div className="flex items-center gap-3 py-4"><div className="flex-1"><p className="text-[15px] font-semibold text-navy">Gentle offers</p><p className="text-[13px] text-muted">Never more than twice a month</p></div><Toggle label="Gentle offers" on={offers} onChange={(v) => { setOffers(v); s.setProfile({ consents: { ...p.consents, offers: v } }) }} /></div>
       </div>
       <div className="mt-2 space-y-2.5">

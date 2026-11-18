@@ -2,6 +2,30 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — Launch offer, plans, coupon, subscriptions, pay-first booking with time approval · branch claude/new-session-94881h
+**Status:** Pushed (preview in `apps/client`)
+**Done:** top-of-Home launch banner → full-screen animated offer: Yearly ₹9,600 cut to ₹8,000 (2 months free, save ₹1,600), Pay or WhatsApp 90542 20952 "I want to avail the yearly offer"; ✕ → "Are you sure?" → 6-month offer ₹4,800 → ₹4,000 (1 month free) with claim / skip; live countdown to 1 Dec · after paying: congratulations animation + 15% first-purchase coupon WELCOME15 (7 days, applied at bag/checkout on products) · checkout asks to subscribe per product (every 30 days) and places the order only after confirm · delivered orders ask for a review (stars + note) · follow-up booking offers 6 months (Recommended) / Yearly (Best value) / One time; plans cover later follow-ups · booking order is now pay → preferred time → "Time requested" (confirmed by Jitu Bhaiya or Haresh bhai, else the team calls) · helpline Mr. Haresh 96013 45289 on Help, booking done and session screens
+**Tests:** 43 green (8 flows incl. launch offer + plan booking, 11 sizes, axe)
+**Needs MANAGER/CONSULTANT:** approve/adjust requested times (`timeRequested`), mark pay-after-session payments, refill subscriptions confirmation and the WhatsApp review message a few days after delivery
+**OWNER confirmed 2026-11-18:** a plan = one ₹800 follow-up consultation a month (yearly = 12 × ₹800 = ₹9,600, launch ₹8,000; 6 months ₹4,800, launch ₹4,000); launch prices end 1 Dec 23:59 IST
+**Live:** https://exceptionalappstudios-ship-it.github.io/bewise_system/preview/client/ (preview/client on main, refreshed with owner approval)
+
+## 2026-11-18 — Real product range, shop redesign, owner intake + booking feedback · branch claude/new-session-94881h
+**Status:** Pushed (preview in `apps/client`)
+**Done:** all 18 products from `Bewise Products Range.xlsx` (7 roll-ons ₹600, 4 aura sprays ₹1,200, Bach remedy dropper/spray ₹800 as reorder of the client's own blend, Rescue Remedy, Hair Oil, Beauty mist, 2 bath salts ₹500) · product images made from the owner's photos (cutouts, recoloured roll-on bands, BeWise labels) · shop: categories, "How do you want to feel?" intents, most loved, disclaimer · first consultation pre-selected; follow-up link only · "Skip" with a recommendation dialog (new clients) · feelings as face tiles + "More feelings"; nuance step skipped when empty; sleep faces; duration + goals screens removed; alcohol notes removed; privacy line rewritten · **pay after session** option (booking stays confirmed; pay later from the session) · no em/en dashes in any copy · brochure testimonials (3, verbatim) + WhatsApp 90542 20952 · remedy label facts (lasts up to 25 days, storage, personal use)
+**Tests:** `pnpm build && pnpm test:e2e`: 41 green (6 flows incl. pay later, 11 sizes, axe)
+**Flags for OWNER:** product names "Diabetes", "BP", "Cough & Cold" and sheet claims (blood sugar, BP, immunity, relief from cold) were softened to wellbeing language with "not a medicine" notes because of the DMR Act / no-medical-claims rule; please confirm or have counsel review. Ingredient lists not in the sheet ("full list on the label"). Confirm the brochure clients consent to in-app use. Pay-later needs a staff "mark paid" step in the manager app.
+**Next:** owner review
+
+## 2026-11-18 — Consultant request + owner rules: drops tick, feedback benefits, booking link, staff-booking pay, check-in link · branch claude/new-session-94881h
+**Status:** Pushed — preview in `apps/client`; merged `origin/main` + consultant branch `claude/new-session-1j1y0u` first
+**Done:** daily "Took my drops" tick (Home + My Remedies, 2 days editable, 14-day strip, gentle copy) · feedback "How do you feel after the session?" → `benefits[]` · public link `/book/jitu-bhaiya?type=` (landing → sign-in → onboarding → booking, type kept) · `/app/pay?appointment=` for consultant/manager-made bookings (no slot picking) + "Payment received — pick a new time" (consultant point 8) · `/app/checkin?appointment=` deep link · welcome slide 3 story: dropper lifts out, 4 drops, Sad → Happy · speed: CSS skeleton, `loading.tsx`, idle prefetch · AA: muted #5F667A, small grey text → muted, peri/rose/sage tokens darkened, roles on labelled elements
+**Tests:** `pnpm build && pnpm test:e2e` — 40 green (5 flows, 11 screen sizes × 24 routes overflow + nav-clear, axe WCAG A/AA on 24 routes)
+**Contracts used (consultant ACCEPTED):** `logDrops`, `submitSessionFeedback.benefits`, `getCheckinForm/submitCheckin`, `appointment.needs_new_time`
+**Requests:** consultant `20261118-consultant-to-client-drops-feedback-booking.md` → DONE (reply in file)
+**Blocked / needs:** FTP secrets in GitHub for auto-deploy to Hostinger (builds green, upload step skipped); domain D-12 for the QR link; OWNER payment-link sender
+**Next:** owner review; then fold `apps/client` into the foundation when ✅
+
 ## 2026-11-18 — Owner review round 1 (preview) · branch claude/new-session-94881h
 **Status:** Pushed — auto-deploys via "Client app → Pages & Hostinger"
 **Done:** welcome story rewritten (Welcome to BeWise Wellness · Book with Jitendra Khimlani · Bach flower remedy benefits · "Let's begin"); decorative rings contained (no overlap with text); all cut-out art re-made with neural background removal (no floor patches); mood characters normalised to one box/baseline; **31 feelings** incl. Happy with search in the log sheet; **journal notes** (add/edit/search); **goals on Home**; 4-digit OTP; no session durations shown; photo copy rewritten; WhatsApp + offers consents default on (owner); subtle focus ring; bottom nav fixed for trailing-slash URLs on static hosting; Meet sheet layout fixed; "Client stories" testimonials section (empty until consented quotes); follow-up path for returning clients

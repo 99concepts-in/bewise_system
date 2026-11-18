@@ -14,16 +14,17 @@ import { moodOf, REORDER_PRICE_PAISE } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { dayKey, fmtDay, formatINR } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
+import { DropsTick } from '@/components/drops-tick'
 import { blendSupply } from '@/lib/supply'
 import { BP } from '@/lib/asset'
 
 // @decision(D-10) generic Bach descriptions — Jitu Bhaiya approves final wording before launch. Never the reason it was chosen.
 const ABOUT: Record<string, string> = {
-  Mimulus: 'Dr Bach described Mimulus for everyday fears of known things — a gentle companion for quiet courage.',
-  'White Chestnut': 'Associated with a busy mind and repeating thoughts — for a calmer, clearer head.',
-  Larch: 'Linked with self-belief — for having a go without expecting to fail.',
-  Impatiens: 'Associated with impatience and irritation — for an easier, unhurried pace.',
-  Walnut: 'Known as the remedy for times of change — for steadiness while life shifts.',
+  Mimulus: 'Dr Bach described Mimulus for everyday fears of known things, a gentle companion for quiet courage.',
+  'White Chestnut': 'Associated with a busy mind and repeating thoughts, for a calmer, clearer head.',
+  Larch: 'Linked with self-belief, for having a go without expecting to fail.',
+  Impatiens: 'Associated with impatience and irritation, for an easier, unhurried pace.',
+  Walnut: 'Known as the remedy for times of change, for steadiness while life shifts.',
 }
 const FLOWER_IMG = ['f-rose', 'f-mimulus']
 
@@ -44,7 +45,7 @@ export default function Remedies() {
       <div className="card mt-6 flex flex-col items-center p-8 text-center">
         <Mascot pose="sleep" height={150} />
         <p className="mt-4 text-[18px] font-extrabold text-navy">Your blend will bloom here</p>
-        <p className="mt-1 max-w-[280px] text-[14px] leading-5 text-muted">After your first session, Jitu Bhaiya prepares a personal blend of flower essences — included in your consultation.</p>
+        <p className="mt-1 max-w-[280px] text-[14px] leading-5 text-muted">After your first session, Jitu Bhaiya prepares a personal blend of flower essences, included in your consultation.</p>
         <BtnLink href="/app/book" size="md" className="mt-5">Book a consultation</BtnLink>
       </div>
     </main>
@@ -58,8 +59,8 @@ export default function Remedies() {
   const mix = moodMix(journal)
   const reorder = () => {
     addToCart('remedy-reorder'); buzz(12)
-    const r = reorderRef.current?.getBoundingClientRect(); if (r) flyToBag(r, `${BP}/img/p-dropper.webp`)
-    toast(`Blend added to your bag · ${formatINR(REORDER_PRICE_PAISE)}`)
+    const r = reorderRef.current?.getBoundingClientRect(); if (r) flyToBag(r, `${BP}/img/products/bach-remedy-dropper.webp`)
+    toast(`Blend added to cart · ${formatINR(REORDER_PRICE_PAISE)}`)
   }
 
   return (
@@ -70,10 +71,10 @@ export default function Remedies() {
         <Item>
           <section className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(150deg,#fbf3dc_0%,#f6efe4_45%,#eef1fb_100%)] p-6 shadow-[var(--shadow-card)]">
             <motion.img src={`${BP}/img/f-mimulus.webp`} alt="" aria-hidden className="absolute -right-10 top-2 h-[150px] opacity-80" animate={{ rotate: [0, 4, 0] }} transition={{ duration: 6, repeat: Infinity }} />
-            <motion.img src={`${BP}/img/p-dropper.webp`} alt="" aria-hidden className="absolute bottom-3 right-6 h-[170px] drop-shadow-[0_18px_18px_rgba(24,41,87,.22)]" initial={{ y: 30, opacity: 0 }} animate={{ y: [0, -8, 0], opacity: 1 }} transition={{ y: { duration: 5, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.6 } }} />
+            <motion.img src={`${BP}/img/products/bach-remedy-dropper.webp`} alt="" aria-hidden className="absolute bottom-3 right-6 h-[170px] drop-shadow-[0_18px_18px_rgba(24,41,87,.22)]" initial={{ y: 30, opacity: 0 }} animate={{ y: [0, -8, 0], opacity: 1 }} transition={{ y: { duration: 5, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.6 } }} />
             <p className="text-[13px] font-semibold text-[#8a6a2c]">Since {fmtDay(blend.startedOn)}</p>
             <h2 className="relative mt-1 max-w-[62%] text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">{blend.name} <span className="text-soft">v{blend.version}</span></h2>
-            <p className="relative mt-1 max-w-[62%] text-[14px] text-muted">{blend.drops} drops · {blend.timesPerDay}× a day{' · alcohol-free'}</p>
+            <p className="relative mt-1 max-w-[62%] text-[14px] text-muted">{blend.drops} drops · {blend.timesPerDay}× a day</p>
             <div className="relative mt-5 flex max-w-[62%] items-center gap-3">
               <Ring value={sup.level} size={74} stroke={8} color="#c48a3a" track="#ffffffaa"><span className="text-center leading-none"><b className="text-[18px] text-navy tnum">{left}</b><br /><span className="text-[11px] text-muted">days left</span></span></Ring>
               <p className="text-[13px] leading-4 text-muted">{sup.next ? 'Lasts until your next session.' : 'A follow-up refreshes your blend.'}</p>
@@ -118,7 +119,7 @@ export default function Remedies() {
                 </div>
               )}
               <p className="mt-3 flex items-start gap-2 text-[13px] leading-5 text-muted"><Lightbulb className="mt-0.5 size-4 shrink-0 text-gold" />{dailyInsight(journal)}</p>
-              <p className="mt-2 text-[11px] text-soft">From your journal and check-ins · not medical advice</p>
+              <p className="mt-2 text-[11px] text-muted">From your journal and check-ins · not medical advice</p>
             </section>
           </Item>
         )}
@@ -175,31 +176,13 @@ function Donut({ mix }: { mix: { mood: Parameters<typeof moodOf>[0]; pct: number
 
 function RitualToday({ onTimes }: { onTimes: () => void }) {
   const blend = useApp((s) => s.blend)!
-  const ritual = useApp((s) => s.ritual)
-  const take = useApp((s) => s.takeDrop)
-  const untake = useApp((s) => s.untakeDrop)
-  const taken = ritual[dayKey(new Date())] ?? 0
-  const streak = (() => { let n = 0; for (let i = 1; i < 60; i++) { const d = new Date(); d.setDate(d.getDate() - i); if ((ritual[dayKey(d)] ?? 0) >= blend.timesPerDay - 1) n++; else break } return n })()
   return (
-    <section className="card p-5">
+    <section className="card p-5" aria-labelledby="drops-h">
       <div className="flex items-start justify-between">
-        <div><h2 className="h-section">Ritual & reminders</h2><p className="text-[13px] text-muted">{taken} of {blend.timesPerDay} today{streak ? ` · ${streak}-day rhythm 🌿` : ''}</p></div>
+        <div><h2 id="drops-h" className="h-section">Your daily drops</h2><p className="text-[13px] text-muted">{blend.drops} drops, {blend.timesPerDay}× a day · {blend.reminderTimes.join(', ')}</p></div>
         <button onClick={onTimes} className="inline-flex items-center gap-1.5 rounded-full bg-peri-50 px-3 py-2 text-[13px] font-semibold text-navy"><Bell className="size-4" /> Times</button>
       </div>
-      <div className="mt-4 grid grid-cols-4 gap-2">
-        {blend.reminderTimes.slice(0, blend.timesPerDay).map((t, k) => {
-          const on = k < taken
-          return (
-            <motion.button key={k} whileTap={{ scale: 0.9 }} aria-label={on ? `${t} taken` : `Mark ${t} taken`} onClick={() => { if (on && k === taken - 1) untake(); else if (!on && k === taken) { take(); buzz(12) } }}
-              className="relative flex h-[84px] flex-col items-center justify-end overflow-hidden rounded-[20px] bg-[#f6f1e8] pb-2">
-              <motion.span className="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,#eac27c,#c48a3a)]" initial={false} animate={{ height: on ? '100%' : '0%' }} transition={{ type: 'spring', stiffness: 140, damping: 18 }} />
-              <svg viewBox="0 0 24 24" className={`relative mb-1 size-6 ${on ? 'text-white' : 'text-[#c9a46a]'}`} aria-hidden><path fill="currentColor" d="M12 2.5c3.6 4.6 6 8 6 11a6 6 0 1 1-12 0c0-3 2.4-6.4 6-11Z" /></svg>
-              <span className={`relative text-[13px] font-bold tnum ${on ? 'text-white' : 'text-navy'}`}>{t}</span>
-            </motion.button>
-          )
-        })}
-      </div>
-      <button onClick={() => { untake(); }} className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-muted"><RotateCcw className="size-3.5" /> Undo last</button>
+      <div className="mt-4"><DropsTick full /></div>
     </section>
   )
 }
@@ -222,7 +205,7 @@ function ReminderSheet({ open, onClose }: { open: boolean; onClose: () => void }
         ))}
       </div>
       <Btn full className="mt-5" onClick={() => { set([...t].sort()); toast('Reminders updated'); onClose() }}>Save times</Btn>
-      <p className="mt-3 flex items-center justify-center gap-1 text-[12px] text-soft">Notifications arrive once the app is installed <ChevronRight className="size-3" /></p>
+      <p className="mt-3 flex items-center justify-center gap-1 text-[12px] text-muted">Notifications arrive once the app is installed <ChevronRight className="size-3" /></p>
     </Sheet>
   )
 }

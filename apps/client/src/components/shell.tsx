@@ -31,6 +31,27 @@ const NAV_ROOTS = new Set(['/app', '/app/remedies', '/app/book', '/app/shop', '/
 /** Static hosting serves /app/ (trailing slash) — compare routes without it. */
 export const usePath = () => { const p = usePathname() || '/'; return p.length > 1 ? p.replace(/\/+$/, '') : p }
 
+// In-app history (paths only), so Back steps back instead of pushing a new page: pushing the parent made
+// Checkout → Bag → (back) Checkout loop forever (owner 2026-11-18).
+const trail: string[] = []
+function useTrail() {
+  const path = usePath()
+  useEffect(() => {
+    if (trail[trail.length - 1] === path) return
+    if (trail[trail.length - 2] === path) trail.pop() // went back
+    else trail.push(path)
+    if (trail.length > 50) trail.shift()
+  }, [path])
+}
+function useBack(target?: string) {
+  const router = useRouter()
+  return () => {
+    const prev = trail[trail.length - 2]
+    if (prev && (!target || prev === target)) return router.back()
+    router.replace(target ?? '/app')
+  }
+}
+
 function BottomNav() {
   const path = usePath()
   const hidden = useUi((s) => s.navHidden)
@@ -66,7 +87,7 @@ function BottomNav() {
 }
 
 export function AppHeader({ back, right, title }: { back?: boolean | string; right?: ReactNode; title?: string }) {
-  const router = useRouter()
+  const goBack = useBack(typeof back === 'string' ? back : undefined)
   const { openNotices } = useChrome()
   const unread = useApp((s) => s.notices.filter((n) => !n.read).length)
   const profile = useApp((s) => s.profile)
@@ -74,7 +95,7 @@ export function AppHeader({ back, right, title }: { back?: boolean | string; rig
     <header className="sticky top-0 z-30 -mx-5 flex items-center justify-between gap-3 bg-[linear-gradient(180deg,#dce2f5_0%,#dfe4f6_72%,rgba(223,228,246,0)_100%)] px-5 pb-4 pt-2 safe-t">
       {back ? (
         <div className="flex items-center gap-3">
-          <IconBtn label="Back" onClick={() => (typeof back === 'string' ? router.push(back) : router.back())}><ChevronLeft className="size-5" /></IconBtn>
+          <IconBtn label="Back" onClick={goBack}><ChevronLeft className="size-5" /></IconBtn>
           {title ? <span className="text-[16px] font-bold text-navy">{title}</span> : null}
         </div>
       ) : (
@@ -119,13 +140,13 @@ function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
       <p className="mt-1 text-[14px] text-muted">Today · {fmtTime(now)}</p>
       <label className="mt-4 flex h-12 items-center gap-3 rounded-full bg-peri-50 px-4 focus-within:ring-2 focus-within:ring-navy">
         <Search className="size-[18px] text-navy" aria-hidden />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings — happy, stressed, loved…" aria-label="Search feelings"
-          className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-soft" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings like happy, stressed, loved…" aria-label="Search feelings"
+          className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted" />
         {q && <button aria-label="Clear search" onClick={() => setQ('')}><X className="size-4 text-muted" /></button>}
       </label>
       {q ? (
         <div className="mt-4 flex min-h-[120px] flex-wrap content-start gap-2">
-          {results.length ? results.map((m) => <Pill key={m.key} k={m.key as Emotion} />) : <p className="w-full py-6 text-center text-[14px] text-muted">No match for “{q}” — try a simpler word like “stressed” or “happy”.</p>}
+          {results.length ? results.map((m) => <Pill key={m.key} k={m.key as Emotion} />) : <p className="w-full py-6 text-center text-[14px] text-muted">No match for “{q}”. Try a simpler word like “stressed” or “happy”.</p>}
         </div>
       ) : (
         <>
@@ -146,7 +167,7 @@ function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
           <motion.label initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 block overflow-hidden">
             <span className="mb-1.5 block text-[13px] font-semibold text-navy">Add a note <span className="font-normal text-muted">(optional)</span></span>
             <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 500))} rows={3} placeholder="What’s behind this feeling? A word or two is enough."
-              className="w-full resize-none rounded-[20px] bg-peri-50/80 p-4 text-[15px] leading-6 outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" />
+              className="w-full resize-none rounded-[20px] bg-peri-50/80 p-4 text-[15px] leading-6 outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
           </motion.label>
         )}
       </AnimatePresence>
@@ -178,8 +199,8 @@ function EntrySheet({ id, onClose }: { id: string | null; onClose: () => void })
           <label className="mt-5 block">
             <span className="mb-1.5 block text-[13px] font-semibold text-navy">Your note</span>
             <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 500))} rows={4} placeholder="What’s behind this feeling? A word or two is enough."
-              className="w-full resize-none rounded-[20px] bg-peri-50/80 p-4 text-[15px] leading-6 outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" />
-            <span className="mt-1 block text-right text-[11px] text-soft tnum">{note.length}/500</span>
+              className="w-full resize-none rounded-[20px] bg-peri-50/80 p-4 text-[15px] leading-6 outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
+            <span className="mt-1 block text-right text-[11px] text-muted tnum">{note.length}/500</span>
           </label>
           <div className="mt-3 flex gap-3">
             <Btn full variant="white" size="md" onClick={() => { const e = entry; remove(e.id); onClose(); toast('Entry removed', { label: 'Undo', onClick: () => restore(e.emotion, new Date(e.at), e.note) }) }}>Remove</Btn>
@@ -208,7 +229,7 @@ function NoticeSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
               <button onClick={() => { onClose(); if (n.href) router.push(n.href) }} className="flex w-full items-start gap-3 rounded-[20px] bg-peri-50/70 p-4 text-left">
                 <span className={`mt-1.5 size-2.5 shrink-0 rounded-full ${n.read ? 'bg-transparent' : 'bg-rose'}`} />
                 <span className="flex-1"><span className="block text-[15px] font-bold text-navy">{n.title}</span><span className="block text-[13px] text-muted">{n.body}</span></span>
-                <span className="text-[12px] text-soft">{fmtDay(n.at)}</span>
+                <span className="text-[12px] text-muted">{fmtDay(n.at)}</span>
               </button>
             </motion.li>
           ))}
@@ -237,7 +258,23 @@ function Flyer({ fly, onDone }: { fly: { from: DOMRect; img: string; id: number 
   )
 }
 
+const PREFETCH = ['/app', '/app/remedies', '/app/book', '/app/shop', '/app/me', '/app/journal', '/app/sessions', '/app/ask', '/app/goals', '/app/bag', '/app/checkin', '/app/pay']
+/** Fetch the other screens' code while the phone is idle, so the first tap on any tab is instant. */
+function IdlePrefetch() {
+  const router = useRouter()
+  useEffect(() => {
+    type IdleWin = Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void }
+    const w = window as IdleWin
+    let i = 0, handle = 0
+    const next = () => { if (i >= PREFETCH.length) return; router.prefetch(PREFETCH[i++]); handle = w.requestIdleCallback ? w.requestIdleCallback(next, { timeout: 2000 }) : window.setTimeout(next, 200) }
+    const start = window.setTimeout(next, 1200) // after first paint & hydration
+    return () => { clearTimeout(start); if (w.cancelIdleCallback) w.cancelIdleCallback(handle); else clearTimeout(handle) }
+  }, [router])
+  return null
+}
+
 export function AppChrome({ children }: { children: ReactNode }) {
+  useTrail()
   const [log, setLog] = useState(false)
   const [notes, setNotes] = useState(false)
   const [entry, setEntry] = useState<string | null>(null)
@@ -250,6 +287,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
   return (
     <Chrome.Provider value={ctx}>
       {children}
+      <IdlePrefetch />
       <BottomNav />
       <LogSheet open={log} onClose={() => setLog(false)} />
       <NoticeSheet open={notes} onClose={() => setNotes(false)} />

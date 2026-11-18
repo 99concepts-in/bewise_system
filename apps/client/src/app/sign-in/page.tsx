@@ -12,6 +12,7 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { LogoMark } from '@/components/brand'
 import { Btn, IconBtn, buzz, ease } from '@/components/ui'
 import { useApp } from '@/lib/store'
+import { takeNextStep } from '@/lib/next-step'
 
 const CODE_LEN = 4 // owner 2026-11-18: 4-digit codes everywhere
 const DEMO_CODE = '2468'
@@ -61,7 +62,7 @@ function SignIn() {
       setCode(''); codeRef.current?.focus(); return
     }
     setProfile({ phone })
-    if (profile?.onboardedAt && (returning || profile.phone === phone)) router.replace('/app')
+    if (profile?.onboardedAt && (returning || profile.phone === phone)) router.replace(takeNextStep() ?? '/app')
     else router.push('/onboarding/about')
   }
 
@@ -127,7 +128,7 @@ function SignIn() {
             </div>
             <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} onClick={() => onCode(DEMO_CODE)}
               className="mx-auto mt-8 rounded-full border border-dashed border-[#b9c2dc] bg-white/60 px-4 py-2 text-[13px] text-muted">
-              Preview build — no SMS is sent. Tap to use code <b className="tnum text-navy">{DEMO_CODE}</b>
+              Preview build. No SMS is sent. Tap to use code <b className="tnum text-navy">{DEMO_CODE}</b>
             </motion.button>
             <div className="mt-auto pb-3 safe-b">
               <Btn full variant="gradient" disabled={code.length < CODE_LEN} loading={busy} onClick={() => verify(code)}>Verify</Btn>
