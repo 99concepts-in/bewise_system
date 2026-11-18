@@ -10,6 +10,7 @@
 **Also (late round 1):** intake fully optional (every question skippable; review shows "Skipped"), "Who is this for?" removed — dependent bookings parked until the owner asks again
 **Intake flow (owner):** guided breathing first ("Take a deep breath", 4-2-6 rhythm) → feelings → detail → body → sleep → life → personal message/voice note → safety → gentle question → goals
 **Also:** sleep quality is a simple 5-step scale (Very poor → Very good); all remedy blends alcohol-free — question removed, note shown, legal drafts updated
+**Also:** IN-11 sharing + AI summary are now a plain notice, not toggles (owner) — privacy draft updated; counsel to confirm wording
 **Needs from owner:** consented testimonials (Monika, Mitul Shah, Dhaval Gohil, Shivam S. + more); counsel view on pre-ticked consents
 
 ## 2026-11-17 — Auto-deploy to Hostinger on every commit · branch claude/new-session-94881h

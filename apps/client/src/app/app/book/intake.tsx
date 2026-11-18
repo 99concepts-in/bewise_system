@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { Heart, Lock, Mic, Phone, Sparkles, Square, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { MoodImg } from '@/components/brand'
-import { Chip, Segmented, Toggle, buzz, cx, spring } from '@/components/ui'
+import { Chip, Segmented, buzz, cx, spring } from '@/components/ui'
 import { BODY_AREAS, FEELINGS, GOAL_FEELINGS, HELPLINES, LIFE_CHANGES, NUANCE, type Emotion } from '@/lib/data'
 import type { IntakeAnswers } from '@/lib/store'
 
@@ -414,11 +414,11 @@ export function StepReview({ a, set, edit }: P & { edit: (step: string) => void 
           <button onClick={() => edit(r.k)} className="text-[14px] font-semibold text-navy underline underline-offset-4">Edit</button>
         </motion.div>
       ))}
-      <div className="card divide-y divide-line px-5">
-        <div className="flex items-center gap-3 py-4"><Lock className="size-5 text-navy" /><span className="flex-1 text-[15px] font-semibold text-navy">Share with my consultant</span><Toggle label="Share with my consultant" on onChange={() => {}} /></div>
-        <div className="flex items-center gap-3 py-4"><Sparkles className="size-5 text-navy" /><span className="flex-1 text-[15px] font-semibold text-navy">Let AI prepare a private summary for Jitu Bhaiya</span><Toggle label="AI summary" on={a.consentAi} onChange={(consentAi) => set({ consentAi })} /></div>
+      {/* owner 2026-11-18: sharing + AI summary are part of the service — stated plainly, not toggles */}
+      <div className="card space-y-3 p-5">
+        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Lock className="mt-0.5 size-5 shrink-0 text-navy" /><span>Your answers go <b className="text-navy">privately to Jitu Bhaiya</b> so he can prepare for your session.</span></p>
+        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Sparkles className="mt-0.5 size-5 shrink-0 text-navy" /><span>A secure AI assistant prepares a short summary for him. <b className="text-navy">Only he sees it</b> — it never decides your remedy.</span></p>
       </div>
-      <p className="px-2 text-[12px] text-muted">Sharing is needed so Jitu Bhaiya can prepare. The AI summary is optional and only he sees it.</p>
     </div>
   )
 }
