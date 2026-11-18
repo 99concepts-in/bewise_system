@@ -2,10 +2,10 @@
  * @screens CN-03 Today — share link, today's appointments with check-in (+ calendar), impact, "Needs you" insights, motivation.
  */
 import { useMemo, useState } from 'react'
-import { AnimatePresence, m, useMotionValue, useTransform, animate } from 'motion/react'
+import { AnimatePresence, m, useMotionValue, useTransform } from 'motion/react'
 import { Bell, MapPin, Video, Play, Sparkles, ChevronRight, MessageCircle, Link2, CalendarDays, UserCheck, Leaf, Check, ClipboardCheck, ClipboardList } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { CountUp, Empty, go, softSpring, spring, useToast } from '../ui/kit'
+import { CountUp, Empty, go, softSpring, spring, useMedia, useToast } from '../ui/kit'
 import { useSheets, waLink, reminderText } from './Sheets'
 import { ImpactCard } from './Impact'
 import { insights, personView, growth, WEEK_GOAL, LIFETIME_REACH, type Insight, type PersonView } from '../lib/derive'
@@ -27,6 +27,7 @@ export default function Today() {
   const views = useMemo(() => new Map(s.people.map((p) => [p.id, personView(p, byPerson.get(p.id), now)])), [s.people, byPerson, now])
   const deck = useMemo(() => insights(s.people, views, s.appts, s, now).filter((i) => !s.dismissed.includes(i.key)), [s, views, now])
   const g = useMemo(() => growth(s.appts, s.people, now), [s.appts, s.people, now])
+  const wide = useMedia('(min-width: 1180px)')
   const inCare = useMemo(() => [...views.values()].filter((v) => v.buckets.includes('care')).length, [views])
 
   const sub = todays.length === 0 ? 'No sessions today. A good day for follow-ups.'
@@ -48,27 +49,34 @@ export default function Today() {
 
       <h1 className="hello"><span>{greeting(now)}, Jitu Bhaiya.</span><span className="hello-sub">{sub}</span></h1>
 
-      <TodayList todays={todays} next={next} done={done} now={now} />
-
-      <ImpactCard />
-
-      <section className="block" aria-label="Needs you">
-        <div className="block-head"><h2>Needs you</h2>{deck.length > 0 && <span className="muted small">{deck.length} {deck.length === 1 ? 'thing' : 'things'}</span>}</div>
-        <InsightDeck items={deck} views={views} />
-      </section>
-
-      <section className="block" aria-label="Your week">
-        <div className="block-head"><h2>Your week</h2><button className="link" onClick={() => go('/growth')}>Growth</button></div>
-        <div className="week card">
-          <Ring value={g.thisWeek} goal={WEEK_GOAL} />
-          <div className="week-stats">
-            <p><b><CountUp to={g.thisWeek} /></b> of {WEEK_GOAL} sessions done this week</p>
-            <p className="muted small">{g.thisWeek >= WEEK_GOAL ? 'Weekly goal reached. Remember to rest too.' : g.thisWeek + g.bookedRest >= WEEK_GOAL ? `${g.bookedRest} more booked. You're on track for your goal.` : `${g.bookedRest} more booked, ${WEEK_GOAL - g.thisWeek - g.bookedRest} open spots to your goal.`}</p>
-            <p className="reach"><Sparkles size={14} /> <span><b><CountUp to={inCare} /></b> people in your care right now, part of the {(LIFETIME_REACH).toLocaleString('en-IN')}+ lives you've reached</span></p>
-          </div>
-        </div>
-        <KindWords appts={g.kind} />
-      </section>
+      {(() => {
+        const list = <TodayList todays={todays} next={next} done={done} now={now} />
+        const impact = <ImpactCard />
+        const needs = (
+          <section className="block" aria-label="Needs you">
+            <div className="block-head"><h2>Needs you</h2>{deck.length > 0 && <span className="muted small">{deck.length} {deck.length === 1 ? 'thing' : 'things'}</span>}</div>
+            <InsightDeck items={deck} views={views} />
+          </section>
+        )
+        const week = (
+          <section className="block" aria-label="Your week">
+            <div className="block-head"><h2>Your week</h2><button className="link" onClick={() => go('/growth')}>Growth</button></div>
+            <div className="week card">
+              <Ring value={g.thisWeek} goal={WEEK_GOAL} />
+              <div className="week-stats">
+                <p><b><CountUp to={g.thisWeek} /></b> of {WEEK_GOAL} sessions done this week</p>
+                <p className="muted small">{g.thisWeek >= WEEK_GOAL ? 'Weekly goal reached. Remember to rest too.' : g.thisWeek + g.bookedRest >= WEEK_GOAL ? `${g.bookedRest} more booked. You're on track for your goal.` : `${g.bookedRest} more booked, ${WEEK_GOAL - g.thisWeek - g.bookedRest} open ${WEEK_GOAL - g.thisWeek - g.bookedRest === 1 ? 'spot' : 'spots'} to your goal.`}</p>
+                <p className="reach"><Sparkles size={14} /> <span><b><CountUp to={inCare} /></b> people in your care right now, part of the {(LIFETIME_REACH).toLocaleString('en-IN')}+ lives you've reached</span></p>
+              </div>
+            </div>
+            <KindWords appts={g.kind} />
+          </section>
+        )
+        // wide screens: two calm columns (work on the left, motivation on the right); phones keep the requested order
+        return wide
+          ? <div className="today-cols"><div>{list}{needs}</div><div>{impact}{week}</div></div>
+          : <>{list}{impact}{needs}{week}</>
+      })()}
 
       {todays.length === 0 && <Empty img="owl-read" title="A quiet day" body="No sessions booked today. Follow-ups that are due are a gentle place to start." action={<button className="btn btn-quiet" onClick={() => go('/people?due')}>See follow-ups due</button>} />}
     </div>
@@ -186,7 +194,7 @@ function InsightDeck({ items, views }: { items: Insight[]; views: Map<string, Pe
   const toast = useToast()
   const [, force] = useState(0)
   if (items.length === 0) {
-    return <div className="card all-clear"><img src="./img/owl-wave.webp" width={64} height={64} alt="" /><div><b>You're all caught up.</b><p className="muted small">New things will appear here as they happen.</p></div></div>
+    return <div className="card all-clear"><img src="./img/owl-wave-160.webp" width={64} height={64} alt="" decoding="async" /><div><b>You're all caught up.</b><p className="muted small">New things will appear here as they happen.</p></div></div>
   }
   const act = (i: Insight) => {
     const a = i.action
@@ -230,11 +238,11 @@ function DeckCard({ it, depth, total, onAct, onDismiss }: { it: Insight; depth: 
       dragSnapToOrigin
       dragElastic={0.7}
       onDragEnd={(_, info) => {
-        if (Math.abs(info.offset.x) > 110 || Math.abs(info.velocity.x) > 700) { animate(x, info.offset.x > 0 ? 420 : -420, { duration: 0.2 }); onDismiss() }
+        if (Math.abs(info.offset.x) > 110 || Math.abs(info.velocity.x) > 700) { x.set(info.offset.x); onDismiss() }
       }}
       aria-hidden={!top}
     >
-      <img className="insight-owl" src={`./img/${TONE_IMG[it.tone]}.webp`} width={72} height={72} alt="" />
+      <img className="insight-owl" src={`./img/${TONE_IMG[it.tone]}-160.webp`} width={72} height={72} alt="" decoding="async" />
       <h3>{it.title}</h3>
       <p>{it.why}</p>
       <div className="insight-foot">

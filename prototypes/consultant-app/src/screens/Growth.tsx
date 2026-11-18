@@ -74,7 +74,7 @@ function WeekBars({ weeks }: { weeks: { start: number; count: number }[] }) {
   const max = Math.max(...weeks.map((w) => w.count), 1)
   const H = 140
   return (
-    <div className="wbars" role="img" aria-label={`Sessions per week: ${weeks.map((w) => `week of ${fmtShort(w.start)}, ${w.count}`).join('; ')}`}>
+    <div className="wbars" role="group" aria-label={`Sessions per week: ${weeks.map((w) => `week of ${fmtShort(w.start)}, ${w.count}`).join('; ')}`}>
       <div className="wbars-plot" style={{ height: H }}>
         {[0.5, 1].map((f) => <span key={f} className="gridline" style={{ bottom: f * H }}><small>{Math.round(max * f)}</small></span>)}
         {weeks.map((w, i) => (

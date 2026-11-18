@@ -104,7 +104,7 @@ export default function Sessions() {
         <div className="title-actions">
           <button className="icon-btn" aria-label={searching ? 'Close search' : 'Search'} aria-expanded={searching} onClick={() => { setSearching((x) => !x); setQ('') }}>{searching ? <X size={19} /> : <Search size={19} />}</button>
           <button className="icon-btn" aria-label="Calendar" onClick={sheets.calendar}><CalendarDays size={19} /></button>
-          <button className="sort-btn" onClick={() => sheets.express()}><Zap size={16} /> Express</button>
+          <button className="sort-btn" onClick={() => sheets.express()}><Zap size={16} /><span className="hide-xs">Express</span></button>
         </div>
       </div>
       <AnimatePresence initial={false}>
@@ -179,17 +179,19 @@ function Row({ a, act, n, past }: { a: Appt; act: Act | null; n: number; past: b
   const Icon = act?.icon === 'remind' ? MessageCircle : act?.icon === 'remedy' ? Leaf : CalendarPlus
   return (
     <li>
-      <div className={'row' + (soon ? ' is-soon' : '')} role="button" tabIndex={0} onClick={() => sheets.session(a.id)} onKeyDown={(e) => { if (e.key === 'Enter') sheets.session(a.id) }}>
-        <span className="row-time">{fmtTime(a.start)}<small>{soon ? relative(a.start, now) : `${a.durationMin} min`}</small></span>
-        <Avatar name={p.name} size={40} />
-        <span className="row-main"><b>{p.name}</b><small className={past && a.benefits?.length ? 'felt' : a.status === 'no_show' ? 'warn' : ''}>{sub}</small></span>
-        <span className="row-end">
+      <div className={'row row-split' + (soon ? ' is-soon' : '')}>
+        <button className="row-hit" onClick={() => sheets.session(a.id)}>
+          <span className="row-time">{fmtTime(a.start)}<small>{soon ? relative(a.start, now) : `${a.durationMin} min`}</small></span>
+          <Avatar name={p.name} size={40} />
+          <span className="row-main"><b>{p.name}</b><small className={past && a.benefits?.length ? 'felt' : a.status === 'no_show' ? 'warn' : ''}>{sub}</small></span>
           {past && a.rating ? <span className="mini-rating"><Star size={12} />{a.rating}</span> : null}
+        </button>
+        <span className="row-end">
           {act ? (
-            <m.button className={`act act-${act.icon}`} whileTap={{ scale: 0.94 }} onClick={(e) => { e.stopPropagation(); act.run() }}>
+            <m.button className={`act act-${act.icon}`} whileTap={{ scale: 0.94 }} onClick={act.run}>
               <Icon size={14} />{act.label}
             </m.button>
-          ) : !past && <span className="mode-ic" aria-label={a.mode === 'online' ? 'Online' : 'In person'}>{a.mode === 'online' ? <Video size={15} /> : <MapPin size={15} />}</span>}
+          ) : !past && <span className="mode-ic" role="img" aria-label={a.mode === 'online' ? 'Online' : 'In person'}>{a.mode === 'online' ? <Video size={15} /> : <MapPin size={15} />}</span>}
         </span>
       </div>
     </li>

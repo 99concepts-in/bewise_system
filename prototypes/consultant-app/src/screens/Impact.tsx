@@ -40,9 +40,9 @@ export function ImpactCard() {
       {top.length > 0 && (
         <div className="imp-felt">
           <span className="imp-felt-label">They told you they felt</span>
-          <div className="felt-chips">
+          <div className="felt-chips" tabIndex={0} role="list" aria-label="What people said they felt">
             {top.map(([b, n], k) => (
-              <m.span key={b} className="felt-chip" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...softSpring, delay: 0.45 + k * 0.07 }}>{b}<em>{n}</em></m.span>
+              <m.span key={b} role="listitem" className="felt-chip" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...softSpring, delay: 0.45 + k * 0.07 }}>{b}<em>{n}</em></m.span>
             ))}
           </div>
         </div>

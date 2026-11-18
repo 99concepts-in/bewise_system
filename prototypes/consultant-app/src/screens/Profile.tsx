@@ -78,7 +78,7 @@ export default function Profile({ id }: { id: string }) {
         <div className="mood-week">
           {week.map(({ d, mood }, i) => (
             <div key={d} className="mw-day">
-              {mood ? <m.span initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...softSpring, delay: 0.1 + i * 0.04 }}><MoodFace mood={mood} size={38} /></m.span> : <span className="mw-empty" aria-label="No entry" />}
+              {mood ? <m.span initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...softSpring, delay: 0.1 + i * 0.04 }}><MoodFace mood={mood} size={38} /></m.span> : <span className="mw-empty" role="img" aria-label="No entry" />}
               <small>{fmtWeekday(d).slice(0, 2)}</small>
             </div>
           ))}
@@ -95,7 +95,7 @@ export default function Profile({ id }: { id: string }) {
             {allConcerns.map((c) => (
               <div key={c} className="cg-row" style={{ display: 'contents' }}>
                 <span className="cg-name">{c}</span>
-                {troublingHistory.map((a) => <span key={a.id} className={'cg-cell' + (a.troubling!.includes(c) ? ' on' : '')} aria-label={a.troubling!.includes(c) ? `${c} on ${fmtShort(a.start)}` : undefined} />)}
+                {troublingHistory.map((a) => <span key={a.id} role="img" className={'cg-cell' + (a.troubling!.includes(c) ? ' on' : '')} aria-label={a.troubling!.includes(c) ? `${c} on ${fmtShort(a.start)}` : `No ${c.toLowerCase()} on ${fmtShort(a.start)}`} />)}
               </div>
             ))}
           </div>

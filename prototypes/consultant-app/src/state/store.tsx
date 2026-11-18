@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useMemo, useReducer, useState, ty
 import { makeSeed, startOfDay, MIN } from '../data/seed'
 import type { Appt, Kind, Mode, Notice, Person } from '../data/types'
 
-interface State {
+export interface State {
   day: number
   people: Person[]
   appts: Appt[]
@@ -16,7 +16,7 @@ interface State {
   saturdayMorning: boolean
 }
 
-type Action =
+export type Action =
   | { type: 'giveRemedy'; apptId: string; flowers: string[]; now: number }
   | { type: 'reschedule'; apptId: string; start: number }
   | { type: 'book'; personId: string; start: number; kind: Kind; mode: Mode; id: string; now: number; greeting: string }
@@ -33,7 +33,7 @@ type Action =
 
 const KEY = 'bewise.consult.v1'
 
-function fresh(now: number): State {
+export function fresh(now: number): State {
   const s = makeSeed(now)
   return { day: startOfDay(now), ...s, readUpTo: 0, dismissed: [], saturdayMorning: false }
 }
@@ -49,7 +49,7 @@ function load(now: number): State {
   return fresh(now)
 }
 
-function reducer(s: State, a: Action): State {
+export function reducer(s: State, a: Action): State {
   switch (a.type) {
     case 'giveRemedy':
       return { ...s, appts: s.appts.map((x) => x.id === a.apptId ? { ...x, remedy: { flowers: a.flowers, stage: 'preparing', givenAt: a.now } } : x) }

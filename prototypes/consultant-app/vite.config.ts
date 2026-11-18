@@ -4,5 +4,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: './',
-  build: { target: 'es2022', cssMinify: true, sourcemap: false },
+  build: {
+    target: 'es2022', cssMinify: true, sourcemap: false, modulePreload: { polyfill: false },
+    rollupOptions: { output: { experimentalMinChunkSize: 6000 } }, // fold tiny shared icon chunks into their parents
+  },
 })

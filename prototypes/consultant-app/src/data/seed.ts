@@ -97,7 +97,6 @@ function mulberry32(seed: number) {
 }
 
 export function startOfDay(t: number) { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime() }
-function at(day: number, h: number, m = 0) { return day + h * HOUR + m * MIN }
 
 export interface Seed { people: Person[]; appts: Appt[]; notices: Notice[] }
 
@@ -111,6 +110,11 @@ export function makeSeed(now: number): Seed {
   const used = new Set<string>()
   const N = 128
   let aid = 1
+  // one consultant: every session must land in a free slot (10-min gap), past and future alike
+  const busy = new Map<number, [number, number][]>()
+  const isFree = (s: number, dur: number) => (busy.get(startOfDay(s)) ?? []).every(([a, b]) => s + dur * MIN + 10 * MIN <= a || s >= b + 10 * MIN)
+  const occupy = (s: number, dur: number) => { const d = startOfDay(s); const l = busy.get(d) ?? []; l.push([s, s + dur * MIN]); busy.set(d, l) }
+  const TIMES = [10, 10.5, 11, 11.5, 12, 16, 16.5, 17, 17.5, 18, 18.5, 19]
 
   for (let i = 0; i < N; i++) {
     const female = r() < 0.66
@@ -134,8 +138,12 @@ export function makeSeed(now: number): Seed {
       const day = startOfDay(t)
       const dow = new Date(day).getDay()
       if (dow === 0) { t += DAY; continue }
-      const slotH = pick([10, 11, 12, 16, 17, 18])
       const kind: Kind = k === 0 ? 'first' : 'followup'
+      const dur = kind === 'first' ? 60 : 30
+      const off = Math.floor(r() * TIMES.length)
+      const slot = [...TIMES.slice(off), ...TIMES.slice(0, off)].map((h) => day + h * HOUR).find((s) => s + dur * MIN <= day + (s < day + 13 * HOUR ? 13 : 20) * HOUR && isFree(s, dur))
+      if (slot === undefined) { t += DAY; continue }
+      occupy(slot, dur)
       const noShow = k > 0 && r() < 0.05
       const troubling = pickN([...mainConcerns, ...pickN(CONCERNS, 1)], 1 + Math.floor(r() * 3))
       const flowers = noShow ? [] : (k > 0 && r() < 0.35 && lastFlowers.length ? lastFlowers : pickN(troubling.flatMap((c) => CONCERN_FLOWERS[c]), 3 + Math.floor(r() * 3)))
@@ -143,10 +151,10 @@ export function makeSeed(now: number): Seed {
       const rated = !noShow && r() < 0.78
       const rating = rated ? (r() < 0.72 ? 5 : r() < 0.85 ? 4 : 3) : undefined
       appts.push({
-        id: `a${aid++}`, personId: p.id, start: at(day, slotH, r() < 0.5 ? 0 : 30), durationMin: kind === 'first' ? 60 : 30,
+        id: `a${aid++}`, personId: p.id, start: slot, durationMin: dur,
         kind, mode: r() < 0.62 ? 'online' : 'in_person', status: noShow ? 'no_show' : 'completed',
         note: r() < 0.5 ? pick(NOTES) : undefined, troubling: noShow ? undefined : troubling,
-        remedy: noShow ? undefined : { flowers, stage: 'delivered', givenAt: at(day, slotH + 1) },
+        remedy: noShow ? undefined : { flowers, stage: 'delivered', givenAt: slot + (dur + 15) * MIN },
         rating, feedback: rating ? (rating === 5 ? pick(KIND_WORDS) : pick(FEEDBACK_OK)) : undefined,
         followUpWeeks: pick([3, 4, 4, 6]),
       })
@@ -180,6 +188,7 @@ export function makeSeed(now: number): Seed {
     const start = round15(anchor + off)
     const end = start + (kind === 'first' ? 60 : 30) * MIN
     const p = todayPeople[i]
+    occupy(start, kind === 'first' ? 60 : 30)
     const status = end <= now ? 'completed' : start <= now ? 'in_session' : 'confirmed'
     const done = status === 'completed'
     appts.push({
@@ -205,8 +214,10 @@ export function makeSeed(now: number): Seed {
       const p = isFirst && fresh[2 + u % 10] ? fresh[2 + u % 10] : upcomingPool[u % upcomingPool.length]
       u++
       if (appts.some((a) => a.personId === p.id && a.start > now)) continue
+      if (!isFree(day + h * HOUR, isFirst ? 60 : 30)) continue
+      occupy(day + h * HOUR, isFirst ? 60 : 30)
       appts.push({
-        id: `a${aid++}`, personId: p.id, start: at(day, h, h === 12 || r() < 0.3 ? 0 : 0), durationMin: isFirst ? 60 : 30,
+        id: `a${aid++}`, personId: p.id, start: day + h * HOUR, durationMin: isFirst ? 60 : 30,
         kind: isFirst ? 'first' : 'followup', mode: r() < 0.6 ? 'online' : 'in_person',
         status: d === 1 && u % 5 === 0 ? 'awaiting_payment' : 'confirmed', note: r() < 0.5 ? pick(NOTES) : undefined,
       })
@@ -214,7 +225,14 @@ export function makeSeed(now: number): Seed {
   }
   // one hold awaiting payment today-ish (drives an insight)
   const holdP = fresh[12] ?? inCare[20]
-  appts.push({ id: `a${aid++}`, personId: holdP.id, start: today + 2 * DAY + 17 * HOUR, durationMin: 60, kind: 'first', mode: 'online', status: 'awaiting_payment', note: NOTES[6] })
+  let holdAt = 0
+  for (let d = 2; d < 14 && !holdAt; d++) {
+    const day = today + d * DAY
+    if (new Date(day).getDay() === 0) continue
+    holdAt = [17, 18, 16, 10, 11].map((h) => day + h * HOUR).find((x) => isFree(x, 60)) ?? 0
+  }
+  occupy(holdAt, 60)
+  appts.push({ id: `a${aid++}`, personId: holdP.id, start: holdAt, durationMin: 60, kind: 'first', mode: 'online', status: 'awaiting_payment', note: NOTES[6] })
 
   appts.sort((a, b) => a.start - b.start)
 
