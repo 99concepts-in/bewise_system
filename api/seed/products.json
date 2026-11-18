@@ -285,13 +285,54 @@
   ]
  },
  {
+  "slug": "migraine-go-roll-on",
+  "name": "Migraine Go",
+  "tagline": "Calm, cool comfort for tense days",
+  "category": "rollons",
+  "format": "Roll-on",
+  "sold_out": false,
+  "sort": 7,
+  "data": {
+   "about": "A soothing aromatherapy blend for moments of head tension and stress. Helps relax the mind, ease tension and bring a sense of freshness and well-being.",
+   "feel": [
+    "Soothed",
+    "Relaxed",
+    "Fresh"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Apply the roll-on to both palms and rub them together. Cup your hands over your nose and breathe in deeply through your nose. Repeat 3 to 4 times. Apply any remaining oil to the area your Bach expert recommends.",
+   "safety": "For external use only. Patch test on your inner arm first. Avoid eyes and broken skin. Keep away from children. If you are pregnant, nursing or under medical care, check with your doctor first. Not a migraine or headache medicine. If headaches are frequent or severe, please see your doctor. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "calm",
+    "wellness"
+   ],
+   "art": "products/migraine-go-rollon",
+   "color": "#7F6BC0",
+   "tint": [
+    "#efe9fb",
+    "#e7ecfa"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "migraine-go-roll-on-15",
+    "label": "15 ml",
+    "price_paise": 60000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
   "slug": "abundance-spray",
   "name": "Abundance",
   "tagline": "Aura spray for an uplifting space",
   "category": "sprays",
   "format": "Spray",
   "sold_out": false,
-  "sort": 7,
+  "sort": 8,
   "data": {
    "about": "An uplifting mist that creates a positive, bright atmosphere around you and in your space.",
    "feel": [
@@ -331,7 +372,7 @@
   "category": "sprays",
   "format": "Spray",
   "sold_out": false,
-  "sort": 8,
+  "sort": 9,
   "data": {
    "about": "A grounding mist for a sense of calm and personal protection. Many people use it to feel shielded from negativity and the evil eye.",
    "feel": [
@@ -372,7 +413,7 @@
   "category": "sprays",
   "format": "Spray",
   "sold_out": false,
-  "sort": 9,
+  "sort": 10,
   "data": {
    "about": "A light mist to refresh your energy and help you feel lighter, calmer and more centred.",
    "feel": [
@@ -413,7 +454,7 @@
   "category": "sprays",
   "format": "Spray",
   "sold_out": false,
-  "sort": 10,
+  "sort": 11,
   "data": {
    "about": "A soothing aroma to help you unwind and drift into a peaceful night.",
    "feel": [
@@ -453,7 +494,7 @@
   "category": "remedies",
   "format": "Dropper",
   "sold_out": false,
-  "sort": 11,
+  "sort": 12,
   "data": {
    "about": "A personalised blend of Bach flower essences, chosen by Jitu Bhaiya for how you feel. Your first blend comes with your consultation; reorder the same blend here anytime.",
    "feel": [
@@ -493,7 +534,7 @@
   "category": "remedies",
   "format": "Spray",
   "sold_out": false,
-  "sort": 12,
+  "sort": 13,
   "data": {
    "about": "Your personalised Bach flower blend in an easy spray, handy on the go. Available once Jitu Bhaiya has prepared your blend.",
    "feel": [
@@ -533,7 +574,7 @@
   "category": "remedies",
   "format": "Spray",
   "sold_out": false,
-  "sort": 13,
+  "sort": 14,
   "data": {
    "about": "A classic Bach blend to help calm the mind and soothe your nerves in stressful moments, like exams, interviews or travel.",
    "feel": [
@@ -573,7 +614,7 @@
   "category": "care",
   "format": "Dropper",
   "sold_out": false,
-  "sort": 14,
+  "sort": 15,
   "data": {
    "about": "A nourishing blend for your hair and scalp, for natural softness and shine.",
    "feel": [
@@ -613,7 +654,7 @@
   "category": "care",
   "format": "Spray",
   "sold_out": false,
-  "sort": 15,
+  "sort": 16,
   "data": {
    "about": "A light, revitalising mist to refresh and nourish your skin through the day.",
    "feel": [
@@ -653,7 +694,7 @@
   "category": "bath",
   "format": "Bath salt",
   "sold_out": false,
-  "sort": 16,
+  "sort": 17,
   "data": {
    "about": "A soothing bath ritual to help cleanse your aura and leave you feeling light and renewed.",
    "feel": [
@@ -694,7 +735,7 @@
   "category": "bath",
   "format": "Bath salt",
   "sold_out": false,
-  "sort": 17,
+  "sort": 18,
   "data": {
    "about": "A warm bath ritual to welcome abundance, positivity and self-love into your day.",
    "feel": [
@@ -734,7 +775,7 @@
   "category": "bath",
   "format": "Bath salt",
   "sold_out": true,
-  "sort": 18,
+  "sort": 19,
   "data": {
    "about": "A sunny bath ritual to lift your mood and invite a little more joy into your day.",
    "feel": [

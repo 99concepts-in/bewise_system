@@ -137,7 +137,8 @@ function bw_migrate(): array
 function bw_auto_migrate(): void
 {
     $files = glob(dirname(__DIR__) . '/migrations/*.sql') ?: [];
-    $stamp = md5(implode('|', array_map('basename', $files)));
+    $seedFiles = array_merge(glob(dirname(__DIR__) . '/seed/*.json') ?: [], [__DIR__ . '/seed.php']);
+    $stamp = md5(implode('|', array_map('basename', $files)) . '|' . implode('|', array_map(fn($f) => md5_file($f), $seedFiles)));
     $marker = bw_storage_dir() . '/migrated-' . $stamp;
     if (is_file($marker)) return;
     bw_migrate();

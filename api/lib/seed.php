@@ -72,13 +72,16 @@ function bw_seed(): void
     }
 
     // catalogue (MANAGER edits afterwards in the manager app)
-    if ((int)val('SELECT COUNT(*) FROM products') === 0) {
-        $products = json_decode((string)file_get_contents(dirname(__DIR__) . '/seed/products.json'), true) ?: [];
-        foreach ($products as $p) {
+    // adds products whose slug is new; never touches products the team already edited or archived
+    $products = json_decode((string)file_get_contents(dirname(__DIR__) . '/seed/products.json'), true) ?: [];
+    foreach ($products as $p) {
+        if (val('SELECT 1 FROM products WHERE slug = ?', [$p['slug']])) continue;
+        {
             $pid = uuid();
             insert('products', ['id' => $pid, 'slug' => $p['slug'], 'name' => $p['name'], 'tagline' => $p['tagline'], 'category' => $p['category'],
                 'format' => $p['format'], 'data' => $p['data'], 'sold_out' => $p['sold_out'] ? 1 : 0, 'sort' => $p['sort']]);
             foreach ($p['variants'] as $v) {
+                if (val('SELECT 1 FROM product_variants WHERE id = ?', [$v['id']])) continue;
                 insert('product_variants', ['id' => $v['id'], 'product_id' => $pid, 'label' => $v['label'], 'price_paise' => $v['price_paise'], 'mrp_paise' => $v['mrp_paise']]);
             }
         }
