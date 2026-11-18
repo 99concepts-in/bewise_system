@@ -7,7 +7,8 @@
 **Done:** top-of-Home launch banner → full-screen animated offer: Yearly ₹9,600 cut to ₹8,000 (2 months free, save ₹1,600), Pay or WhatsApp 90542 20952 "I want to avail the yearly offer"; ✕ → "Are you sure?" → 6-month offer ₹4,800 → ₹4,000 (1 month free) with claim / skip; live countdown to 1 Dec · after paying: congratulations animation + 15% first-purchase coupon WELCOME15 (7 days, applied at bag/checkout on products) · checkout asks to subscribe per product (every 30 days) and places the order only after confirm · delivered orders ask for a review (stars + note) · follow-up booking offers 6 months (Recommended) / Yearly (Best value) / One time; plans cover later follow-ups · booking order is now pay → preferred time → "Time requested" (confirmed by Jitu Bhaiya or Haresh bhai, else the team calls) · helpline Mr. Haresh 96013 45289 on Help, booking done and session screens
 **Tests:** 43 green (8 flows incl. launch offer + plan booking, 11 sizes, axe)
 **Needs MANAGER/CONSULTANT:** approve/adjust requested times (`timeRequested`), mark pay-after-session payments, refill subscriptions confirmation and the WhatsApp review message a few days after delivery
-**Needs OWNER:** confirm plan meaning (one consultation a month at the ₹800 follow-up fee, so yearly = 12 × ₹800) and that launch prices end 1 Dec 23:59 IST
+**OWNER confirmed 2026-11-18:** a plan = one ₹800 follow-up consultation a month (yearly = 12 × ₹800 = ₹9,600, launch ₹8,000; 6 months ₹4,800, launch ₹4,000); launch prices end 1 Dec 23:59 IST
+**Live:** https://exceptionalappstudios-ship-it.github.io/bewise_system/preview/client/ (preview/client on main, refreshed with owner approval)
 
 ## 2026-11-18 — Real product range, shop redesign, owner intake + booking feedback · branch claude/new-session-94881h
 **Status:** Pushed (preview in `apps/client`)

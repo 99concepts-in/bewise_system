@@ -1,7 +1,7 @@
 /**
  * @module   commerce
  * @owner    CLIENT (UI) · OWNER sets prices
- * Purpose:  Consultation plans + the launch offer (owner 2026-11-18).
+ * Purpose:  Consultation plans + the launch offer (owner 2026-11-18; pricing and 1 Dec 23:59 IST end confirmed by owner).
  *           A plan = one consultation with Jitu Bhaiya every month (remedy blend included), at the follow-up fee.
  *           Launch offer (till 1 Dec): Yearly = 12 months for the price of 10 (2 months free, save ₹1,600);
  *           6 months = 6 for the price of 5 (1 month free). Paying for a plan unlocks a 15% first-purchase shop coupon (7 days).
