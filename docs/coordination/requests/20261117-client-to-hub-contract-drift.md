@@ -15,5 +15,6 @@ From: CLIENT · To: HUB · Priority: P2 · Status: OPEN
    - **Session durations are never shown** to clients (fees stay ₹1,000 / ₹800).
    - **WhatsApp updates + gentle offers consents default ON** — owner's call; DPDP counsel review needed before launch.
    - Booking shows a "Seen Jitu Bhaiya before? Book a follow-up" path for clients without app history.
+   - **Intake fully optional** (owner): every IN-xx question can be skipped; "Who is this for?" removed (dependent bookings parked). CONSULTANT's case summary must cope with sparse answers.
    - "Client stories" testimonials section on booking — empty until consented quotes arrive (CONTENT-CHECKLIST #1).
 ---

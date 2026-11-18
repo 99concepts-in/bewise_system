@@ -51,7 +51,7 @@ self-hosted Plus Jakarta Sans (D-21) · lucide icons. No other runtime deps.
 | Preview | Production (docs/03-CONTRACTS.md) |
 |---|---|
 | `src/lib/store.ts` (localStorage) | journal/commerce/companion tables + other modules' server functions — each store action is annotated with its contract call |
-| OTP code 246810 | Supabase phone OTP (D-04) |
+| OTP code 2468 | Supabase phone OTP (D-04) |
 | `slotsFor()` in `lib/data.ts` | `scheduling.getAvailableSlots` / `holdAppointment` |
 | `PaySheet` | `finance.createCheckout` → Razorpay Checkout.js → `verifyCheckout`; "paid" only after webhook |
 | `lib/companion.ts` intent responder | `companion.sendCompanionMessage` (Claude, server-side tools) — spec `docs/specs/client/C7-CL-55-ask-bewise.md` |

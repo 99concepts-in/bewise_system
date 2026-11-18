@@ -77,19 +77,8 @@ function Book() {
   const setA = (p: Partial<IntakeAnswers>) => setAnswers((a) => ({ ...a, ...p }))
   const c = CONSULTATIONS.find((x) => x.id === (type ?? 'first'))!
 
-  const can: Partial<Record<Step, boolean>> = {
-    who: (answers.onMind.trim().length >= 10) && !!answers.duration && (answers.who === 'me' || !!answers.dependent?.name),
-    feelings: answers.feelings.length > 0,
-    nuance: answers.feelings.filter((f) => NUANCE[f]).every((f) => (answers.nuance[f]?.statements.length ?? 0) > 0 && !!answers.nuance[f]?.intensity),
-    body: answers.bodyAny === false || (answers.bodyAny === true && answers.body.length > 0 && answers.bodyTypes.length > 0),
-    sleep: !!answers.sleepQuality && !!answers.hours && answers.wakes !== undefined,
-    life: answers.life.length > 0,
-    safety: ['doctor', 'medicines', 'pregnant', 'alcoholFree', 'allergies'].every((k) => answers.safety[k as keyof typeof answers.safety] !== undefined) && (!answers.safety.medicines || !!answers.safety.medicinesText.trim()) && (!answers.safety.allergies || !!answers.safety.allergiesText.trim()),
-    gentle: !!answers.selfHarm,
-    goals: answers.goals.length > 0 || answers.goalText.trim().length > 0,
-    'ck-now': !!checkin.now, 'ck-changes': true, 'ck-news': !!checkin.drops,
-    mode: !!mode, time: !!slot,
-  }
+  // owner 2026-11-18: every intake / check-in question is optional — only mode and time are needed to book
+  const can: Partial<Record<Step, boolean>> = { mode: !!mode, time: !!slot }
   const counted = COUNTED.indexOf(step as string)
   const isIntake = INTAKE.includes(step as never) && step !== 'saved'
 

@@ -46,22 +46,7 @@ export function IntakeIntro() {
 export function StepWho({ a, set }: P) {
   return (
     <div className="space-y-4">
-      <StepTitle lead="What’s been on your" em="mind?" />
-      <Card>
-        <Label>Who is this for?</Label>
-        <Segmented value={a.who} onChange={(who) => set({ who })} options={[{ value: 'me', label: 'Me' }, { value: 'child', label: 'My child' }, { value: 'someone_else', label: 'Someone' }]} />
-        <AnimatePresence>
-          {a.who !== 'me' && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-              <div className="mt-4 grid grid-cols-[1fr_88px] gap-2">
-                <input aria-label="Their name" placeholder="Their name" value={a.dependent?.name ?? ''} onChange={(e) => set({ dependent: { relation: '', age: '', ...a.dependent, name: e.target.value } })} className="h-12 rounded-full bg-peri-50 px-4 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
-                <input aria-label="Age" placeholder="Age" inputMode="numeric" value={a.dependent?.age ?? ''} onChange={(e) => set({ dependent: { name: '', relation: '', ...a.dependent, age: e.target.value.replace(/\D/g, '').slice(0, 3) } })} className="h-12 rounded-full bg-peri-50 px-4 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
-              </div>
-              <p className="mt-2 text-[13px] text-muted">You’re answering on their behalf. If they’re 18+, it’s best they fill this in themselves.</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </Card>
+      <StepTitle lead="What’s been on your" em="mind?" sub="Everything here is optional — share as much or as little as you like." />
       <Card>
         <Label>In your own words</Label>
         <textarea value={a.onMind} onChange={(e) => set({ onMind: e.target.value.slice(0, 1000) })} rows={4} placeholder="Work has felt heavy lately, and I can’t switch off at night…"
@@ -366,8 +351,8 @@ export function StepReview({ a, set, edit }: P & { edit: (step: string) => void 
   const rows = [
     { k: 'who', icon: '💭', t: 'On your mind', d: [a.onMind.slice(0, 48) + (a.onMind.length > 48 ? '…' : ''), a.duration?.toLowerCase()].filter(Boolean).join(' · ') },
     { k: 'feelings', icon: '💗', t: 'Feelings', d: Object.values(a.nuance).flatMap((n) => n.statements).slice(0, 3).join(' · ') || a.feelings.join(' · ') },
-    { k: 'body', icon: '🌿', t: 'Body', d: a.bodyAny ? a.body.join(', ').toLowerCase() : 'nothing noted' },
-    { k: 'sleep', icon: '🌙', t: 'Sleep', d: `${a.hours ?? '—'} h · energy ${a.energy}/5 · stress ${a.stress}/5` },
+    { k: 'body', icon: '🌿', t: 'Body', d: a.bodyAny === undefined ? '' : a.bodyAny ? a.body.join(', ').toLowerCase() : 'nothing noted' },
+    { k: 'sleep', icon: '🌙', t: 'Sleep', d: a.hours || a.sleepQuality ? `${a.hours ?? '—'} h · energy ${a.energy}/5 · stress ${a.stress}/5` : '' },
     { k: 'safety', icon: '🛡️', t: 'Safety', d: [a.safety.alcoholFree && 'alcohol-free', a.safety.allergies && a.safety.allergiesText && `${a.safety.allergiesText} allergy`, a.safety.pregnant && 'pregnant'].filter(Boolean).join(' · ') || 'nothing to flag' },
     { k: 'goals', icon: '✨', t: 'You’d like to feel', d: [...a.goals, a.goalText].filter(Boolean).join(' · ').toLowerCase() || '—' },
   ]
@@ -377,7 +362,7 @@ export function StepReview({ a, set, edit }: P & { edit: (step: string) => void 
       {rows.map((r, i) => (
         <motion.div key={r.k} className="card flex items-center gap-3 p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
           <span className="grid size-11 shrink-0 place-items-center rounded-full bg-peri-50 text-[18px]" aria-hidden>{r.icon}</span>
-          <div className="min-w-0 flex-1"><p className="text-[15px] font-bold text-navy">{r.t}</p><p className="truncate text-[13px] text-muted">{r.d}</p></div>
+          <div className="min-w-0 flex-1"><p className="text-[15px] font-bold text-navy">{r.t}</p><p className="truncate text-[13px] text-muted">{r.d && r.d !== '—' ? r.d : 'Skipped'}</p></div>
           <button onClick={() => edit(r.k)} className="text-[14px] font-semibold text-navy underline underline-offset-4">Edit</button>
         </motion.div>
       ))}
