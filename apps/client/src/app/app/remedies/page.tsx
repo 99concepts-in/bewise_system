@@ -14,6 +14,7 @@ import { moodOf, REORDER_PRICE_PAISE } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { dayKey, fmtDay, formatINR } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
+import { blendSupply } from '@/lib/supply'
 import { BP } from '@/lib/asset'
 
 // @decision(D-10) generic Bach descriptions — Jitu Bhaiya approves final wording before launch. Never the reason it was chosen.
@@ -28,6 +29,7 @@ const FLOWER_IMG = ['f-rose', 'f-mimulus']
 
 export default function Remedies() {
   const blend = useApp((s) => s.blend)
+  const appointments = useApp((s) => s.appointments)
   const journal = useApp((s) => s.journal)
   const addToCart = useApp((s) => s.addToCart)
   const { flyToBag } = useChrome()
@@ -50,7 +52,8 @@ export default function Remedies() {
 
   const since = new Date(blend.startedOn)
   const dayN = Math.floor((Date.now() - +since) / 86_400_000) + 1
-  const left = Math.max(0, blend.days - dayN)
+  const sup = blendSupply(blend, appointments)
+  const left = sup.daysLeft
   const lines = progressLines(journal, blend.startedOn)
   const mix = moodMix(journal)
   const reorder = () => {
@@ -72,8 +75,8 @@ export default function Remedies() {
             <h2 className="relative mt-1 max-w-[62%] text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">{blend.name} <span className="text-soft">v{blend.version}</span></h2>
             <p className="relative mt-1 max-w-[62%] text-[14px] text-muted">{blend.drops} drops · {blend.timesPerDay}× a day{' · alcohol-free'}</p>
             <div className="relative mt-5 flex max-w-[62%] items-center gap-3">
-              <Ring value={dayN / blend.days} size={74} stroke={8} color="#c48a3a" track="#ffffffaa"><span className="text-center leading-none"><b className="text-[18px] text-navy tnum">{left}</b><br /><span className="text-[11px] text-muted">days left</span></span></Ring>
-              <p className="text-[13px] leading-4 text-muted">Day {dayN} of {blend.days}. A follow-up refreshes your blend.</p>
+              <Ring value={sup.level} size={74} stroke={8} color="#c48a3a" track="#ffffffaa"><span className="text-center leading-none"><b className="text-[18px] text-navy tnum">{left}</b><br /><span className="text-[11px] text-muted">days left</span></span></Ring>
+              <p className="text-[13px] leading-4 text-muted">{sup.next ? 'Lasts until your next session.' : 'A follow-up refreshes your blend.'}</p>
             </div>
           </section>
         </Item>

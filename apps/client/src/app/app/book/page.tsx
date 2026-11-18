@@ -16,6 +16,7 @@ import { AppHeader, useUi } from '@/components/shell'
 import { Btn, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, useStableCallback } from '@/components/ui'
 import { CONSULTANT, CONSULTATIONS, NUANCE, STUDIO, TESTIMONIALS, TESTIMONIALS_SOURCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
 import { InPersonArt, OnlineArt } from '@/components/mode-art'
+import { parseIsoDay } from '@/lib/supply'
 import { emptyIntake, useApp, type Appointment, type IntakeAnswers } from '@/lib/store'
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
 import { downloadIcs, googleCalUrl, sessionIcs } from '@/lib/ics'
@@ -132,7 +133,7 @@ function Book() {
             {step === 'ck-changes' && <I.CheckinChanges c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} feelings={intake?.answers.feelings ?? []} />}
             {step === 'ck-news' && <I.CheckinNews c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} />}
             {step === 'mode' && <Mode mode={mode} setMode={setMode} />}
-            {step === 'time' && <TimePicker slot={slot} setSlot={setSlot} />}
+            {step === 'time' && <TimePicker slot={slot} setSlot={setSlot} initialDay={parseIsoDay(params.get('date'))} />}
             {step === 'pay' && slot && mode && <Review c={c} slot={slot} mode={mode} holdUntil={holdUntil} onExpire={() => { toast('Your held time was released — pick again'); go('time', -1) }} />}
           </motion.div>
         </AnimatePresence>
@@ -336,13 +337,14 @@ function Mode({ mode, setMode }: { mode?: 'online' | 'in_person'; setMode: (m: '
   )
 }
 
-function TimePicker({ slot, setSlot }: { slot?: Date; setSlot: (d: Date) => void }) {
+function TimePicker({ slot, setSlot, initialDay }: { slot?: Date; setSlot: (d: Date) => void; initialDay?: Date }) {
   const today = startOfDay()
   const monday = addDays(today, -((today.getDay() + 6) % 7))
-  const [week, setWeek] = useState(0)
+  // pre-book from Home passes ?date= → open that week with that day selected
+  const [week, setWeek] = useState(() => initialDay && initialDay >= today ? Math.min(7, Math.floor((startOfDay(initialDay).getTime() - monday.getTime()) / (7 * 86_400_000))) : 0)
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, week * 7 + i))
   const firstOpen = days.find((d) => d >= today && slotsFor(d).length) ?? days[0]
-  const [day, setDay] = useState<Date>(slot ? startOfDay(slot) : firstOpen)
+  const [day, setDay] = useState<Date>(slot ? startOfDay(slot) : initialDay && initialDay >= today && slotsFor(initialDay).length ? startOfDay(initialDay) : firstOpen)
   useEffect(() => { if (!days.some((d) => +d === +day)) setDay(days.find((d) => d >= today && slotsFor(d).length) ?? days[0]) }, [week]) // eslint-disable-line react-hooks/exhaustive-deps
   const times = day >= today ? slotsFor(day) : []
   const groups = [

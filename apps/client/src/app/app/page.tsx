@@ -12,6 +12,7 @@ import { useMemo, useState } from 'react'
 import { Mascot, MoodButton, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
 import { ConsultInviteArt, SessionDateArt } from '@/components/session-art'
+import { BlendBottleCard } from '@/components/blend-bottle'
 import { Btn, BtnLink, Item, Reveal, Ring, buzz, spring, toast, useChrome, useNow } from '@/components/ui'
 import { CONSULTATIONS, QUICK_MOODS, moodOf, type Emotion } from '@/lib/data'
 import { useApp, type Appointment } from '@/lib/store'
@@ -73,7 +74,7 @@ export default function Home() {
 
         <Item><ContextCard /></Item>
 
-        {blend && <Item><RitualCard /></Item>}
+        {blend && <Item><BlendBottleCard /></Item>}
 
         <GoalsCard />
 
@@ -127,8 +128,7 @@ function ContextCard() {
   }
   if (needsFeedback)
     return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitu Bhaiya." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} img={`${BP}/img/mood-grateful.webp`} />
-  if (blend && any)
-    return <Ctx tone="sage" kicker="Check in" title="Time for your follow-up" body="See how you’re doing and refresh your blend · ₹800, blend included." cta="Book follow-up" href="/app/book?type=followup" img={`${BP}/img/owl-bottle.webp`} />
+  if (blend && any) return null // the "Your blend" card carries the follow-up pre-book (owner 2026-11-18)
   return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm, unhurried conversation with Jitu Bhaiya · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" art={<ConsultInviteArt />} wide />
 }
 
@@ -161,38 +161,6 @@ function NextSession({ a, onOpen }: { a: Appointment; onOpen: () => void }) {
           <p className="text-[13px] text-muted">{c.name} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya</p>
           <Btn size="sm" className="mt-3 px-6" onClick={onOpen}>View</Btn>
         </div>
-      </div>
-    </section>
-  )
-}
-
-function RitualCard() {
-  const blend = useApp((s) => s.blend)!
-  const taken = useApp((s) => s.ritual[dayKey(new Date())] ?? 0)
-  const take = useApp((s) => s.takeDrop)
-  const untake = useApp((s) => s.untakeDrop)
-  const next = blend.reminderTimes[taken]
-  return (
-    <section className="card p-5" aria-label="Today's ritual">
-      <div className="flex items-start justify-between">
-        <div>
-          <h2 className="h-section">Today’s ritual</h2>
-          <p className="mt-0.5 text-[13px] text-muted">{blend.drops} drops, {blend.timesPerDay} times a day{next ? ` · next at ${next}` : ' · all done today'}</p>
-        </div>
-        <Link href="/app/remedies" className="text-[13px] font-semibold text-navy">Blend</Link>
-      </div>
-      <div className="mt-4 flex items-center gap-3">
-        {Array.from({ length: blend.timesPerDay }).map((_, k) => {
-          const on = k < taken
-          return (
-            <motion.button key={k} whileTap={{ scale: 0.85 }} aria-label={on ? `Dose ${k + 1} taken — tap to undo` : `Mark dose ${k + 1} taken`}
-              onClick={() => { if (on && k === taken - 1) untake(); else if (!on && k === taken) { take(); buzz(12); if (k + 1 === blend.timesPerDay) toast('All four done today — beautiful') } }}
-              className="relative grid h-14 flex-1 place-items-center overflow-hidden rounded-[18px] bg-[#f6f1e8]">
-              <motion.span className="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,#e7b768,#c48a3a)]" initial={false} animate={{ height: on ? '100%' : '0%' }} transition={{ type: 'spring', stiffness: 160, damping: 20 }} />
-              <svg viewBox="0 0 24 24" className={`relative size-6 ${on ? 'text-white' : 'text-[#c9a46a]'}`} aria-hidden><path fill="currentColor" d="M12 2.5c3.6 4.6 6 8 6 11a6 6 0 1 1-12 0c0-3 2.4-6.4 6-11Z" /></svg>
-            </motion.button>
-          )
-        })}
       </div>
     </section>
   )

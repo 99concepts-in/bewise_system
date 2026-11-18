@@ -12,6 +12,7 @@
 **Also:** sleep quality is a simple 5-step scale (Very poor → Very good); all remedy blends alcohol-free — question removed, note shown, legal drafts updated
 **Also:** IN-11 sharing + AI summary are now a plain notice, not toggles (owner) — privacy draft updated; counsel to confirm wording
 **Also:** studio address added (102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara 390007) — mode card, session Directions (Google Maps listing "Be Wise Holistic Wellness"), calendar invites, legal drafts; CL-13 art replaced with code-drawn video-call phone + Alkapuri map tile
+**Also:** Home "Your blend" card — bottle empties from blend start to the next appointment (or run-out), today's drops, pre-book follow-up on a suggested date (opens booking with `?date=`); My Remedies ring uses the same supply maths. Replaces the separate ritual card and the follow-up context card
 **Needs from owner:** consented testimonials (Monika, Mitul Shah, Dhaval Gohil, Shivam S. + more); counsel view on pre-ticked consents
 
 ## 2026-11-17 — Auto-deploy to Hostinger on every commit · branch claude/new-session-94881h
