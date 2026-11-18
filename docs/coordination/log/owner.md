@@ -2,6 +2,17 @@
 
 > Only the OWNER chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — All previews merged and live on GitHub Pages (owner request)
+**Status:** Merged to main at the owner's request (PRs #1 client, #2 consultant, #3 manager, + this owner PR)
+**Done:** trial-merged all four chat branches (no conflicts); built client (Next static export, basePath
+`/bewise_system/preview/client`), consultant and manager (Vite) and owner (HTML) into `preview/`; landing page `index.html`
+at the repo root + `.nojekyll` (Pages source = main / root). Tested every page under `/bewise_system/` at 1366 px and 390 px:
+no console errors, no 404s, no horizontal scroll. Rebuild: `bash preview/build.sh`.
+**Contracts changed:** none · **Migrations:** none
+**Note for HUB:** root `index.html`, `.nojekyll` and `preview/` are new top-level files for GitHub Pages — previews must be
+rebuilt (`preview/build.sh`) after prototype changes, or Pages can be switched to an Actions build later.
+**Next:** owner feedback on the four previews
+
 ## 2026-11-17 — Owner app v4 design prototype (branch claude/new-session-k130h4)
 **Status:** Design prototype ready for owner review — still waiting for `FOUNDATION: ✅` before O1
 **Done:** `docs/specs/owner/prototype/` — clickable v4 "Soft Bloom" prototype of the Owner app, desktop first + phone
