@@ -1,6 +1,6 @@
 # BeWise Wellness — Live Status Board
 
-> **Owner:** HUB only. Updated after every merge / review. Last updated: **2026-11-16**
+> **Owner:** HUB only. Updated after every merge / review. Last updated: **2026-11-18**
 > Legend: ⬜ Not started · 🟨 In progress · 🟦 In review (PR open) · ✅ Merged to main · 🚀 Live in production · ⛔ Blocked
 
 ## 🚀 Live previews (GitHub Pages, from `main`) — updated 2026-11-18 by HUB
@@ -16,7 +16,11 @@ Prototypes with sample data only — no real payments, OTP or messages. Rebuild:
 
 ## Foundation
 
-**FOUNDATION: ⬜ NOT STARTED** — chats must not scaffold an app until this shows ✅ (see each brief, "Step 0").
+**FOUNDATION: ✅ BACKEND LIVE-READY (2026-11-18, D-44)** — real backend in `api/` (PHP 8 + Hostinger MySQL): 17 modules, 116 functions named as in contracts §5,
+auth (client email OTP · staff password), roles & privacy enforced server-side, events, invoices + double-entry, Razorpay-ready, ICS feed.
+End-to-end test across all four roles: `api/tests/e2e.mjs` (58 checks ✅ on MariaDB 10.11 + Apache .htaccess; CI `api-tests.yml` on MySQL 8).
+**Next for every chat:** wire your app to the API — requests `docs/coordination/requests/20261118-hub-to-<chat>-wire-real-api.md` (P0).
+**Owner action:** create the MySQL database in hPanel and run `/api/install.php` — `hosting/HOSTINGER-DATABASE.md`.
 
 | Item | Status | Notes |
 |---|---|---|
@@ -29,7 +33,8 @@ Prototypes with sample data only — no real payments, OTP or messages. Rebuild:
 | **ALL 4 MODULES DESIGNED** (v2) | ✅ | |
 | Client v4 "Soft Bloom" redesign (owner refs) | ✅ designed, awaiting approval | 66 screens — `design/client-v4`; consultant v4 next |
 | Design boards (12) + motion (splash, hero) | ✅ | `design/boards`, `design/motion` |
-| Next.js/Supabase scaffold, UI kit, shells, auth, spine tables, events, contract stubs, seed, PWA, CI | ⬜ | HUB — next step |
+| Backend foundation: API, auth, spine tables (all modules), events, seed, installer, SDK, CI | ✅ | `api/` · D-44 (replaces Supabase scaffold) |
+| Apps wired to the real API (live data instead of demo) | 🟨 | each chat — P0 requests 2026-11-18 |
 
 ## Chat briefs
 **v2 briefs ready (2026-11-17):** `chats/CHAT-1-CONSULTANT.md`, `CHAT-2-CLIENT.md`, `CHAT-3-MANAGER.md`, `CHAT-4-OWNER.md` — consolidate every decision D-01…D-43 (fees ₹1,000 / ₹800 incl. remedy, no refunds, intake, Shiprocket, accountant, v4 design).
@@ -65,7 +70,7 @@ Prototypes with sample data only — no real payments, OTP or messages. Rebuild:
 | O7 Personal finance · O8 AI assistant, audit | OWNER | ⬜ | | | |
 
 ## Open cross-chat requests
-_None yet._
+- **P0 (HUB → all four):** wire your app to the real API — `requests/20261118-hub-to-{client,consultant,manager,owner}-wire-real-api.md`.
 
 ## Owner reminders
 ⏳ **10–15 testimonials** and more photos of Jitu Bhaiya — see `CONTENT-CHECKLIST.md` (HUB reminds at the end of each module).

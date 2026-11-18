@@ -67,3 +67,11 @@
   Hostinger **Business/Cloud "Node.js web apps"** or a **VPS** — plus a Supabase project. That's a later step; this setup
   is what we'll extend.
 - Never paste passwords into chats, commits or issues — only into GitHub Secrets / hPanel.
+
+## Real database & backend (D-44, 2026-11-18)
+The build now also ships **`/api/`**: a PHP 8 API on Hostinger MySQL. Turn it on once by following **`hosting/HOSTINGER-DATABASE.md`**:
+1. Create the database in hPanel.
+2. Open `/api/install.php`.
+3. Fill in the form.
+
+When it's done, the landing page chip changes to *"Live · real database connected"*.

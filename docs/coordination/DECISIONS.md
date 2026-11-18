@@ -5,7 +5,7 @@
 
 | ID | Question | Default used until decided | Needed by | Status |
 |---|---|---|---|---|
-| D-01 | Tech stack & hosting | Next.js 15 + TypeScript + Tailwind + shadcn/ui · Supabase (Mumbai) · Vercel · Razorpay | Phase 0 | **OPEN — recommend approve** |
+| D-01 | Tech stack & hosting | **SUPERSEDED by D-44 (2026-11-18):** Hostinger — static apps (Next.js export / Vite) + **PHP 8 API + Hostinger MySQL**. Razorpay unchanged | Phase 0 | ✅ DECIDED (D-44) |
 | D-02 | Remedy charged separately? | **DECIDED 2026-11-17: remedy INCLUDED in the consultation fee** — remedy given after a paid session creates a ₹0 remedy order; **reorders** are charged at `remedy.reorder_price` (owner to set) | K4, C4 | ✅ DECIDED |
 | D-03 | Can the owner read practitioner private notes & questionnaire answers? | **No** by default; break-glass permission with audit | K2 | OPEN |
 | D-04 | Client sign-in method | Phone OTP (+91) primary, email fallback; staff email + password | Phase 0 | OPEN — needs SMS provider (MSG91/Twilio) |
@@ -49,4 +49,4 @@
 | D-41 | Payroll | **DECIDED: later phase** | O | ✅ DECIDED |
 | D-42 | Owner greeting name | Pending — app says "Good morning" until the owner gives a name | O | OPEN |
 | D-43 | Design v4 "Soft Bloom" (owner refs: Sintelly mobile + mood-tracker dashboard) | **ACCEPTED 2026-11-17 for the client app; v4 is the visual language for the whole build** (tokens `design/tokens.json` → `v4`, rules `design/v4-soft-bloom/README.md`). Consultant/manager/owner boards to be restyled in v4; until then build their layouts from v2 boards with v4 tokens | All | ✅ DECIDED |
-
+| D-44 | Backend & database | **DECIDED 2026-11-18 (owner: "use Hostinger now", incl. DB):** PHP 8.1+ API in `api/` (RPC `POST /api/v1/<module>.<fn>`, names = contracts §5) + **Hostinger MySQL/MariaDB**, migrations in `api/migrations/`, one-time setup `/api/install.php`, private config outside `public_html`. Email-OTP for clients, password for staff. Sensitive columns encrypted (sodium). Works on every Hostinger plan (no Node server needed). Guide `hosting/HOSTINGER-DATABASE.md`, reference `api/README.md` | All | ✅ DECIDED |

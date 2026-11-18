@@ -1,0 +1,82 @@
+<?php
+/**
+ * @owner HUB · auth.* — sign in / out.
+ * Clients: requestOtp → verifyOtp (6-digit email code, 10 min, 5 tries, rate-limited).
+ * Staff: login (email + password). The owner sets staff passwords in Team (staff.invite / staff.setPassword).
+ */
+declare(strict_types=1);
+
+const BW_OTP_MINUTES = 10;
+
+return [
+    'requestOtp' => function (array $in) {
+        $email = req_email($in);
+        rate_limit('otp:ip:' . client_ip(), 20, 3600);
+        rate_limit('otp:email:' . $email, 5, 900);
+        $code = (string)random_int(100000, 999999);
+        insert('otp_codes', ['id' => uuid(), 'identifier' => $email, 'code_hash' => hash_hmac('sha256', $code, (string)bw_config('app_key')),
+            'expires_at' => gmdate('Y-m-d H:i:s', time() + BW_OTP_MINUTES * 60)]);
+        $sent = bw_send_mail($email, "Your BeWise sign-in code: $code",
+            "Your BeWise sign-in code is $code\n\nIt works for " . BW_OTP_MINUTES . " minutes. If you didn't ask for it, you can ignore this email.\n\n— BeWise Holistic Wellness");
+        if (!$sent) bw_fail('email_failed', 'We couldn\'t send the email just now. Please try again in a minute.', 502);
+        $out = ['sent' => true, 'expiresInSeconds' => BW_OTP_MINUTES * 60];
+        // Local development only (config debug_show_otp). Never enable on the live site.
+        if (bw_config('debug_show_otp') === true) $out['devCode'] = $code;
+        return $out;
+    },
+
+    'verifyOtp' => function (array $in) {
+        $email = req_email($in);
+        $code = preg_replace('/\D/', '', (string)req_str($in, 'code', 10));
+        rate_limit('otpv:ip:' . client_ip(), 40, 3600);
+        $row = one('SELECT * FROM otp_codes WHERE identifier = ? AND used_at IS NULL AND expires_at > UTC_TIMESTAMP() ORDER BY created_at DESC LIMIT 1', [$email]);
+        if (!$row) bw_fail('code_expired', 'That code has expired. Please ask for a new one.');
+        if ($row['attempts'] >= 5) bw_fail('too_many_attempts', 'Too many wrong tries. Please ask for a new code.', 429);
+        if (!hash_equals($row['code_hash'], hash_hmac('sha256', $code, (string)bw_config('app_key')))) {
+            q('UPDATE otp_codes SET attempts = attempts + 1 WHERE id = ?', [$row['id']]);
+            commit_now();
+            bw_fail('wrong_code', 'That code doesn\'t match. Please check and try again.');
+        }
+        q('UPDATE otp_codes SET used_at = UTC_TIMESTAMP() WHERE id = ?', [$row['id']]);
+        $existing = one('SELECT id, status FROM users WHERE email = ?', [$email]);
+        if ($existing && $existing['status'] === 'disabled') bw_fail('disabled', 'This account is turned off. Please contact BeWise.', 403);
+        if ($existing && $existing['status'] === 'invited') q("UPDATE users SET status = 'active' WHERE id = ?", [$existing['id']]);
+        $uid = $existing ? $existing['id'] : Auth::ensureClientUser($email, (string)($in['name'] ?? ''));
+        // Staff signing in by code keep their roles; anyone without a role becomes a client.
+        if (!val('SELECT 1 FROM user_roles WHERE user_id = ? LIMIT 1', [$uid])) Auth::ensureClientUser($email);
+        audit('login', 'user', $uid, ['method' => 'otp']);
+        return Auth::startSession($uid);
+    },
+
+    'login' => function (array $in) {
+        $email = req_email($in);
+        $pass = (string)req_str($in, 'password', 200);
+        rate_limit('login:ip:' . client_ip(), 30, 900);
+        rate_limit('login:email:' . $email, 8, 900);
+        $u = one("SELECT * FROM users WHERE email = ? AND status IN ('active','invited')", [$email]);
+        if (!$u || !$u['password_hash'] || !password_verify($pass, $u['password_hash'])) {
+            bw_fail('bad_login', 'Email or password is not right.', 401);
+        }
+        if ($u['status'] === 'invited') q("UPDATE users SET status = 'active' WHERE id = ?", [$u['id']]);
+        if (password_needs_rehash($u['password_hash'], PASSWORD_DEFAULT)) q('UPDATE users SET password_hash = ? WHERE id = ?', [password_hash($pass, PASSWORD_DEFAULT), $u['id']]);
+        audit('login', 'user', $u['id'], ['method' => 'password']);
+        return Auth::startSession($u['id']);
+    },
+
+    'me' => fn(array $in) => Auth::user(),
+
+    'logout' => function (array $in) { Auth::endSession(); return ['signedOut' => true]; },
+
+    /** Staff change their own password (min 10 chars). */
+    'changePassword' => function (array $in) {
+        $u = Auth::require(...BW_STAFF_ROLES);
+        $new = (string)req_str($in, 'newPassword', 200);
+        if (mb_strlen($new) < 10) bw_fail('weak_password', 'Use at least 10 characters.');
+        $hash = val('SELECT password_hash FROM users WHERE id = ?', [$u['id']]);
+        if ($hash && !password_verify((string)($in['currentPassword'] ?? ''), $hash)) bw_fail('bad_login', 'Current password is not right.', 401);
+        q('UPDATE users SET password_hash = ? WHERE id = ?', [password_hash($new, PASSWORD_DEFAULT), $u['id']]);
+        q('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?', [$u['id'], hash('sha256', (string)($_COOKIE[BW_COOKIE] ?? ''))]);
+        audit('password.changed', 'user', $u['id']);
+        return ['changed' => true];
+    },
+];

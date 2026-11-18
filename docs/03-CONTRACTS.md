@@ -6,7 +6,7 @@
 > + a log entry, per `docs/04-COORDINATION-PROTOCOL.md`. Additive changes (new optional field, new enum
 > value at the end, new event) are allowed by the owner with a log entry; breaking changes need HUB approval.
 >
-> Contract version: **v1** (2026-11-16)
+> Contract version: **v1** (2026-11-16) · **2026-11-18 (D-44):** implemented as the PHP + MySQL API in `api/` — same function names (`POST /api/v1/<module>.<fn>`), roles and visibility rules; Postgres/RLS/Supabase wording below maps to MySQL + server-side `Auth::require()` checks. Live reference: `api/README.md`.
 
 ---
 

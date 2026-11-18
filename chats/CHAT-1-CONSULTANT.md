@@ -4,6 +4,8 @@
 > **"Read `chats/CHAT-1-CONSULTANT.md` and follow it."**
 > Chat tag: **`consultant`** · PR titles `[CONSULTANT] …` · Brief version **v2 (2026-11-17)** — replaces all earlier versions.
 
+> 🔔 **UPDATE 2026-11-18 — the real backend is ready (D-44, replaces Supabase/Next server).** Backend = `api/` (PHP 8 + Hostinger MySQL), deployed at `/api/` with every push to `main`. **Step 0 is now ✅.** Your first task: `docs/coordination/requests/20261118-hub-to-consultant-wire-real-api.md` (P0) — swap demo data for API calls, keep demo data only when `BeWise.available()` is false. Your module files in `api/modules/` are yours to extend (new migrations in `api/migrations/`). Reference `api/README.md`. Where this brief says Supabase / RLS / `src/modules/*` / Postgres, read: `api/modules/<module>.php`, server-side role checks, MySQL.
+
 ---
 
 ## 1. Mission

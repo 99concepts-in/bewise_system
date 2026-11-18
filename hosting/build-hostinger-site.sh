@@ -6,6 +6,7 @@
 #   yourdomain/consultant/  Jitu Bhaiya's app (prototypes/consultant-app)
 #   yourdomain/manager/     Haresh's app      (prototypes/manager)
 #   yourdomain/owner/       owner app         (docs/specs/owner/prototype)
+#   yourdomain/api/         backend API (PHP + MySQL) · one-time setup at /api/install.php
 #
 # Usage (repo root):  bash hosting/build-hostinger-site.sh
 #   SITE_BASE=""        → site at the root of a domain/sub-domain (default, recommended)
@@ -35,7 +36,12 @@ mkdir -p "$OUT/owner"
   cat "$ROOT/docs/specs/owner/prototype/owner-command-centre.html"
   printf '\n</body></html>\n'; } > "$OUT/owner/index.html"
 
-# 4. Landing page at the site root, links pointing at /client/, /consultant/ …
+# 4. Backend API (PHP 8.1+ · MySQL) → /api   — set up once at /api/install.php (see hosting/HOSTINGER-DATABASE.md)
+mkdir -p "$OUT/api"
+(cd "$ROOT/api" && tar --exclude='./tests' --exclude='./storage/config.php' --exclude='./storage/*.log' --exclude='./storage/migrated-*' -cf - .) | (cd "$OUT/api" && tar -xf -)
+php -l "$OUT/api/index.php" >/dev/null 2>&1 || echo "note: php not found locally — API files copied without a syntax check"
+
+# 5. Landing page at the site root, links pointing at /client/, /consultant/ …
 sed 's#href="preview/#href="#g' "$ROOT/index.html" > "$OUT/index.html"
 sed "s#__BASE__#${BASE}#g" "$ROOT/hosting/htaccess-site.template" > "$OUT/.htaccess"
 printf 'User-agent: *\nDisallow: /\n' > "$OUT/robots.txt"

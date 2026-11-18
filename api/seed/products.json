@@ -1,0 +1,770 @@
+[
+ {
+  "slug": "abundance-roll-on",
+  "name": "Abundance",
+  "tagline": "For a positive, confident mindset",
+  "category": "rollons",
+  "format": "Roll-on",
+  "sold_out": false,
+  "sort": 0,
+  "data": {
+   "about": "A warm blend for days you want to feel motivated, focused and open to abundance. Make it part of your morning intention.",
+   "feel": [
+    "Positive",
+    "Confident",
+    "Motivated",
+    "Focused"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Apply the roll-on to both palms and rub them together. Cup your hands over your nose and breathe in deeply through your nose. Repeat 3 to 4 times. Apply any remaining oil to the area your Bach expert recommends.",
+   "safety": "For external use only. Patch test on your inner arm first. Avoid eyes and broken skin. Keep away from children. If you are pregnant, nursing or under medical care, check with your doctor first. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "abundance"
+   ],
+   "art": "products/abundance-rollon",
+   "color": "#B58A3C",
+   "tint": [
+    "#fbf3dc",
+    "#f7ecd7"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "abundance-roll-on-15",
+    "label": "15 ml",
+    "price_paise": 60000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "sleep-roll-on",
+  "name": "Sleep",
+  "tagline": "For a calm mind at bedtime",
+  "category": "rollons",
+  "format": "Roll-on",
+  "sold_out": false,
+  "sort": 1,
+  "data": {
+   "about": "A soothing blend to help you relax and settle into a peaceful bedtime routine.",
+   "feel": [
+    "Relaxed",
+    "Calm mind",
+    "Peaceful",
+    "Rested"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Apply the roll-on to both palms and rub them together. Cup your hands over your nose and breathe in deeply through your nose. Repeat 3 to 4 times. Apply any remaining oil to the area your Bach expert recommends.",
+   "safety": "For external use only. Patch test on your inner arm first. Avoid eyes and broken skin. Keep away from children. If you are pregnant, nursing or under medical care, check with your doctor first. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "sleep",
+    "calm"
+   ],
+   "art": "products/sleep-rollon",
+   "color": "#24508F",
+   "tint": [
+    "#e7ecfa",
+    "#efe9fb"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "sleep-roll-on-15",
+    "label": "15 ml",
+    "price_paise": 60000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "immutime-roll-on",
+  "name": "Immutime",
+  "tagline": "Feel refreshed and balanced",
+  "category": "rollons",
+  "format": "Roll-on",
+  "sold_out": false,
+  "sort": 2,
+  "data": {
+   "about": "A fresh, revitalising blend to make part of your everyday wellness routine, for days you want to feel refreshed and balanced.",
+   "feel": [
+    "Refreshed",
+    "Balanced",
+    "Revitalised"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Apply the roll-on to both palms and rub them together. Cup your hands over your nose and breathe in deeply through your nose. Repeat 3 to 4 times. Apply any remaining oil to the area your Bach expert recommends.",
+   "safety": "For external use only. Patch test on your inner arm first. Avoid eyes and broken skin. Keep away from children. If you are pregnant, nursing or under medical care, check with your doctor first. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "wellness"
+   ],
+   "art": "products/immutime-rollon",
+   "color": "#3E8E3A",
+   "tint": [
+    "#e5efe2",
+    "#eef5e6"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "immutime-roll-on-15",
+    "label": "15 ml",
+    "price_paise": 60000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "detox-roll-on",
+  "name": "Detox",
+  "tagline": "Light, fresh and renewed",
+  "category": "rollons",
+  "format": "Roll-on",
+  "sold_out": false,
+  "sort": 3,
+  "data": {
+   "about": "A bright blend for your cleanse and reset days, to help you feel fresh, light and well.",
+   "feel": [
+    "Fresh",
+    "Light",
+    "Renewed"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Apply the roll-on to both palms and rub them together. Cup your hands over your nose and breathe in deeply through your nose. Repeat 3 to 4 times. Apply any remaining oil to the area your Bach expert recommends.",
+   "safety": "For external use only. Patch test on your inner arm first. Avoid eyes and broken skin. Keep away from children. If you are pregnant, nursing or under medical care, check with your doctor first. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "wellness"
+   ],
+   "art": "products/detox-rollon",
+   "color": "#D0723F",
+   "tint": [
+    "#fbeadf",
+    "#fbf3dc"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "detox-roll-on-15",
+    "label": "15 ml",
+    "price_paise": 60000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "cough-cold-roll-on",
+  "name": "Cough & Cold",
+  "tagline": "A comforting aroma for the cold season",
+  "category": "rollons",
+  "format": "Roll-on",
+  "sold_out": false,
+  "sort": 4,
+  "data": {
+   "about": "A warm, comforting aromatic blend for the cold season, for cosy moments of rest when you feel under the weather.",
+   "feel": [
+    "Comforted",
+    "Cosy",
+    "Soothed"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Apply the roll-on to both palms and rub them together. Cup your hands over your nose and breathe in deeply through your nose. Repeat 3 to 4 times. Apply any remaining oil to the area your Bach expert recommends.",
+   "safety": "For external use only. Patch test on your inner arm first. Avoid eyes and broken skin. Keep away from children. If you are pregnant, nursing or under medical care, check with your doctor first. Not a cough or cold medicine. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "wellness"
+   ],
+   "art": "products/cough-cold-rollon",
+   "color": "#2E918E",
+   "tint": [
+    "#dff0ee",
+    "#e7ecfa"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "cough-cold-roll-on-15",
+    "label": "15 ml",
+    "price_paise": 60000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "diabetes-roll-on",
+  "name": "Diabetes",
+  "tagline": "A calm companion for your daily routine",
+  "category": "rollons",
+  "format": "Roll-on",
+  "sold_out": false,
+  "sort": 5,
+  "data": {
+   "about": "A gentle aromatherapy blend to complement your daily wellness routine and help you feel calm and steady. It does not lower or manage blood sugar.",
+   "feel": [
+    "Calm",
+    "Steady",
+    "Cared for"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Apply the roll-on to both palms and rub them together. Cup your hands over your nose and breathe in deeply through your nose. Repeat 3 to 4 times. Apply any remaining oil to the area your Bach expert recommends.",
+   "safety": "For external use only. Patch test on your inner arm first. Avoid eyes and broken skin. Keep away from children. If you are pregnant, nursing or under medical care, check with your doctor first. Keep taking your medicines exactly as your doctor advises. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "wellness",
+    "calm"
+   ],
+   "art": "products/diabetes-rollon",
+   "color": "#7A4E9F",
+   "tint": [
+    "#efe9fb",
+    "#f4eef8"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "diabetes-roll-on-15",
+    "label": "15 ml",
+    "price_paise": 60000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "bp-roll-on",
+  "name": "BP",
+  "tagline": "Unwind and ease everyday stress",
+  "category": "rollons",
+  "format": "Roll-on",
+  "sold_out": false,
+  "sort": 6,
+  "data": {
+   "about": "A calming blend to help you relax and ease everyday stress, for slower, steadier moments in your day. It does not lower blood pressure.",
+   "feel": [
+    "Calm",
+    "Relaxed",
+    "Unwound"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Apply the roll-on to both palms and rub them together. Cup your hands over your nose and breathe in deeply through your nose. Repeat 3 to 4 times. Apply any remaining oil to the area your Bach expert recommends.",
+   "safety": "For external use only. Patch test on your inner arm first. Avoid eyes and broken skin. Keep away from children. If you are pregnant, nursing or under medical care, check with your doctor first. Keep taking your medicines exactly as your doctor advises. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "calm",
+    "wellness"
+   ],
+   "art": "products/bp-rollon",
+   "color": "#B6475E",
+   "tint": [
+    "#fbe9ee",
+    "#f8f1f4"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "bp-roll-on-15",
+    "label": "15 ml",
+    "price_paise": 60000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "abundance-spray",
+  "name": "Abundance",
+  "tagline": "Aura spray for an uplifting space",
+  "category": "sprays",
+  "format": "Spray",
+  "sold_out": false,
+  "sort": 7,
+  "data": {
+   "about": "An uplifting mist that creates a positive, bright atmosphere around you and in your space.",
+   "feel": [
+    "Uplifted",
+    "Positive",
+    "Bright"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Gently spray around your body 3 to 4 times to refresh your aura. Use 2 to 3 times a day, or whenever you feel low, drained or in need of a lift.",
+   "safety": "Do not spray on the face or near the eyes. Keep away from children and flames. If you are pregnant or nursing, check with your doctor first. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "abundance"
+   ],
+   "art": "products/abundance-spray",
+   "color": "#B58A3C",
+   "tint": [
+    "#fbf3dc",
+    "#f6efe4"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "abundance-spray-100",
+    "label": "100 ml",
+    "price_paise": 120000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "protection-spray",
+  "name": "Protection",
+  "tagline": "Aura spray for grounding and calm",
+  "category": "sprays",
+  "format": "Spray",
+  "sold_out": false,
+  "sort": 8,
+  "data": {
+   "about": "A grounding mist for a sense of calm and personal protection. Many people use it to feel shielded from negativity and the evil eye.",
+   "feel": [
+    "Grounded",
+    "Calm",
+    "Shielded"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Gently spray around your body 3 to 4 times to refresh your aura. Use 2 to 3 times a day, or whenever you feel low, drained or in need of a lift.",
+   "safety": "Do not spray on the face or near the eyes. Keep away from children and flames. If you are pregnant or nursing, check with your doctor first. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "protection",
+    "calm"
+   ],
+   "art": "products/protection-spray",
+   "color": "#7A4E9F",
+   "tint": [
+    "#efe9fb",
+    "#eef1fb"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "protection-spray-100",
+    "label": "100 ml",
+    "price_paise": 120000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "aura-spray",
+  "name": "Aura",
+  "tagline": "Refresh your energy",
+  "category": "sprays",
+  "format": "Spray",
+  "sold_out": false,
+  "sort": 9,
+  "data": {
+   "about": "A light mist to refresh your energy and help you feel lighter, calmer and more centred.",
+   "feel": [
+    "Lighter",
+    "Calmer",
+    "Centred"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Gently spray around your body 3 to 4 times to refresh your aura. Use 2 to 3 times a day, or whenever you feel low, drained or in need of a lift.",
+   "safety": "Do not spray on the face or near the eyes. Keep away from children and flames. If you are pregnant or nursing, check with your doctor first. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "protection",
+    "calm"
+   ],
+   "art": "products/aura-spray",
+   "color": "#5B78B8",
+   "tint": [
+    "#e7ecfa",
+    "#eef1fb"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "aura-spray-100",
+    "label": "100 ml",
+    "price_paise": 120000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "sleep-spray",
+  "name": "Sleep",
+  "tagline": "Pillow & room spray",
+  "category": "sprays",
+  "format": "Spray",
+  "sold_out": false,
+  "sort": 10,
+  "data": {
+   "about": "A soothing aroma to help you unwind and drift into a peaceful night.",
+   "feel": [
+    "Unwound",
+    "Peaceful",
+    "Rested"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Before bedtime, spray once on each collar of your shirt or t-shirt and 1 to 2 times on your pillow. Breathe slowly as you settle in.",
+   "safety": "Do not spray on the face or near the eyes. Keep away from children and flames. If you are pregnant or nursing, check with your doctor first. Aromatherapy supports comfort and wellbeing. It is not a medicine and does not replace your doctor’s care.",
+   "intents": [
+    "sleep"
+   ],
+   "art": "products/sleep-spray",
+   "color": "#24508F",
+   "tint": [
+    "#e7ecfa",
+    "#efe9fb"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "sleep-spray-100",
+    "label": "100 ml",
+    "price_paise": 120000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "bach-remedy-dropper",
+  "name": "Bach Flower Remedy",
+  "tagline": "Your personal blend, dropper",
+  "category": "remedies",
+  "format": "Dropper",
+  "sold_out": false,
+  "sort": 11,
+  "data": {
+   "about": "A personalised blend of Bach flower essences, chosen by Jitu Bhaiya for how you feel. Your first blend comes with your consultation; reorder the same blend here anytime.",
+   "feel": [
+    "Made for you",
+    "Gentle",
+    "Natural"
+   ],
+   "ingredients": "Bach flower essences chosen for you by Jitu Bhaiya.",
+   "howTo": "Take 4 drops, 4 times a day, directly or in any drink you like, or as your Bach expert suggests. A bottle lasts up to 25 days when taken regularly.",
+   "safety": "An individual, customised remedy for personal use only. Store at room temperature, away from direct sunlight, and keep away from children. Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor.",
+   "intents": [
+    "calm"
+   ],
+   "art": "products/bach-remedy-dropper",
+   "color": "#5E8F6A",
+   "tint": [
+    "#e5efe2",
+    "#f1f6ec"
+   ],
+   "personal": "dropper",
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "bach-remedy-dropper-30",
+    "label": "30 ml",
+    "price_paise": 80000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "bach-remedy-spray",
+  "name": "Bach Remedy Spray",
+  "tagline": "Your personal blend, spray",
+  "category": "remedies",
+  "format": "Spray",
+  "sold_out": false,
+  "sort": 12,
+  "data": {
+   "about": "Your personalised Bach flower blend in an easy spray, handy on the go. Available once Jitu Bhaiya has prepared your blend.",
+   "feel": [
+    "Made for you",
+    "On the go",
+    "Gentle"
+   ],
+   "ingredients": "Bach flower essences chosen for you by Jitu Bhaiya.",
+   "howTo": "Spray directly into your mouth, 3 sprays per dose, 4 times a day, or as your Bach expert recommends.",
+   "safety": "An individual, customised remedy for personal use only. Store at room temperature, away from direct sunlight, and keep away from children. Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor.",
+   "intents": [
+    "calm"
+   ],
+   "art": "products/bach-remedy-spray",
+   "color": "#5E8F6A",
+   "tint": [
+    "#e5efe2",
+    "#eef1fb"
+   ],
+   "personal": "spray",
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "bach-remedy-spray-30",
+    "label": "30 ml",
+    "price_paise": 80000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "rescue-remedy",
+  "name": "Rescue Remedy",
+  "tagline": "For stressful moments",
+  "category": "remedies",
+  "format": "Spray",
+  "sold_out": false,
+  "sort": 13,
+  "data": {
+   "about": "A classic Bach blend to help calm the mind and soothe your nerves in stressful moments, like exams, interviews or travel.",
+   "feel": [
+    "Calm",
+    "Steady",
+    "Reassured"
+   ],
+   "ingredients": "The classic five-flower Bach rescue blend.",
+   "howTo": "Spray directly into your mouth, 3 sprays per dose, up to 4 times a day, or as your Bach expert recommends.",
+   "safety": "A gentle, complementary practice for emotional balance, not a substitute for your doctor. If you are pregnant or nursing, check with your doctor first.",
+   "intents": [
+    "calm"
+   ],
+   "art": "products/rescue-remedy-spray",
+   "color": "#C7892E",
+   "tint": [
+    "#fbf0dc",
+    "#fbf3dc"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "rescue-remedy-30",
+    "label": "30 ml",
+    "price_paise": 80000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "hair-oil",
+  "name": "Hair Oil",
+  "tagline": "Nourish hair and scalp",
+  "category": "care",
+  "format": "Dropper",
+  "sold_out": false,
+  "sort": 14,
+  "data": {
+   "about": "A nourishing blend for your hair and scalp, for natural softness and shine.",
+   "feel": [
+    "Nourished",
+    "Soft",
+    "Shiny"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Warm a few drops between your fingertips and massage gently into your scalp. Leave for at least an hour, or overnight, then wash as usual.",
+   "safety": "For external use only. Patch test first. Avoid eyes. Keep away from children.",
+   "intents": [
+    "beauty"
+   ],
+   "art": "products/hair-oil",
+   "color": "#C7892E",
+   "tint": [
+    "#fbf0dc",
+    "#f6efe4"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "hair-oil-30",
+    "label": "30 ml",
+    "price_paise": 60000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "beauty-spray",
+  "name": "Beauty",
+  "tagline": "Face & body mist",
+  "category": "care",
+  "format": "Spray",
+  "sold_out": false,
+  "sort": 15,
+  "data": {
+   "about": "A light, revitalising mist to refresh and nourish your skin through the day.",
+   "feel": [
+    "Refreshed",
+    "Glowing",
+    "Soft"
+   ],
+   "ingredients": "A blend of pure essential oils. The full ingredient list is printed on the label. If you have allergies, message us on WhatsApp before ordering.",
+   "howTo": "Close your eyes and mist lightly over your face and body from about 20 cm. Use whenever your skin needs a refresh.",
+   "safety": "Keep your eyes closed while misting. Patch test first. Stop use if any irritation appears.",
+   "intents": [
+    "beauty"
+   ],
+   "art": "products/beauty-spray",
+   "color": "#C96A86",
+   "tint": [
+    "#fbe9ee",
+    "#f8f1f4"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "beauty-spray-100",
+    "label": "100 ml",
+    "price_paise": 120000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "aura-bath-salt",
+  "name": "Aura",
+  "tagline": "Bath salt to cleanse your aura",
+  "category": "bath",
+  "format": "Bath salt",
+  "sold_out": false,
+  "sort": 16,
+  "data": {
+   "about": "A soothing bath ritual to help cleanse your aura and leave you feeling light and renewed.",
+   "feel": [
+    "Cleansed",
+    "Light",
+    "Renewed"
+   ],
+   "ingredients": "Natural salts, dried flower petals and essential oils. Full list on the pack.",
+   "howTo": "Add 2 to 3 spoonfuls to warm water and enjoy a relaxing bath, or soak your feet for 15 to 20 minutes.",
+   "safety": "For external use only. Do not use on broken skin. Not for eating. Keep away from children.",
+   "intents": [
+    "protection",
+    "calm"
+   ],
+   "art": "products/aura-bath-salt",
+   "color": "#5B78B8",
+   "tint": [
+    "#e7ecfa",
+    "#fbe9ee"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "aura-bath-salt-200",
+    "label": "200 g",
+    "price_paise": 50000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "abundance-bath-salt",
+  "name": "Abundance",
+  "tagline": "Bath salt for positivity and self-love",
+  "category": "bath",
+  "format": "Bath salt",
+  "sold_out": false,
+  "sort": 17,
+  "data": {
+   "about": "A warm bath ritual to welcome abundance, positivity and self-love into your day.",
+   "feel": [
+    "Positive",
+    "Abundant",
+    "Self-love"
+   ],
+   "ingredients": "Natural salts, dried flower petals and essential oils. Full list on the pack.",
+   "howTo": "Add 2 to 3 spoonfuls to warm water and enjoy a relaxing bath, or soak your feet for 15 to 20 minutes.",
+   "safety": "For external use only. Do not use on broken skin. Not for eating. Keep away from children.",
+   "intents": [
+    "abundance"
+   ],
+   "art": "products/abundance-bath-salt",
+   "color": "#B58A3C",
+   "tint": [
+    "#fbf3dc",
+    "#fbe9ee"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "abundance-bath-salt-200",
+    "label": "200 g",
+    "price_paise": 50000,
+    "mrp_paise": null
+   }
+  ]
+ },
+ {
+  "slug": "happiness-bath-salt",
+  "name": "Happiness",
+  "tagline": "Bath salt for a lighter, happier mood",
+  "category": "bath",
+  "format": "Bath salt",
+  "sold_out": true,
+  "sort": 18,
+  "data": {
+   "about": "A sunny bath ritual to lift your mood and invite a little more joy into your day.",
+   "feel": [
+    "Joyful",
+    "Light",
+    "Uplifted"
+   ],
+   "ingredients": "Natural salts, dried flower petals and essential oils. Full list on the pack.",
+   "howTo": "Add 2 to 3 spoonfuls to warm water and enjoy a relaxing bath, or soak your feet for 15 to 20 minutes.",
+   "safety": "For external use only. Do not use on broken skin. Not for eating. Keep away from children.",
+   "intents": [
+    "calm"
+   ],
+   "art": "products/happiness-bath-salt",
+   "color": "#C7892E",
+   "tint": [
+    "#fbf3dc",
+    "#fbf0dc"
+   ],
+   "personal": null,
+   "allergens": [],
+   "wide": false
+  },
+  "variants": [
+   {
+    "id": "happiness-bath-salt-200",
+    "label": "200 g",
+    "price_paise": 50000,
+    "mrp_paise": null
+   }
+  ]
+ }
+]
