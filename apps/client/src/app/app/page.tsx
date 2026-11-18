@@ -50,9 +50,9 @@ export default function Home() {
               <h2 id="mood-h" className="h-section">Today’s mood</h2>
               <p className="mt-0.5 text-[13px] text-muted">Tap once to reflect. Takes 3 seconds.</p>
             </div>
-            <div className="mt-3 flex justify-between">
+            <div className="mt-3 grid grid-cols-5 gap-0.5">
               {QUICK_MOODS.map((m) => (
-                <MoodButton key={m} mood={m} size={54} burstKey={burst?.mood === m ? burst.n : undefined} selected={lastToday?.emotion === m} onPick={() => tapMood(m)} />
+                <MoodButton key={m} mood={m} size={54} fluid burstKey={burst?.mood === m ? burst.n : undefined} selected={lastToday?.emotion === m} onPick={() => tapMood(m)} />
               ))}
             </div>
             <div className="mt-2 flex min-h-9 items-center justify-between px-2">
@@ -82,7 +82,7 @@ export default function Home() {
           <Link href="/app/ask" className="card group relative block overflow-hidden p-5 pr-[42%]">
             <span className="absolute -right-6 -top-6 size-44 rounded-full bg-[radial-gradient(circle,#dce2f5_0%,transparent_70%)]" />
             <h2 className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">Ask <span className="text-soft">BeWise</span></h2>
-            <p className="mt-1.5 text-[14px] leading-5 text-muted">Your wise companion — answers about your remedy, journal and orders.</p>
+            <p className="mt-1.5 text-[14px] leading-5 text-muted">Your wise companion for questions about your remedy, journal and orders.</p>
             <span className="mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-navy px-5 text-[14px] font-semibold text-white shadow-[var(--shadow-cta)]"><Sparkles className="size-4" /> Start a chat</span>
             <div className="absolute bottom-2 right-3"><Mascot pose="wave" height={150} /></div>
           </Link>
@@ -93,7 +93,7 @@ export default function Home() {
         <Item>
           <div className="card flex items-start gap-3 p-5">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#fbf3dc] text-gold"><Lightbulb className="size-5" /></span>
-            <p className="text-[14px] leading-6 text-ink"><b className="text-navy">Your daily insight</b> — {dailyInsight(journal)}</p>
+            <p className="text-[14px] leading-6 text-ink"><b className="text-navy">Your daily insight</b>, {dailyInsight(journal)}</p>
           </div>
         </Item>
       </Reveal>
@@ -121,9 +121,9 @@ function ContextCard() {
   const appts = useApp.getState().appointments
   const toPay = appts.find((x) => x.needsNewTime || ((x.status === 'awaiting_payment' || x.status === 'expired') && !x.paidAt))
   if (toPay?.needsNewTime)
-    return <Ctx tone="sage" kicker="Payment received" title="Pick a new time" body="The held time was released before your payment arrived — choose any time, no extra cost." cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
+    return <Ctx tone="sage" kicker="Payment received" title="Pick a new time" body="The held time was released before your payment arrived. Choose any time at no extra cost." cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
   if (toPay)
-    return <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitu Bhaiya'} title="Complete your booking" body={`${fmtDay(toPay.startsAt)} · ${fmtTime(toPay.startsAt)} — pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
+    return <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitu Bhaiya'} title="Complete your booking" body={`${fmtDay(toPay.startsAt)} · ${fmtTime(toPay.startsAt)}, pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
 
   if (intake && !intake.submittedAt && intake.step > 0)
     return <Ctx tone="peri" kicker="Almost there" title="Your answers are saved" body="Finish in about 3 minutes, then pick a time." cta="Continue" href="/app/book?resume=1" img={`${BP}/img/owl-read.webp`} />
@@ -214,7 +214,7 @@ function GoalsCard() {
               <span className={`flex-1 text-[15px] font-semibold ${g.done ? 'text-sage-text line-through decoration-sage/50' : 'text-navy'}`}>{g.title}</span>
               {!g.done && (
                 <motion.button whileTap={{ scale: 0.88 }} aria-label={`Add progress to ${g.title}`}
-                  onClick={() => { const n = Math.min(100, g.progress + 10); buzz(8); upd(g.id, { progress: n, done: n === 100 }); if (n === 100) toast('Goal complete — well done') }}
+                  onClick={() => { const n = Math.min(100, g.progress + 10); buzz(8); upd(g.id, { progress: n, done: n === 100 }); if (n === 100) toast('Goal complete. Well done!') }}
                   className="h-9 rounded-full bg-peri-50 px-3 text-[13px] font-bold text-navy">+10%</motion.button>
               )}
             </li>

@@ -20,11 +20,11 @@ import { BP } from '@/lib/asset'
 
 // @decision(D-10) generic Bach descriptions — Jitu Bhaiya approves final wording before launch. Never the reason it was chosen.
 const ABOUT: Record<string, string> = {
-  Mimulus: 'Dr Bach described Mimulus for everyday fears of known things — a gentle companion for quiet courage.',
-  'White Chestnut': 'Associated with a busy mind and repeating thoughts — for a calmer, clearer head.',
-  Larch: 'Linked with self-belief — for having a go without expecting to fail.',
-  Impatiens: 'Associated with impatience and irritation — for an easier, unhurried pace.',
-  Walnut: 'Known as the remedy for times of change — for steadiness while life shifts.',
+  Mimulus: 'Dr Bach described Mimulus for everyday fears of known things, a gentle companion for quiet courage.',
+  'White Chestnut': 'Associated with a busy mind and repeating thoughts, for a calmer, clearer head.',
+  Larch: 'Linked with self-belief, for having a go without expecting to fail.',
+  Impatiens: 'Associated with impatience and irritation, for an easier, unhurried pace.',
+  Walnut: 'Known as the remedy for times of change, for steadiness while life shifts.',
 }
 const FLOWER_IMG = ['f-rose', 'f-mimulus']
 
@@ -45,7 +45,7 @@ export default function Remedies() {
       <div className="card mt-6 flex flex-col items-center p-8 text-center">
         <Mascot pose="sleep" height={150} />
         <p className="mt-4 text-[18px] font-extrabold text-navy">Your blend will bloom here</p>
-        <p className="mt-1 max-w-[280px] text-[14px] leading-5 text-muted">After your first session, Jitu Bhaiya prepares a personal blend of flower essences — included in your consultation.</p>
+        <p className="mt-1 max-w-[280px] text-[14px] leading-5 text-muted">After your first session, Jitu Bhaiya prepares a personal blend of flower essences, included in your consultation.</p>
         <BtnLink href="/app/book" size="md" className="mt-5">Book a consultation</BtnLink>
       </div>
     </main>
@@ -59,7 +59,7 @@ export default function Remedies() {
   const mix = moodMix(journal)
   const reorder = () => {
     addToCart('remedy-reorder'); buzz(12)
-    const r = reorderRef.current?.getBoundingClientRect(); if (r) flyToBag(r, `${BP}/img/p-dropper.webp`)
+    const r = reorderRef.current?.getBoundingClientRect(); if (r) flyToBag(r, `${BP}/img/products/bach-remedy-dropper.webp`)
     toast(`Blend added to your bag · ${formatINR(REORDER_PRICE_PAISE)}`)
   }
 
@@ -71,10 +71,10 @@ export default function Remedies() {
         <Item>
           <section className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(150deg,#fbf3dc_0%,#f6efe4_45%,#eef1fb_100%)] p-6 shadow-[var(--shadow-card)]">
             <motion.img src={`${BP}/img/f-mimulus.webp`} alt="" aria-hidden className="absolute -right-10 top-2 h-[150px] opacity-80" animate={{ rotate: [0, 4, 0] }} transition={{ duration: 6, repeat: Infinity }} />
-            <motion.img src={`${BP}/img/p-dropper.webp`} alt="" aria-hidden className="absolute bottom-3 right-6 h-[170px] drop-shadow-[0_18px_18px_rgba(24,41,87,.22)]" initial={{ y: 30, opacity: 0 }} animate={{ y: [0, -8, 0], opacity: 1 }} transition={{ y: { duration: 5, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.6 } }} />
+            <motion.img src={`${BP}/img/products/bach-remedy-dropper.webp`} alt="" aria-hidden className="absolute bottom-3 right-6 h-[170px] drop-shadow-[0_18px_18px_rgba(24,41,87,.22)]" initial={{ y: 30, opacity: 0 }} animate={{ y: [0, -8, 0], opacity: 1 }} transition={{ y: { duration: 5, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.6 } }} />
             <p className="text-[13px] font-semibold text-[#8a6a2c]">Since {fmtDay(blend.startedOn)}</p>
             <h2 className="relative mt-1 max-w-[62%] text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">{blend.name} <span className="text-soft">v{blend.version}</span></h2>
-            <p className="relative mt-1 max-w-[62%] text-[14px] text-muted">{blend.drops} drops · {blend.timesPerDay}× a day{' · alcohol-free'}</p>
+            <p className="relative mt-1 max-w-[62%] text-[14px] text-muted">{blend.drops} drops · {blend.timesPerDay}× a day</p>
             <div className="relative mt-5 flex max-w-[62%] items-center gap-3">
               <Ring value={sup.level} size={74} stroke={8} color="#c48a3a" track="#ffffffaa"><span className="text-center leading-none"><b className="text-[18px] text-navy tnum">{left}</b><br /><span className="text-[11px] text-muted">days left</span></span></Ring>
               <p className="text-[13px] leading-4 text-muted">{sup.next ? 'Lasts until your next session.' : 'A follow-up refreshes your blend.'}</p>

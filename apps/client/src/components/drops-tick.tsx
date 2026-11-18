@@ -21,7 +21,7 @@ export function DropsTick({ full = false }: { full?: boolean }) {
   const v = drops[k0]
   const set = (k: string, taken: boolean, quiet = false) => {
     log(k, taken); buzz(taken ? 14 : 6)
-    if (!quiet) toast(taken ? 'Lovely — drops ticked for today' : 'That’s okay — tomorrow is a new day')
+    if (!quiet) toast(taken ? 'Lovely, drops ticked for today' : 'That’s okay. Tomorrow is a new day')
   }
   const past = [1, 2].map((i) => ({ d: addDays(today, -i), i }))
   const strip = Array.from({ length: 14 }, (_, i) => addDays(today, i - 13))
@@ -48,7 +48,7 @@ export function DropsTick({ full = false }: { full?: boolean }) {
               className={cx('grid size-9 shrink-0 place-items-center rounded-full', v ? 'bg-sage-text text-white' : 'bg-white text-navy')} aria-hidden>
               {v ? <Check className="size-5" strokeWidth={3} /> : <span className="text-[16px]">🌙</span>}
             </motion.span>
-            <p className="flex-1 text-[14px] leading-5 text-ink">{v ? <><b className="text-navy">Drops taken today.</b> Lovely.</> : <><b className="text-navy">Not today — that’s okay.</b> Tomorrow is a new day.</>}</p>
+            <p className="flex-1 text-[14px] leading-5 text-ink">{v ? <><b className="text-navy">Drops taken today.</b> Lovely.</> : <><b className="text-navy">Not today, that’s okay.</b> Tomorrow is a new day.</>}</p>
             <button onClick={() => set(k0, !v, true)} className="text-[13px] font-semibold text-navy underline underline-offset-2">Change</button>
           </motion.div>
         )}
@@ -80,7 +80,7 @@ export function DropsTick({ full = false }: { full?: boolean }) {
               return <span key={dayKey(d)} title={d.toDateString()} className={cx('h-6 flex-1 rounded-[6px]', x === true ? 'bg-[linear-gradient(180deg,#e7b768,#c48a3a)]' : x === false ? 'bg-[#e3e6ef]' : 'bg-white ring-1 ring-dashed ring-[#d9dce6]')} />
             })}
           </div>
-          <p className="mt-2 text-[12px] text-muted">{counted.length ? `You took them on ${took} of the last ${counted.length} days you logged. Every day counts.` : 'Tick once a day — it helps Jitu Bhaiya see how your blend is going.'}</p>
+          <p className="mt-2 text-[12px] text-muted">{counted.length ? `You took them on ${took} of the last ${counted.length} days you logged. Every day counts.` : 'Tick once a day. It helps Jitu Bhaiya see how your blend is going.'}</p>
         </div>
       )}
     </div>

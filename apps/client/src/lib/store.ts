@@ -11,7 +11,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { ConsultationId, Emotion } from './data'
-import { PRODUCTS, REORDER_PRICE_PAISE, variantById } from './data'
+import { PRODUCTS, REORDER_PRICE_PAISE, productTitle, variantById } from './data'
 import { uid, dayKey } from './format'
 
 export type Profile = {
@@ -44,7 +44,7 @@ export type IntakeAnswers = {
   consentAi: boolean
 }
 export type Blend = { name: string; version: number; flowers: string[]; drops: number; timesPerDay: number; startedOn: string; days: number; reminderTimes: string[]; alcoholFree: boolean }
-export type CartLine = { key: string; qty: number } // key = variantId | 'remedy-reorder'
+export type CartLine = { key: string; qty: number } // key = variantId | 'remedy-reorder' | 'remedy-reorder-spray'
 export type Address = { id: string; name: string; phone: string; line1: string; line2: string; city: string; state: string; pin: string }
 export type OrderLine = { key: string; name: string; label: string; qty: number; pricePaise: number; kind: 'product' | 'remedy' }
 export type Order = { id: string; code: string; lines: OrderLine[]; totalPaise: number; address: Address; placedAt: string; stage: 0 | 1 | 2 | 3 }
@@ -114,10 +114,11 @@ const initial = {
 }
 
 export const cartLineInfo = (l: CartLine) => {
-  if (l.key === 'remedy-reorder') return { name: 'Personal blend', label: '30 ml', pricePaise: REORDER_PRICE_PAISE, kind: 'remedy' as const, art: 'p-dropper' }
+  if (l.key === 'remedy-reorder') return { name: 'Personal blend', label: '30 ml dropper', pricePaise: REORDER_PRICE_PAISE, kind: 'remedy' as const, art: 'products/bach-remedy-dropper' }
+  if (l.key === 'remedy-reorder-spray') return { name: 'Personal blend', label: '30 ml spray', pricePaise: REORDER_PRICE_PAISE, kind: 'remedy' as const, art: 'products/bach-remedy-spray' }
   const v = variantById(l.key)
   if (!v) return null
-  return { name: v.product.name, label: v.variant.label, pricePaise: v.variant.pricePaise, kind: 'product' as const, art: v.product.art, product: v.product }
+  return { name: productTitle(v.product), label: v.variant.label, pricePaise: v.variant.pricePaise, kind: 'product' as const, art: v.product.art, product: v.product }
 }
 
 export const useApp = create<State>()(
@@ -158,7 +159,7 @@ export const useApp = create<State>()(
         if (!a) return
         const late = a.status === 'expired'
         set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString(), ...(late ? { needsNewTime: true } : { status: 'confirmed' as const }) } : x)) }))
-        get().notify(late ? { title: 'Payment received', body: 'Please pick a new time for your session — no extra cost.', href: `/app/pay?appointment=${id}` } : { title: 'You’re booked', body: 'Payment received. See you soon.', href: `/app/sessions/view?id=${id}` })
+        get().notify(late ? { title: 'Payment received', body: 'Please pick a new time for your session, no extra cost.', href: `/app/pay?appointment=${id}` } : { title: 'You’re booked', body: 'Payment received. See you soon.', href: `/app/sessions/view?id=${id}` })
       },
       pickNewTime: (id, startsAt) => set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, startsAt, status: 'confirmed' as const, needsNewTime: false } : x)) })),
       submitCheckin: (appointmentId, answers) => set((s) => ({ checkins: { ...s.checkins, [appointmentId]: { at: new Date().toISOString(), answers } } })),
@@ -176,7 +177,7 @@ export const useApp = create<State>()(
       setReminderTimes: (t) => set((s) => (s.blend ? { blend: { ...s.blend, reminderTimes: t } } : {})),
       addToCart: (key, qty = 1) => set((s) => {
         const ex = s.cart.find((l) => l.key === key)
-        const max = key === 'remedy-reorder' ? 1 : 10
+        const max = key.startsWith('remedy-reorder') ? 1 : 10
         return { cart: ex ? s.cart.map((l) => (l.key === key ? { ...l, qty: Math.min(l.qty + qty, max) } : l)) : [...s.cart, { key, qty: Math.min(qty, max) }] }
       }),
       setQty: (key, qty) => set((s) => ({ cart: qty <= 0 ? s.cart.filter((l) => l.key !== key) : s.cart.map((l) => (l.key === key ? { ...l, qty } : l)) })),
@@ -197,7 +198,7 @@ export const useApp = create<State>()(
           address: s.addresses.find((a) => a.id === addressId)!, placedAt: new Date().toISOString(), stage: 0,
         }
         set({ orders: [order, ...s.orders], cart: [], seq })
-        get().notify({ title: 'Order placed', body: `${order.code} — we’ll let you know when it ships.`, href: `/app/orders/view?id=${order.id}` })
+        get().notify({ title: 'Order placed', body: `${order.code}, we’ll let you know when it ships.`, href: `/app/orders/view?id=${order.id}` })
         return order
       },
       pushChat: (m) => set((s) => ({ chat: [...s.chat, { ...m, id: uid(), at: new Date().toISOString() }].slice(-80) })),
@@ -239,7 +240,7 @@ function demoState(s: State): Partial<State> {
     blend: { name: 'Personal blend', version: 1, flowers: ['Mimulus', 'White Chestnut', 'Larch', 'Impatiens', 'Walnut'], drops: 4, timesPerDay: 4, startedOn: d(-13).toISOString(), days: 30, reminderTimes: ['08:00', '13:00', '18:00', '22:00'], alcoholFree: true },
     goals: s.goals.length ? s.goals : [{ id: uid(), title: 'Sleep by 11 PM', progress: 60, done: false }, { id: uid(), title: 'Morning walk 3× a week', progress: 35, done: false }],
     addresses: s.addresses.length ? s.addresses : [addr],
-    orders: [{ id: 'demo-o1', code: 'BW-00040', lines: [{ key: 'remedy', name: 'Personal blend v1', label: '30 ml', qty: 1, pricePaise: 0, kind: 'remedy' }, { key: 'sleep-oil-30', name: 'Sleep Oil', label: '30 ml', qty: 1, pricePaise: 65000, kind: 'product' }], totalPaise: 65000, address: addr, placedAt: d(-12).toISOString(), stage: 3 }],
+    orders: [{ id: 'demo-o1', code: 'BW-00040', lines: [{ key: 'remedy', name: 'Personal blend v1', label: '30 ml', qty: 1, pricePaise: 0, kind: 'remedy' }, { key: 'sleep-roll-on-15', name: 'Sleep Roll-on', label: '15 ml', qty: 1, pricePaise: 60000, kind: 'product' }], totalPaise: 60000, address: addr, placedAt: d(-12).toISOString(), stage: 3 }],
     profile: s.profile ? { ...s.profile, allergies: s.profile.allergies.length ? s.profile.allergies : ['lavender'] } : s.profile,
     intake: s.intake ?? { answers: { ...emptyIntake(), feelings: ['Fear', 'Overthinking'] }, step: 99, submittedAt: d(-16).toISOString() },
   }

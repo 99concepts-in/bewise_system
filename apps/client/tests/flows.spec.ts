@@ -4,10 +4,10 @@ import { seed } from './seed'
 
 const state = (page: import('@playwright/test').Page) => page.evaluate(() => JSON.parse(localStorage.getItem('bewise-client-v1') || '{}').state)
 
-test('drops tick: yes today, change, edit yesterday — gentle copy', async ({ page }) => {
+test('drops tick: yes today, change, edit yesterday, gentle copy', async ({ page }) => {
   await seed(page)
   await page.goto('/app'); await page.getByRole('button', { name: 'Not today' }).click()
-  await expect(page.getByText('Not today — that’s okay.')).toBeVisible()
+  await expect(page.getByText('Not today, that’s okay.')).toBeVisible()
   await page.getByRole('button', { name: 'Change' }).click()
   await expect(page.getByText('Drops taken today.')).toBeVisible()
   await page.goto('/app/remedies'); await page.getByRole('button', { name: 'Took them' }).first().click()
@@ -49,7 +49,7 @@ test('staff-made booking: pay without picking a slot; late payment → pick a ne
   // late payment
   await page.goto('/app/me'); await page.getByRole('button', { name: '…paid after hold expired' }).click()
   await page.getByRole('button', { name: /Pay ₹/ }).click(); await page.getByRole('button', { name: 'Google Pay' }).click()
-  await expect(page.getByText('Payment received — pick a new time')).toBeVisible({ timeout: 8000 })
+  await expect(page.getByText('Payment received. Pick a new time')).toBeVisible({ timeout: 8000 })
   await page.locator('button[aria-pressed="false"]:has-text(":")').first().click()
   await page.getByRole('button', { name: /^Confirm/ }).click()
   await page.waitForURL('**/app/sessions/view?id=*')

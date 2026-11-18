@@ -38,7 +38,7 @@ export default function Bag() {
                 const hit = info.kind === 'product' && info.product ? allergyHit(info.product, allergies) : undefined
                 return (
                   <motion.li key={l.key} layout initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 60, height: 0, marginTop: 0 }} transition={{ duration: 0.3 }} className="card flex items-center gap-3 p-3">
-                    <ProductArt product={info.product ?? { art: 'p-dropper', tint: ['#fbf3dc', '#f6efe4'], name: info.name }} size="sm" className="w-[84px] shrink-0" />
+                    <ProductArt product={info.product ?? { art: info.art, tint: ['#e5efe2', '#f1f6ec'], name: info.name, color: '#5E8F6A' }} size="sm" className="w-[84px] shrink-0" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[15px] font-bold text-navy">{info.name} · {info.label}</p>
                       {info.kind === 'remedy' && <span className="mt-0.5 inline-block rounded-full bg-sage-100 px-2 py-0.5 text-[11px] font-bold text-sage-text">Remedy</span>}

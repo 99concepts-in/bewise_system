@@ -96,7 +96,7 @@ export default function Checkout() {
           <div className="flex justify-between"><span className="text-muted">Delivery</span><span className="tnum">{ship ? formatINR(ship) : 'Free'}</span></div>
           <div className="flex justify-between pt-1 text-[18px] font-extrabold text-navy"><span>Total</span><span className="tnum">{formatINR(total)}</span></div>
         </div>
-        <p className="mt-3 flex items-center gap-2 text-[13px] text-muted"><Package className="size-4" /> Arrives in 4–6 days · No returns for change of mind — damaged or wrong items are replaced.</p>
+        <p className="mt-3 flex items-center gap-2 text-[13px] text-muted"><Package className="size-4" /> Arrives in 4 to 6 days · No returns for change of mind. Damaged or wrong items are replaced.</p>
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">

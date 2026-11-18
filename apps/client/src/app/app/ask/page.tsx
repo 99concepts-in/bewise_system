@@ -13,7 +13,7 @@ import { Mascot, ProductArt } from '@/components/brand'
 import { Btn, IconBtn, Sheet, buzz, ease, spring, toast, useChrome } from '@/components/ui'
 import { SafetyCard } from '../book/intake'
 import { respond, crisisCheck } from '@/lib/companion'
-import { productBySlug } from '@/lib/data'
+import { productBySlug, productTitle } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { dayKey, firstName, formatINR } from '@/lib/format'
 import { BP } from '@/lib/asset'
@@ -47,7 +47,7 @@ export default function Ask() {
   const act = (id: string, label: string) => {
     buzz(8)
     if (id.startsWith('q:')) return send(id.slice(2))
-    if (id.startsWith('remind-')) { const t = id.slice(7); toast(`We’ll remind you at ${t}`); s.pushChat({ role: 'bot', text: `Done — a gentle nudge at ${t}. 🌿` }); return }
+    if (id.startsWith('remind-')) { const t = id.slice(7); toast(`We’ll remind you at ${t}`); s.pushChat({ role: 'bot', text: `Done! A gentle nudge at ${t}. 🌿` }); return }
     if (id === 'book-followup') return router.push('/app/book?type=followup')
     if (id === 'book-first') return router.push('/app/book')
     if (id === 'open-remedies') return router.push('/app/remedies')
@@ -109,8 +109,8 @@ export default function Ask() {
                   return (
                     <motion.div key={slug} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.1 }} className="card ml-11 flex items-center gap-3 p-3">
                       <ProductArt product={p} size="sm" className="w-[84px] shrink-0" />
-                      <div className="flex-1"><p className="text-[16px] font-bold text-navy">{p.name}</p><p className="text-[13px] text-muted">{v.label} · {formatINR(v.pricePaise)}</p>
-                        <button onClick={(e) => { s.addToCart(v.id); flyToBag(e.currentTarget.getBoundingClientRect(), `${BP}/img/${p.art}.webp`); toast(`${p.name} added to your bag`) }} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white"><ShoppingBag className="size-3.5" /> Add to bag</button>
+                      <div className="flex-1"><p className="text-[16px] font-bold text-navy">{productTitle(p)}</p><p className="text-[13px] text-muted">{v.label} · {formatINR(v.pricePaise)}</p>
+                        <button onClick={(e) => { s.addToCart(v.id); flyToBag(e.currentTarget.getBoundingClientRect(), `${BP}/img/${p.art}.webp`); toast(`${productTitle(p)} added to your bag`) }} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white"><ShoppingBag className="size-3.5" /> Add to bag</button>
                       </div>
                     </motion.div>
                   )

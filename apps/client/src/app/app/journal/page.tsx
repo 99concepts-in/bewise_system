@@ -98,7 +98,7 @@ export default function Journal() {
             <Item>
               <div className="card flex items-start gap-3 p-5">
                 <Lightbulb className="mt-0.5 size-5 shrink-0 text-gold" />
-                <p className="text-[14px] leading-6"><b className="text-navy">Your daily insight</b> — {dailyInsight(journal)}</p>
+                <p className="text-[14px] leading-6"><b className="text-navy">Your daily insight</b>, {dailyInsight(journal)}</p>
               </div>
             </Item>
           </>

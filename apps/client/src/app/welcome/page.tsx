@@ -13,9 +13,9 @@ import { BP } from '@/lib/asset'
 
 // Copy rule: no cure / medical claims — "gently support emotional balance" (design system §10)
 const SLIDES = [
-  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A calm, private space for your emotional wellbeing — guided by Jitu Bhaiya and the gentle wisdom of Bach flower remedies.' },
-  { lead: 'Book your appointment with', em: 'Jitendra Khimlani', sub: 'Jitu Bhaiya, Bach Remedy Therapist. Online or in person — your personal remedy blend is included.' },
-  { lead: 'Bach flower remedy', em: 'benefits', sub: '38 natural flower essences that gently support emotional balance — chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'A few drops a day'] },
+  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A calm, private space for your emotional wellbeing, guided by Jitu Bhaiya and the gentle wisdom of Bach flower remedies.' },
+  { lead: 'Book your appointment with', em: 'Jitendra Khimlani', sub: 'Jitu Bhaiya, Bach Remedy Therapist. Online or in person, your personal remedy blend is included.' },
+  { lead: 'Bach flower remedy', em: 'benefits', sub: '38 natural flower essences that gently support emotional balance, chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'A few drops a day'] },
 ] as { lead: string; em: string; sub: string; chips?: string[] }[]
 
 export default function Welcome() {
@@ -156,7 +156,7 @@ function ArtBook() {
       <div className="absolute inset-0 grid place-items-center">
         <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 18 }}
           className="relative aspect-square h-[62%] overflow-hidden rounded-full bg-white p-1.5 shadow-[var(--shadow-float)]">
-          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani — Jitu Bhaiya" className="h-full w-full rounded-full object-cover object-[50%_18%]" />
+          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="h-full w-full rounded-full object-cover object-[50%_18%]" />
         </motion.div>
       </div>
       <Float className="left-[6%] top-[14%]" delay={0.3} dy={6}>

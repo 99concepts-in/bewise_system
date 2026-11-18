@@ -68,7 +68,7 @@ export function BlendBottleCard() {
           </div>
           <p className="mt-1 text-[30px] font-extrabold leading-none tracking-[-0.02em] text-navy tnum">{sup.daysLeft}<span className="ml-1 text-[15px] font-bold text-muted">{sup.daysLeft === 1 ? 'day' : 'days'} left</span></p>
           <p className="mt-1.5 text-[13px] leading-[18px] text-muted">
-            {sup.next ? <>Lasts until your session · <b className="text-navy">{fmtDay(sup.next.startsAt)}</b></> : sup.low ? <b className="text-[#9a5b12]">Running low — pre-book your follow-up</b> : <>Runs low around <b className="text-navy">{fmtDay(sup.runOut)}</b></>}
+            {sup.next ? <>Lasts until your session · <b className="text-navy">{fmtDay(sup.next.startsAt)}</b></> : sup.low ? <b className="text-[#9a5b12]">Running low. Pre-book your follow-up</b> : <>Runs low around <b className="text-navy">{fmtDay(sup.runOut)}</b></>}
           </p>
           <p className="mt-2 text-[12px] text-muted">{blend.drops} drops, {blend.timesPerDay}× a day</p>
         </div>

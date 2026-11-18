@@ -128,7 +128,7 @@ function SignIn() {
             </div>
             <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} onClick={() => onCode(DEMO_CODE)}
               className="mx-auto mt-8 rounded-full border border-dashed border-[#b9c2dc] bg-white/60 px-4 py-2 text-[13px] text-muted">
-              Preview build — no SMS is sent. Tap to use code <b className="tnum text-navy">{DEMO_CODE}</b>
+              Preview build. No SMS is sent. Tap to use code <b className="tnum text-navy">{DEMO_CODE}</b>
             </motion.button>
             <div className="mt-auto pb-3 safe-b">
               <Btn full variant="gradient" disabled={code.length < CODE_LEN} loading={busy} onClick={() => verify(code)}>Verify</Btn>

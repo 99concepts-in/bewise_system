@@ -35,7 +35,7 @@ function Detail() {
   const past = a.status === 'completed' || now > start + c.minutes * 60_000
   const joinable = !past && mins <= 10
   const soon = !past && mins <= 60
-  const ics = () => downloadIcs('bewise-session.ics', sessionIcs({ id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online — link in the BeWise app' : `${STUDIO.name}, ${STUDIO.full}`, description: c.name }))
+  const ics = () => downloadIcs('bewise-session.ics', sessionIcs({ id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online (link in the BeWise app)' : `${STUDIO.name}, ${STUDIO.full}`, description: c.name }))
 
   return (
     <main className="px-5 pb-36">
@@ -132,7 +132,7 @@ function RescheduleSheet({ open, onClose, id, startsAt, used }: { open: boolean;
       <h2 className="h-duo text-[26px]">Can’t make <em>it?</em></h2>
       <p className="mt-2 text-[14px] leading-5 text-muted">Sessions are non-refundable, but you can move yours to another time.</p>
       <div className={cx('mt-3 rounded-[18px] p-3 text-[13px] font-semibold', blocked ? 'bg-rose-50 text-rose' : 'bg-sage-100 text-sage-text')}>
-        {blocked ? 'You’ve already moved this session once within 24 hours. Please message us on WhatsApp.' : late ? 'Less than 24 h to go — you can move it once.' : 'Free to reschedule — more than 24 h to go.'}
+        {blocked ? 'You’ve already moved this session once within 24 hours. Please message us on WhatsApp.' : late ? 'Less than 24 h to go. You can move it once.' : 'Free to reschedule with more than 24 h to go.'}
       </div>
       {!blocked && (
         <>
@@ -188,7 +188,7 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
             </div>
             <div className="mt-5 flex flex-wrap gap-2">{TAGS.map((t) => <Chip key={t} on={tags.includes(t)} onClick={() => setTags(tags.includes(t) ? tags.filter((x) => x !== t) : [...tags, t])}>{t}</Chip>)}</div>
             <p className="mt-6 text-[15px] font-bold text-navy">How do you feel after the session?</p>
-            <p className="text-[13px] text-muted">Pick any that fit — in your own words.</p>
+            <p className="text-[13px] text-muted">Pick any that fit, in your own words.</p>
             <div className="mt-3 flex flex-wrap gap-2">{BENEFITS.map((b) => <Chip key={b} on={benefits.includes(b)} onClick={() => setBenefits(benefits.includes(b) ? benefits.filter((x) => x !== b) : [...benefits, b])}>{b}</Chip>)}</div>
             <label className="mt-6 block text-[15px] font-bold text-navy" htmlFor="fbnotes">Notes for Jitu Bhaiya</label>
             <textarea id="fbnotes" rows={3} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder="Anything you’d like him to know…" className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] outline-none focus:ring-2 focus:ring-navy" />

@@ -25,7 +25,7 @@ import * as I from './intake'
 import { BP } from '@/lib/asset'
 
 // owner 2026-11-18: breathe first → feelings → … → personal message later ('who' = the share/voice-note step)
-const INTAKE = ['intro', 'feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle', 'goals', 'review', 'saved'] as const
+const INTAKE = ['intro', 'feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle', 'review', 'saved'] as const // owner 2026-11-18: "How would you like to feel?" removed
 const COUNTED = ['feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle']
 const CHECKIN = ['ck-now', 'ck-changes', 'ck-news'] as const
 type Step = 'choose' | (typeof INTAKE)[number] | (typeof CHECKIN)[number] | 'mode' | 'time' | 'pay' | 'done'
@@ -42,7 +42,7 @@ function Book() {
   const book = useApp((s) => s.book)
   const hasHistory = useApp((s) => s.appointments.length > 0 || !!s.blend)
 
-  const [type, setType] = useState<ConsultationId | null>((params.get('type') as ConsultationId) || null)
+  const [type, setType] = useState<ConsultationId | null>(() => (params.get('type') as ConsultationId) || (hasHistory ? null : 'first')) // new clients: first consultation pre-selected (owner 2026-11-18)
   const [step, setStep] = useState<Step>('choose')
   const [dir, setDir] = useState(1)
   const [answers, setAnswers] = useState<IntakeAnswers>(() => intake?.answers ?? emptyIntake())
@@ -54,13 +54,16 @@ function Book() {
   const [meet, setMeet] = useState(false)
   const [stories, setStories] = useState(false)
   const [holdUntil, setHoldUntil] = useState(0)
+  const [skipAsk, setSkipAsk] = useState(false)
 
   // decided once per visit: submitting the intake mid-flow must not remove the steps we're standing on
   const [needIntake] = useState(() => !intake?.submittedAt)
+  // owner 2026-11-18: no follow-up questions for the chosen feelings (or none chosen) → skip "Tell us a little more"
+  const skipNuance = !answers.feelings.some((f) => NUANCE[f])
   const flow: Step[] = useMemo(() => {
     if (type === 'followup') return ['choose', ...CHECKIN, 'mode', 'time', 'pay', 'done']
-    return ['choose', ...(needIntake ? INTAKE : []), 'mode', 'time', 'pay', 'done'] as Step[]
-  }, [type, needIntake])
+    return ['choose', ...(needIntake ? INTAKE.filter((x) => x !== 'nuance' || !skipNuance) : []), 'mode', 'time', 'pay', 'done'] as Step[]
+  }, [type, needIntake, skipNuance])
 
   useEffect(() => { setNavHidden(step !== 'choose'); return () => setNavHidden(false) }, [step, setNavHidden])
   useEffect(() => {
@@ -77,13 +80,16 @@ function Book() {
     if (n === 'pay') setHoldUntil(Date.now() + 15 * 60_000) // scheduling.holdAppointment → holdExpiresAt
     go(n)
   }
+  // owner 2026-11-18: "Skip" replaces "Save for later"; answers so far are kept, straight on to choosing a time
+  const skipIntake = () => { saveIntake(answers, Math.max(1, INTAKE.indexOf(step as never))); setSkipAsk(false); go('mode') }
   const back = () => (idx <= 0 ? router.back() : go(flow[idx - 1], -1))
   const setA = (p: Partial<IntakeAnswers>) => setAnswers((a) => ({ ...a, ...p }))
   const c = CONSULTATIONS.find((x) => x.id === (type ?? 'first'))!
 
   // owner 2026-11-18: every intake / check-in question is optional — only mode and time are needed to book
   const can: Partial<Record<Step, boolean>> = { mode: !!mode, time: !!slot }
-  const counted = COUNTED.indexOf(step as string)
+  const steps = COUNTED.filter((x) => x !== 'nuance' || !skipNuance)
+  const counted = steps.indexOf(step as string)
   const isIntake = INTAKE.includes(step as never) && step !== 'saved'
 
   const confirmPaid = () => {
@@ -102,13 +108,13 @@ function Book() {
             <IconBtn label="Back" onClick={back}><ChevronLeft className="size-5" /></IconBtn>
             {isIntake ? (
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-semibold text-navy">{step === 'intro' ? 'A moment for you' : counted >= 0 ? `Step ${counted + 1} of 8` : 'Almost done'}</p>
-                <ProgressBar value={step === 'intro' ? 0.02 : counted >= 0 ? (counted + 1) / 8 : 1} className="mt-1.5" />
+                <p className="text-[13px] font-semibold text-navy">{step === 'intro' ? 'A moment for you' : counted >= 0 ? `Step ${counted + 1} of ${steps.length}` : 'Almost done'}</p>
+                <ProgressBar value={step === 'intro' ? 0.02 : counted >= 0 ? (counted + 1) / steps.length : 1} className="mt-1.5" />
               </div>
             ) : <Stepper at={CHECKIN.includes(step as never) || INTAKE.includes(step as never) ? 0 : step === 'pay' ? 2 : 1} />}
             {isIntake && step !== 'intro' && (
-              <button onClick={() => { saveIntake(answers, Math.max(1, INTAKE.indexOf(step as never))); toast('Saved — finish anytime'); router.push('/app') }}
-                className="shrink-0 rounded-full bg-white px-3.5 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Save for later</button>
+              <button onClick={() => (hasHistory ? skipIntake() : setSkipAsk(true))}
+                className="shrink-0 rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Skip</button>
             )}
           </div>
         </header>
@@ -127,7 +133,6 @@ function Book() {
             {step === 'life' && <I.StepLife a={answers} set={setA} />}
             {step === 'safety' && <I.StepSafety a={answers} set={setA} />}
             {step === 'gentle' && <I.StepGentle a={answers} set={setA} />}
-            {step === 'goals' && <I.StepGoals a={answers} set={setA} />}
             {step === 'review' && <I.StepReview a={answers} set={setA} edit={(k) => go(k as Step, -1)} />}
             {step === 'saved' && <Saved />}
             {step === 'ck-now' && <I.CheckinNow c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} />}
@@ -135,7 +140,7 @@ function Book() {
             {step === 'ck-news' && <I.CheckinNews c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} />}
             {step === 'mode' && <Mode mode={mode} setMode={setMode} />}
             {step === 'time' && <TimePicker slot={slot} setSlot={setSlot} initialDay={parseIsoDay(params.get('date'))} />}
-            {step === 'pay' && slot && mode && <Review c={c} slot={slot} mode={mode} holdUntil={holdUntil} onExpire={() => { toast('Your held time was released — pick again'); go('time', -1) }} />}
+            {step === 'pay' && slot && mode && <Review c={c} slot={slot} mode={mode} holdUntil={holdUntil} onExpire={() => { toast('Your held time was released. Please pick again'); go('time', -1) }} />}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -150,7 +155,7 @@ function Book() {
           </>
         ) : (
           <Btn full variant={can[step] === false ? 'primary' : 'gradient'} disabled={can[step] === false} onClick={next}>
-            {step === 'intro' ? 'I’m ready — start' : step === 'goals' ? 'Review answers' : step === 'review' ? 'Save & choose a time' : step === 'saved' ? 'Choose a time' : 'Continue'}
+            {step === 'intro' ? 'I’m ready, let’s start' : step === 'gentle' ? 'Review answers' : step === 'review' ? 'Save & choose a time' : step === 'saved' ? 'Choose a time' : 'Continue'}
           </Btn>
         )}
       </div>
@@ -158,6 +163,17 @@ function Book() {
       <PaySheet open={paying} amountPaise={c.feePaise} purpose={`${c.name} · ${slot ? fmtTime(slot) : ''}`} onClose={() => setPaying(false)} onPaid={confirmPaid} />
       <MeetSheet open={meet} onClose={() => setMeet(false)} />
       <StoriesSheet open={stories} onClose={() => setStories(false)} />
+      <Sheet open={skipAsk} onClose={() => setSkipAsk(false)} title="Skip the questions?">
+        <div className="text-center">
+          <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#fbf3dc] text-[30px]" aria-hidden>🌼</span>
+          <h2 className="h-duo mt-3 text-[26px]">We <em>recommend</em> this</h2>
+          <p className="mx-auto mt-2 max-w-[300px] text-[15px] leading-6 text-muted">These few questions help Jitu Bhaiya understand you before you meet, so your first session goes deeper. It takes about 2 minutes.</p>
+        </div>
+        <div className="mt-6 flex gap-3 pb-1">
+          <Btn full variant="white" size="md" onClick={skipIntake}>Skip anyway</Btn>
+          <Btn full size="md" onClick={() => setSkipAsk(false)}>Continue</Btn>
+        </div>
+      </Sheet>
     </main>
   )
 }
@@ -206,7 +222,7 @@ function Choose({ type, setType, canFollow, onMeet, onStories }: { type: Consult
       {!follow && (
         <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} onClick={() => { buzz(); setShowFollow(true); setType('followup') }}
           className="mx-auto -mt-1 block rounded-full px-4 py-2 text-[14px] text-muted">
-          Seen Jitu Bhaiya before? <span className="font-semibold text-navy underline underline-offset-4">Book a follow-up · ₹800</span>
+          <span className="font-semibold text-navy underline underline-offset-4">Book a follow-up · ₹800</span>
         </motion.button>
       )}
       <motion.button onClick={onMeet} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="card flex w-full items-center gap-4 p-4 text-left">
@@ -221,7 +237,7 @@ function Choose({ type, setType, canFollow, onMeet, onStories }: { type: Consult
         <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Client stories</span><span className="text-[13px] text-muted">{TESTIMONIALS.length ? `View ${TESTIMONIALS.length} testimonials` : 'View testimonials'}</span></span>
         <ChevronRight className="size-5 text-soft" />
       </motion.button>
-      <p className="px-2 text-center text-[13px] text-muted">Online or in person — you choose next. Sessions are non-refundable, but you can reschedule.</p>
+      <p className="px-2 text-center text-[13px] text-muted">Online or in person, you choose next. Sessions are non-refundable, but you can reschedule.</p>
     </div>
   )
 }
@@ -235,7 +251,7 @@ function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void })
   return (
     <Sheet open={open} onClose={onClose} title="Client stories">
       <h2 className="h-duo text-[26px]">Client <em>stories</em></h2>
-      <p className="mt-1 text-[14px] text-muted">In their own words — shared with permission.</p>
+      <p className="mt-1 text-[14px] text-muted">In their own words, shared with permission.</p>
       {n ? (
         <>
           <div className="relative mt-5 min-h-[210px]">
@@ -246,7 +262,7 @@ function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void })
                 <Quote className="size-8 text-gold" aria-hidden />
                 {t.rating ? <p className="mt-2 text-[15px] tracking-[2px] text-gold" role="img" aria-label={`${t.rating} out of 5`}>{'★'.repeat(t.rating)}</p> : null}
                 <blockquote className="mt-3 text-[17px] font-semibold leading-7 text-navy">“{t.quote}”</blockquote>
-                <figcaption className="mt-4 text-[14px] text-muted">— {t.name}{t.city ? `, ${t.city}` : ''}</figcaption>
+                <figcaption className="mt-4 text-[14px] text-muted">{t.name}{t.city ? `, ${t.city}` : ''}</figcaption>
               </motion.figure>
             </AnimatePresence>
           </div>
@@ -282,7 +298,7 @@ function MeetSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
       <div className="mt-4 grid grid-cols-2 gap-2">{CONSULTANT.stats.map((s) => <div key={s} className="rounded-[18px] bg-peri-50 p-3 text-[13px] font-semibold text-navy">{s}</div>)}</div>
       <div className="mt-4 rounded-[22px] bg-[linear-gradient(135deg,#fbf3dc,#eef1fb)] p-4">
         <p className="text-[15px] font-bold text-navy">How Bach remedies work</p>
-        <p className="mt-1 text-[14px] leading-5 text-muted">Dr Edward Bach described 38 flower essences, each linked to an emotional state. Your blend is chosen for how you feel — a gentle, complementary practice alongside your doctor’s care.</p>
+        <p className="mt-1 text-[14px] leading-5 text-muted">Dr Edward Bach described 38 flower essences, each linked to an emotional state. Your blend is chosen for how you feel. A gentle, complementary practice alongside your doctor’s care.</p>
       </div>
       <a href={CONSULTANT.website} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-navy underline underline-offset-4">Visit his website <ExternalLink className="size-4" /></a>
     </Sheet>
@@ -363,7 +379,7 @@ function Review({ c, slot, mode, holdUntil, onExpire }: { c: (typeof CONSULTATIO
         <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-sage-100 px-3 py-1.5 text-[12px] font-bold text-sage-text"><Check className="size-3.5" strokeWidth={3} /> Remedy blend included</span>
       </div>
       <div className="flex items-start gap-3 rounded-[22px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
-        <Info className="mt-0.5 size-5 shrink-0" /><p>Sessions are non-refundable — you can reschedule free up to 24 h before.</p>
+        <Info className="mt-0.5 size-5 shrink-0" /><p>Sessions are non-refundable, but you can reschedule free up to 24 h before.</p>
       </div>
       <div className="flex items-center justify-between px-1">
         <span className="text-[14px] text-muted">We’re holding this time for <b className="tnum text-navy">{mm}:{String(ss).padStart(2, '0')}</b></span>
@@ -380,7 +396,7 @@ function Booked({ a }: { a: Appointment }) {
   const router = useRouter()
   const [cal, setCal] = useState(false)
   const c = CONSULTATIONS.find((x) => x.id === a.type)!
-  const ev = { id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online — link in the BeWise app' : `${STUDIO.name}, ${STUDIO.full}`, description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
+  const ev = { id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online (link in the BeWise app)' : `${STUDIO.name}, ${STUDIO.full}`, description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
   return (
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       <Petals />

@@ -45,7 +45,7 @@ function Pay() {
       <AppHeader back="/app" />
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-2 flex items-start gap-3 rounded-[24px] bg-sage-100/80 p-4">
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage-text text-white"><Check className="size-5" strokeWidth={3} /></span>
-        <div><p className="text-[16px] font-extrabold text-navy">Payment received — pick a new time</p><p className="text-[13px] leading-5 text-sage-text">The time we were holding was released before the payment arrived. Choose any time below — no extra cost.</p></div>
+        <div><p className="text-[16px] font-extrabold text-navy">Payment received. Pick a new time</p><p className="text-[13px] leading-5 text-sage-text">The time we were holding was released before the payment arrived. Choose any time below at no extra cost.</p></div>
       </motion.div>
       <div className="mt-5"><TimePicker slot={slot} setSlot={setSlot} /></div>
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
@@ -94,11 +94,11 @@ function Pay() {
         ))}
       </section>
       <div className="mt-4 flex items-start gap-3 rounded-[22px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
-        <Info className="mt-0.5 size-5 shrink-0" /><p>Sessions are non-refundable — you can reschedule free up to 24 h before.</p>
+        <Info className="mt-0.5 size-5 shrink-0" /><p>Sessions are non-refundable, but you can reschedule free up to 24 h before.</p>
       </div>
       <AnimatePresence>
         {a.status === 'expired' && (
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 px-2 text-[13px] text-muted">The held time may have been released. If so, you’ll pick a new time right after paying — at no extra cost.</motion.p>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 px-2 text-[13px] text-muted">The held time may have been released. If so, you’ll pick a new time right after paying, at no extra cost.</motion.p>
         )}
       </AnimatePresence>
       <div className="card mt-4 flex items-center justify-between p-5"><span className="text-[20px] font-extrabold text-navy">Total</span><span className="text-[30px] font-extrabold text-navy tnum">{formatINR(a.amountPaise)}</span></div>

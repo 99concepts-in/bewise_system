@@ -19,7 +19,7 @@ export default function Goals() {
   const [party, setParty] = useState(0)
   const bump = (id: string, p: number, d: number) => {
     const n = Math.max(0, Math.min(100, p + d)); buzz(6); upd(id, { progress: n, done: n === 100 })
-    if (n === 100 && p < 100) { setParty(Date.now()); toast('Goal complete — well done') }
+    if (n === 100 && p < 100) { setParty(Date.now()); toast('Goal complete. Well done!') }
   }
   return (
     <main className="px-5 pb-32">

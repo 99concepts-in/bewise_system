@@ -19,7 +19,7 @@ export default function Privacy() {
   const rows = [
     { k: 'wellbeing' as const, icon: <Lock className="size-5" />, t: 'Keep my wellbeing data safe', d: 'Needed to use BeWise. Only you and Jitu Bhaiya see your answers and journal.', req: true },
     { k: 'whatsapp' as const, icon: <MessageCircle className="size-5" />, t: 'Updates on WhatsApp', d: 'Session reminders and order updates.' },
-    { k: 'offers' as const, icon: <Sparkles className="size-5" />, t: 'Gentle offers', d: 'Now and then — never more than twice a month.' },
+    { k: 'offers' as const, icon: <Sparkles className="size-5" />, t: 'Gentle offers', d: 'Now and then, never more than twice a month.' },
   ]
   return (
     <OnboardShell step={3} title="Your" em="privacy" sub="Plain and simple. Change these anytime in Me → Privacy.">

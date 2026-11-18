@@ -46,17 +46,17 @@ export function MoodImg({ mood, size = 56, className }: { mood: Emotion; size?: 
 }
 
 /** Tap-to-log mood character with squash bounce + sparkle burst. */
-export function MoodButton({ mood, size = 58, selected, onPick, burstKey, showLabel = true }: { mood: Emotion; size?: number; selected?: boolean; onPick: () => void; burstKey?: number; showLabel?: boolean }) {
+export function MoodButton({ mood, size = 58, selected, onPick, burstKey, showLabel = true, fluid }: { mood: Emotion; size?: number; selected?: boolean; onPick: () => void; burstKey?: number; showLabel?: boolean; fluid?: boolean }) {
   const m = moodOf(mood)
   return (
     <motion.button type="button" aria-pressed={selected} aria-label={m.label} onClick={onPick} whileTap={{ scale: 0.86 }}
-      className={cx('relative flex flex-col items-center gap-1.5 rounded-[22px] px-1 pb-1 pt-1.5 outline-none', selected && 'ring-2 ring-navy ring-offset-2 ring-offset-white')}>
-      <motion.span key={burstKey} className="relative block"
+      className={cx('relative flex min-w-0 flex-col items-center gap-1.5 rounded-[22px] px-0.5 pb-1 pt-1.5 outline-none', selected && 'ring-2 ring-navy ring-offset-2 ring-offset-white')}>
+      <motion.span key={burstKey} className={cx('relative block', fluid && 'w-full')} style={fluid ? { maxWidth: size } : undefined}
         animate={burstKey ? { scale: [1, 1.22, 0.92, 1.04, 1], rotate: [0, -6, 4, 0] } : undefined} transition={{ duration: 0.6, ease: 'easeOut' }}>
-        <MoodImg mood={mood} size={size} />
+        <MoodImg mood={mood} size={size} className={fluid ? 'h-auto w-full' : undefined} />
         <AnimatePresence>{burstKey ? <Burst key={burstKey} color={m.color} /> : null}</AnimatePresence>
       </motion.span>
-      {showLabel && <span className="text-[13px] font-semibold text-navy">{m.label}</span>}
+      {showLabel && <span className={cx('font-semibold text-navy', fluid ? 'max-w-full truncate text-[12px]' : 'text-[13px]')}>{m.label}</span>}
     </motion.button>
   )
 }
@@ -85,17 +85,19 @@ export function Avatar({ photo, name, size = 44, ring }: { photo?: string; name?
   )
 }
 
-export function ProductArt({ product, size = 'md', className }: { product: Pick<Product, 'art' | 'accent' | 'tint' | 'name'>; size?: 'sm' | 'md' | 'lg'; className?: string }) {
+type ArtInput = Pick<Product, 'art' | 'tint' | 'name'> & { color?: string; wide?: boolean }
+/** Product photo on a soft BeWise tile: tint gradient, a glow in the product's colour, floor shadow. */
+export function ProductArt({ product, size = 'md', className }: { product: ArtInput; size?: 'sm' | 'md' | 'lg'; className?: string }) {
   const h = size === 'lg' ? 'h-[240px]' : size === 'md' ? 'h-[150px]' : 'h-[84px]'
+  const img = product.wide
+    ? (size === 'lg' ? 'bottom-6 w-[78%]' : size === 'md' ? 'bottom-3 w-[88%]' : 'bottom-2 w-[90%]')
+    : (size === 'lg' ? 'bottom-5 h-[78%]' : size === 'md' ? 'bottom-3 h-[124px]' : 'bottom-1.5 h-[72px]')
   return (
-    <div className={cx('relative overflow-hidden rounded-[24px]', h, className)} style={{ background: `linear-gradient(150deg, ${product.tint[0]}, ${product.tint[1]})` }}>
-      <span className="absolute -bottom-6 left-1/2 h-10 w-[70%] -translate-x-1/2 rounded-[50%] bg-[#182957]/10 blur-md" />
-      {product.accent && size !== 'sm' && (
-        <img src={`${BP}/img/${product.accent}.webp`} alt="" aria-hidden loading="lazy" decoding="async"
-          className={cx('absolute object-contain opacity-95', size === 'lg' ? '-right-6 bottom-6 h-[150px]' : '-right-4 bottom-3 h-[84px]')} />
-      )}
+    <div className={cx('relative overflow-hidden rounded-[24px]', h, className)} style={{ background: `linear-gradient(155deg, ${product.tint[0]}, ${product.tint[1]})` }}>
+      <span className="absolute left-1/2 top-[14%] aspect-square w-[70%] -translate-x-1/2 rounded-full opacity-[.16] blur-xl" style={{ background: product.color ?? '#5b78b8' }} />
+      <span className="absolute bottom-[6%] left-1/2 h-[10%] w-[60%] -translate-x-1/2 rounded-[50%] bg-[#182957]/12 blur-md" />
       <img src={`${BP}/img/${product.art}.webp`} alt={product.name} loading="lazy" decoding="async" draggable={false}
-        className={cx('absolute left-1/2 -translate-x-1/2 object-contain drop-shadow-[0_12px_14px_rgba(24,41,87,.18)]', size === 'lg' ? 'bottom-4 h-[200px]' : size === 'md' ? 'bottom-3 h-[118px]' : 'bottom-1.5 h-[70px]')} />
+        className={cx('absolute left-1/2 -translate-x-1/2 object-contain drop-shadow-[0_10px_12px_rgba(24,41,87,.16)]', img)} />
     </div>
   )
 }

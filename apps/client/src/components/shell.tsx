@@ -119,13 +119,13 @@ function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
       <p className="mt-1 text-[14px] text-muted">Today · {fmtTime(now)}</p>
       <label className="mt-4 flex h-12 items-center gap-3 rounded-full bg-peri-50 px-4 focus-within:ring-2 focus-within:ring-navy">
         <Search className="size-[18px] text-navy" aria-hidden />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings — happy, stressed, loved…" aria-label="Search feelings"
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings like happy, stressed, loved…" aria-label="Search feelings"
           className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted" />
         {q && <button aria-label="Clear search" onClick={() => setQ('')}><X className="size-4 text-muted" /></button>}
       </label>
       {q ? (
         <div className="mt-4 flex min-h-[120px] flex-wrap content-start gap-2">
-          {results.length ? results.map((m) => <Pill key={m.key} k={m.key as Emotion} />) : <p className="w-full py-6 text-center text-[14px] text-muted">No match for “{q}” — try a simpler word like “stressed” or “happy”.</p>}
+          {results.length ? results.map((m) => <Pill key={m.key} k={m.key as Emotion} />) : <p className="w-full py-6 text-center text-[14px] text-muted">No match for “{q}”. Try a simpler word like “stressed” or “happy”.</p>}
         </div>
       ) : (
         <>

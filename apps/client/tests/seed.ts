@@ -19,7 +19,7 @@ export function seedState(opts: { onboarded?: boolean } = {}) {
       intake: { answers: { who: 'me', onMind: '', feelings: ['Fear', 'Overthinking'], nuance: {}, body: [], bodyTypes: [], energy: 3, stress: 3, life: [], lifeOther: '', safety: { medicinesText: '', allergiesText: '' }, goals: [], goalText: '', consentAi: true }, step: 99, submittedAt: iso(now - 16 * D) },
       blend: { name: 'Personal blend', version: 1, flowers: ['Mimulus', 'White Chestnut', 'Larch'], drops: 4, timesPerDay: 4, startedOn: iso(now - 13 * D), days: 30, reminderTimes: ['08:00', '13:00', '18:00', '22:00'], alcoholFree: true },
       drops: { [day(-1)]: true, [day(-2)]: false, [day(-3)]: true },
-      checkins: {}, cart: [{ key: 'sleep-oil-30', qty: 1 }], wishlist: ['aura-spray'],
+      checkins: {}, cart: [{ key: 'sleep-roll-on-15', qty: 1 }], wishlist: ['aura-spray'],
       addresses: [{ id: 'ad1', name: 'Priya Shah', phone: '9876543210', line1: '12, Shanti Kunj', line2: 'Alkapuri', city: 'Vadodara', state: 'Gujarat', pin: '390007' }],
       orders: [{ id: 'o1', code: 'BW-00040', lines: [{ key: 'remedy', name: 'Personal blend v1', label: '30 ml', qty: 1, pricePaise: 0, kind: 'remedy' }], totalPaise: 0, address: { id: 'ad1', name: 'Priya Shah', phone: '9876543210', line1: '12, Shanti Kunj', line2: 'Alkapuri', city: 'Vadodara', state: 'Gujarat', pin: '390007' }, placedAt: iso(now - 12 * D), stage: 3 }],
       chat: [], notices: [], seq: 42,
@@ -32,5 +32,5 @@ export async function seed(page: Page, opts: { onboarded?: boolean } = {}) {
   await page.evaluate((s) => { localStorage.setItem('bewise-client-v1', JSON.stringify(s)) }, seedState(opts))
 }
 export const ROUTES = ['/app', '/app/journal', '/app/goals', '/app/remedies', '/app/book', '/app/sessions', '/app/sessions/view?id=a2', '/app/checkin?appointment=a2',
-  '/app/pay?appointment=a3', '/app/shop', '/app/shop/sleep-oil', '/app/bag', '/app/checkout', '/app/orders', '/app/orders/view?id=o1', '/app/ask', '/app/me', '/app/help']
+  '/app/pay?appointment=a3', '/app/shop', '/app/shop/sleep-roll-on', '/app/bag', '/app/checkout', '/app/orders', '/app/orders/view?id=o1', '/app/ask', '/app/me', '/app/help']
 export const PUBLIC = ['/welcome', '/sign-in', '/book/jitu-bhaiya?type=followup', '/onboarding/about', '/onboarding/photo', '/onboarding/privacy']

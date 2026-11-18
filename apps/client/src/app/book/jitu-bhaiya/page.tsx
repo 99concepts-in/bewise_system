@@ -37,7 +37,7 @@ function BookingLink() {
       <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }} className="mt-6 flex flex-col items-center text-center">
         <div className="relative">
           <motion.span className="absolute -inset-3 rounded-full border-2 border-white" animate={{ scale: [1, 1.06, 1], opacity: [0.9, 0.4, 0.9] }} transition={{ duration: 4, repeat: Infinity }} />
-          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani — Jitu Bhaiya" className="relative size-[148px] rounded-full object-cover object-[50%_18%] ring-[6px] ring-white shadow-[var(--shadow-float)]" />
+          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="relative size-[148px] rounded-full object-cover object-[50%_18%] ring-[6px] ring-white shadow-[var(--shadow-float)]" />
         </div>
         <h1 className="h-duo mt-6 text-[30px]">Book with <em>Jitu Bhaiya</em></h1>
         <p className="mt-1 text-[14px] font-semibold text-peri">{CONSULTANT.fullName} · {CONSULTANT.title}</p>
@@ -60,7 +60,7 @@ function BookingLink() {
       <div className="mt-4 flex flex-wrap justify-center gap-2 text-[12px] font-semibold text-navy">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 shadow-[var(--shadow-card)]"><Video className="size-3.5" /> Online</span>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 shadow-[var(--shadow-card)]"><MapPin className="size-3.5" /> {STUDIO.short}</span>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 shadow-[var(--shadow-card)]">🌿 Alcohol-free blends</span>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 shadow-[var(--shadow-card)]">🌿 Remedy blend included</span>
       </div>
 
       <div className="mt-auto space-y-2 pt-8 safe-b">

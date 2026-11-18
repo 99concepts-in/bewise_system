@@ -52,7 +52,7 @@ export function TimePicker({ slot, setSlot, initialDay, heading = true }: { slot
         </div>
       </div>
       <div className="card p-5">
-        {times.length === 0 ? <p className="py-4 text-center text-[14px] text-muted">No times this day — try another.</p> : groups.map((g) => {
+        {times.length === 0 ? <p className="py-4 text-center text-[14px] text-muted">No times this day. Try another.</p> : groups.map((g) => {
           const ts = times.filter((t) => g.f(Number(t.split(':')[0])))
           if (!ts.length) return null
           return (
