@@ -1,6 +1,7 @@
 'use client'
 /** @module onboarding @owner CLIENT @screens CL-07 You're in — celebration + two first choices. */
 import { useRouter } from 'next/navigation'
+import { goSafe } from '@/lib/nav'
 import { motion } from 'motion/react'
 import { CalendarHeart, ShoppingBag, ChevronRight } from 'lucide-react'
 import { Avatar, Mascot, Petals } from '@/components/brand'
@@ -40,14 +41,14 @@ export default function Done() {
           { icon: <CalendarHeart className="size-6" />, t: next ? 'Continue to your booking' : 'Book your first consultation', d: next?.includes('followup') ? '₹800 follow-up · your remedy blend included' : '₹1,000 · your remedy blend included', href: next ?? '/app/book', primary: true },
           { icon: <ShoppingBag className="size-6" />, t: 'Explore the shop', d: 'Oils, mists and bath rituals', href: '/app/shop' },
         ].map((o) => (
-          <motion.button variants={rise} whileTap={{ scale: 0.98 }} key={o.t} onClick={() => { if (o.primary) takeNextStep(); router.replace(o.href) }}
+          <motion.button variants={rise} whileTap={{ scale: 0.98 }} key={o.t} onClick={() => { if (o.primary) takeNextStep(); goSafe(router, o.href, 'replace') }}
             className={`flex w-full items-center gap-4 rounded-[26px] p-4 text-left shadow-[var(--shadow-card)] ${o.primary ? 'bg-navy text-white' : 'bg-white text-navy'}`}>
             <span className={`grid size-12 place-items-center rounded-full ${o.primary ? 'bg-white/15' : 'bg-peri-50'}`}>{o.icon}</span>
             <span className="flex-1"><span className="block text-[16px] font-bold">{o.t}</span><span className={`text-[13px] ${o.primary ? 'text-white/75' : 'text-muted'}`}>{o.d}</span></span>
             <ChevronRight className="size-5 opacity-70" />
           </motion.button>
         ))}
-        <button onClick={() => router.replace('/app')} className="w-full py-2 text-[14px] font-semibold text-navy">Take me home</button>
+        <button onClick={() => goSafe(router, '/app', 'replace')} className="w-full py-2 text-[14px] font-semibold text-navy">Take me home</button>
       </motion.div>
     </main>
   )

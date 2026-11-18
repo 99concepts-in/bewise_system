@@ -1,6 +1,7 @@
 'use client'
 /** @module onboarding @owner CLIENT @screens CL-05 About you — name, date of birth, city (gender optional). */
 import { useRouter } from 'next/navigation'
+import { goSafe } from '@/lib/nav'
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import { CalendarDays, MapPin, User } from 'lucide-react'
@@ -22,7 +23,7 @@ export default function About() {
   const age = dob ? Math.floor((Date.now() - new Date(dob).getTime()) / 31_557_600_000) : NaN
   const errs = { name: name.trim().length < 2 ? 'Please tell us your name' : '', dob: !dob ? 'Please add your date of birth' : age < 18 ? 'You need to be 18 or over. A parent can book for you' : age > 110 ? 'Please check the year' : '', city: city.trim().length < 2 ? 'Please add your city' : '' }
   const ok = !errs.name && !errs.dob && !errs.city
-  const next = () => { setTouched(true); if (!ok) return; setProfile({ name: name.trim(), dob, city: city.trim(), gender: gender || undefined }); router.push('/onboarding/photo') }
+  const next = () => { setTouched(true); if (!ok) return; setProfile({ name: name.trim(), dob, city: city.trim(), gender: gender || undefined }); goSafe(router, '/onboarding/photo') }
 
   return (
     <OnboardShell step={1} title="A little about" em="you" sub="So Jitu Bhaiya knows who he’s meeting.">

@@ -6,6 +6,7 @@
  * @stub     Preview build: no SMS is sent; demo code below. Replace with Supabase phone OTP once FOUNDATION ✅.
  */
 import { useRouter, useSearchParams } from 'next/navigation'
+import { goSafe } from '@/lib/nav'
 import { AnimatePresence, motion, useAnimate } from 'motion/react'
 import { ChevronLeft, ShieldCheck } from 'lucide-react'
 import { Suspense, useEffect, useRef, useState } from 'react'
@@ -62,8 +63,8 @@ function SignIn() {
       setCode(''); codeRef.current?.focus(); return
     }
     setProfile({ phone })
-    if (profile?.onboardedAt && (returning || profile.phone === phone)) router.replace(takeNextStep() ?? '/app')
-    else router.push('/onboarding/about')
+    if (profile?.onboardedAt && (returning || profile.phone === phone)) goSafe(router, takeNextStep() ?? '/app', 'replace')
+    else goSafe(router, '/onboarding/about')
   }
 
   const onCode = (v: string) => {

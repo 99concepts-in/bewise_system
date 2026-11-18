@@ -152,3 +152,11 @@ test('?reset=1 starts the device fresh for a demo', async ({ page }) => {
   const s = await state(page)
   expect(s.profile).toBeNull(); expect(s.appointments).toEqual([]); expect(s.plan).toBeNull()
 })
+
+test('My remedies shows the booked session when there is no blend yet', async ({ page }) => {
+  await seed(page)
+  await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('bewise-client-v1')!); r.state.blend = null; localStorage.setItem('bewise-client-v1', JSON.stringify(r)) })
+  await page.goto('/app/remedies')
+  await expect(page.getByText('Your session is booked')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Book a consultation' })).toHaveCount(0)
+})
