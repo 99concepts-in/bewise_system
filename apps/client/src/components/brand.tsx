@@ -7,7 +7,8 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useMemo, type CSSProperties } from 'react'
 import type { Emotion, Product } from '@/lib/data'
-import { moodOf } from '@/lib/data'
+import { MOOD_FACES, moodOf } from '@/lib/data'
+import { MoodFace } from './mood-face'
 import { cx } from './ui'
 import { BP } from '@/lib/asset'
 
@@ -41,8 +42,7 @@ export function Mascot({ pose = 'wave', height = 160, float = true, className, p
 
 export function MoodImg({ mood, size = 56, className }: { mood: Emotion; size?: number; className?: string }) {
   const m = moodOf(mood)
-  return <img src={`${BP}/img/mood-${m.sprite}.webp`} alt="" aria-hidden width={size} height={size} draggable={false} loading="lazy" decoding="async"
-    className={cx('object-contain drop-shadow-[0_6px_8px_rgba(24,41,87,.10)]', className)} style={{ width: size, height: size, filter: m.filter }} />
+  return <MoodFace color={m.color} face={MOOD_FACES[m.key] ?? MOOD_FACES.calm} size={size} className={cx('drop-shadow-[0_6px_8px_rgba(24,41,87,.10)]', className)} />
 }
 
 /** Tap-to-log mood character with squash bounce + sparkle burst. */

@@ -55,7 +55,7 @@ export default function Journal() {
                     <div key={i} className="flex min-w-0 flex-col items-center gap-1.5">
                       <motion.div initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...spring, delay: 0.15 + i * 0.05 }}
                         className={`grid aspect-square w-full max-w-11 place-items-center rounded-full ${d.mood ? '' : 'bg-[#f0f2f8]'} ${d.today ? 'ring-2 ring-navy ring-offset-2' : ''}`}>
-                        {d.mood ? <MoodImg mood={d.mood} size={40} className="!h-auto !w-full" /> : <span className="text-[16px] text-soft">{d.future ? '' : '·'}</span>}
+                        {d.mood ? <MoodImg mood={d.mood} size={40} className="h-auto w-full" /> : <span className="text-[16px] text-soft">{d.future ? '' : '·'}</span>}
                       </motion.div>
                       <span className={`text-[12px] ${d.today ? 'font-bold text-navy' : 'text-muted'}`}>{d.date.toLocaleDateString('en-IN', { weekday: 'short' })}</span>
                     </div>

@@ -134,7 +134,7 @@ function ContextCard() {
     return <NextSession a={upcoming} onOpen={() => router.push(`/app/sessions/view?id=${upcoming.id}`)} />
   }
   if (needsFeedback)
-    return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitu Bhaiya." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} img={`${BP}/img/mood-grateful.webp`} />
+    return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitu Bhaiya." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} art={<div className="absolute bottom-4 right-4"><MoodImg mood="grateful" size={84} /></div>} />
   if (blend && any) return null // the "Your blend" card carries the follow-up pre-book (owner 2026-11-18)
   return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm, unhurried conversation with Jitu Bhaiya · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" art={<ConsultInviteArt />} wide />
 }

@@ -5,6 +5,8 @@
  * Purpose:  Static/seed data for the standalone preview. Replaced by module calls once the foundation lands:
  *           consultation types → scheduling.listConsultationTypes, products → catalog.*, intake bank → intake.getIntakeForm.
  */
+import type { FaceSpec } from '@/components/mood-face'
+
 /** The 8 illustrated mood characters (design/assets/v4/mood-characters.png). */
 export type MoodSprite = 'calm' | 'joyful' | 'grateful' | 'hopeful' | 'tired' | 'anxious' | 'sad' | 'irritated'
 
@@ -16,14 +18,14 @@ const M = (key: string, label: string, color: string, sprite: MoodSprite, pleasa
 
 export const MOODS = [
   // primary grid (8)
-  M('happy', 'Happy', '#F6DE8D', 'joyful', true, 5, 'hue-rotate(-12deg) saturate(1.15)', 'glad good cheerful smile'),
-  M('calm', 'Calm', '#BFD8C2', 'calm', true, 4.5, undefined, 'relaxed settled'),
+  M('happy', 'Happy', '#F7D774', 'joyful', true, 5, 'hue-rotate(-12deg) saturate(1.15)', 'glad good cheerful smile'),
+  M('calm', 'Calm', '#B5D3B8', 'calm', true, 4.5, undefined, 'relaxed settled'),
   M('grateful', 'Grateful', '#F4C2C8', 'grateful', true, 5, undefined, 'thankful blessed'),
   M('hopeful', 'Hopeful', '#B9CBF2', 'hopeful', true, 4, undefined, 'optimistic'),
-  M('tired', 'Tired', '#D6CBEF', 'tired', false, 2.5, undefined, 'sleepy exhausted drained'),
-  M('anxious', 'Anxious', '#BFE0F2', 'anxious', false, 2, undefined, 'nervous uneasy'),
-  M('sad', 'Sad', '#C3CCD8', 'sad', false, 1.5, undefined, 'down low unhappy blue'),
-  M('irritated', 'Irritated', '#F3B1A4', 'irritated', false, 2, undefined, 'annoyed'),
+  M('tired', 'Tired', '#CFC2EE', 'tired', false, 2.5, undefined, 'sleepy exhausted drained'),
+  M('anxious', 'Anxious', '#AFD6EE', 'anxious', false, 2, undefined, 'nervous uneasy'),
+  M('sad', 'Sad', '#B7C3D6', 'sad', false, 1.5, undefined, 'down low unhappy blue'),
+  M('irritated', 'Irritated', '#F2A797', 'irritated', false, 2, undefined, 'annoyed'),
   // more feelings (searchable)
   M('joyful', 'Joyful', '#F6DE8D', 'joyful', true, 5, undefined, 'delighted'),
   M('excited', 'Excited', '#F7C98B', 'joyful', true, 5, 'hue-rotate(-28deg) saturate(1.35)', 'thrilled eager'),
@@ -49,6 +51,41 @@ export const MOODS = [
   M('jealous', 'Jealous', '#DCC3A0', 'irritated', false, 2, 'hue-rotate(38deg) saturate(.8)', 'envious'),
   M('confused', 'Confused', '#C8D9E8', 'hopeful', false, 2.5, 'hue-rotate(-24deg) saturate(.8)', 'unsure lost'),
 ] as const satisfies readonly MoodDef[]
+
+/** Face for every feeling — round, expressive, BeWise palette (owner 2026-11-18). */
+export const MOOD_FACES: Record<string, FaceSpec> = {
+  happy: { eyes: 'happy', mouth: 'grin', extras: ['blush'] },
+  calm: { eyes: 'closed', mouth: 'small', extras: ['blush'] },
+  grateful: { eyes: 'closed', mouth: 'smile', extras: ['blush', 'heart'] },
+  hopeful: { eyes: 'up', mouth: 'small', extras: ['sparkle'] },
+  tired: { eyes: 'sleepy', mouth: 'flat', extras: ['zzz'] },
+  anxious: { eyes: 'wide', mouth: 'wavy', brows: 'worried', extras: ['sweat'] },
+  sad: { eyes: 'open', mouth: 'frown', brows: 'sad', extras: ['tear'] },
+  irritated: { eyes: 'squint', mouth: 'flat', brows: 'angry' },
+  joyful: { eyes: 'happy', mouth: 'grin', extras: ['blush', 'sparkle'] },
+  excited: { eyes: 'star', mouth: 'grin', extras: ['blush', 'sparkle'] },
+  loved: { eyes: 'heart', mouth: 'smile', extras: ['blush'] },
+  peaceful: { eyes: 'closed', mouth: 'small' },
+  relaxed: { eyes: 'closed', mouth: 'smile', extras: ['blush'] },
+  content: { eyes: 'happy', mouth: 'small' },
+  confident: { eyes: 'open', mouth: 'smirk', brows: 'raised' },
+  proud: { eyes: 'closed', mouth: 'grin', extras: ['sparkle'] },
+  motivated: { eyes: 'open', mouth: 'grin', brows: 'determined' },
+  loving: { eyes: 'happy', mouth: 'smile', extras: ['blush', 'heart'] },
+  worried: { eyes: 'open', mouth: 'smallfrown', brows: 'worried' },
+  stressed: { eyes: 'squint', mouth: 'teeth', brows: 'worried', extras: ['sweat'] },
+  scared: { eyes: 'wide', mouth: 'o', brows: 'worried' },
+  overwhelmed: { eyes: 'tight', mouth: 'wavy', extras: ['sweat'] },
+  bored: { eyes: 'sleepy', mouth: 'flat' },
+  restless: { eyes: 'side', mouth: 'wavy' },
+  lonely: { eyes: 'down', mouth: 'smallfrown', brows: 'sad' },
+  hurt: { eyes: 'tight', mouth: 'frown', extras: ['tears'] },
+  guilty: { eyes: 'down', mouth: 'wavy', brows: 'sad', extras: ['blush'] },
+  angry: { eyes: 'squint', mouth: 'teeth', brows: 'angry' },
+  frustrated: { eyes: 'tight', mouth: 'flat', brows: 'angry' },
+  jealous: { eyes: 'side', mouth: 'smirk', brows: 'angry' },
+  confused: { eyes: 'open', mouth: 'wavy', brows: 'raised', extras: ['question'] },
+}
 
 export type Emotion = (typeof MOODS)[number]['key']
 export const PRIMARY_MOODS: Emotion[] = ['happy', 'calm', 'grateful', 'hopeful', 'tired', 'anxious', 'sad', 'irritated']
