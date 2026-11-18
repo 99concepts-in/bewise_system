@@ -9,9 +9,10 @@ import Link from 'next/link'
 import { motion } from 'motion/react'
 import { CalendarPlus, ChevronRight } from 'lucide-react'
 import { useId } from 'react'
-import { BtnLink, buzz, cx, toast, useNow } from './ui'
+import { BtnLink, cx, useNow } from './ui'
 import { useApp } from '@/lib/store'
-import { dayKey, fmtDay, fmtTime } from '@/lib/format'
+import { DropsTick } from './drops-tick'
+import { fmtDay, fmtTime } from '@/lib/format'
 import { blendSupply, isoDay } from '@/lib/supply'
 
 /** Amber dropper bottle; liquid height = level (0–1) with a slow moving surface. */
@@ -50,13 +51,9 @@ export function Bottle({ level, height = 150 }: { level: number; height?: number
 export function BlendBottleCard() {
   const blend = useApp((s) => s.blend)
   const appointments = useApp((s) => s.appointments)
-  const taken = useApp((s) => s.ritual[dayKey(new Date())] ?? 0)
-  const take = useApp((s) => s.takeDrop)
-  const untake = useApp((s) => s.untakeDrop)
   const now = useNow(60_000)
   if (!blend) return null
   const sup = blendSupply(blend, appointments, now)
-  const next = blend.reminderTimes[taken]
   return (
     <section className={cx('relative overflow-hidden rounded-[28px] p-5 shadow-[var(--shadow-card)]', sup.low ? 'bg-[linear-gradient(140deg,#fff_35%,#fbefd9)]' : 'bg-[linear-gradient(140deg,#fff_40%,#f6efe4)]')} aria-labelledby="blend-h">
       <div className="flex gap-4">
@@ -69,27 +66,15 @@ export function BlendBottleCard() {
             <h2 id="blend-h" className="h-section">Your blend</h2>
             <Link href="/app/remedies" aria-label="Open My Remedies" className="-mr-1 grid size-8 place-items-center rounded-full text-soft"><ChevronRight className="size-5" /></Link>
           </div>
-          <p className="mt-1 text-[30px] font-extrabold leading-none tracking-[-0.02em] text-navy tnum">{sup.daysLeft}<span className="ml-1 text-[15px] font-bold text-soft">{sup.daysLeft === 1 ? 'day' : 'days'} left</span></p>
+          <p className="mt-1 text-[30px] font-extrabold leading-none tracking-[-0.02em] text-navy tnum">{sup.daysLeft}<span className="ml-1 text-[15px] font-bold text-muted">{sup.daysLeft === 1 ? 'day' : 'days'} left</span></p>
           <p className="mt-1.5 text-[13px] leading-[18px] text-muted">
             {sup.next ? <>Lasts until your session · <b className="text-navy">{fmtDay(sup.next.startsAt)}</b></> : sup.low ? <b className="text-[#9a5b12]">Running low — pre-book your follow-up</b> : <>Runs low around <b className="text-navy">{fmtDay(sup.runOut)}</b></>}
           </p>
-          {/* today's drops */}
-          <div className="mt-3 flex items-center gap-1.5" aria-label="Today's drops">
-            {Array.from({ length: blend.timesPerDay }).map((_, k) => {
-              const on = k < taken
-              return (
-                <motion.button key={k} whileTap={{ scale: 0.85 }} aria-label={on ? `Dose ${k + 1} taken — tap to undo` : `Mark dose ${k + 1} taken`}
-                  onClick={() => { if (on && k === taken - 1) untake(); else if (!on && k === taken) { take(); buzz(12); if (k + 1 === blend.timesPerDay) toast('All drops done today — beautiful') } }}
-                  className="relative grid h-9 flex-1 place-items-center overflow-hidden rounded-[12px] bg-white/80 ring-1 ring-[#efe5d4]">
-                  <motion.span className="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,#e7b768,#c48a3a)]" initial={false} animate={{ height: on ? '100%' : '0%' }} transition={{ type: 'spring', stiffness: 160, damping: 20 }} />
-                  <svg viewBox="0 0 24 24" className={`relative size-4 ${on ? 'text-white' : 'text-[#c9a46a]'}`} aria-hidden><path fill="currentColor" d="M12 2.5c3.6 4.6 6 8 6 11a6 6 0 1 1-12 0c0-3 2.4-6.4 6-11Z" /></svg>
-                </motion.button>
-              )
-            })}
-          </div>
-          <p className="mt-1.5 text-[12px] text-muted">{taken}/{blend.timesPerDay} today{next ? ` · next at ${next}` : ' · all done'}</p>
+          <p className="mt-2 text-[12px] text-muted">{blend.drops} drops, {blend.timesPerDay}× a day</p>
         </div>
       </div>
+
+      <div className="mt-4"><DropsTick /></div>
 
       {/* next appointment / pre-book */}
       <div className="mt-4 rounded-[20px] bg-white/85 p-3.5 ring-1 ring-[#efe5d4]">

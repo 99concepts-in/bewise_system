@@ -16,7 +16,7 @@ import { BlendBottleCard } from '@/components/blend-bottle'
 import { Btn, BtnLink, Item, Reveal, Ring, buzz, spring, toast, useChrome, useNow } from '@/components/ui'
 import { CONSULTATIONS, QUICK_MOODS, moodOf, type Emotion } from '@/lib/data'
 import { useApp, type Appointment } from '@/lib/store'
-import { dayKey, firstName, fmtDay, fmtTime } from '@/lib/format'
+import { dayKey, firstName, fmtDay, fmtTime, formatINR } from '@/lib/format'
 import { dailyInsight, progressLines } from '@/lib/insights'
 import { BP } from '@/lib/asset'
 
@@ -118,6 +118,13 @@ function ContextCard() {
   const { upcoming, needsFeedback, any, now } = useNextAppointment()
   const router = useRouter()
 
+  const appts = useApp.getState().appointments
+  const toPay = appts.find((x) => x.needsNewTime || ((x.status === 'awaiting_payment' || x.status === 'expired') && !x.paidAt))
+  if (toPay?.needsNewTime)
+    return <Ctx tone="sage" kicker="Payment received" title="Pick a new time" body="The held time was released before your payment arrived — choose any time, no extra cost." cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
+  if (toPay)
+    return <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitu Bhaiya'} title="Complete your booking" body={`${fmtDay(toPay.startsAt)} · ${fmtTime(toPay.startsAt)} — pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
+
   if (intake && !intake.submittedAt && intake.step > 0)
     return <Ctx tone="peri" kicker="Almost there" title="Your answers are saved" body="Finish in about 3 minutes, then pick a time." cta="Continue" href="/app/book?resume=1" img={`${BP}/img/owl-read.webp`} />
 
@@ -181,7 +188,7 @@ function ProgressCompact() {
         <MoodImg mood={lines[0].mood} size={44} />
         <p className="text-[14px] leading-5 text-ink">{lines[0].text}</p>
       </div>
-      <p className="mt-3 flex items-center gap-1.5 text-[12px] text-soft"><BookOpen className="size-3.5" /> From your journal · not medical advice</p>
+      <p className="mt-3 flex items-center gap-1.5 text-[12px] text-muted"><BookOpen className="size-3.5" /> From your journal · not medical advice</p>
     </Link>
   )
 }

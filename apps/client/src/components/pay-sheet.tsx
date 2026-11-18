@@ -59,7 +59,7 @@ export function PaySheet({ open, amountPaise, purpose, onClose, onPaid }: { open
                 </button>
               ))}
             </div>
-            <p className="mt-4 text-center text-[12px] text-soft">Preview build — this simulates Razorpay. No money moves.</p>
+            <p className="mt-4 text-center text-[12px] text-muted">Preview build — this simulates Razorpay. No money moves.</p>
           </motion.div>
         ) : (
           <motion.div key="progress" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center py-8 text-center" aria-live="polite">

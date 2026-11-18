@@ -59,6 +59,11 @@ self-hosted Plus Jakarta Sans (D-21) · lucide icons. No other runtime deps.
 | Seeded 6 products | `catalog.*` (owner list due 2026-11-18) |
 | Photo as data-URL on device | private storage bucket via signed URL (`crm`) |
 
+## Tests
+```bash
+pnpm build && pnpm test:e2e   # 40 browser tests: 5 owner-rule flows, 11 screen sizes × 24 routes (overflow, nav clear), axe WCAG A/AA
+```
+
 ## Notes
 - Fixed bars/sheets live outside any transformed ancestor (see `src/app/app/template.tsx` comment).
 - Times are generated as **IST wall-clock** (`istDate`) regardless of device timezone.

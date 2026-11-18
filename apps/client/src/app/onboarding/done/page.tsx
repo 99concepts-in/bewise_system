@@ -6,11 +6,15 @@ import { CalendarHeart, ShoppingBag, ChevronRight } from 'lucide-react'
 import { Avatar, Mascot, Petals } from '@/components/brand'
 import { ease, rise, stagger } from '@/components/ui'
 import { useApp } from '@/lib/store'
+import { peekNextStep, takeNextStep } from '@/lib/next-step'
+import { useEffect, useState } from 'react'
 import { firstName } from '@/lib/format'
 
 export default function Done() {
   const router = useRouter()
   const profile = useApp((s) => s.profile)
+  const [next, setNext] = useState<string | null>(null)
+  useEffect(() => { setNext(peekNextStep()) }, [])
   return (
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       <Petals />
@@ -33,10 +37,10 @@ export default function Done() {
       </motion.div>
       <motion.div variants={stagger} initial="hidden" animate="show" transition={{ delayChildren: 0.5 }} className="mt-auto space-y-3 pb-3 pt-8 safe-b">
         {[
-          { icon: <CalendarHeart className="size-6" />, t: 'Book your first consultation', d: '₹1,000 · your remedy blend included', href: '/app/book', primary: true },
+          { icon: <CalendarHeart className="size-6" />, t: next ? 'Continue to your booking' : 'Book your first consultation', d: next?.includes('followup') ? '₹800 follow-up · your remedy blend included' : '₹1,000 · your remedy blend included', href: next ?? '/app/book', primary: true },
           { icon: <ShoppingBag className="size-6" />, t: 'Explore the shop', d: 'Oils, mists and bath rituals', href: '/app/shop' },
         ].map((o) => (
-          <motion.button variants={rise} whileTap={{ scale: 0.98 }} key={o.t} onClick={() => router.replace(o.href)}
+          <motion.button variants={rise} whileTap={{ scale: 0.98 }} key={o.t} onClick={() => { if (o.primary) takeNextStep(); router.replace(o.href) }}
             className={`flex w-full items-center gap-4 rounded-[26px] p-4 text-left shadow-[var(--shadow-card)] ${o.primary ? 'bg-navy text-white' : 'bg-white text-navy'}`}>
             <span className={`grid size-12 place-items-center rounded-full ${o.primary ? 'bg-white/15' : 'bg-peri-50'}`}>{o.icon}</span>
             <span className="flex-1"><span className="block text-[16px] font-bold">{o.t}</span><span className={`text-[13px] ${o.primary ? 'text-white/75' : 'text-muted'}`}>{o.d}</span></span>

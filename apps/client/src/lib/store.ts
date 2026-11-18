@@ -22,10 +22,14 @@ export type Profile = {
 // @decision(D-19) owner 2026-11-18: journal entries may carry an optional note (was emotion + time only)
 export type JournalEntry = { id: string; emotion: Emotion; at: string; note?: string }
 export type Goal = { id: string; title: string; progress: number; done: boolean }
-export type Feedback = { rating: number; tags: string[]; notes: string }
+export type Feedback = { rating: number; tags: string[]; notes: string; benefits?: string[] } // benefits: 'How do you feel after the session?' (client's words, owner 2026-11-18)
 export type Appointment = {
   id: string; code: string; type: ConsultationId; mode: 'online' | 'in_person'; startsAt: string
-  status: 'confirmed' | 'completed'; amountPaise: number; createdAt: string; feedback?: Feedback; rescheduled?: number
+  status: 'confirmed' | 'completed' | 'awaiting_payment' | 'expired'; amountPaise: number; createdAt: string; feedback?: Feedback; rescheduled?: number
+  /** who made the booking — staff-made bookings arrive awaiting payment (owner 2026-11-18) */
+  source?: 'client' | 'consultant' | 'manager'
+  /** paid after the hold expired → no time yet; client picks a new one at no cost (consultant K1 §4.3) */
+  needsNewTime?: boolean; paidAt?: string
 }
 export type IntakeAnswers = {
   who: 'me' | 'child' | 'someone_else'; dependent?: { name: string; age: string; relation: string }
@@ -47,6 +51,8 @@ export type Order = { id: string; code: string; lines: OrderLine[]; totalPaise: 
 export type ChatMsg = { id: string; role: 'user' | 'bot'; text: string; products?: string[]; actions?: { id: string; label: string }[]; safety?: boolean; at: string }
 export type Notice = { id: string; title: string; body: string; at: string; read: boolean; href?: string }
 
+export type CheckinAnswers = { now?: Emotion; changes: Record<string, 'Better' | 'Same' | 'Harder'>; news: string; drops?: string }
+
 export const emptyIntake = (): IntakeAnswers => ({
   who: 'me', onMind: '', feelings: [], nuance: {}, body: [], bodyTypes: [], energy: 3, stress: 3, life: [], lifeOther: '',
   safety: { medicinesText: '', allergiesText: '' }, goals: [], goalText: '', consentAi: true,
@@ -60,7 +66,9 @@ type State = {
   appointments: Appointment[]
   intake: { answers: IntakeAnswers; step: number; submittedAt?: string } | null
   blend: Blend | null
-  ritual: Record<string, number>
+  /** daily "Took my drops" tick — remedies.logDrops({ date, taken }) (consultant request 2026-11-18) */
+  drops: Record<string, boolean>
+  checkins: Record<string, { at: string; answers: CheckinAnswers }>
   cart: CartLine[]
   wishlist: string[]
   addresses: Address[]
@@ -81,8 +89,11 @@ type State = {
   book: (a: Omit<Appointment, 'id' | 'code' | 'createdAt' | 'status'>) => Appointment // holdAppointment + payment.captured
   reschedule: (id: string, startsAt: string) => void         // scheduling.rescheduleAppointment
   giveFeedback: (id: string, f: Feedback) => void            // scheduling.submitSessionFeedback
-  takeDrop: (date?: Date) => void
-  untakeDrop: (date?: Date) => void
+  logDrops: (date: string, taken: boolean) => void            // remedies.logDrops
+  payAppointment: (id: string) => void                         // finance checkout for an existing appointment → payment.captured
+  pickNewTime: (id: string, startsAt: string) => void          // scheduling.rescheduleAppointment (no cost) → confirmed
+  submitCheckin: (appointmentId: string, answers: CheckinAnswers) => void // intake.submitCheckin
+  simulateStaffBooking: (late?: boolean) => Appointment         // preview only: what a booking from Jitu Bhaiya / Haresh looks like
   setReminderTimes: (t: string[]) => void
   addToCart: (key: string, qty?: number) => void             // commerce.addToCart
   setQty: (key: string, qty: number) => void
@@ -98,7 +109,7 @@ type State = {
 }
 
 const initial = {
-  profile: null, journal: [], goals: [], appointments: [], intake: null, blend: null, ritual: {}, cart: [], wishlist: [],
+  profile: null, journal: [], goals: [], appointments: [], intake: null, blend: null, drops: {}, checkins: {}, cart: [], wishlist: [],
   addresses: [], orders: [], chat: [], notices: [], seq: 41,
 }
 
@@ -141,11 +152,27 @@ export const useApp = create<State>()(
       },
       reschedule: (id, startsAt) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, startsAt, rescheduled: (a.rescheduled ?? 0) + 1 } : a)) })),
       giveFeedback: (id, f) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, feedback: f } : a)) })),
-      takeDrop: (date = new Date()) => set((s) => {
-        const k = dayKey(date); const max = s.blend?.timesPerDay ?? 4
-        return { ritual: { ...s.ritual, [k]: Math.min((s.ritual[k] ?? 0) + 1, max) } }
-      }),
-      untakeDrop: (date = new Date()) => set((s) => { const k = dayKey(date); return { ritual: { ...s.ritual, [k]: Math.max((s.ritual[k] ?? 0) - 1, 0) } } }),
+      logDrops: (date, taken) => set((s) => ({ drops: { ...s.drops, [date]: taken } })),
+      payAppointment: (id) => {
+        const a = get().appointments.find((x) => x.id === id)
+        if (!a) return
+        const late = a.status === 'expired'
+        set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString(), ...(late ? { needsNewTime: true } : { status: 'confirmed' as const }) } : x)) }))
+        get().notify(late ? { title: 'Payment received', body: 'Please pick a new time for your session — no extra cost.', href: `/app/pay?appointment=${id}` } : { title: 'You’re booked', body: 'Payment received. See you soon.', href: `/app/sessions/view?id=${id}` })
+      },
+      pickNewTime: (id, startsAt) => set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, startsAt, status: 'confirmed' as const, needsNewTime: false } : x)) })),
+      submitCheckin: (appointmentId, answers) => set((s) => ({ checkins: { ...s.checkins, [appointmentId]: { at: new Date().toISOString(), answers } } })),
+      simulateStaffBooking: (late = false) => {
+        const seq = get().seq + 1
+        const d = new Date(); d.setDate(d.getDate() + 3); d.setHours(11, 0, 0, 0)
+        const appt: Appointment = {
+          id: uid(), code: `BW-A-${String(seq).padStart(5, '0')}`, type: get().appointments.length ? 'followup' : 'first', mode: 'online', startsAt: d.toISOString(),
+          status: late ? 'expired' : 'awaiting_payment', amountPaise: get().appointments.length ? 80000 : 100000, createdAt: new Date().toISOString(), source: 'consultant',
+        }
+        set((s) => ({ appointments: [...s.appointments, appt], seq }))
+        get().notify({ title: 'Jitu Bhaiya booked a session for you', body: 'Complete the payment to confirm it.', href: `/app/pay?appointment=${appt.id}` })
+        return appt
+      },
       setReminderTimes: (t) => set((s) => (s.blend ? { blend: { ...s.blend, reminderTimes: t } } : {})),
       addToCart: (key, qty = 1) => set((s) => {
         const ex = s.cart.find((l) => l.key === key)
@@ -200,14 +227,14 @@ function demoState(s: State): Partial<State> {
     if (i % 3 === 0) out.push({ id: uid(), emotion: i > 8 ? 'grateful' : 'tired', at: d(-day, 20, 5).toISOString() })
     return out
   }).reverse()
-  const ritual: Record<string, number> = {}
-  for (let i = 1; i <= 12; i++) ritual[dayKey(d(-i))] = i % 5 === 0 ? 2 : i % 3 === 0 ? 3 : 4
+  const drops: Record<string, boolean> = {}
+  for (let i = 1; i <= 12; i++) drops[dayKey(d(-i))] = i % 5 !== 0
   const first: Appointment = { id: 'demo-a1', code: 'BW-A-00038', type: 'first', mode: 'online', startsAt: d(-14, 11).toISOString(), status: 'completed', amountPaise: 100000, createdAt: d(-17).toISOString() }
   const next: Appointment = { id: 'demo-a2', code: 'BW-A-00041', type: 'followup', mode: 'online', startsAt: d(3, 11).toISOString(), status: 'confirmed', amountPaise: 80000, createdAt: d(-1).toISOString() }
   const addr: Address = { id: 'demo-addr', name: s.profile?.name || 'Priya Shah', phone: s.profile?.phone || '9876543210', line1: '12, Shanti Kunj', line2: 'Alkapuri', city: 'Vadodara', state: 'Gujarat', pin: '390007' }
   return {
     journal: [...journal, ...s.journal],
-    ritual,
+    drops,
     appointments: [first, next],
     blend: { name: 'Personal blend', version: 1, flowers: ['Mimulus', 'White Chestnut', 'Larch', 'Impatiens', 'Walnut'], drops: 4, timesPerDay: 4, startedOn: d(-13).toISOString(), days: 30, reminderTimes: ['08:00', '13:00', '18:00', '22:00'], alcoholFree: true },
     goals: s.goals.length ? s.goals : [{ id: uid(), title: 'Sleep by 11 PM', progress: 60, done: false }, { id: uid(), title: 'Morning walk 3× a week', progress: 35, done: false }],

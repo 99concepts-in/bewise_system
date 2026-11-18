@@ -14,6 +14,7 @@ import { moodOf, REORDER_PRICE_PAISE } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { dayKey, fmtDay, formatINR } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
+import { DropsTick } from '@/components/drops-tick'
 import { blendSupply } from '@/lib/supply'
 import { BP } from '@/lib/asset'
 
@@ -118,7 +119,7 @@ export default function Remedies() {
                 </div>
               )}
               <p className="mt-3 flex items-start gap-2 text-[13px] leading-5 text-muted"><Lightbulb className="mt-0.5 size-4 shrink-0 text-gold" />{dailyInsight(journal)}</p>
-              <p className="mt-2 text-[11px] text-soft">From your journal and check-ins · not medical advice</p>
+              <p className="mt-2 text-[11px] text-muted">From your journal and check-ins · not medical advice</p>
             </section>
           </Item>
         )}
@@ -175,31 +176,13 @@ function Donut({ mix }: { mix: { mood: Parameters<typeof moodOf>[0]; pct: number
 
 function RitualToday({ onTimes }: { onTimes: () => void }) {
   const blend = useApp((s) => s.blend)!
-  const ritual = useApp((s) => s.ritual)
-  const take = useApp((s) => s.takeDrop)
-  const untake = useApp((s) => s.untakeDrop)
-  const taken = ritual[dayKey(new Date())] ?? 0
-  const streak = (() => { let n = 0; for (let i = 1; i < 60; i++) { const d = new Date(); d.setDate(d.getDate() - i); if ((ritual[dayKey(d)] ?? 0) >= blend.timesPerDay - 1) n++; else break } return n })()
   return (
-    <section className="card p-5">
+    <section className="card p-5" aria-labelledby="drops-h">
       <div className="flex items-start justify-between">
-        <div><h2 className="h-section">Ritual & reminders</h2><p className="text-[13px] text-muted">{taken} of {blend.timesPerDay} today{streak ? ` · ${streak}-day rhythm 🌿` : ''}</p></div>
+        <div><h2 id="drops-h" className="h-section">Your daily drops</h2><p className="text-[13px] text-muted">{blend.drops} drops, {blend.timesPerDay}× a day · {blend.reminderTimes.join(', ')}</p></div>
         <button onClick={onTimes} className="inline-flex items-center gap-1.5 rounded-full bg-peri-50 px-3 py-2 text-[13px] font-semibold text-navy"><Bell className="size-4" /> Times</button>
       </div>
-      <div className="mt-4 grid grid-cols-4 gap-2">
-        {blend.reminderTimes.slice(0, blend.timesPerDay).map((t, k) => {
-          const on = k < taken
-          return (
-            <motion.button key={k} whileTap={{ scale: 0.9 }} aria-label={on ? `${t} taken` : `Mark ${t} taken`} onClick={() => { if (on && k === taken - 1) untake(); else if (!on && k === taken) { take(); buzz(12) } }}
-              className="relative flex h-[84px] flex-col items-center justify-end overflow-hidden rounded-[20px] bg-[#f6f1e8] pb-2">
-              <motion.span className="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,#eac27c,#c48a3a)]" initial={false} animate={{ height: on ? '100%' : '0%' }} transition={{ type: 'spring', stiffness: 140, damping: 18 }} />
-              <svg viewBox="0 0 24 24" className={`relative mb-1 size-6 ${on ? 'text-white' : 'text-[#c9a46a]'}`} aria-hidden><path fill="currentColor" d="M12 2.5c3.6 4.6 6 8 6 11a6 6 0 1 1-12 0c0-3 2.4-6.4 6-11Z" /></svg>
-              <span className={`relative text-[13px] font-bold tnum ${on ? 'text-white' : 'text-navy'}`}>{t}</span>
-            </motion.button>
-          )
-        })}
-      </div>
-      <button onClick={() => { untake(); }} className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-muted"><RotateCcw className="size-3.5" /> Undo last</button>
+      <div className="mt-4"><DropsTick full /></div>
     </section>
   )
 }
@@ -222,7 +205,7 @@ function ReminderSheet({ open, onClose }: { open: boolean; onClose: () => void }
         ))}
       </div>
       <Btn full className="mt-5" onClick={() => { set([...t].sort()); toast('Reminders updated'); onClose() }}>Save times</Btn>
-      <p className="mt-3 flex items-center justify-center gap-1 text-[12px] text-soft">Notifications arrive once the app is installed <ChevronRight className="size-3" /></p>
+      <p className="mt-3 flex items-center justify-center gap-1 text-[12px] text-muted">Notifications arrive once the app is installed <ChevronRight className="size-3" /></p>
     </Sheet>
   )
 }

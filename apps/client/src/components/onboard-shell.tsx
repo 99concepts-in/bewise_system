@@ -12,7 +12,7 @@ export function OnboardShell({ step, title, em, sub, children }: { step: 1 | 2 |
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       <header className="flex items-center gap-4 pt-2">
         <IconBtn label="Back" onClick={() => router.back()}><ChevronLeft className="size-5" /></IconBtn>
-        <div className="flex flex-1 gap-1.5" aria-label={`Step ${step} of 3`}>
+        <div className="flex flex-1 gap-1.5" role="group" aria-label={`Step ${step} of 3`}>
           {[1, 2, 3].map((k) => (
             <span key={k} className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/80">
               <motion.span className="block h-full rounded-full bg-navy" initial={{ width: k < step ? '100%' : 0 }} animate={{ width: k <= step ? '100%' : 0 }} transition={{ duration: 0.6, ease, delay: 0.15 }} />

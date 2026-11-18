@@ -86,7 +86,7 @@ export function StepWho({ a, set }: P) {
       <Card>
         <Label>In your own words</Label>
         <textarea value={a.onMind} onChange={(e) => set({ onMind: e.target.value.slice(0, 1000) })} rows={4} placeholder="Work has felt heavy lately, and I can’t switch off at night…"
-          className="w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] leading-6 outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" aria-label="What’s been on your mind" />
+          className="w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] leading-6 outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" aria-label="What’s been on your mind" />
         <VoiceNote />
       </Card>
       <Card>
@@ -303,7 +303,7 @@ export function StepLife({ a, set }: P) {
         })}
       </div>
       <input value={a.lifeOther} onChange={(e) => set({ lifeOther: e.target.value.slice(0, 300) })} placeholder="Anything else you’d like to share" aria-label="Anything else you’d like to share"
-        className="h-14 w-full rounded-[22px] bg-white px-5 text-[15px] shadow-[var(--shadow-card)] outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" />
+        className="h-14 w-full rounded-[22px] bg-white px-5 text-[15px] shadow-[var(--shadow-card)] outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
     </div>
   )
 }
@@ -389,7 +389,7 @@ export function StepGoals({ a, set }: P) {
       <div className="card p-5">
         <p className="mb-2 text-[14px] text-muted">In your own words —</p>
         <input value={a.goalText} onChange={(e) => set({ goalText: e.target.value.slice(0, 200) })} placeholder="Able to switch off and sleep well" aria-label="Your goal in your own words"
-          className="h-12 w-full rounded-full bg-peri-50 px-4 text-[15px] outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" />
+          className="h-12 w-full rounded-full bg-peri-50 px-4 text-[15px] outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
       </div>
     </div>
   )
@@ -458,7 +458,7 @@ export function CheckinNews({ c, set }: { c: Checkin; set: (p: Partial<Checkin>)
     <div className="space-y-4">
       <StepTitle lead="Anything" em="new?" />
       <textarea value={c.news} onChange={(e) => set({ news: e.target.value.slice(0, 800) })} rows={4} placeholder="Optional — anything you’d like Jitu Bhaiya to know" aria-label="Anything new"
-        className="card w-full resize-none p-5 text-[15px] outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" />
+        className="card w-full resize-none p-5 text-[15px] outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
       <div className="card p-5">
         <Label>I took my drops</Label>
         <div className="grid grid-cols-2 gap-2">{['Every day', 'Most days', 'Sometimes', 'Rarely'].map((d) => <Chip key={d} on={c.drops === d} onClick={() => set({ drops: d })} className="justify-center">{d}</Chip>)}</div>

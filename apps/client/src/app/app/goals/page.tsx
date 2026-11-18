@@ -49,7 +49,7 @@ export default function Goals() {
       {goals.length < 3 && (
         <div className="card mt-4 p-4">
           <form onSubmit={(e) => { e.preventDefault(); if (t.trim()) { add(t.trim()); setT(''); buzz() } }} className="flex gap-2">
-            <input value={t} onChange={(e) => setT(e.target.value.slice(0, 60))} placeholder="Add a goal…" aria-label="New goal" className="h-12 flex-1 rounded-full bg-peri-50 px-4 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
+            <input value={t} onChange={(e) => setT(e.target.value.slice(0, 60))} placeholder="Add a goal…" aria-label="New goal" className="h-12 min-w-0 flex-1 rounded-full bg-peri-50 px-4 text-[16px] outline-none focus:ring-2 focus:ring-navy" />
             <Btn size="md" type="submit" disabled={!t.trim()}>Add</Btn>
           </form>
           <div className="mt-3 flex flex-wrap gap-2">{IDEAS.filter((i) => !goals.some((g) => g.title === i)).map((i) => <button key={i} onClick={() => add(i)} className="rounded-full bg-[#f6f1e8] px-3 py-1.5 text-[13px] font-semibold text-navy">+ {i}</button>)}</div>

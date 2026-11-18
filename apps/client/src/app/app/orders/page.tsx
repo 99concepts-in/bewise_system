@@ -27,7 +27,7 @@ export default function Orders() {
               <span className="flex-1">
                 <span className="block text-[15px] font-bold text-navy">{o.code}</span>
                 <span className="block text-[13px] text-muted">{o.lines.map((l) => l.name).join(', ')}</span>
-                <span className="mt-1 inline-flex items-center gap-2 text-[12px]"><span className="rounded-full bg-sage-100 px-2 py-0.5 font-bold text-sage-text">{STAGES[stageOf(o)]}</span><span className="text-soft">{fmtDay(o.placedAt)} · {formatINR(o.totalPaise)}</span></span>
+                <span className="mt-1 inline-flex items-center gap-2 text-[12px]"><span className="rounded-full bg-sage-100 px-2 py-0.5 font-bold text-sage-text">{STAGES[stageOf(o)]}</span><span className="text-muted">{fmtDay(o.placedAt)} · {formatINR(o.totalPaise)}</span></span>
               </span>
               <ChevronRight className="size-5 text-soft" />
             </Link>

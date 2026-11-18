@@ -12,7 +12,7 @@ import { dayKey, fmtDay, fmtTime, formatINR } from './format'
 import { lastNDays } from './insights'
 import { stageOf, STAGES } from './orders'
 
-export type Ctx = { name: string; blend: Blend | null; ritualToday: number; journal: JournalEntry[]; appointments: Appointment[]; orders: Order[]; allergies: string[] }
+export type Ctx = { name: string; blend: Blend | null; droppedToday?: boolean; journal: JournalEntry[]; appointments: Appointment[]; orders: Order[]; allergies: string[] }
 export type Reply = { text: string; products?: string[]; actions?: { id: string; label: string }[]; quick?: string[]; safety?: boolean }
 
 const CRISIS = /(kill myself|end my life|suicid|harm myself|hurt myself|no reason to live|want to die|don'?t want to live|marna chah|jeena nahi|khudkushi|self.?harm)/i
@@ -38,10 +38,10 @@ export function respond(raw: string, c: Ctx): Reply {
   }
   if (/(drop|ritual|when should|take my|dose|blend)/.test(t)) {
     if (!c.blend) return { text: 'Your personal blend arrives after your first session with Jitu Bhaiya — it’s included in the consultation.', actions: [{ id: 'book-first', label: 'Book a consultation' }] }
-    const next = c.blend.reminderTimes[c.ritualToday]
+    const nextTime = c.blend.reminderTimes.find((t) => { const [h, m] = t.split(':').map(Number); const x = new Date(); x.setHours(h, m, 0, 0); return x.getTime() > Date.now() })
     return {
-      text: `Your blend is ${c.blend.drops} drops, ${c.blend.timesPerDay} times a day. You’ve taken ${c.ritualToday} today${next ? ` — next at ${next}.` : ' — all done. Lovely.'}${next ? ' Want a reminder?' : ''}`,
-      actions: next ? [{ id: `remind-${next}`, label: `Remind me at ${next}` }] : undefined, quick: ['What’s in my blend?'],
+      text: `Your blend is ${c.blend.drops} drops, ${c.blend.timesPerDay} times a day (${c.blend.reminderTimes.join(', ')}).${c.droppedToday ? ' You’ve ticked today — lovely.' : nextTime ? ` Next one around ${nextTime}. Want a reminder?` : ''}`,
+      actions: !c.droppedToday && nextTime ? [{ id: `remind-${nextTime}`, label: `Remind me at ${nextTime}` }] : undefined, quick: ['What’s in my blend?'],
     }
   }
   if (/(in my blend|what.*flowers|which flowers)/.test(t) && c.blend) return { text: `Your blend has ${c.blend.flowers.join(', ')}. Tap any flower in My Remedies to read about it.`, actions: [{ id: 'open-remedies', label: 'Open My Remedies' }] }

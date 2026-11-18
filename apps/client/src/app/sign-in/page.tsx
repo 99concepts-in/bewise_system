@@ -12,6 +12,7 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { LogoMark } from '@/components/brand'
 import { Btn, IconBtn, buzz, ease } from '@/components/ui'
 import { useApp } from '@/lib/store'
+import { takeNextStep } from '@/lib/next-step'
 
 const CODE_LEN = 4 // owner 2026-11-18: 4-digit codes everywhere
 const DEMO_CODE = '2468'
@@ -61,7 +62,7 @@ function SignIn() {
       setCode(''); codeRef.current?.focus(); return
     }
     setProfile({ phone })
-    if (profile?.onboardedAt && (returning || profile.phone === phone)) router.replace('/app')
+    if (profile?.onboardedAt && (returning || profile.phone === phone)) router.replace(takeNextStep() ?? '/app')
     else router.push('/onboarding/about')
   }
 

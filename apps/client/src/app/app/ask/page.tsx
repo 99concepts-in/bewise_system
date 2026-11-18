@@ -36,7 +36,7 @@ export default function Ask() {
     buzz(6); setText(''); s.pushChat({ role: 'user', text: m })
     const crisis = crisisCheck(m)
     setTyping(true)
-    const reply = respond(m, { name: firstName(s.profile?.name), blend: s.blend, ritualToday: s.ritual[dayKey(new Date())] ?? 0, journal: s.journal, appointments: s.appointments, orders: s.orders, allergies: s.profile?.allergies ?? [] })
+    const reply = respond(m, { name: firstName(s.profile?.name), blend: s.blend, droppedToday: s.drops[dayKey(new Date())], journal: s.journal, appointments: s.appointments, orders: s.orders, allergies: s.profile?.allergies ?? [] })
     setTimeout(() => {
       setTyping(false)
       s.pushChat({ role: 'bot', text: reply.text, products: reply.products, actions: [...(reply.actions ?? []), ...((reply.quick ?? []).map((q) => ({ id: `q:${q}`, label: q })))], safety: reply.safety })
@@ -131,7 +131,7 @@ export default function Ask() {
             {typing && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-end gap-2">
                 <img src={`${BP}/img/owl-wave.webp`} alt="" className="mb-1 size-9 rounded-full bg-white object-contain p-0.5 shadow-[var(--shadow-card)]" />
-                <span className="flex gap-1.5 rounded-[24px] rounded-bl-md bg-white px-5 py-4 shadow-[var(--shadow-card)]" aria-label="BeWise is typing">
+                <span className="flex gap-1.5 rounded-[24px] rounded-bl-md bg-white px-5 py-4 shadow-[var(--shadow-card)]" role="status" aria-label="BeWise is typing">
                   {[0, 1, 2].map((k) => <motion.span key={k} className="size-2 rounded-full bg-peri" animate={{ y: [0, -5, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 0.9, repeat: Infinity, delay: k * 0.15 }} />)}
                 </span>
               </motion.div>
@@ -154,7 +154,7 @@ export default function Ask() {
       <Sheet open={menu} onClose={() => setMenu(false)} title="Ask BeWise">
         <h2 className="h-duo text-[24px]">How Ask BeWise <em>works</em></h2>
         <p className="mt-2 text-[14px] leading-6 text-muted">Ask BeWise reads only <b>your</b> ritual, journal, sessions and orders to answer you. It isn’t a doctor, never changes your blend, and can make mistakes. Your chats are private to you.</p>
-        <p className="mt-2 text-[12px] text-soft">Preview build: answers are generated on this device. The full AI companion connects at launch.</p>
+        <p className="mt-2 text-[12px] text-muted">Preview build: answers are generated on this device. The full AI companion connects at launch.</p>
         <Btn full variant="white" className="mt-5" onClick={() => { s.clearChat(); setMenu(false); toast('Conversation cleared') }}><Trash2 className="size-4" /> Clear conversation</Btn>
       </Sheet>
     </main>

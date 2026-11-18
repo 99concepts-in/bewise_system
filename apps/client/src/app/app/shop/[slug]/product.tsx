@@ -60,7 +60,7 @@ export default function ProductPage() {
         </div>
         <div className="text-right">
           <AnimatePresence mode="popLayout"><motion.p key={v.id} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -10, opacity: 0 }} className="text-[30px] font-extrabold leading-none text-navy tnum">{formatINR(v.pricePaise)}</motion.p></AnimatePresence>
-          {v.mrpPaise && <p className="text-[14px] text-soft line-through tnum">{formatINR(v.mrpPaise)}</p>}
+          {v.mrpPaise && <p className="text-[14px] text-muted line-through tnum">{formatINR(v.mrpPaise)}</p>}
         </div>
       </div>
 

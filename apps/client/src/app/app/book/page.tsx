@@ -16,6 +16,7 @@ import { AppHeader, useUi } from '@/components/shell'
 import { Btn, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, useStableCallback } from '@/components/ui'
 import { CONSULTANT, CONSULTATIONS, NUANCE, STUDIO, TESTIMONIALS, TESTIMONIALS_SOURCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
 import { InPersonArt, OnlineArt } from '@/components/mode-art'
+import { TimePicker } from '@/components/time-picker'
 import { parseIsoDay } from '@/lib/supply'
 import { emptyIntake, useApp, type Appointment, type IntakeAnswers } from '@/lib/store'
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
@@ -163,7 +164,7 @@ function Book() {
 
 function Stepper({ at }: { at: number }) {
   return (
-    <div className="flex flex-1 items-center justify-center" aria-label={`Step ${at + 1} of 3`}>
+    <div className="flex flex-1 items-center justify-center" role="group" aria-label={`Step ${at + 1} of 3`}>
       {[0, 1, 2].map((k) => (
         <div key={k} className="flex items-center">
           <motion.span className="grid size-8 place-items-center rounded-full" animate={{ backgroundColor: k <= at ? '#182957' : '#ffffff', scale: k === at ? 1.08 : 1 }} transition={spring}
@@ -243,7 +244,7 @@ function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void })
                 initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.35, ease }}
                 className="rounded-[26px] bg-[linear-gradient(140deg,#fbf3dc,#f6efe4_55%,#eef1fb)] p-6">
                 <Quote className="size-8 text-gold" aria-hidden />
-                {t.rating ? <p className="mt-2 text-[15px] tracking-[2px] text-gold" aria-label={`${t.rating} out of 5`}>{'★'.repeat(t.rating)}</p> : null}
+                {t.rating ? <p className="mt-2 text-[15px] tracking-[2px] text-gold" role="img" aria-label={`${t.rating} out of 5`}>{'★'.repeat(t.rating)}</p> : null}
                 <blockquote className="mt-3 text-[17px] font-semibold leading-7 text-navy">“{t.quote}”</blockquote>
                 <figcaption className="mt-4 text-[14px] text-muted">— {t.name}{t.city ? `, ${t.city}` : ''}</figcaption>
               </motion.figure>
@@ -333,74 +334,6 @@ function Mode({ mode, setMode }: { mode?: 'online' | 'in_person'; setMode: (m: '
           </motion.div>
         )
       })}
-    </div>
-  )
-}
-
-function TimePicker({ slot, setSlot, initialDay }: { slot?: Date; setSlot: (d: Date) => void; initialDay?: Date }) {
-  const today = startOfDay()
-  const monday = addDays(today, -((today.getDay() + 6) % 7))
-  // pre-book from Home passes ?date= → open that week with that day selected
-  const [week, setWeek] = useState(() => initialDay && initialDay >= today ? Math.min(7, Math.floor((startOfDay(initialDay).getTime() - monday.getTime()) / (7 * 86_400_000))) : 0)
-  const days = Array.from({ length: 7 }, (_, i) => addDays(monday, week * 7 + i))
-  const firstOpen = days.find((d) => d >= today && slotsFor(d).length) ?? days[0]
-  const [day, setDay] = useState<Date>(slot ? startOfDay(slot) : initialDay && initialDay >= today && slotsFor(initialDay).length ? startOfDay(initialDay) : firstOpen)
-  useEffect(() => { if (!days.some((d) => +d === +day)) setDay(days.find((d) => d >= today && slotsFor(d).length) ?? days[0]) }, [week]) // eslint-disable-line react-hooks/exhaustive-deps
-  const times = day >= today ? slotsFor(day) : []
-  const groups = [
-    { t: 'Morning', f: (h: number) => h < 12 }, { t: 'Afternoon', f: (h: number) => h >= 12 && h < 17 }, { t: 'Evening', f: (h: number) => h >= 17 },
-  ]
-  const pick = (t: string) => { buzz(); setSlot(istDate(day, t)) }
-  return (
-    <div className="space-y-4">
-      <h1 className="h-duo">Pick a <em>time</em></h1>
-      <div className="card p-4">
-        <div className="flex items-center justify-between">
-          <button aria-label="Previous week" disabled={week === 0} onClick={() => setWeek((w) => w - 1)} className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy disabled:opacity-30"><ChevronLeft className="size-5" /></button>
-          <motion.p key={week} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="text-[17px] font-bold text-navy">{fmtMonth(days[3])}</motion.p>
-          <button aria-label="Next week" disabled={week >= 7} onClick={() => setWeek((w) => w + 1)} className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy disabled:opacity-30"><ChevronRight className="size-5" /></button>
-        </div>
-        <div className="mt-3 grid grid-cols-7 gap-1 text-center">
-          {days.map((d) => {
-            const open = d >= today && slotsFor(d).length > 0
-            const on = +d === +day
-            return (
-              <button key={+d} disabled={!open} aria-pressed={on} aria-label={fmtLongDay(d)} onClick={() => { buzz(5); setDay(d) }} className="flex flex-col items-center gap-1.5 py-1 disabled:opacity-35">
-                <span className="text-[12px] font-medium text-muted">{d.toLocaleDateString('en-IN', { weekday: 'short' })}</span>
-                <span className="relative grid size-10 place-items-center text-[16px] font-bold">
-                  {on && <motion.span layoutId="day-pill" transition={spring} className="absolute inset-0 rounded-full bg-navy" />}
-                  <span className={cx('relative', on ? 'text-white' : 'text-navy')}>{d.getDate()}</span>
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-      <div className="card p-5">
-        {times.length === 0 ? <p className="py-4 text-center text-[14px] text-muted">No times this day — try another.</p> : groups.map((g) => {
-          const ts = times.filter((t) => g.f(Number(t.split(':')[0])))
-          if (!ts.length) return null
-          return (
-            <div key={g.t} className="border-b border-line py-3 first:pt-0 last:border-0 last:pb-0">
-              <p className="mb-2.5 text-[16px] font-bold text-navy">{g.t}</p>
-              <div className="grid grid-cols-3 gap-2">
-                {ts.map((t, i) => {
-                  const d = istDate(day, t)
-                  const on = slot && +slot === +d
-                  return (
-                    <motion.button key={t} onClick={() => pick(t)} aria-pressed={!!on} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.03 }}
-                      className={cx('relative h-11 rounded-full text-[14px] font-semibold', on ? 'text-white' : 'bg-peri-50/70 text-navy')}>
-                      {on && <motion.span layoutId="slot-pill" transition={spring} className="absolute inset-0 rounded-full bg-navy shadow-[0_6px_14px_rgba(24,41,87,.3)]" />}
-                      <span className="relative">{fmtTime(d)}</span>
-                    </motion.button>
-                  )
-                })}
-              </div>
-            </div>
-          )
-        })}
-        <p className="mt-3 text-[12px] text-soft">Times in IST</p>
-      </div>
     </div>
   )
 }

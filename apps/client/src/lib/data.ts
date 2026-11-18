@@ -207,6 +207,10 @@ export function slotsFor(date: Date): string[] {
   })
 }
 
+/** Session feedback — "How do you feel after the session?" in the client's own words (consultant request §2). Shown to
+ * Jitu Bhaiya as "What people said they felt" — never as a BeWise claim. */
+export const BENEFITS = ['Calmer', 'Felt heard', 'Sleeping better', 'Lighter', 'Clearer mind', 'More confident', 'Less anxious', 'More hopeful', 'More patient', 'More energy', 'At peace', 'More connected']
+
 export const HELPLINES = [
   { name: 'Tele-MANAS', number: '14416', note: 'Free, confidential, 24×7' }, // @decision(D-38) verify before launch
   { name: 'Emergency', number: '112', note: 'If you are in immediate danger' },

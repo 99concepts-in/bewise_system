@@ -66,8 +66,16 @@ export default function Me() {
           <div className="flex-1"><p className="text-[15px] font-semibold text-navy">Explore with sample data</p><p className="text-[12px] text-muted">Preview a returning client: blend, sessions, journal, orders</p></div>
           <Btn size="sm" variant="sage" onClick={() => { s.loadDemo(); toast('Sample journey loaded'); router.push('/app') }}>Load</Btn>
         </Item>
+        <Item className="card p-4">
+          <p className="text-[13px] font-bold uppercase tracking-[0.1em] text-muted">Preview tools</p>
+          <p className="mt-1 text-[12px] text-muted">See what a client receives when Jitu Bhaiya or Haresh books for them.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(); router.push(`/app/pay?appointment=${a.id}`) }}>Booking from Jitu Bhaiya</Btn>
+            <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(true); router.push(`/app/pay?appointment=${a.id}`) }}>…paid after hold expired</Btn>
+          </div>
+        </Item>
         <Item><Btn full variant="ghost" size="md" onClick={() => setSheet('signout')}><LogOut className="size-4" /> Sign out</Btn></Item>
-        <Item><p className="pb-2 text-center text-[11px] text-soft">BeWise · Holistic Wellness · preview build</p></Item>
+        <Item><p className="pb-2 text-center text-[11px] text-muted">BeWise · Holistic Wellness · preview build</p></Item>
       </Reveal>
 
       <Sheet open={sheet === 'photo'} onClose={() => setSheet(null)} title="Your photo" tall>

@@ -16,7 +16,7 @@ export function LogoMark({ size = 40, white }: { size?: number; white?: boolean 
 }
 export function Logo({ white, compact }: { white?: boolean; compact?: boolean }) {
   return (
-    <div className="flex items-center gap-2.5" aria-label="BeWise · Holistic Wellness">
+    <div className="flex items-center gap-2.5" role="img" aria-label="BeWise · Holistic Wellness">
       <LogoMark size={compact ? 36 : 42} white={white} />
       <div className={cx('leading-none', white ? 'text-white' : 'text-navy')}>
         <div className="text-[19px] font-extrabold tracking-[-0.02em]">BeWise</div>

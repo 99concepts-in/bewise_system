@@ -39,7 +39,7 @@ function OrderDetail() {
                   {done ? <Check className="size-4" strokeWidth={3} /> : <span className="size-2 rounded-full bg-white" />}
                   {i === st && st < 3 && <motion.span className="absolute inset-0 rounded-full ring-4 ring-navy/25" animate={{ scale: [1, 1.5], opacity: [0.8, 0] }} transition={{ duration: 1.6, repeat: Infinity }} />}
                 </motion.span>
-                <div><p className={cx('text-[15px] font-bold', done ? 'text-navy' : 'text-soft')}>{s}</p><p className="text-[13px] text-muted">{done ? fmtDay(addDays(new Date(o.placedAt), [0, 1, 2, 4][i])) : 'Pending'}</p></div>
+                <div><p className={cx('text-[15px] font-bold', done ? 'text-navy' : 'text-muted')}>{s}</p><p className="text-[13px] text-muted">{done ? fmtDay(addDays(new Date(o.placedAt), [0, 1, 2, 4][i])) : 'Pending'}</p></div>
               </li>
             )
           })}

@@ -11,7 +11,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { Mascot, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
 import { Btn, Chip, Sheet, buzz, cx, ease, spring, toast, useNow } from '@/components/ui'
-import { CONSULTATIONS, STUDIO, istDate, slotsFor, type Emotion } from '@/lib/data'
+import { BENEFITS, CONSULTATIONS, STUDIO, istDate, slotsFor, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { addDays, fmtDay, fmtLongDay, fmtTime, formatINR, startOfDay } from '@/lib/format'
 import { downloadIcs, sessionIcs } from '@/lib/ics'
@@ -24,6 +24,7 @@ function Detail() {
   const id = params.get('id') ?? ''
   const router = useRouter()
   const a = useApp((s) => s.appointments.find((x) => x.id === id))
+  const checkin = useApp((s) => s.checkins[id])
   const now = useNow(1000)
   const [move, setMove] = useState(false)
   const [fb, setFb] = useState(params.get('feedback') === '1')
@@ -61,6 +62,17 @@ function Detail() {
         </div>
 
         {!past && (
+          checkin ? (
+            <div className="flex items-center gap-3 rounded-[22px] bg-sage-100/80 p-4 text-[14px] text-sage-text"><Check className="size-5" strokeWidth={3} /><span className="flex-1"><b>Check-in shared</b> · Jitu Bhaiya will read it before you meet</span><button onClick={() => router.push(`/app/checkin?appointment=${a.id}`)} className="font-semibold underline underline-offset-2">Edit</button></div>
+          ) : (
+            <button onClick={() => router.push(`/app/checkin?appointment=${a.id}`)} className="card flex w-full items-center gap-3 p-4 text-left">
+              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-peri-50 text-[18px]" aria-hidden>📝</span>
+              <span className="flex-1"><span className="block text-[15px] font-bold text-navy">2-minute check-in</span><span className="text-[13px] text-muted">Tell Jitu Bhaiya how you’ve been since last time</span></span>
+              <span className="text-[13px] font-semibold text-navy">Start</span>
+            </button>
+          )
+        )}
+        {!past && (
           <div className="card p-5">
             <p className="h-section">Before you begin</p>
             <ul className="mt-3 space-y-3">
@@ -77,7 +89,7 @@ function Detail() {
           <div className="card p-5">
             <p className="h-section">How was your session?</p>
             {a.feedback ? (
-              <div className="mt-3 flex items-center gap-3"><MoodImg mood={RATING[a.feedback.rating - 1]} size={44} /><p className="flex-1 text-[14px] text-muted">{a.feedback.tags.join(' · ') || 'Thank you for sharing.'}</p><button onClick={() => setFb(true)} className="text-[14px] font-semibold text-navy underline underline-offset-4">Edit</button></div>
+              <div className="mt-3 flex items-center gap-3"><MoodImg mood={RATING[a.feedback.rating - 1]} size={44} /><p className="flex-1 text-[14px] text-muted">{[...(a.feedback.benefits ?? []), ...a.feedback.tags].join(' · ') || 'Thank you for sharing.'}</p><button onClick={() => setFb(true)} className="text-[14px] font-semibold text-navy underline underline-offset-4">Edit</button></div>
             ) : (
               <><p className="mt-1 text-[14px] text-muted">Your notes go straight to Jitu Bhaiya.</p><Btn size="md" className="mt-4" onClick={() => setFb(true)}>Share feedback</Btn></>
             )}
@@ -149,6 +161,7 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
   const give = useApp((s) => s.giveFeedback)
   const [rating, setRating] = useState(existing?.rating ?? 0)
   const [tags, setTags] = useState<string[]>(existing?.tags ?? [])
+  const [benefits, setBenefits] = useState<string[]>(existing?.benefits ?? [])
   const [notes, setNotes] = useState(existing?.notes ?? '')
   const [sent, setSent] = useState(false)
   useEffect(() => { if (open) setSent(false) }, [open])
@@ -174,10 +187,13 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
               ))}
             </div>
             <div className="mt-5 flex flex-wrap gap-2">{TAGS.map((t) => <Chip key={t} on={tags.includes(t)} onClick={() => setTags(tags.includes(t) ? tags.filter((x) => x !== t) : [...tags, t])}>{t}</Chip>)}</div>
-            <label className="mt-5 block text-[15px] font-bold text-navy" htmlFor="fbnotes">Notes for Jitu Bhaiya</label>
+            <p className="mt-6 text-[15px] font-bold text-navy">How do you feel after the session?</p>
+            <p className="text-[13px] text-muted">Pick any that fit — in your own words.</p>
+            <div className="mt-3 flex flex-wrap gap-2">{BENEFITS.map((b) => <Chip key={b} on={benefits.includes(b)} onClick={() => setBenefits(benefits.includes(b) ? benefits.filter((x) => x !== b) : [...benefits, b])}>{b}</Chip>)}</div>
+            <label className="mt-6 block text-[15px] font-bold text-navy" htmlFor="fbnotes">Notes for Jitu Bhaiya</label>
             <textarea id="fbnotes" rows={3} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder="Anything you’d like him to know…" className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
             <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-muted"><Check className="size-3.5" /> Visible only to your consultant</p>
-            <Btn full className="mt-5" disabled={!rating} onClick={() => { give(id, { rating, tags, notes }); setSent(true); buzz(20) }}>Send to Jitu Bhaiya</Btn>
+            <Btn full className="mt-5" disabled={!rating} onClick={() => { give(id, { rating, tags, notes, benefits }); setSent(true); buzz(20) }}>Send to Jitu Bhaiya</Btn>
           </motion.div>
         )}
       </AnimatePresence>
