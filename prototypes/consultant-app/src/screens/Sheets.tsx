@@ -1,6 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat } from 'lucide-react'
+import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
 import { Avatar, Chip, Segmented, Sheet, go, softSpring, spring, useToast } from '../ui/kit'
 import { dayLabel, fmtDay, fmtShort, fmtTime, relative, inr } from '../lib/time'
@@ -18,6 +18,8 @@ type Open =
   | { k: 'notices' }
   | { k: 'add'; then: 'profile' | 'express' }
   | { k: 'express'; personId?: string }
+  | { k: 'share' }
+  | { k: 'calendar' }
   | null
 
 interface Api {
@@ -28,6 +30,8 @@ interface Api {
   notices: () => void
   addPerson: (then?: 'profile' | 'express') => void
   express: (personId?: string) => void
+  share: () => void
+  calendar: () => void
 }
 const C = createContext<Api | null>(null)
 export const useSheets = () => useContext(C)!
@@ -35,7 +39,7 @@ export const useSheets = () => useContext(C)!
 export const FEE: Record<Kind, number> = { first: 1000, followup: 800 }
 export const KIND_LABEL: Record<Kind, string> = { first: 'First consultation', followup: 'Follow-up' }
 export const STATUS_LABEL: Record<Appt['status'], string> = {
-  awaiting_payment: 'Awaiting payment', confirmed: 'Confirmed', in_session: 'In session', completed: 'Completed', no_show: 'No-show',
+  awaiting_payment: 'Awaiting payment', confirmed: 'Confirmed', checked_in: 'Checked in', in_session: 'In session', completed: 'Completed', no_show: 'No-show',
 }
 
 export function waLink(phone: string, text: string) {
@@ -57,6 +61,8 @@ export function SheetsProvider({ children }: { children: ReactNode }) {
     notices: () => setOpen({ k: 'notices' }),
     addPerson: (then = 'profile') => setOpen({ k: 'add', then }),
     express: (personId) => setOpen({ k: 'express', personId }),
+    share: () => setOpen({ k: 'share' }),
+    calendar: () => setOpen({ k: 'calendar' }),
   }), [])
   return (
     <C.Provider value={api}>
@@ -76,6 +82,12 @@ export function SheetsProvider({ children }: { children: ReactNode }) {
       <Sheet open={open?.k === 'add'} onClose={close} label="Add a person">
         {open?.k === 'add' && <AddPersonBody then={open.then} close={close} api={api} />}
       </Sheet>
+      <Sheet open={open?.k === 'share'} onClose={close} label="Share your booking link">
+        {open?.k === 'share' && <ShareBody />}
+      </Sheet>
+      <Sheet open={open?.k === 'calendar'} onClose={close} label="Calendar">
+        {open?.k === 'calendar' && <CalendarBody api={api} />}
+      </Sheet>
       <Sheet open={open?.k === 'express'} onClose={close} label="Express booking">
         {open?.k === 'express' && <ExpressBody key={open.personId ?? 'pick'} personId={open.personId} close={close} api={api} />}
       </Sheet>
@@ -90,7 +102,7 @@ function SessionBody({ id, close, api }: { id: string; close: () => void; api: A
   const a = s.appts.find((x) => x.id === id)
   if (!a) return null
   const p = person.get(a.personId)!
-  const upcoming = a.status === 'confirmed' || a.status === 'awaiting_payment'
+  const upcoming = a.status === 'confirmed' || a.status === 'awaiting_payment' || a.status === 'checked_in'
   const startsSoon = a.start - now < 30 * MIN
   return (
     <div className="sd">
@@ -443,6 +455,118 @@ function ExpressBody({ personId, close, api }: { personId?: string; close: () =>
         ))}
       </ul>
       <button className="btn btn-quiet btn-block" onClick={() => api.book(p.id)}><CalendarClock size={16} /> Pick another day</button>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- share booking link (+ QR for workshops)
+export const BOOKING_LINK = 'https://bewise.in/book/jitu-bhaiya' // illustrative until the domain is set (D-12)
+const SHARE_MSGS: Record<'new' | 'followup' | 'workshop', { label: string; text: string }> = {
+  new: { label: 'New client', text: 'Namaste 🙏 You can book a calm, one-to-one consultation with me here. Pick any time that suits you:' },
+  followup: { label: 'Follow-up', text: 'Namaste 🙏 Time for our follow-up. Choose a time that works for you here:' },
+  workshop: { label: 'Workshop', text: 'Thank you for joining the workshop today 🙏 If you would like a personal session with me, book here:' },
+}
+function ShareBody() {
+  const { s, now } = useStore()
+  const toast = useToast()
+  const [kind, setKind] = useState<keyof typeof SHARE_MSGS>('new')
+  const [qr, setQr] = useState<string | null>(null)
+  const msg = `${SHARE_MSGS[kind].text}\n${BOOKING_LINK}`
+  useEffect(() => {
+    let live = true
+    import('qrcode').then((Q) => Q.toDataURL(BOOKING_LINK, { margin: 1, width: 360, color: { dark: '#182957', light: '#FFFFFF' } })).then((u) => { if (live) setQr(u) }).catch(() => {})
+    return () => { live = false }
+  }, [])
+  const m0 = new Date(now); m0.setDate(1); m0.setHours(0, 0, 0, 0)
+  const firsts = s.appts.filter((a) => a.kind === 'first' && a.start >= m0.getTime()).length
+  const copy = async (text = BOOKING_LINK, done = 'Link copied') => {
+    try { await navigator.clipboard.writeText(text); toast(done) }
+    catch { toast('Copy not allowed here. Long-press the text to copy.') }
+  }
+  const canShare = typeof navigator !== 'undefined' && 'share' in navigator
+  return (
+    <div className="share">
+      <h3 className="sheet-title">Your booking link</h3>
+      <p className="muted small">Anyone with this link sees your free times and can book with you. {firsts} first consultations booked this month.</p>
+      <div className="link-box"><span>{BOOKING_LINK.replace('https://', '')}</span><button className="btn btn-primary btn-sm" onClick={() => copy()}><Copy size={15} /> Copy</button></div>
+      <div className="chips-wrap tight">{(Object.keys(SHARE_MSGS) as (keyof typeof SHARE_MSGS)[]).map((k) => <Chip key={k} active={kind === k} onClick={() => setKind(k)}>{SHARE_MSGS[k].label}</Chip>)}</div>
+      <p className="wa-bubble wa-preview">{msg}</p>
+      <div className="form-actions">
+        <a className="btn btn-quiet" href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a>
+        {canShare
+          ? <button className="btn btn-primary" onClick={() => navigator.share({ title: 'Book with Jitu Bhaiya', text: SHARE_MSGS[kind].text, url: BOOKING_LINK }).catch(() => {})}><Share2 size={16} /> Share</button>
+          : <button className="btn btn-primary" onClick={() => copy(msg, 'Message copied')}><Copy size={16} /> Copy message</button>}
+      </div>
+      <div className="qr">
+        {qr ? <m.img src={qr} width={180} height={180} alt="QR code for your booking link" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={softSpring} /> : <span className="qr-ph" />}
+        <div><b>QR code</b><p className="muted small">Show it at workshops or keep it at the studio desk. People scan and book.</p>
+          {qr && <a className="link" href={qr} download="jitu-bhaiya-booking-qr.png">Download QR</a>}</div>
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- calendar (month view of all appointments)
+function CalendarBody({ api }: { api: Api }) {
+  const { s, now } = useStore()
+  const { person } = useIndex()
+  const today = startOfDay(now)
+  const [month, setMonth] = useState(() => { const d = new Date(now); d.setDate(1); d.setHours(0, 0, 0, 0); return d.getTime() })
+  const [dir, setDir] = useState(0)
+  const [sel, setSel] = useState(today)
+  const byDay = useMemo(() => {
+    const mp = new Map<number, Appt[]>()
+    for (const a of s.appts) { if (a.status === 'no_show') continue; const d = startOfDay(a.start); const l = mp.get(d); if (l) l.push(a); else mp.set(d, [a]) }
+    return mp
+  }, [s.appts])
+  const md = new Date(month)
+  const lead = (md.getDay() + 6) % 7
+  const daysIn = new Date(md.getFullYear(), md.getMonth() + 1, 0).getDate()
+  const cells = Array.from({ length: Math.ceil((lead + daysIn) / 7) * 7 }, (_, i) => i - lead + 1)
+  const shift = (n: number) => { const d = new Date(month); d.setMonth(d.getMonth() + n); setDir(n); setMonth(d.getTime()) }
+  const list = byDay.get(sel) ?? []
+  const max = Math.max(1, ...[...byDay.values()].map((l) => l.length))
+  return (
+    <div className="cal">
+      <div className="cal-head">
+        <button className="icon-btn sm" onClick={() => shift(-1)} aria-label="Previous month"><ChevronLeft size={18} /></button>
+        <h3 className="sheet-title">{new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric' }).format(month)}</h3>
+        <button className="icon-btn sm" onClick={() => shift(1)} aria-label="Next month"><ChevronRight size={18} /></button>
+      </div>
+      <div className="cal-wd">{['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((w, i) => <span key={i}>{w}</span>)}</div>
+      <AnimatePresence mode="wait" initial={false} custom={dir}>
+        <m.div key={month} className="cal-grid" initial={{ opacity: 0, x: dir * 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -30 }} transition={{ duration: 0.18 }}>
+          {cells.map((n, i) => {
+            if (n < 1 || n > daysIn) return <span key={i} />
+            const d = new Date(md.getFullYear(), md.getMonth(), n).getTime()
+            const l = byDay.get(d) ?? []
+            const unpaid = l.some((a) => a.status === 'awaiting_payment')
+            return (
+              <button key={i} className={'cal-d' + (d === sel ? ' is-sel' : '') + (d === today ? ' is-today' : '') + (d < today ? ' is-past' : '')} onClick={() => setSel(d)} aria-label={`${n}: ${l.length} sessions`} aria-pressed={d === sel}>
+                <span className="cal-n">{n}</span>
+                {l.length > 0 && <span className="cal-bar" style={{ opacity: 0.35 + 0.65 * (l.length / max) }}>{l.length}</span>}
+                {unpaid && <i className="cal-unpaid" aria-hidden />}
+              </button>
+            )
+          })}
+        </m.div>
+      </AnimatePresence>
+      <p className="cal-legend"><span className="cal-bar demo">3</span> sessions that day <i className="cal-unpaid" /> awaiting payment</p>
+      <h4 className="x-head">{dayLabel(sel, now)}{list.length ? `, ${list.length} ${list.length === 1 ? 'session' : 'sessions'}` : ''}</h4>
+      {list.length === 0 ? <p className="muted small">Nothing booked.</p> : (
+        <ul className="rows cal-list">
+          {list.map((a) => {
+            const p = person.get(a.personId)!
+            return (
+              <li key={a.id}><button className="row" onClick={() => api.session(a.id)}>
+                <span className="row-time">{fmtTime(a.start)}<small>{a.durationMin} min</small></span>
+                <span className="row-main"><b>{p.name}</b><small>{KIND_LABEL[a.kind]}{a.status !== 'confirmed' ? `, ${STATUS_LABEL[a.status].toLowerCase()}` : ''}</small></span>
+                <span className="mode-ic">{a.mode === 'online' ? <Video size={15} /> : <MapPin size={15} />}</span>
+              </button></li>
+            )
+          })}
+        </ul>
+      )}
     </div>
   )
 }

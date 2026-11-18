@@ -1,12 +1,12 @@
 /**
- * @screens CN-03 Today — bloom of today's sessions, next session, "Needs you" insights, timeline, motivation.
+ * @screens CN-03 Today — share link, today's appointments with check-in (+ calendar), impact, "Needs you" insights, motivation.
  */
 import { useMemo, useState } from 'react'
 import { AnimatePresence, m, useMotionValue, useTransform, animate } from 'motion/react'
-import { Bell, MapPin, Video, Play, NotebookPen, Sparkles, ChevronRight, MessageCircle } from 'lucide-react'
+import { Bell, MapPin, Video, Play, Sparkles, ChevronRight, MessageCircle, Link2, CalendarDays, UserCheck, Leaf, Check, ClipboardCheck, ClipboardList } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { Avatar, CountUp, Empty, go, softSpring, spring, useToast } from '../ui/kit'
-import { useSheets, KIND_LABEL, waLink, reminderText } from './Sheets'
+import { CountUp, Empty, go, softSpring, spring, useToast } from '../ui/kit'
+import { useSheets, waLink, reminderText } from './Sheets'
 import { ImpactCard } from './Impact'
 import { insights, personView, growth, WEEK_GOAL, LIFETIME_REACH, type Insight, type PersonView } from '../lib/derive'
 import { fmtTime, greeting, relative } from '../lib/time'
@@ -21,7 +21,7 @@ export default function Today() {
   const todays = useMemo(() => s.appts.filter((a) => startOfDay(a.start) === today && a.status !== 'awaiting_payment'), [s.appts, today])
   const done = todays.filter((a) => a.status === 'completed' || a.status === 'no_show').length
   const live = todays.find((a) => a.status === 'in_session')
-  const next = live ?? todays.find((a) => a.start > now && a.status === 'confirmed')
+  const next = live ?? todays.find((a) => a.status === 'checked_in') ?? todays.find((a) => a.start > now - 15 * MIN && a.status === 'confirmed')
   const unread = s.notices.filter((n) => n.at > s.readUpTo && !n.seen).length
 
   const views = useMemo(() => new Map(s.people.map((p) => [p.id, personView(p, byPerson.get(p.id), now)])), [s.people, byPerson, now])
@@ -39,6 +39,7 @@ export default function Today() {
       <header className="topbar">
         <img className="me" src="./img/jitu.webp" width={44} height={44} alt="Jitu Bhaiya" />
         <div className="brand"><b>BeWise</b><span>Consultant</span></div>
+        <m.button className="share-btn" onClick={sheets.share} whileTap={{ scale: 0.95 }}><Link2 size={16} /> Share my link</m.button>
         <button className="icon-btn" aria-label={`Updates${unread ? `, ${unread} new` : ''}`} onClick={sheets.notices}>
           <Bell size={20} />
           <AnimatePresence>{unread > 0 && <m.span className="badge" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring}>{unread}</m.span>}</AnimatePresence>
@@ -47,51 +48,14 @@ export default function Today() {
 
       <h1 className="hello"><span>{greeting(now)}, Jitu Bhaiya.</span><span className="hello-sub">{sub}</span></h1>
 
+      <TodayList todays={todays} next={next} done={done} now={now} />
+
       <ImpactCard />
-
-      <section className="bloom-row" aria-label="Today's sessions">
-        <Bloom appts={todays} now={now} onPetal={(a) => sheets.session(a.id)} />
-        <div className="bloom-legend">
-          <p className="bloom-count"><b>{done}</b><span>/{todays.length}</span></p>
-          <p className="muted small">sessions done today</p>
-          <ul className="legend">
-            <li><i className="lg lg-done" />Done</li>
-            <li><i className="lg lg-next" />Next</li>
-            <li><i className="lg lg-later" />Later</li>
-          </ul>
-        </div>
-      </section>
-
-      {next ? <NextCard a={next} now={now} /> : todays.length > 0 && (
-        <div className="card done-card"><img src="./img/owl-sleep.webp" width={72} height={72} alt="" /><div><b>That's everyone for today.</b><p className="muted small">Tomorrow: {s.appts.filter((a) => startOfDay(a.start) === today + DAY).length} sessions booked.</p></div></div>
-      )}
 
       <section className="block" aria-label="Needs you">
         <div className="block-head"><h2>Needs you</h2>{deck.length > 0 && <span className="muted small">{deck.length} {deck.length === 1 ? 'thing' : 'things'}</span>}</div>
         <InsightDeck items={deck} views={views} />
       </section>
-
-      {todays.length > 0 && (
-        <section className="block" aria-label="Today's timeline">
-          <div className="block-head"><h2>Today</h2><button className="link" onClick={() => go('/sessions')}>All sessions</button></div>
-          <ol className="timeline">
-            {todays.map((a, i) => {
-              const p = person.get(a.personId)!
-              const st = a.status === 'completed' || a.status === 'no_show' ? 'done' : a === next ? 'next' : 'later'
-              return (
-                <m.li key={a.id} className={`tl tl-${st}`} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.05, duration: 0.25 }}>
-                  <button onClick={() => sheets.session(a.id)}>
-                    <span className="tl-time">{fmtTime(a.start)}</span>
-                    <span className="tl-dot" aria-hidden />
-                    <span className="tl-main"><b>{p.name}</b><small>{KIND_LABEL[a.kind]}, {a.durationMin} min</small></span>
-                    <span className="tl-mode" aria-label={a.mode === 'online' ? 'Online' : 'In person'}>{a.mode === 'online' ? <Video size={16} /> : <MapPin size={16} />}</span>
-                  </button>
-                </m.li>
-              )
-            })}
-          </ol>
-        </section>
-      )}
 
       <section className="block" aria-label="Your week">
         <div className="block-head"><h2>Your week</h2><button className="link" onClick={() => go('/growth')}>Growth</button></div>
@@ -114,7 +78,7 @@ export default function Today() {
 // ---------------------------------------------------------------- the bloom
 function Bloom({ appts, now, onPetal }: { appts: Appt[]; now: number; onPetal: (a: Appt) => void }) {
   const n = Math.max(appts.length, 1)
-  const nextIdx = appts.findIndex((a) => a.status === 'in_session' || (a.start > now && a.status === 'confirmed'))
+  const nextIdx = appts.findIndex((a) => a.status === 'in_session' || a.status === 'checked_in' || (a.start > now - 15 * MIN && a.status === 'confirmed'))
   const w = Math.min(1, 6 / n)
   return (
     <svg className="bloom" viewBox="0 0 200 200" role="group" aria-label={`${appts.length} sessions today`}>
@@ -156,28 +120,61 @@ function Bloom({ appts, now, onPetal }: { appts: Appt[]; now: number; onPetal: (
   )
 }
 
-// ---------------------------------------------------------------- next session
-function NextCard({ a, now }: { a: Appt; now: number }) {
+// ---------------------------------------------------------------- today's appointments with check-in
+function TodayList({ todays, next, done, now }: { todays: Appt[]; next?: Appt; done: number; now: number }) {
   const { person } = useIndex()
-  const p = person.get(a.personId)!
-  const live = a.status === 'in_session'
-  const soon = a.start - now < 30 * MIN
+  const { s, dispatch } = useStore()
+  const sheets = useSheets()
+  const toast = useToast()
+  if (todays.length === 0) return (
+    <section className="card today-list" aria-label="Today's appointments">
+      <div className="tdl-head"><div><h2>Today's appointments</h2><small>None booked</small></div><button className="cal-btn" onClick={sheets.calendar}><CalendarDays size={16} /> Calendar</button></div>
+    </section>
+  )
   return (
-    <m.article className={'card next' + (live ? ' is-live' : '')} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ ...softSpring, delay: 0.35 }}>
-      <p className="next-when">{live ? <><span className="live-dot" />With {p.first} now</> : <>Next session <b>{relative(a.start, now)}</b></>}</p>
-      <button className="next-who" onClick={() => go(`/people/${p.id}`)}>
-        <Avatar name={p.name} size={56} mood={p.moods.at(-1)?.mood} layoutId={`av-${p.id}`} />
-        <span><strong>{p.name}</strong><small>{KIND_LABEL[a.kind]} at {fmtTime(a.start)}</small>
-          <span className="pill">{a.mode === 'online' ? <><Video size={13} /> Online</> : <><MapPin size={13} /> In person</>}</span></span>
-      </button>
-      {a.note && <p className="next-note">“{a.note}”</p>}
-      <div className="btn-row">
-        <button className="btn btn-quiet" onClick={() => go(`/people/${p.id}`)}><NotebookPen size={16} /> Prepare</button>
-        <button className="btn btn-primary" disabled={!soon && !live} onClick={() => go(`/session/${a.id}`)}>
-          <Play size={16} /> {live ? 'Open session' : soon ? 'Start' : `Start at ${fmtTime(a.start)}`}
-        </button>
+    <section className="card today-list" aria-label="Today's appointments">
+      <div className="tdl-head">
+        <div className="mini-bloom"><Bloom appts={todays} now={now} onPetal={(a) => sheets.session(a.id)} /></div>
+        <div><h2>Today's appointments</h2><small>{done} of {todays.length} done{todays.filter((a) => a.status === 'checked_in').length ? `, ${todays.filter((a) => a.status === 'checked_in').length} checked in` : ''}</small></div>
+        <button className="cal-btn" onClick={sheets.calendar}><CalendarDays size={16} /> Calendar</button>
       </div>
-    </m.article>
+      <ul className="tdl">
+        {todays.map((a, i) => {
+          const p = person.get(a.personId)!
+          const isNext = a === next
+          const fin = a.status === 'completed' || a.status === 'no_show'
+          const soon = a.start - now < 2 * 60 * MIN
+          const form = a.kind === 'followup' ? (p.checkin && now - p.checkin.at < 10 * DAY ? 'filled' : 'missing') : null
+          let action: JSX.Element | null = null
+          if (a.status === 'confirmed' && soon) action = <m.button className="tdl-act act-in" whileTap={{ scale: 0.94 }} onClick={() => { dispatch({ type: 'checkIn', apptId: a.id }); toast(`${p.first} ${a.mode === 'online' ? 'has joined' : 'has arrived'}. Start when you're ready.`) }}><UserCheck size={14} /> Check in</m.button>
+          else if (a.status === 'checked_in') action = <m.button className="tdl-act act-start" whileTap={{ scale: 0.94 }} onClick={() => go(`/session/${a.id}`)}><Play size={14} /> Start</m.button>
+          else if (a.status === 'in_session') action = <m.button className="tdl-act act-start" whileTap={{ scale: 0.94 }} onClick={() => go(`/session/${a.id}`)}><Play size={14} /> Open</m.button>
+          else if (a.status === 'completed' && !a.remedy) action = <m.button className="tdl-act act-remedy" whileTap={{ scale: 0.94 }} onClick={() => sheets.remedy(a.id)}><Leaf size={14} /> Give remedy</m.button>
+          else if (fin) action = <span className="tdl-done">{a.status === 'no_show' ? "Didn't come" : <><Check size={14} /> Done</>}</span>
+          return (
+            <m.li key={a.id} className={'tdl-row' + (fin ? ' is-fin' : '') + (isNext ? ' is-next' : '') + (a.status === 'in_session' ? ' is-live' : '')} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.05, duration: 0.24 }}>
+              <div className="tdl-line">
+                <button className="tdl-who" onClick={() => sheets.session(a.id)}>
+                  <span className="tdl-time">{fmtTime(a.start)}<small>{isNext && !fin ? (a.status === 'in_session' ? 'now' : relative(a.start, now)) : `${a.durationMin} min`}</small></span>
+                  <span className="tdl-main"><b>{p.name}</b>
+                    <small>{a.mode === 'online' ? <Video size={12} /> : <MapPin size={12} />} {a.kind === 'first' ? 'First visit' : 'Follow-up'}{a.status === 'checked_in' ? (a.mode === 'online' ? ', joined' : ', arrived') : ''}</small></span>
+                </button>
+                {action}
+              </div>
+              {!fin && form && (
+                <div className="tdl-form">
+                  {form === 'filled'
+                    ? <button className="form-ok" onClick={() => go(`/people/${p.id}`)}><ClipboardCheck size={13} /> Check-in form filled {relative(p.checkin!.at, now)}</button>
+                    : <a className="form-miss" href={waLink(p.phone, `Namaste ${p.first} 🙏 Before our follow-up at ${fmtTime(a.start)}, please fill the 2-minute check-in in the BeWise app so I can see how you've been. Jitu Bhaiya`)} target="_blank" rel="noreferrer"><ClipboardList size={13} /> No check-in form yet. Ask {p.first}</a>}
+                </div>
+              )}
+              {isNext && a.note && !fin && <p className="tdl-note">“{a.note}”</p>}
+            </m.li>
+          )
+        })}
+      </ul>
+      {todays.length > 0 && !next && <p className="muted small tdl-end">That's everyone for today. Tomorrow: {s.appts.filter((x) => startOfDay(x.start) === startOfDay(now) + DAY).length} sessions booked.</p>}
+    </section>
   )
 }
 

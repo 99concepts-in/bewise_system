@@ -2,6 +2,12 @@
 
 > Only the CONSULTANT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — Prototype: share link, today's appointments with check-in, calendar (branch claude/new-session-1j1y0u)
+**Status:** Prototype (demo data)
+**Done:** "Share my link" at top of Today (copy, WhatsApp templates, native share, QR) · Today's appointments at the top with Check in → Start → Open / Give remedy, check-in form status + "Ask" · month calendar sheet (Today + Sessions) · new appointment status `checked_in` used in the prototype (contract enum already has it)
+**Needs from others:** HUB/OWNER — real booking domain (D-12) for the share link
+**Breaking changes:** none
+
 ## 2026-11-18 — Consultant prototype v2: impact, live session, suggested flowers, adherence, add person, express booking (branch claude/new-session-1j1y0u)
 **Status:** Prototype (demo data)
 **Done:** "Your impact" on top of Today + Growth (milestones, people helped, % felt better, what people said they felt) · live session route `#/session/:id` (summary → troubling → private notes → flowers to consider → End session → Give remedy) · suggested flowers with reasons in the remedy sheet (D-37, reference only) · "Taking the remedy" adherence card + "Missing drops" group + insight · New person form + Express booking · **owner rule 2026-11-18: booking = greet + confirm first, payment link sent automatically after; he never sends a link himself** · Sessions redesigned (summary, actionable chips, inline Remind / Give remedy / Book, next 7 days only, past rows show what people felt)

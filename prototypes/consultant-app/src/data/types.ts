@@ -7,7 +7,7 @@
 export type Mode = 'online' | 'in_person'
 export type Kind = 'first' | 'followup'
 export type Mood = 'calm' | 'joyful' | 'grateful' | 'hopeful' | 'tired' | 'anxious' | 'sad' | 'irritated'
-export type ApptStatus = 'awaiting_payment' | 'confirmed' | 'in_session' | 'completed' | 'no_show'
+export type ApptStatus = 'awaiting_payment' | 'confirmed' | 'checked_in' | 'in_session' | 'completed' | 'no_show'
 export type RemedyStage = 'given' | 'preparing' | 'dispatched' | 'delivered'
 
 export interface Person {

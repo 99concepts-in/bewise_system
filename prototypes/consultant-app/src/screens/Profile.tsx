@@ -54,7 +54,7 @@ export default function Profile({ id }: { id: string }) {
 
       {v.next && v.next.start - now < 60 * MIN && (
         <m.button className="live-banner" onClick={() => go(`/session/${v.next!.id}`)} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-          <span className="live-dot" /><span><b>{v.next.status === 'in_session' ? 'Session in progress' : `Session ${relative(v.next.start, now)}`}</b><small>{fmtTime(v.next.start)}, {v.next.mode === 'online' ? 'online' : 'in person'}</small></span>
+          <span className="live-dot" /><span><b>{v.next.status === 'in_session' ? 'Session in progress' : v.next.status === 'checked_in' ? `${p.first} has ${v.next.mode === 'online' ? 'joined' : 'arrived'}` : `Session ${relative(v.next.start, now)}`}</b><small>{fmtTime(v.next.start)}, {v.next.mode === 'online' ? 'online' : 'in person'}</small></span>
           <span className="lb-cta">{v.next.status === 'in_session' ? 'Open' : 'Start'}</span>
         </m.button>
       )}

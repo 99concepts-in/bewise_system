@@ -26,7 +26,7 @@ export function personView(p: Person, list: Appt[] = [], now: number): PersonVie
   const past = list.filter((a) => a.start + a.durationMin * MIN <= now || a.status === 'completed' || a.status === 'no_show').filter((a) => a.status !== 'confirmed' && a.status !== 'awaiting_payment')
   const done = past.filter((a) => a.status === 'completed')
   const last = done.at(-1)
-  const next = list.find((a) => a.start > now - 30 * MIN && (a.status === 'confirmed' || a.status === 'awaiting_payment' || a.status === 'in_session'))
+  const next = list.find((a) => a.start > now - 30 * MIN && (a.status === 'confirmed' || a.status === 'awaiting_payment' || a.status === 'checked_in' || a.status === 'in_session'))
   const blend = [...done].reverse().find((a) => a.remedy)
   const dueOn = last && !next ? startOfDay(last.start) + (last.followUpWeeks ?? 4) * 7 * DAY : undefined
   const buckets: Bucket[] = ['all']
@@ -158,7 +158,7 @@ export function growth(appts: Appt[], people: Person[], now: number) {
     return { start: s, count: done.filter((a) => a.start >= s && a.start < e).length }
   })
   const thisWeek = appts.filter((a) => a.start >= ws && a.start < ws + 7 * DAY && a.status === 'completed').length
-  const bookedRest = appts.filter((a) => a.start >= now && a.start < ws + 7 * DAY && (a.status === 'confirmed' || a.status === 'in_session')).length
+  const bookedRest = appts.filter((a) => a.start >= now && a.start < ws + 7 * DAY && (a.status === 'confirmed' || a.status === 'checked_in' || a.status === 'in_session')).length
   const m0 = new Date(now); m0.setDate(1); m0.setHours(0, 0, 0, 0)
   const monthStart = m0.getTime()
   const lm = new Date(monthStart); lm.setMonth(lm.getMonth() - 1)

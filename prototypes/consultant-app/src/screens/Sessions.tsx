@@ -4,7 +4,7 @@
  */
 import { useDeferredValue, useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { CalendarPlus, ChevronDown, Leaf, MapPin, MessageCircle, Search, Star, Video, X, Zap } from 'lucide-react'
+import { CalendarDays, CalendarPlus, ChevronDown, Leaf, MapPin, MessageCircle, Search, Star, Video, X, Zap } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
 import { Avatar, Empty, Segmented, softSpring, spring } from '../ui/kit'
 import { useSheets, reminderText, waLink } from './Sheets'
@@ -30,7 +30,7 @@ export default function Sessions() {
   const [showLater, setShowLater] = useState(false)
   const [pastDays, setPastDays] = useState(14)
 
-  const isPast = (a: Appt) => a.status === 'completed' || a.status === 'no_show' || (a.start + a.durationMin * MIN < now && a.status !== 'in_session')
+  const isPast = (a: Appt) => a.status === 'completed' || a.status === 'no_show' || (a.start + a.durationMin * MIN < now && a.status !== 'in_session' && a.status !== 'checked_in')
   const upcoming = useMemo(() => s.appts.filter((a) => !isPast(a)), [s.appts, now]) // eslint-disable-line react-hooks/exhaustive-deps
   const past = useMemo(() => s.appts.filter(isPast).reverse(), [s.appts, now]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -103,6 +103,7 @@ export default function Sessions() {
         <h1 className="page-title">Sessions</h1>
         <div className="title-actions">
           <button className="icon-btn" aria-label={searching ? 'Close search' : 'Search'} aria-expanded={searching} onClick={() => { setSearching((x) => !x); setQ('') }}>{searching ? <X size={19} /> : <Search size={19} />}</button>
+          <button className="icon-btn" aria-label="Calendar" onClick={sheets.calendar}><CalendarDays size={19} /></button>
           <button className="sort-btn" onClick={() => sheets.express()}><Zap size={16} /> Express</button>
         </div>
       </div>

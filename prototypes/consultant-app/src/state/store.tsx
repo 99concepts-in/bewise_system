@@ -21,6 +21,7 @@ type Action =
   | { type: 'reschedule'; apptId: string; start: number }
   | { type: 'book'; personId: string; start: number; kind: Kind; mode: Mode; id: string; now: number; greeting: string }
   | { type: 'start'; apptId: string }
+  | { type: 'checkIn'; apptId: string }
   | { type: 'dismiss'; key: string }
   | { type: 'readAll'; now: number }
   | { type: 'saturday'; on: boolean }
@@ -69,6 +70,8 @@ function reducer(s: State, a: Action): State {
     }
     case 'start':
       return { ...s, appts: s.appts.map((x) => x.id === a.apptId ? { ...x, status: 'in_session' } : x) }
+    case 'checkIn':
+      return { ...s, appts: s.appts.map((x) => x.id === a.apptId && x.status === 'confirmed' ? { ...x, status: 'checked_in' } : x) }
     case 'dismiss':
       return s.dismissed.includes(a.key) ? s : { ...s, dismissed: [...s.dismissed, a.key] }
     case 'readAll':
