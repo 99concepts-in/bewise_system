@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import { AnimatePresence, animate, m, useMotionValue, useTransform } from 'motion/react'
+import { AnimatePresence, m } from 'motion/react'
 import { Check } from 'lucide-react'
 import type { Mood } from '../data/types'
 
@@ -18,6 +18,18 @@ export function useRoute() {
   return route
 }
 export const go = (path: string) => { if (location.hash !== '#' + path) location.hash = path }
+
+// ---------------------------------------------------------------- media query (re-renders only when it flips)
+export function useMedia(q: string) {
+  const [on, setOn] = useState(() => typeof matchMedia !== 'undefined' && matchMedia(q).matches)
+  useEffect(() => {
+    const m = matchMedia(q)
+    const f = () => setOn(m.matches)
+    m.addEventListener('change', f); f()
+    return () => m.removeEventListener('change', f)
+  }, [q])
+  return on
+}
 
 // ---------------------------------------------------------------- springs
 export const spring = { type: 'spring', stiffness: 420, damping: 36, mass: 0.8 } as const
@@ -136,22 +148,34 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 export const useToast = () => useContext(ToastC)
 
 // ---------------------------------------------------------------- count-up number
+/** Count-up via a tiny rAF loop — writes straight to the DOM node, no re-renders, no animation engine needed. */
 export function CountUp({ to, format = (n) => Math.round(n).toLocaleString('en-IN'), duration = 0.9 }: { to: number; format?: (n: number) => string; duration?: number }) {
-  const v = useMotionValue(0)
-  const text = useTransform(v, format)
+  const ref = useRef<HTMLSpanElement>(null)
+  const from = useRef(0)
   useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const start = from.current
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduce) { v.set(to); return }
-    const c = animate(v, to, { duration, ease: [0.22, 1, 0.36, 1] })
-    return () => c.stop()
-  }, [to, duration, v])
-  return <m.span className="num">{text}</m.span>
+    if (reduce || start === to) { el.textContent = format(to); from.current = to; return }
+    const t0 = performance.now(), ms = duration * 1000
+    let raf = 0
+    const tick = (t: number) => {
+      const k = Math.min(1, (t - t0) / ms)
+      const e = 1 - Math.pow(1 - k, 3)
+      el.textContent = format(start + (to - start) * e)
+      if (k < 1) raf = requestAnimationFrame(tick); else from.current = to
+    }
+    raf = requestAnimationFrame(tick)
+    return () => { cancelAnimationFrame(raf); from.current = to }
+  }, [to, duration]) // eslint-disable-line react-hooks/exhaustive-deps
+  return <span ref={ref} className="num">{format(from.current)}</span>
 }
 
 export function Empty({ img, title, body, action }: { img: string; title: string; body: string; action?: ReactNode }) {
   return (
     <div className="empty">
-      <img src={`./img/${img}.webp`} width={120} height={120} alt="" />
+      <img src={`./img/${img}.webp`} width={120} height={120} alt="" loading="lazy" decoding="async" />
       <h3>{title}</h3>
       <p>{body}</p>
       {action}

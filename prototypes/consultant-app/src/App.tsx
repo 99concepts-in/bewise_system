@@ -1,17 +1,27 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react'
-import { LazyMotion, MotionConfig, domMax, m } from 'motion/react'
+import { Suspense, useEffect, useLayoutEffect, useRef } from 'react'
+import { LazyMotion, MotionConfig, m } from 'motion/react'
 import { CalendarDays, Home, Sprout, Users } from 'lucide-react'
 import { StoreProvider } from './state/store'
 import { ToastProvider, go, spring, useRoute } from './ui/kit'
 import { SheetsProvider } from './screens/Sheets'
 import Today from './screens/Today'
-import Sessions from './screens/Sessions'
-import People from './screens/People'
-import Profile from './screens/Profile'
-import Live from './screens/Live'
+import { SheetBody } from './screens/Sheets'
+import { lazyWithPreload } from './ui/lazy'
 import type { Bucket } from './lib/derive'
 
-const Growth = lazy(() => import('./screens/Growth'))
+// Today ships in the first bundle; everything else is split and prefetched while idle, so taps stay instant.
+const Sessions = lazyWithPreload(() => import('./screens/Sessions'))
+const People = lazyWithPreload(() => import('./screens/People'))
+const Profile = lazyWithPreload(() => import('./screens/Profile'))
+const Live = lazyWithPreload(() => import('./screens/Live'))
+const Growth = lazyWithPreload(() => import('./screens/Growth'))
+const loadFeatures = () => import('./motionFeatures').then((r) => r.default)
+
+function prefetchAll() {
+  const run = () => { loadFeatures(); SheetBody.preload(); [Sessions, People, Profile, Live, Growth].forEach((c) => c.preload()) }
+  const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => void }).requestIdleCallback
+  if (ric) ric(run, { timeout: 1500 }); else setTimeout(run, 300)
+}
 
 const TABS = [
   { path: '/', key: '', label: 'Today', Icon: Home },
@@ -37,19 +47,21 @@ function Shell() {
     requestAnimationFrame(() => scrollTo({ top: y, behavior: 'instant' as ScrollBehavior }))
   }, [key])
 
+  useEffect(prefetchAll, [])
+
   let screen
   if (top === 'session' && parts[1]) screen = <Live id={parts[1]} />
   else if (top === 'sessions') screen = <Sessions />
   else if (top === 'people' && parts[1]) screen = <Profile id={parts[1]} />
   else if (top === 'people') screen = <People initialBucket={(q || undefined) as Bucket | undefined} />
-  else if (top === 'growth') screen = <Suspense fallback={<div className="screen" />}><Growth /></Suspense>
+  else if (top === 'growth') screen = <Growth />
   else screen = <Today />
 
   return (
     <div className={'app' + (top === 'session' ? ' is-focus' : '')}>
       <a className="skip" href="#main">Skip to content</a>
       <nav className="nav" aria-label="Main">
-        <img className="nav-logo" src="./img/owl-drops.webp" width={40} height={40} alt="BeWise" />
+        <img className="nav-logo" src="./img/owl-drops-160.webp" width={40} height={40} alt="BeWise" decoding="async" />
         {TABS.map(({ path, key: k, label, Icon }) => {
           const on = top === k
           return (
@@ -61,19 +73,27 @@ function Shell() {
           )
         })}
       </nav>
-      <main id="main" className="main">
+      <main id="main" className={'main' + (top === '' ? ' main-wide' : '')}>
         {/* Enter-only transition: the new screen never waits for the old one to leave (instant, and nothing can stall it). */}
         <m.div key={key} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}>
-          {screen}
+          <Suspense fallback={<ScreenSkeleton />}>{screen}</Suspense>
         </m.div>
       </main>
     </div>
   )
 }
 
+function ScreenSkeleton() {
+  return (
+    <div className="screen skel" aria-busy="true" aria-label="Loading">
+      <span className="skel-line w40" /><span className="skel-block" /><span className="skel-block short" /><span className="skel-block" />
+    </div>
+  )
+}
+
 export default function App() {
   return (
-    <LazyMotion features={domMax} strict>
+    <LazyMotion features={loadFeatures} strict>
       <MotionConfig reducedMotion="user">
         <StoreProvider>
           <ToastProvider>

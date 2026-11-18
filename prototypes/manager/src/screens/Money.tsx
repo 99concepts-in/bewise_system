@@ -3,14 +3,14 @@
  * UI only — in the real build these call OWNER finance.* functions (flag follow_up_centre). No refunds (D-16).
  */
 import { AnimatePresence, motion } from 'motion/react'
-import { Plus, MessageCircle, Mail, IndianRupee, Copy, Repeat, CheckCheck } from 'lucide-react'
+import { Plus, MessageCircle, Mail, IndianRupee, Repeat, CheckCheck } from 'lucide-react'
 import { useState } from 'react'
 import { useStore } from '../lib/store'
 import { ago, dateKey, day, dueLabel, firstName, inr } from '../lib/format'
 import type { Invoice } from '../lib/types'
 import {
   Button, Chip, Choices, CountUp, Divided, Empty, Field, FlowBar, PhotoInput, Row, Screen, SectionTitle, Segmented, Sheet, Stat, Surface,
-  copyText, cx, inputCls, spring, useIntent,
+  cx, inputCls, spring, useIntent,
 } from '../ui/kit'
 import owlSleep from '../assets/owl-sleep.webp'
 
@@ -134,8 +134,8 @@ export function InvoiceDetail({ id }: { id: string }) {
   if (!i) return <Screen title="Invoice"><Empty title="Invoice not found" body="It may have been removed in a demo reset." /></Screen>
   const c = s.clients.find((x) => x.id === i.clientId)!
   const left = due(i)
-  const link = `https://pay.bewise.in/${i.code.split('/').pop()}`
-  const msg = `Namaste ${firstName(c.name)} 🙏 A gentle reminder from BeWise: ${inr(left)} is pending for "${i.label}" (${i.code}), ${dueLabel(i.dueOn).replace('due', 'due')}. You can pay here: ${link}. Thank you!`
+  // Haresh never sends a payment link by hand — BeWise sent it automatically; the reminder points to that message.
+  const msg = `Namaste ${firstName(c.name)} 🙏 Just checking you got the BeWise message about ${inr(left)} for "${i.label}" (${i.code}). The payment link is in that chat. Thank you! Haresh, BeWise`
   return (
     <Screen title={<span className="tnum">{inr(left)}</span>} sub={`${c.name} · ${i.code}`}
       actions={<Chip tone={left === 0 ? 'ok' : i.dueOn < dateKey(0) ? 'bad' : 'accent'}>{left === 0 ? 'Paid' : dueLabel(i.dueOn)}</Chip>}>
@@ -178,8 +178,6 @@ export function InvoiceDetail({ id }: { id: string }) {
       </Divided>
       {left > 0 && (
         <>
-          <button onClick={() => copyText(link, (ok) => s.toast(ok ? 'Payment link copied' : 'Copy blocked — select the link instead', ok ? 'good' : 'bad'))}
-            className="mx-auto mt-4 flex items-center gap-1.5 rounded-full px-4 py-2 text-[14px] font-semibold text-accent hover:bg-accent-soft"><Copy size={15} /> Copy payment link</button>
           <FlowBar label={`Send reminder on ${channel === 'whatsapp' ? 'WhatsApp' : 'email'}`} icon={channel === 'whatsapp' ? <MessageCircle size={19} /> : <Mail size={19} />}
             onAction={() => { s.remind(i.id, channel); s.toast('Reminder sent') }}
             secondary={<Button onClick={() => setPay(true)} className="h-[58px] shrink-0" icon={<IndianRupee size={17} />}>Paid</Button>} />

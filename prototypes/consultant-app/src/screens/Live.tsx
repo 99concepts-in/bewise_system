@@ -46,7 +46,7 @@ export default function Live({ id }: { id: string }) {
       <header className="live-top">
         <button className="icon-btn" onClick={() => history.length >= 0 && go(`/people/${p.id}`)} aria-label="Back to profile"><ArrowLeft size={20} /></button>
         <div className="live-who"><b>{p.name}</b><small>{KIND_LABEL[a.kind]}, {a.durationMin} min</small></div>
-        <span className={'timer' + (over ? ' over' : '')} aria-label={`${mm} minutes in`}>{ended ? 'Ended' : `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`}</span>
+        <span className={'timer' + (over ? ' over' : '')} role="timer" aria-label={`${mm} minutes in`}>{ended ? 'Ended' : `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`}</span>
       </header>
       <div className="live-chips">
         <span className="pill">{a.mode === 'online' ? <><Video size={13} /> Online</> : <><MapPin size={13} /> In person</>}</span>
@@ -62,7 +62,7 @@ export default function Live({ id }: { id: string }) {
             {(lines ?? [`Last session ${relative(last.start, now)}${last.troubling ? `: ${last.troubling.join(', ').toLowerCase()}` : ''}.`]).map((l, i) => <li key={i}>{l}</li>)}
           </ul>
         ) : <p className="muted small">First visit. {p.first}'s intake answers and an AI case summary will show here.</p>}
-        {v.blend?.remedy && <p className="live-blend"><Leaf size={14} /> Current blend since {fmtShort(v.blend.remedy.givenAt)}: <b>{v.blend.remedy.flowers.join(', ')}</b></p>}
+        {v.blend?.remedy && <p className="live-blend"><Leaf size={14} /><span>Current blend since {fmtShort(v.blend.remedy.givenAt)}: <b>{v.blend.remedy.flowers.join(', ')}</b></span></p>}
       </m.section>
 
       {v.blend?.remedy && <div className="live-adh"><AdherenceCard p={p} now={now} compact /></div>}

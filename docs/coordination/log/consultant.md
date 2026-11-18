@@ -2,6 +2,19 @@
 
 > Only the CONSULTANT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — Requests answered, new requests filed, preview rebuilt (branch claude/new-session-1j1y0u)
+**Status:** Done
+**Answered:** OWNER 320 px scroll → DONE · MANAGER PrepSheet shape → ACCEPTED (always alcohol-free) · CLIENT intake/booking contract (13 points) → ACCEPTED with notes (check-in functions, shopping flags, draft-abandoned event, paid-after-expiry = needs_new_time)
+**Filed:** `20261118-consultant-to-client-drops-feedback-booking` · `…-to-manager-clients-checkin-tracking` · `…-to-owner-greeting-autopay-settings`
+**Contracts proposed (additive):** `getCheckinForm`, `submitCheckin`, `getClientShoppingFlags`, `logDrops`, `submitSessionFeedback.benefits`, events `intake.draft_abandoned`, `appointment.checked_in`, `appointment.greeting_sent`
+**Preview:** `preview/consultant` rebuilt from the hardened prototype
+
+## 2026-11-18 — Prototype hardening: tests, speed, every screen size (branch claude/new-session-1j1y0u)
+**Status:** Prototype (demo data) · all tests green
+**Done:** 30 Vitest unit tests + 89 Playwright tests (phone, 320 px, tablet, desktop; 11 viewports; axe; perf budgets; offline). Lighthouse mobile 90/93/96 → 96/100/100, FCP 2.4 → 1.4 s, LCP 2.9 → 2.4 s, first-load JS 122 → 80 KB gz. Fixed: double-booked demo sessions, form chips submitting the form, nested interactive rows, contrast (muted #5F667A, rose #A2453D, peri-ink #4A6AA3), tiny tap targets, iOS input zoom, 320 px header overflow, 2-column Today on wide screens.
+**Notes for the real build:** reuse the patterns — preloadable lazy routes, async LazyMotion, self-hosted variable font, inline boot shell, content-visibility lists, AA colour tokens above (HUB: consider adopting `--muted #5F667A` in tokens).
+**Breaking changes:** none
+
 ## 2026-11-18 — Prototype: share link, today's appointments with check-in, calendar (branch claude/new-session-1j1y0u)
 **Status:** Prototype (demo data)
 **Done:** "Share my link" at top of Today (copy, WhatsApp templates, native share, QR) · Today's appointments at the top with Check in → Start → Open / Give remedy, check-in form status + "Ask" · month calendar sheet (Today + Sessions) · new appointment status `checked_in` used in the prototype (contract enum already has it)

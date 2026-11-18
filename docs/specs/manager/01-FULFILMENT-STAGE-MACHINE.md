@@ -8,8 +8,9 @@
 2. **One big button moves work forward.** Each stage has exactly one primary action; every other action is secondary (menu).
 3. **No refunds anywhere (D-16).** Problems end in *reattempt* or *replacement order*, never money back.
 4. **Most remedy orders are ₹0** (fee includes the remedy, D-02/D-09) — they still go through prep → QC → pack → dispatch exactly like paid orders.
-5. Prep staff see **only** the prep sheet (`consultation.getPrepSheet`) + `intake.getIntakeFlagsForPrep` → `alcoholFree`. No notes, no reasons, no intake answers.
-6. Every transition: validated server-side, written in the same DB transaction as an `audit_logs` row and the `fulfilment.stage_changed` outbox event.
+5. **All blends are alcohol-free** (owner 2026-11-18): base is always glycerine; `getIntakeFlagsForPrep()` returns `{ alcoholFree: true }`.
+6. Prep staff see **only** the prep sheet (`consultation.getPrepSheet`) + `intake.getIntakeFlagsForPrep` → `alcoholFree`. No notes, no reasons, no intake answers.
+7. Every transition: validated server-side, written in the same DB transaction as an `audit_logs` row and the `fulfilment.stage_changed` outbox event.
 
 ## 2. Task type
 | Order (`SalesOrderKind`) | `fulfilment_tasks.type` | Path |
@@ -100,7 +101,7 @@ The prep sheet is **snapshotted** at T1 so a later edit by the consultant can't 
 | `order.cancelled` [salesOrderId] | T14 |
 | `remedy.given` (optional, read-only) | if an open task holds that client's older blend → set `needs_attention='blend_updated'` |
 
-Emits: `fulfilment.stage_changed {taskId, salesOrderId, from, to}` on every transition; `shipment.*` from §Shiprocket spec.
+Emits: `fulfilment.stage_changed {taskId, salesOrderId, remedyOrderId?, from, to}` on every transition (`remedyOrderId` on remedy/combined orders — consultant remedy tracker, 2026-11-18); `shipment.dispatched/delivered/failed` also carry `remedyOrderId?` (see §Shiprocket spec).
 
 **Suggested commerce mapping** (commerce owns it): `new`→`paid`, `preparing…ready_to_dispatch`→`processing`, `dispatched`→`dispatched` (or `partially_dispatched`), `delivered`→`delivered`, `rto`→`returned`, `cancelled`→`cancelled`; `failed_delivery` keeps `dispatched`.
 

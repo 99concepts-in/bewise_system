@@ -33,12 +33,25 @@ pnpm dev        # http://localhost:5173
 pnpm build && pnpm preview   # production build on :4173
 ```
 
-## Speed & motion
-- Vite + React 18 + `motion` (LazyMotion), ~110 KB gzipped JS total, Growth tab code-split; WebP assets 5–20 KB.
-- Long lists render incrementally (IntersectionObserver) with `content-visibility: auto`; search uses `useDeferredValue`.
-- One orchestrated moment (the bloom opens); every other animation answers a tap: nav pill, segmented pill, sheets (drag to close), insight deck (swipe), list re-order, chart growth, count-ups, shared avatar into profile.
-- Screens animate in only (no exit wait), so navigation is instant and can never stall. Sheets manage their own presence.
-- `prefers-reduced-motion` respected (MotionConfig `reducedMotion="user"`).
+## Speed (measured, Lighthouse mobile: slow 4G + 4× CPU)
+| | Before | After |
+|---|---|---|
+| Performance / Accessibility / Best practices | 90 / 93 / 96 | **96 / 100 / 100** |
+| First paint · Largest paint | 2.4 s · 2.9 s | **1.4 s · 2.4 s** |
+| Page weight | 258 KB | **166 KB** |
+| First-load JS (gzip) | 122 KB | **80 KB** (rest prefetched on idle) |
+| Tab switch / open sheet (test) | — | ~100 ms |
+
+How: instant HTML skeleton before JS · Today in the first bundle, every other screen and all sheets code-split and **prefetched while idle** (no loading flash later) · animation engine loaded after first paint (LazyMotion async) · count-ups via a tiny rAF loop · self-hosted variable font (one file, all weights, ₹ included) · right-sized WebP images · offline service worker for instant repeat opens · long lists rendered incrementally with `content-visibility`.
+
+## Works on every size
+Checked automatically at 320, 360, 375, 393, 430 px phones, phone landscape, iPad mini, iPad landscape, laptop, desktop and 1920 px: no sideways scrolling, nothing hidden behind the nav, sheets fit the screen. Phones use the floating nav; 960 px+ gets a side rail; 1180 px+ shows Today in two columns. Inputs are 16 px (no iOS zoom), hover effects only where there's a mouse, safe areas respected, reduced motion respected.
+
+## Tests
+```bash
+pnpm test        # 30 unit tests: slot engine, data integrity (no double bookings), suggestions, adherence, impact, insights, booking state
+pnpm test:e2e    # 89 browser tests on phone, 320 px phone, tablet, desktop: every flow, 11 screen sizes, axe accessibility, performance budgets, offline
+```
 
 ## Not real yet (by design)
 Demo data only; no auth, no server. WhatsApp/Call open `wa.me` / `tel:` links. "Progress since last remedy" is a rule-based stand-in for the AI summary (K6). The remedy sheet never suggests flowers — his judgement decides (D-25/D-37).

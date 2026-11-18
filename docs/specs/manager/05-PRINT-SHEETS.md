@@ -1,7 +1,7 @@
 # M2 / M5 · Printable prep sheet, bottle label & batch sheet
 
 > **Owner:** MANAGER · Screens MG-06 (prep sheet), MG-20 (batch sheet) · Rendering `@react-pdf/renderer` server-side (PDF) + the same data on screen.
-> Status: **SPEC v1 (2026-11-17)**. Print on any home/office printer (A5 portrait, fits 2-up on A4) or share the PDF on WhatsApp.
+> Status: **SPEC v1.1 (2026-11-18)** — all blends are alcohol-free (owner): the banner and "ALCOHOL-FREE" print on **every** sheet and label; label text comes from `getPrepSheet().labelText`, e.g. "Priya S. · White Chestnut, Mimulus, Walnut · 4 drops 4× a day · 30 ml · ALCOHOL-FREE"; `dosage` and `base` are part of `PrepSheet`. Print on any home/office printer (A5 portrait, fits 2-up on A4) or share the PDF on WhatsApp.
 
 ## 1. Remedy prep sheet (A5 portrait, 148 × 210 mm)
 Data: **only** `consultation.getPrepSheet(remedyOrderId)` (snapshot) + `intake.getIntakeFlagsForPrep()` → `alcoholFree`. Never notes, reasons, emotions or intake answers.

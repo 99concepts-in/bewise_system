@@ -5,14 +5,16 @@
  * plus a quick "Share booking link" button.
  */
 import { AnimatePresence, motion } from 'motion/react'
-import { Bell, Check, ChevronRight, Leaf, Link2, MessageCircle, Copy, Truck, Store, Video, Package, RotateCcw } from 'lucide-react'
+import { Bell, Check, ChevronRight, Leaf, Link2, MessageCircle, Copy, Truck, Store, Video, Package, RotateCcw, Zap } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useStore } from '../lib/store'
 import { ago, dateKey, dueLabel, firstName, greeting, inr, longDay, shortName, time, when } from '../lib/format'
 import type { Appointment, Invoice, Order } from '../lib/types'
+import { CheckInControl, ExpressBookingSheet } from './Desk'
 import { Chip, Choices, Divided, Field, IconButton, Row, Sheet, copyText, cx, inputCls, spring, useDesktop, useIntent } from '../ui/kit'
 
-const BOOKING_BASE = 'https://bewisewellness.in/book' // @decision(D-12) domain pending
+// Same link as the consultant app; the page itself is owned by the CLIENT chat. @decision(D-12) domain pending
+export const BOOKING_LINK = 'https://bewise.in/book/jitu-bhaiya'
 const waLink = (phone: string, text: string) => {
   const d = phone.replace(/\D/g, '')
   return `https://wa.me/${d.length === 10 ? '91' + d : d}?text=${encodeURIComponent(text)}`
@@ -60,27 +62,17 @@ function Act({ children, onClick, kind = 'primary', icon }: { children: ReactNod
 }
 
 /* ───────── 1 · sessions ───────── */
-function SessionRow({ a, onShare }: { a: Appointment; onShare: (a: Appointment) => void }) {
+function SessionRow({ a }: { a: Appointment }) {
   const s = useStore()
   const c = s.clients.find((x) => x.id === a.clientId)!
-  const done = a.status === 'completed'
   return (
-    <div className={cx('flex items-center gap-3 px-4 py-3.5', done && 'opacity-50')}>
+    <div className={cx('flex items-center gap-3 px-4 py-3.5', a.status === 'completed' && 'opacity-50')}>
       <span className="w-[74px] shrink-0 text-[15px] font-bold whitespace-nowrap text-ink tnum">{time(a.startsAt)}</span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[16px] font-semibold text-ink">{c.name}</span>
-        <span className="flex items-center gap-1.5 truncate text-[13px] text-ink-2">{a.mode === 'online' ? <Video size={13} className="shrink-0" /> : <Store size={13} className="shrink-0" />}{a.mode === 'online' ? 'Online' : 'Studio'} · {a.type === 'First consultation' ? 'First' : 'Follow-up'}</span>
+        <span className="flex items-center gap-1.5 truncate text-[13px] text-ink-2">{a.mode === 'online' ? <Video size={13} className="shrink-0" /> : <Store size={13} className="shrink-0" />}{a.mode === 'online' ? 'Online' : 'In person'} · {a.type === 'First consultation' ? 'First' : 'Follow-up'}</span>
       </span>
-      <AnimatePresence mode="wait" initial={false}>
-        {done ? <motion.span key="d" className="text-[13px] font-semibold text-ink-3">Done</motion.span>
-          : a.status === 'checked_in' ? (
-            <motion.span key="in" initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={spring} className="inline-flex h-11 items-center gap-1.5 rounded-full bg-ok-soft px-4 text-[14px] font-bold text-ok"><Check size={16} strokeWidth={3} />Here</motion.span>
-          ) : a.mode === 'in_person' ? (
-            <motion.span key="btn" exit={{ scale: 0.85, opacity: 0 }}><Act onClick={() => { s.checkIn(a.id); s.toast(`${firstName(c.name)} checked in`) }}>Check in</Act></motion.span>
-          ) : (
-            <motion.span key="ol"><Act kind="soft" icon={<Link2 size={16} />} onClick={() => onShare(a)}>Send link</Act></motion.span>
-          )}
-      </AnimatePresence>
+      <CheckInControl a={a} big />
     </div>
   )
 }
@@ -96,7 +88,7 @@ function RemedyRow({ o }: { o: Order }) {
       actions={<Act kind={o.stage === 'new' ? 'primary' : 'soft'} onClick={() => s.go({ name: 'order', id: o.id })}>{REMEDY_ACTION[o.stage]}</Act>}>
       <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage-soft text-sage"><Leaf size={18} /></span>
       <span className="min-w-0 flex-1">
-        <span className="flex flex-wrap items-center gap-1.5"><span className="text-[16px] font-semibold text-ink">{shortName(c.name)}</span>{o.alcoholFree && <Chip tone="gold">Alcohol-free</Chip>}</span>
+        <span className="block text-[16px] font-semibold text-ink">{shortName(c.name)}</span>
         <span className={cx('block text-[13px]', late ? 'font-semibold text-bad' : 'text-ink-2')}>
           {o.prep?.flowers.length} flowers · {late ? 'late, was due' : 'due'} {when(o.dueAt)}
         </span>
@@ -144,17 +136,14 @@ function PaymentRow({ i }: { i: Invoice }) {
   const late = i.dueOn < dateKey(0)
   const last = i.reminders.at(-1)
   const justSent = last && Date.now() - last.at < 60_000
-  const link = `https://pay.bewise.in/${i.code.split('/').pop()}`
   const actions = (
     <>
-      <button aria-label="Copy payment link" onClick={() => copyText(link, (ok) => s.toast(ok ? 'Payment link copied' : 'Copy blocked — open the invoice to see the link', ok ? 'good' : 'bad'))}
-        className="grid size-11 shrink-0 place-items-center rounded-full bg-surface-2 text-ink"><Copy size={16} /></button>
       <AnimatePresence mode="wait" initial={false}>
         {justSent ? (
           <motion.span key="sent" initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={spring} className="inline-flex h-11 items-center gap-1.5 rounded-full bg-ok-soft px-4 text-[14px] font-bold text-ok"><Check size={16} strokeWidth={3} />Sent</motion.span>
         ) : (
           <motion.span key="btn" exit={{ scale: 0.85, opacity: 0 }}>
-            <Act icon={<MessageCircle size={15} />} onClick={() => { s.remind(i.id, 'whatsapp'); s.toast(`Reminder with payment link sent to ${firstName(c.name)}`) }}>{last ? 'Again' : 'Remind'}</Act>
+            <Act icon={<MessageCircle size={15} />} onClick={() => { s.remind(i.id, 'whatsapp'); s.toast(`Reminder sent to ${firstName(c.name)}`) }}>{last ? 'Again' : 'Remind'}</Act>
           </motion.span>
         )}
       </AnimatePresence>
@@ -173,34 +162,32 @@ function PaymentRow({ i }: { i: Invoice }) {
   )
 }
 
-/* ───────── share booking link ───────── */
-export function ShareBookingSheet({ open, onClose, appt }: { open: boolean; onClose: () => void; appt?: Appointment }) {
+/* ───────── share booking link (same link + messages as the consultant app) ───────── */
+const SHARE_MSGS = {
+  new: { label: 'New client', type: 'first', text: 'Namaste 🙏 You can book a calm, one-to-one consultation with Jitu Bhaiya here. Pick any time that suits you:' },
+  followup: { label: 'Follow-up', type: 'followup', text: 'Namaste 🙏 Time for your follow-up with Jitu Bhaiya. Choose a time that works for you here:' },
+  workshop: { label: 'Workshop', type: 'first', text: 'Thank you for joining the workshop today 🙏 If you would like a personal session with Jitu Bhaiya, book here:' },
+} as const
+export function ShareBookingSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const s = useStore()
-  const c = appt ? s.clients.find((x) => x.id === appt.clientId) : undefined
-  const [kind, setKind] = useState<'first' | 'followup'>('first')
+  const [kind, setKind] = useState<keyof typeof SHARE_MSGS>('new')
   const [phone, setPhone] = useState('')
-  const link = appt ? `https://meet.bewisewellness.in/${appt.id}` : `${BOOKING_BASE}?type=${kind}`
-  const text = appt
-    ? `Namaste ${firstName(c!.name)} 🙏 Your session with Jitu Bhaiya is today at ${time(appt.startsAt)}. Join here: ${link}`
-    : `Namaste 🙏 Book your ${kind === 'first' ? 'first consultation (₹1,000)' : 'follow-up session (₹800)'} with Jitu Bhaiya at BeWise. Your Bach flower remedy is included. Choose a time here: ${link}`
-  const to = appt ? c!.phone : phone
-  const valid = appt || phone.replace(/\D/g, '').length >= 10
+  const link = `${BOOKING_LINK}?type=${SHARE_MSGS[kind].type}`
+  const text = `${SHARE_MSGS[kind].text}\n${link}`
+  const ok10 = phone.replace(/\D/g, '').length >= 10
   return (
-    <Sheet open={open} onClose={onClose} title={appt ? `Session link for ${firstName(c!.name)}` : 'Share booking link'}>
+    <Sheet open={open} onClose={onClose} title="Share booking link">
       <div className="space-y-4">
-        {!appt && (
-          <>
-            <Choices id="bk-kind" value={kind} onChange={setKind} options={[{ value: 'first', label: 'First session · ₹1,000' }, { value: 'followup', label: 'Follow-up · ₹800' }]} />
-            <Field label="Client's WhatsApp number (optional)"><input id="bk-phone" inputMode="tel" className={cx(inputCls, 'tnum')} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98250 00000" /></Field>
-          </>
-        )}
+        <p className="text-[13.5px] text-ink-2">Anyone with this link sees Jitu Bhaiya's free times and can book. BeWise sends the payment link after they book.</p>
+        <Choices id="bk-kind" value={kind} onChange={setKind} options={(Object.keys(SHARE_MSGS) as (keyof typeof SHARE_MSGS)[]).map((k) => ({ value: k, label: SHARE_MSGS[k].label }))} />
+        <Field label="Client's WhatsApp number (optional)"><input id="bk-phone" inputMode="tel" className={cx(inputCls, 'tnum')} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98250 00000" /></Field>
         <div className="rounded-[22px] bg-[var(--wa-bg)] p-3">
-          <div className="ml-auto max-w-[92%] rounded-[18px] rounded-tr-md bg-[var(--wa-bubble)] px-4 py-3 text-[14.5px] leading-relaxed text-[var(--wa-fg)]">{text}</div>
+          <div className="ml-auto max-w-[92%] rounded-[18px] rounded-tr-md bg-[var(--wa-bubble)] px-4 py-3 text-[14.5px] leading-relaxed whitespace-pre-line text-[var(--wa-fg)]">{text}</div>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <motion.button whileTap={{ scale: 0.96 }} onClick={() => copyText(text, (ok) => s.toast(ok ? 'Message copied — paste it anywhere' : 'Copy blocked — select the message instead', ok ? 'good' : 'bad'))}
-            className="flex h-14 items-center justify-center gap-2 rounded-full bg-surface text-[15px] font-bold text-ink shadow-soft"><Copy size={18} />Copy</motion.button>
-          <motion.a whileTap={{ scale: 0.96 }} href={valid ? waLink(to, text) : `https://wa.me/?text=${encodeURIComponent(text)}`} target="_blank" rel="noreferrer"
+          <motion.button whileTap={{ scale: 0.96 }} onClick={() => copyText(link, (ok) => s.toast(ok ? 'Link copied' : 'Copy not allowed here. Long-press the link to copy.', ok ? 'good' : 'bad'))}
+            className="flex h-14 items-center justify-center gap-2 rounded-full bg-surface text-[15px] font-bold text-ink shadow-soft"><Copy size={18} />Copy link</motion.button>
+          <motion.a whileTap={{ scale: 0.96 }} href={ok10 ? waLink(phone, text) : `https://wa.me/?text=${encodeURIComponent(text)}`} target="_blank" rel="noreferrer"
             className="cta flex h-14 items-center justify-center gap-2 rounded-full text-[15px] font-bold shadow-lift"><MessageCircle size={18} />WhatsApp</motion.a>
         </div>
         <p className="text-center text-[12.5px] break-all text-ink-3 select-all">{link}</p>
@@ -213,11 +200,13 @@ export function ShareBookingSheet({ open, onClose, appt }: { open: boolean; onCl
 export function Today() {
   const s = useStore()
   const desktop = useDesktop()
-  const [share, setShare] = useState<{ open: boolean; appt?: Appointment }>({ open: false })
-  useIntent('share', () => setShare({ open: true }))
+  const [share, setShare] = useState(false)
+  const [express, setExpress] = useState(false)
+  useIntent('share', () => setShare(true))
+  useIntent('express', () => setExpress(true))
 
   const sessions = s.appointments
-  const left = sessions.filter((a) => a.status !== 'completed').length
+  const left = sessions.filter((a) => a.status !== 'completed' && a.status !== 'checked_in').length
   const remedies = s.orders.filter((o) => o.kind !== 'store' && ['new', 'preparing', 'quality_check'].includes(o.stage)).sort((a, b) => a.dueAt - b.dueAt)
   const deliveries = s.orders
     .filter((o) => ['failed_delivery', 'rto'].includes(o.stage) && !o.problem?.startsWith('Replacement sent')
@@ -237,13 +226,19 @@ export function Today() {
         {!desktop && <IconButton label="Notifications" badge={unread > 0} onClick={() => s.setRoot('notifications')}><Bell size={20} /></IconButton>}
       </header>
 
-      <motion.button whileTap={{ scale: 0.98 }} transition={spring} onClick={() => setShare({ open: true })}
-        className="cta mt-5 flex h-[60px] w-full items-center justify-center gap-2.5 rounded-full text-[16px] font-bold shadow-lift">
-        <Link2 size={20} /> Share booking link
-      </motion.button>
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <motion.button whileTap={{ scale: 0.97 }} transition={spring} onClick={() => setShare(true)}
+          className="cta flex h-[60px] items-center justify-center gap-2 rounded-full px-3 text-[15px] font-bold whitespace-nowrap shadow-lift">
+          <Link2 size={18} /> Booking link
+        </motion.button>
+        <motion.button whileTap={{ scale: 0.97 }} transition={spring} onClick={() => setExpress(true)}
+          className="flex h-[60px] items-center justify-center gap-2 rounded-full bg-surface px-3 text-[15px] font-bold whitespace-nowrap text-ink shadow-soft">
+          <Zap size={18} /> Express booking
+        </motion.button>
+      </div>
 
       <Section title="Sessions today" count={left} done="No more sessions today">
-        {sessions.map((a) => <SessionRow key={a.id} a={a} onShare={(x) => setShare({ open: true, appt: x })} />)}
+        {sessions.map((a) => <SessionRow key={a.id} a={a} />)}
       </Section>
 
       <Section title="Remedies to make" count={remedies.length} done="All remedies are made">
@@ -260,11 +255,12 @@ export function Today() {
       </Section>
 
       <Section title="Payments pending" count={payments.length} done="Everyone has paid"
-        more={payments.length > 0 && <p className="mt-2 px-2 text-[12.5px] text-ink-2">Total {inr(payments.reduce((a, i) => a + i.totalPaise - i.paidPaise, 0))} · each reminder includes the payment link</p>}>
+        more={payments.length > 0 && <p className="mt-2 px-2 text-[12.5px] text-ink-2">Total {inr(payments.reduce((a, i) => a + i.totalPaise - i.paidPaise, 0))}. BeWise already sent each payment link — Remind is a gentle nudge that points to it.</p>}>
         {payments.map((i) => <PaymentRow key={i.id} i={i} />)}
       </Section>
 
-      <ShareBookingSheet open={share.open} appt={share.appt} onClose={() => setShare({ open: false })} />
+      <ShareBookingSheet open={share} onClose={() => setShare(false)} />
+      <ExpressBookingSheet open={express} onClose={() => setExpress(false)} />
     </motion.div>
   )
 }
