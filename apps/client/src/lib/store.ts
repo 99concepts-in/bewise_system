@@ -19,7 +19,8 @@ export type Profile = {
   photo?: string; consents: { wellbeing: boolean; whatsapp: boolean; offers: boolean }
   allergies: string[]; onboardedAt?: string
 }
-export type JournalEntry = { id: string; emotion: Emotion; at: string }
+// @decision(D-19) owner 2026-11-18: journal entries may carry an optional note (was emotion + time only)
+export type JournalEntry = { id: string; emotion: Emotion; at: string; note?: string }
 export type Goal = { id: string; title: string; progress: number; done: boolean }
 export type Feedback = { rating: number; tags: string[]; notes: string }
 export type Appointment = {
@@ -31,7 +32,7 @@ export type IntakeAnswers = {
   onMind: string; duration?: 'Days' | 'Weeks' | 'Months' | 'Years'
   feelings: string[]; nuance: Record<string, { statements: string[]; intensity?: 'Mild' | 'Moderate' | 'Strong' }>
   bodyAny?: boolean; body: string[]; bodyTypes: string[]
-  sleepQuality?: Emotion; hours?: string; wakes?: boolean; energy: number; stress: number
+  sleepQuality?: 1 | 2 | 3 | 4 | 5; hours?: string; wakes?: boolean; energy: number; stress: number
   life: string[]; lifeOther: string
   safety: { doctor?: boolean; medicines?: boolean; medicinesText: string; pregnant?: boolean; alcoholFree?: boolean; allergies?: boolean; allergiesText: string }
   selfHarm?: 'No' | 'Sometimes' | 'Often'
@@ -69,7 +70,8 @@ type State = {
   seq: number
   // actions
   setProfile: (p: Partial<Profile>) => void
-  logMood: (e: Emotion, at?: Date) => JournalEntry          // journal.createEntry
+  logMood: (e: Emotion, at?: Date, note?: string) => JournalEntry   // journal.createEntry
+  updateMood: (id: string, patch: Partial<Pick<JournalEntry, 'emotion' | 'note'>>) => void
   removeMood: (id: string) => void
   addGoal: (title: string) => void
   updateGoal: (id: string, patch: Partial<Goal>) => void
@@ -113,11 +115,12 @@ export const useApp = create<State>()(
       hydrated: false,
       ...initial,
       setProfile: (p) => set((s) => ({ profile: { ...(s.profile ?? { name: '', phone: '', dob: '', city: '', consents: { wellbeing: false, whatsapp: false, offers: false }, allergies: [] }), ...p } })),
-      logMood: (emotion, at = new Date()) => {
-        const e = { id: uid(), emotion, at: at.toISOString() }
+      logMood: (emotion, at = new Date(), note) => {
+        const e: JournalEntry = { id: uid(), emotion, at: at.toISOString(), ...(note?.trim() ? { note: note.trim().slice(0, 500) } : {}) }
         set((s) => ({ journal: [e, ...s.journal] }))
         return e
       },
+      updateMood: (id, patch) => set((s) => ({ journal: s.journal.map((j) => (j.id === id ? { ...j, ...patch, note: patch.note !== undefined ? (patch.note.trim().slice(0, 500) || undefined) : j.note } : j)) })),
       removeMood: (id) => set((s) => ({ journal: s.journal.filter((j) => j.id !== id) })),
       addGoal: (title) => set((s) => ({ goals: [...s.goals, { id: uid(), title, progress: 0, done: false }].slice(0, 3) })),
       updateGoal: (id, patch) => set((s) => ({ goals: s.goals.map((g) => (g.id === id ? { ...g, ...patch } : g)) })),

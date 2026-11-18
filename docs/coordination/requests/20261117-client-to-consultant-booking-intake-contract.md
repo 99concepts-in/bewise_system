@@ -13,5 +13,5 @@ Need (all additive; client builds against stubs behind flags `booking` / `intake
 9. **Edit lock**: confirm error code `INTAKE_LOCKED` when editing < 2 h before the session.
 10. **Ask BeWise distress alert** — reuse D-38 routing (Jitu Bhaiya only) for `companion.safety_flagged`? (HUB/owner to confirm.)
 11. **Client-facing remedy view** for Ask BeWise / My Remedies: `getCurrentRemedyForClient` should include `drops`, `timesPerDay`, `startedOn`, `daysLeft`, `alcoholFree`, flower names — no rationale.
-Why: C3 booking + intake (IN-01…IN-12), C6 allergy warnings, C7 Ask BeWise.
+Why: C3 booking + intake (IN-01…IN-12), C6 allergy warnings, C7 Ask BeWise.12. **All blends are alcohol-free (owner 2026-11-18)** — the intake no longer asks; please default the remedy builder base to alcohol-free and drop the `alcohol_free` intake flag (MANAGER prep sheet can show "ALCOHOL-FREE" on every label). `getCurrentRemedyForClient().alcoholFree` can be dropped or always true.13. **AI case summary is no longer optional (owner 2026-11-18)** — IN-11 shows a plain notice instead of a toggle; `submitIntake` will always send `consent.aiSummary: true`. D-36 said "consent-based": HUB/owner please record the change.
 ---

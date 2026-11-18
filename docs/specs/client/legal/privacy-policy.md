@@ -21,7 +21,7 @@ Under the DPDP Act we are the **Data Fiduciary** for the personal data you share
 | Account details | Mobile number, name, date of birth, city, gender (optional) | Sign you in with a one-time code, address you by name, check age |
 | Contact & delivery | Email (optional), delivery addresses, pincode | Send confirmations, deliver remedies and products |
 | **Case-taking (intake) answers** — *sensitive* | What's on your mind, feelings and how strongly you feel them, voice notes, body map of discomfort, sleep & energy, life changes, goals | So Jitu Bhaiya understands you before your session |
-| **Safety answers** — *sensitive* | Doctor/therapist, medicines, pregnancy or breastfeeding, alcohol-free preference, allergies, the "one gentle question" about self-harm | Your safety, and preparing your remedy and product suggestions safely |
+| **Safety answers** — *sensitive* | Doctor/therapist, medicines, pregnancy or breastfeeding, allergies, the "one gentle question" about self-harm | Your safety, and preparing your remedy and product suggestions safely |
 | Mood journal & goals | The feeling you logged and when; your personal goals | Show you your patterns; shared with your consultant only if you allow it |
 | Session feedback | Rating, tags, notes for Jitu Bhaiya | Help him care for you better |
 | Appointments & remedies | Bookings, session mode, your current blend and ritual | Run your consultations and reminders |
@@ -34,7 +34,7 @@ Under the DPDP Act we are the **Data Fiduciary** for the personal data you share
 ## 3. Your consent
 We ask for clear consent before collecting sensitive information:
 - **CL-06 Your privacy** — keeping your wellbeing data safe (required to use the app); WhatsApp updates (optional); gentle offers (optional).
-- **IN-11 Review & consent** — sharing your answers with your consultant (required to book); letting AI prepare a private summary for him (optional, on by default — you can turn it off).
+- **IN-11 Review** — your answers are shared with your consultant and an AI assistant prepares a private summary for him; this is part of the service and is explained on the screen before you continue (owner 2026-11-18). ⚠️ OWNER TO CONFIRM with counsel: under the DPDP Act sensitive data needs informed consent — the in-app notice + this policy must state it clearly.
 - **Journal sharing** with your consultant (on by default, change anytime in Me → Privacy & data). ⚠️ OWNER TO CONFIRM (D-15)
 
 You can withdraw consent anytime in **Me → Privacy & data**. Withdrawing doesn't affect what was done before, but some services (e.g. booking a consultation) may not be possible without it.
@@ -43,15 +43,15 @@ You can withdraw consent anytime in **Me → Privacy & data**. Withdrawing doesn
 | Person | Can see | Can't see |
 |---|---|---|
 | **You** | Everything you've entered, your remedy, orders, invoices | Your consultant's private notes |
-| **Jitu Bhaiya (Jitendra Khimlani), Bach Remedy Therapist** | Your intake and check-in answers, feedback, journal (if shared), AI summary (if allowed) | — |
-| **Office manager** | Your name, delivery address, order and payment status, and only what's needed to prepare your remedy (e.g. "alcohol-free base") | Your answers, journal, feedback or chats |
+| **Jitu Bhaiya (Jitendra Khimlani), Bach Remedy Therapist** | Your intake and check-in answers, feedback, journal (if shared), AI summary | — |
+| **Office manager** | Your name, delivery address, order and payment status, and only what's needed to prepare your remedy (e.g. which flowers go in your blend and the bottle size) | Your answers, journal, feedback or chats |
 | **Owner** | Business totals and anonymous statistics, session ratings | Your answers, journal, notes or chats |
 | **Accountant** | Invoices and payment records for tax | Anything about your wellbeing |
 
 **The self-harm question:** if you answer "Sometimes" or "Often", we show you free helplines straight away, and **only Jitu Bhaiya is alerted** so he can check in with care. Nobody else is told.
 
 ## 5. AI processing
-- If you allow it, we use **Claude (by Anthropic)**, on our servers, to turn your intake answers into a short private summary **for your consultant only**. You never see it in the app, and it never decides your remedy — Jitu Bhaiya does.
+- We use **Claude (by Anthropic)**, on our servers, to turn your intake answers into a short private summary **for your consultant only**. You never see it in the app, and it never decides your remedy — Jitu Bhaiya does.
 - **Ask BeWise**, our companion, uses the same AI to answer questions from *your own* data (appointments, blend, journal feelings, orders) and our product catalogue. It does not diagnose and does not change remedies.
 - Your consultant's private notes are **not** sent to AI.
 - Our AI provider does not use your data to train its models. ⚠️ OWNER TO CONFIRM against the final API agreement.

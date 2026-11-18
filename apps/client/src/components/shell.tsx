@@ -7,12 +7,12 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { Bell, CalendarDays, ChevronLeft, Home, Leaf, ShoppingBag, User } from 'lucide-react'
+import { Bell, CalendarDays, ChevronLeft, Home, Leaf, Search, ShoppingBag, User, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { create } from 'zustand'
-import { Avatar, Logo, MoodButton } from './brand'
+import { Avatar, Logo, MoodButton, MoodImg } from './brand'
 import { Btn, Chrome, IconBtn, Sheet, buzz, spring, toast, useChrome } from './ui'
-import { MOODS, type Emotion } from '@/lib/data'
+import { MOODS, PRIMARY_MOODS, moodOf, searchMoods, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { fmtTime, fmtDay } from '@/lib/format'
 import { BP } from '@/lib/asset'
@@ -28,8 +28,11 @@ const NAV = [
 ]
 const NAV_ROOTS = new Set(['/app', '/app/remedies', '/app/book', '/app/shop', '/app/me', '/app/journal', '/app/sessions', '/app/orders', '/app/goals'])
 
+/** Static hosting serves /app/ (trailing slash) — compare routes without it. */
+export const usePath = () => { const p = usePathname() || '/'; return p.length > 1 ? p.replace(/\/+$/, '') : p }
+
 function BottomNav() {
-  const path = usePathname()
+  const path = usePath()
   const hidden = useUi((s) => s.navHidden)
   const count = useApp((s) => s.cart.reduce((n, l) => n + l.qty, 0))
   const show = NAV_ROOTS.has(path) && !hidden
@@ -89,22 +92,101 @@ export function AppHeader({ back, right, title }: { back?: boolean | string; rig
   )
 }
 
+/** CL-09 — 8 main feelings + a searchable list of more (owner 2026-11-18: "add happy, more options, searchable"). */
 function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const logMood = useApp((s) => s.logMood)
   const [pick, setPick] = useState<Emotion | null>(null)
   const [burst, setBurst] = useState(0)
+  const [q, setQ] = useState('')
+  const [note, setNote] = useState('')
   const now = new Date()
-  useEffect(() => { if (open) setPick(null) }, [open])
+  useEffect(() => { if (open) { setPick(null); setQ(''); setNote('') } }, [open])
+  const choose = (k: Emotion) => { setPick(k); setBurst((b) => b + 1); buzz(8) }
+  const results = searchMoods(q)
+  const more = MOODS.filter((m) => !PRIMARY_MOODS.includes(m.key))
+  const Pill = ({ k }: { k: Emotion }) => {
+    const m = moodOf(k), on = pick === k
+    return (
+      <motion.button type="button" layout whileTap={{ scale: 0.94 }} aria-pressed={on} onClick={() => choose(k)}
+        className={`inline-flex h-12 items-center gap-2 rounded-full pl-1.5 pr-4 text-[14px] font-semibold transition-colors ${on ? 'bg-navy text-white' : 'bg-peri-50/80 text-navy'}`}>
+        <span className="grid size-9 place-items-center rounded-full bg-white"><MoodImg mood={k} size={30} /></span>{m.label}
+      </motion.button>
+    )
+  }
   return (
-    <Sheet open={open} onClose={onClose} title="Log a feeling">
+    <Sheet open={open} onClose={onClose} title="Log a feeling" tall>
       <h2 className="h-duo mt-1 text-[26px]">How are you <em>feeling?</em></h2>
       <p className="mt-1 text-[14px] text-muted">Today · {fmtTime(now)}</p>
-      <div className="mt-5 grid grid-cols-4 gap-y-3">
-        {MOODS.map((m) => (
-          <MoodButton key={m.key} mood={m.key} size={62} selected={pick === m.key} burstKey={pick === m.key ? burst : undefined} onPick={() => { setPick(m.key); setBurst((b) => b + 1); buzz(8) }} />
-        ))}
+      <label className="mt-4 flex h-12 items-center gap-3 rounded-full bg-peri-50 px-4 focus-within:ring-2 focus-within:ring-navy">
+        <Search className="size-[18px] text-navy" aria-hidden />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings — happy, stressed, loved…" aria-label="Search feelings"
+          className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-soft" />
+        {q && <button aria-label="Clear search" onClick={() => setQ('')}><X className="size-4 text-muted" /></button>}
+      </label>
+      {q ? (
+        <div className="mt-4 flex min-h-[120px] flex-wrap content-start gap-2">
+          {results.length ? results.map((m) => <Pill key={m.key} k={m.key as Emotion} />) : <p className="w-full py-6 text-center text-[14px] text-muted">No match for “{q}” — try a simpler word like “stressed” or “happy”.</p>}
+        </div>
+      ) : (
+        <>
+          <div className="mt-4 grid grid-cols-4 gap-y-2">
+            {PRIMARY_MOODS.map((k) => (
+              <MoodButton key={k} mood={k} size={60} selected={pick === k} burstKey={pick === k ? burst : undefined} onPick={() => choose(k)} />
+            ))}
+          </div>
+          <p className="mb-2 mt-5 text-[12px] font-bold uppercase tracking-[0.12em] text-muted">More feelings</p>
+          <p className="mb-2 text-[12px] font-semibold text-sage-text">Pleasant</p>
+          <div className="flex flex-wrap gap-2">{more.filter((m) => m.pleasant).map((m) => <Pill key={m.key} k={m.key} />)}</div>
+          <p className="mb-2 mt-4 text-[12px] font-semibold text-rose">Difficult</p>
+          <div className="flex flex-wrap gap-2">{more.filter((m) => !m.pleasant).map((m) => <Pill key={m.key} k={m.key} />)}</div>
+        </>
+      )}
+      <AnimatePresence>
+        {pick && (
+          <motion.label initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 block overflow-hidden">
+            <span className="mb-1.5 block text-[13px] font-semibold text-navy">Add a note <span className="font-normal text-muted">(optional)</span></span>
+            <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 500))} rows={3} placeholder="What’s behind this feeling? A word or two is enough."
+              className="w-full resize-none rounded-[20px] bg-peri-50/80 p-4 text-[15px] leading-6 outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" />
+          </motion.label>
+        )}
+      </AnimatePresence>
+      <div className="sticky bottom-0 -mx-5 mt-4 bg-gradient-to-t from-white via-white to-white/0 px-5 pb-1 pt-4">
+        <Btn full disabled={!pick} onClick={() => { if (!pick) return; logMood(pick, new Date(), note); toast(`Logged · ${moodOf(pick).label}`); onClose() }}>
+          {pick ? `Save · ${moodOf(pick).label}` : 'Choose a feeling'}
+        </Btn>
       </div>
-      <Btn full className="mt-6" disabled={!pick} onClick={() => { if (!pick) return; logMood(pick); toast(`Logged · ${MOODS.find((x) => x.key === pick)!.label}`); onClose() }}>Save</Btn>
+    </Sheet>
+  )
+}
+
+/** Journal entry: read / write its note, or remove it. Opened from Home ("Add a note") and the journal list. */
+function EntrySheet({ id, onClose }: { id: string | null; onClose: () => void }) {
+  const entry = useApp((s) => s.journal.find((j) => j.id === id))
+  const update = useApp((s) => s.updateMood)
+  const remove = useApp((s) => s.removeMood)
+  const restore = useApp((s) => s.logMood)
+  const [note, setNote] = useState('')
+  useEffect(() => { setNote(entry?.note ?? '') }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <Sheet open={!!id && !!entry} onClose={onClose} title="Journal entry">
+      {entry && (
+        <div className="pb-1 pt-1">
+          <div className="flex items-center gap-4">
+            <MoodImg mood={entry.emotion} size={72} />
+            <div><p className="text-[22px] font-extrabold text-navy">{moodOf(entry.emotion).label}</p><p className="text-[14px] text-muted">{fmtDay(entry.at)} · {fmtTime(entry.at)}</p></div>
+          </div>
+          <label className="mt-5 block">
+            <span className="mb-1.5 block text-[13px] font-semibold text-navy">Your note</span>
+            <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 500))} rows={4} placeholder="What’s behind this feeling? A word or two is enough."
+              className="w-full resize-none rounded-[20px] bg-peri-50/80 p-4 text-[15px] leading-6 outline-none placeholder:text-soft focus:ring-2 focus:ring-navy" />
+            <span className="mt-1 block text-right text-[11px] text-soft tnum">{note.length}/500</span>
+          </label>
+          <div className="mt-3 flex gap-3">
+            <Btn full variant="white" size="md" onClick={() => { const e = entry; remove(e.id); onClose(); toast('Entry removed', { label: 'Undo', onClick: () => restore(e.emotion, new Date(e.at), e.note) }) }}>Remove</Btn>
+            <Btn full size="md" onClick={() => { update(entry.id, { note }); toast(note.trim() ? 'Note saved' : 'Saved'); onClose() }}>Save note</Btn>
+          </div>
+        </div>
+      )}
     </Sheet>
   )
 }
@@ -158,17 +240,20 @@ function Flyer({ fly, onDone }: { fly: { from: DOMRect; img: string; id: number 
 export function AppChrome({ children }: { children: ReactNode }) {
   const [log, setLog] = useState(false)
   const [notes, setNotes] = useState(false)
+  const [entry, setEntry] = useState<string | null>(null)
+  const openEntry = useCallback((id: string) => setEntry(id), [])
   const [fly, setFly] = useState<{ from: DOMRect; img: string; id: number } | null>(null)
   const openLog = useCallback(() => setLog(true), [])
   const openNotices = useCallback(() => setNotes(true), [])
   const flyToBag = useCallback((from: DOMRect, img: string) => setFly({ from, img, id: Date.now() }), [])
-  const ctx = useMemo(() => ({ openLog, openNotices, flyToBag }), [openLog, openNotices, flyToBag])
+  const ctx = useMemo(() => ({ openLog, openNotices, openEntry, flyToBag }), [openLog, openNotices, openEntry, flyToBag])
   return (
     <Chrome.Provider value={ctx}>
       {children}
       <BottomNav />
       <LogSheet open={log} onClose={() => setLog(false)} />
       <NoticeSheet open={notes} onClose={() => setNotes(false)} />
+      <EntrySheet id={entry} onClose={() => setEntry(null)} />
       <Flyer fly={fly} onDone={() => setFly(null)} />
     </Chrome.Provider>
   )

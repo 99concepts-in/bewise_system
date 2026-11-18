@@ -36,7 +36,7 @@ Sometimes Jitu Bhaiya may need to change a time. We'll tell you as early as we c
 - Please find a quiet, private space with a steady connection.
 
 ## In-person sessions
-At our studio: [[STUDIO_ADDRESS]]. Directions are in your appointment.
+At our studio: 102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007. Directions are in your appointment.
 
 ## Payments that don't go through
 A failed payment is **never charged**. If money left your account but the booking wasn't confirmed, your bank or Razorpay reverses it automatically, usually within 5–7 working days. If it hasn't arrived after that, write to us and we'll chase it with you.

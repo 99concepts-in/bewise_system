@@ -40,7 +40,7 @@
 
 - Labels always visible; required = `*` + "(required)" for screen readers.
 - Phone `+91` prefix pill, 10 digits, `inputmode="numeric"`, `autocomplete="tel-national"`.
-- OTP: 6 boxes as one `<input autocomplete="one-time-code" inputmode="numeric" maxlength=6>` visually split (Web OTP API where available).
+- OTP: **4 boxes** (owner 2026-11-18) as one `<input autocomplete="one-time-code" inputmode="numeric" maxlength=4>` visually split (Web OTP API where available). SMS provider must send 4-digit codes.
 - Pincode → city/state auto-fill (India Post data; MANAGER/HUB helper — fallback manual).
 - Money is always formatted by `formatINR()` from paise (Indian grouping `₹1,000`); never compute prices client-side for anything sent to the server.
 - Dates: `Thu 21 Nov · 11:00 AM`, timezone `Asia/Kolkata`, "Times in IST" caption on slot pickers.

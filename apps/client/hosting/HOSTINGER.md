@@ -74,7 +74,7 @@ caching: HTML no-cache, images 7 days, `_next/static` 1 year immutable.
 
 ## Check after going live
 - [ ] `https://…` opens the splash; `http://…` redirects to https
-- [ ] Sign in with demo code **246810**, take a photo (browser asks for camera permission)
+- [ ] Sign in with demo code **2468**, take a photo (browser asks for camera permission)
 - [ ] Me → **Explore with sample data** → Home, Journal, Remedies, Shop all show content
 - [ ] Refresh on a deep page (e.g. `/app/journal/`) still works
 

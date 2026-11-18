@@ -15,7 +15,7 @@ pnpm build && pnpm start
 pnpm typecheck
 pnpm assets         # re-cut sprites from design/assets (Python 3 + Pillow + numpy)
 ```
-Demo sign-in code: **246810** (no SMS is sent). Me → **Explore with sample data** loads a returning-client journey.
+Demo sign-in code: **2468** (no SMS is sent). Me → **Explore with sample data** loads a returning-client journey.
 
 ## Hosting on Hostinger
 See **[hosting/HOSTINGER.md](hosting/HOSTINGER.md)** — `pnpm export:hostinger` → `dist/bewise-client-hostinger.zip` (upload & extract in `public_html`), or Hostinger Git auto-deploy from branch `hostinger-build`.
@@ -51,7 +51,7 @@ self-hosted Plus Jakarta Sans (D-21) · lucide icons. No other runtime deps.
 | Preview | Production (docs/03-CONTRACTS.md) |
 |---|---|
 | `src/lib/store.ts` (localStorage) | journal/commerce/companion tables + other modules' server functions — each store action is annotated with its contract call |
-| OTP code 246810 | Supabase phone OTP (D-04) |
+| OTP code 2468 | Supabase phone OTP (D-04) |
 | `slotsFor()` in `lib/data.ts` | `scheduling.getAvailableSlots` / `holdAppointment` |
 | `PaySheet` | `finance.createCheckout` → Razorpay Checkout.js → `verifyCheckout`; "paid" only after webhook |
 | `lib/companion.ts` intent responder | `companion.sendCompanionMessage` (Claude, server-side tools) — spec `docs/specs/client/C7-CL-55-ask-bewise.md` |

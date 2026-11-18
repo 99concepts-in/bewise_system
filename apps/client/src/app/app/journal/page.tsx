@@ -18,18 +18,15 @@ import { BP } from '@/lib/asset'
 
 export default function Journal() {
   const journal = useApp((s) => s.journal)
-  const remove = useApp((s) => s.removeMood)
-  const restore = useApp((s) => s.logMood)
-  const { openLog } = useChrome()
+  const { openLog, openEntry } = useChrome()
   const [q, setQ] = useState('')
   const [tip, setTip] = useState<number | null>(null)
-  const [sel, setSel] = useState<JournalEntry | null>(null)
   const week = weekRow(journal)
   const days = lastNDays(journal, 14)
 
   const groups = useMemo(() => {
     const ql = q.trim().toLowerCase()
-    const list = journal.filter((e) => !ql || moodOf(e.emotion).label.toLowerCase().includes(ql) || fmtDay(e.at).toLowerCase().includes(ql) || new Date(e.at).toLocaleDateString('en-IN', { month: 'long' }).toLowerCase().includes(ql))
+    const list = journal.filter((e) => !ql || moodOf(e.emotion).label.toLowerCase().includes(ql) || (e.note ?? '').toLowerCase().includes(ql) || fmtDay(e.at).toLowerCase().includes(ql) || new Date(e.at).toLocaleDateString('en-IN', { month: 'long' }).toLowerCase().includes(ql))
     const m = new Map<string, JournalEntry[]>()
     for (const e of list) { const k = dayKey(e.at); m.set(k, [...(m.get(k) ?? []), e]) }
     return [...m.entries()]
@@ -43,7 +40,7 @@ export default function Journal() {
         <Item>
           <label className="flex h-14 items-center gap-3 rounded-full bg-white px-5 shadow-[var(--shadow-card)] focus-within:ring-2 focus-within:ring-navy">
             <Search className="size-5 text-navy" aria-hidden />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by feeling or date" aria-label="Search by feeling or date" className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-soft" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings, notes or dates" aria-label="Search feelings, notes or dates" className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-soft" />
             {q && <button aria-label="Clear search" onClick={() => setQ('')}><X className="size-4 text-muted" /></button>}
           </label>
         </Item>
@@ -123,11 +120,12 @@ export default function Journal() {
                     <AnimatePresence initial={false}>
                       {es.map((e) => (
                         <motion.li key={e.id} layout initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                          <button onClick={() => setSel(e)} className="flex w-full items-center gap-3 py-3 text-left">
+                          <button onClick={() => openEntry(e.id)} className="flex w-full items-center gap-3 py-3 text-left">
                             <span className="grid size-12 place-items-center rounded-[16px]" style={{ background: moodOf(e.emotion).color + '55' }}>
                               <span className="text-[11px] font-bold leading-none text-navy">{new Date(e.at).getDate()}<br /><span className="font-medium">{new Date(e.at).toLocaleDateString('en-IN', { month: 'short' })}</span></span>
                             </span>
-                            <span className="flex-1"><span className="block text-[15px] font-bold text-navy">{moodOf(e.emotion).label}</span><span className="text-[13px] text-muted">{fmtTime(e.at)}</span></span>
+                            <span className="min-w-0 flex-1"><span className="block text-[15px] font-bold text-navy">{moodOf(e.emotion).label} <span className="font-medium text-muted">· {fmtTime(e.at)}</span></span>
+                              {e.note ? <span className="line-clamp-2 block text-[13px] leading-5 text-ink/80">“{e.note}”</span> : <span className="text-[12px] font-semibold text-peri">+ Add a note</span>}</span>
                             <MoodImg mood={e.emotion} size={40} />
                           </button>
                         </motion.li>
@@ -146,18 +144,6 @@ export default function Journal() {
         <Plus className="size-6" />
       </motion.button>
 
-      <Sheet open={!!sel} onClose={() => setSel(null)} title="Journal entry">
-        {sel && (
-          <div className="flex flex-col items-center pb-2 pt-2 text-center">
-            <MoodImg mood={sel.emotion} size={96} />
-            <p className="mt-3 text-[22px] font-extrabold text-navy">{moodOf(sel.emotion).label}</p>
-            <p className="text-[14px] text-muted">{fmtDay(sel.at)} · {fmtTime(sel.at)}</p>
-            <Btn variant="outline" size="md" className="mt-6" onClick={() => { const e = sel; remove(e.id); setSel(null); toast('Entry removed', { label: 'Undo', onClick: () => restore(e.emotion, new Date(e.at)) }) }}>
-              <Trash2 className="size-4" /> Remove entry
-            </Btn>
-          </div>
-        )}
-      </Sheet>
     </main>
   )
 }

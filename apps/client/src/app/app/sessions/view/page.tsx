@@ -11,7 +11,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { Mascot, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
 import { Btn, Chip, Sheet, buzz, cx, ease, spring, toast, useNow } from '@/components/ui'
-import { CONSULTATIONS, istDate, slotsFor, type Emotion } from '@/lib/data'
+import { CONSULTATIONS, STUDIO, istDate, slotsFor, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { addDays, fmtDay, fmtLongDay, fmtTime, formatINR, startOfDay } from '@/lib/format'
 import { downloadIcs, sessionIcs } from '@/lib/ics'
@@ -34,7 +34,7 @@ function Detail() {
   const past = a.status === 'completed' || now > start + c.minutes * 60_000
   const joinable = !past && mins <= 10
   const soon = !past && mins <= 60
-  const ics = () => downloadIcs('bewise-session.ics', sessionIcs({ id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online — link in the BeWise app' : 'BeWise studio, Vadodara', description: c.name }))
+  const ics = () => downloadIcs('bewise-session.ics', sessionIcs({ id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online — link in the BeWise app' : `${STUDIO.name}, ${STUDIO.full}`, description: c.name }))
 
   return (
     <main className="px-5 pb-36">
@@ -56,7 +56,7 @@ function Detail() {
       <div className="mt-4 space-y-3">
         <div className="card divide-y divide-line px-5">
           <Row icon={<img src={`${BP}/img/jitu.webp`} alt="" className="size-10 rounded-full object-cover" />} t="Jitu Bhaiya" d="Bach Remedy Therapist" />
-          <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{a.mode === 'online' ? <Laptop className="size-5" /> : <MapPin className="size-5" />}</span>} t={`${c.name} · ${c.minutes} min`} d={a.mode === 'online' ? 'Online video call' : 'BeWise studio, Vadodara'} />
+          <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{a.mode === 'online' ? <Laptop className="size-5" /> : <MapPin className="size-5" />}</span>} t={c.name} d={a.mode === 'online' ? 'Online video call' : STUDIO.full} />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><FileText className="size-5" /></span>} t={`Paid ${formatINR(a.amountPaise)}`} d="Remedy blend included · receipt in Payments" />
         </div>
 
@@ -89,7 +89,7 @@ function Detail() {
         <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] space-y-2.5 bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
           {a.mode === 'online'
             ? <Btn full variant={joinable ? 'gradient' : 'primary'} disabled={!joinable} onClick={() => toast('The video link opens here at session time')}><Video className="size-5" /> {joinable ? 'Join session' : 'Join opens 10 min before'}</Btn>
-            : <Btn full variant="gradient" onClick={() => toast('Directions will open in Maps once the studio address is added')}><MapPin className="size-5" /> Directions</Btn>}
+            : <Btn full variant="gradient" onClick={() => window.open(STUDIO.directionsUrl, '_blank', 'noopener')}><MapPin className="size-5" /> Directions</Btn>}
           <div className="flex gap-2.5">
             <Btn full size="md" variant="white" onClick={ics}><CalendarPlus className="size-4" /> Calendar</Btn>
             <Btn full size="md" variant="white" onClick={() => setMove(true)}>Can’t make it?</Btn>

@@ -5,31 +5,96 @@
  * Purpose:  Static/seed data for the standalone preview. Replaced by module calls once the foundation lands:
  *           consultation types → scheduling.listConsultationTypes, products → catalog.*, intake bank → intake.getIntakeForm.
  */
-export type Emotion = 'calm' | 'joyful' | 'grateful' | 'hopeful' | 'tired' | 'anxious' | 'sad' | 'irritated'
+/** The 8 illustrated mood characters (design/assets/v4/mood-characters.png). */
+export type MoodSprite = 'calm' | 'joyful' | 'grateful' | 'hopeful' | 'tired' | 'anxious' | 'sad' | 'irritated'
 
-export const MOODS: { key: Emotion; label: string; color: string }[] = [
-  { key: 'calm', label: 'Calm', color: '#BFD8C2' },
-  { key: 'joyful', label: 'Joyful', color: '#F6DE8D' },
-  { key: 'grateful', label: 'Grateful', color: '#F4C2C8' },
-  { key: 'hopeful', label: 'Hopeful', color: '#B9CBF2' },
-  { key: 'tired', label: 'Tired', color: '#D6CBEF' },
-  { key: 'anxious', label: 'Anxious', color: '#BFE0F2' },
-  { key: 'sad', label: 'Sad', color: '#C3CCD8' },
-  { key: 'irritated', label: 'Irritated', color: '#F3B1A4' },
-]
-export const QUICK_MOODS: Emotion[] = ['calm', 'joyful', 'tired', 'anxious', 'sad']
-export const moodOf = (k: Emotion) => MOODS.find((m) => m.key === k)!
+// @cross(HUB) extends the contract Emotion enum (8 values) — additive; request filed. Extra feelings reuse the closest
+// character in their own colour until bespoke illustrations exist.
+type MoodDef = { key: string; label: string; color: string; sprite: MoodSprite; filter?: string; pleasant: boolean; lift: number; words?: string }
+const M = (key: string, label: string, color: string, sprite: MoodSprite, pleasant: boolean, lift: number, filter?: string, words?: string): MoodDef =>
+  ({ key, label, color, sprite, pleasant, lift, filter, words })
+
+export const MOODS = [
+  // primary grid (8)
+  M('happy', 'Happy', '#F6DE8D', 'joyful', true, 5, 'hue-rotate(-12deg) saturate(1.15)', 'glad good cheerful smile'),
+  M('calm', 'Calm', '#BFD8C2', 'calm', true, 4.5, undefined, 'relaxed settled'),
+  M('grateful', 'Grateful', '#F4C2C8', 'grateful', true, 5, undefined, 'thankful blessed'),
+  M('hopeful', 'Hopeful', '#B9CBF2', 'hopeful', true, 4, undefined, 'optimistic'),
+  M('tired', 'Tired', '#D6CBEF', 'tired', false, 2.5, undefined, 'sleepy exhausted drained'),
+  M('anxious', 'Anxious', '#BFE0F2', 'anxious', false, 2, undefined, 'nervous uneasy'),
+  M('sad', 'Sad', '#C3CCD8', 'sad', false, 1.5, undefined, 'down low unhappy blue'),
+  M('irritated', 'Irritated', '#F3B1A4', 'irritated', false, 2, undefined, 'annoyed'),
+  // more feelings (searchable)
+  M('joyful', 'Joyful', '#F6DE8D', 'joyful', true, 5, undefined, 'delighted'),
+  M('excited', 'Excited', '#F7C98B', 'joyful', true, 5, 'hue-rotate(-28deg) saturate(1.35)', 'thrilled eager'),
+  M('loved', 'Loved', '#F2A9B8', 'grateful', true, 5, 'saturate(1.35) hue-rotate(-8deg)', 'cared for affection'),
+  M('peaceful', 'Peaceful', '#C9E2D2', 'calm', true, 4.5, 'hue-rotate(18deg) brightness(1.04)', 'serene still'),
+  M('relaxed', 'Relaxed', '#CFE4C4', 'calm', true, 4.5, 'hue-rotate(-18deg)', 'at ease'),
+  M('content', 'Content', '#DCE5BE', 'calm', true, 4.5, 'hue-rotate(-42deg) saturate(1.1)', 'satisfied okay fine'),
+  M('confident', 'Confident', '#AFC3F0', 'hopeful', true, 4.5, 'saturate(1.3) hue-rotate(-10deg)', 'strong sure'),
+  M('proud', 'Proud', '#C4B8F0', 'hopeful', true, 4.5, 'hue-rotate(30deg)', 'accomplished'),
+  M('motivated', 'Motivated', '#F5D27A', 'joyful', true, 4.5, 'saturate(1.25)', 'energised driven focused'),
+  M('loving', 'Loving', '#F4B6C2', 'grateful', true, 5, 'hue-rotate(-16deg)', 'kind warm'),
+  M('worried', 'Worried', '#BFD6F2', 'anxious', false, 2, 'hue-rotate(12deg)', 'concerned'),
+  M('stressed', 'Stressed', '#B8CFEA', 'anxious', false, 1.8, 'hue-rotate(24deg) saturate(1.15)', 'pressure tense'),
+  M('scared', 'Scared', '#C6D3EE', 'anxious', false, 1.8, 'hue-rotate(38deg) saturate(.85)', 'afraid fear panic'),
+  M('overwhelmed', 'Overwhelmed', '#CBC0EC', 'tired', false, 1.8, 'hue-rotate(-14deg) saturate(1.2)', 'too much burdened'),
+  M('bored', 'Bored', '#DAD3E8', 'tired', false, 2.5, 'saturate(.7)', 'flat meh'),
+  M('restless', 'Restless', '#D9C6EA', 'tired', false, 2.2, 'hue-rotate(14deg)', 'unsettled cannot sleep'),
+  M('lonely', 'Lonely', '#BCC7D9', 'sad', false, 1.5, 'hue-rotate(12deg)', 'alone isolated'),
+  M('hurt', 'Hurt', '#CBC4D6', 'sad', false, 1.5, 'hue-rotate(40deg)', 'pain upset'),
+  M('guilty', 'Guilty', '#C9CDD6', 'sad', false, 1.8, 'saturate(.6)', 'ashamed sorry'),
+  M('angry', 'Angry', '#F09C8E', 'irritated', false, 1.5, 'saturate(1.3) hue-rotate(-6deg)', 'mad furious'),
+  M('frustrated', 'Frustrated', '#F2B795', 'irritated', false, 1.8, 'hue-rotate(14deg)', 'stuck fed up'),
+  M('jealous', 'Jealous', '#DCC3A0', 'irritated', false, 2, 'hue-rotate(38deg) saturate(.8)', 'envious'),
+  M('confused', 'Confused', '#C8D9E8', 'hopeful', false, 2.5, 'hue-rotate(-24deg) saturate(.8)', 'unsure lost'),
+] as const satisfies readonly MoodDef[]
+
+export type Emotion = (typeof MOODS)[number]['key']
+export const PRIMARY_MOODS: Emotion[] = ['happy', 'calm', 'grateful', 'hopeful', 'tired', 'anxious', 'sad', 'irritated']
+export const QUICK_MOODS: Emotion[] = ['happy', 'calm', 'tired', 'anxious', 'sad']
+const FALLBACK = MOODS[1]
+export const moodOf = (k: string): MoodDef => (MOODS as readonly MoodDef[]).find((m) => m.key === k) ?? FALLBACK
 /** for charts: higher = lighter day (used only to give the daily bars a shape, never shown as a score) */
-export const MOOD_LIFT: Record<Emotion, number> = { joyful: 5, grateful: 5, calm: 4.5, hopeful: 4, tired: 2.5, irritated: 2, anxious: 2, sad: 1.5 }
+export const MOOD_LIFT = Object.fromEntries(MOODS.map((m) => [m.key, m.lift])) as Record<Emotion, number>
+export const searchMoods = (q: string) => {
+  const s = q.trim().toLowerCase()
+  if (!s) return [] as MoodDef[]
+  return (MOODS as readonly MoodDef[]).filter((m) => m.label.toLowerCase().includes(s) || (m.words ?? '').includes(s))
+}
 
 // @decision(D-09) @decision(D-02) fees include the remedy blend
 export const CONSULTATIONS = [
+  // minutes = calendar-block length only (never shown — owner 2026-11-18)
   { id: 'first', name: 'First consultation', minutes: 60, feePaise: 100000,
     blurb: 'A gentle, unhurried conversation about how you’ve been feeling.' },
   { id: 'followup', name: 'Follow-up', minutes: 30, feePaise: 80000,
     blurb: 'See how you’re doing and refresh your blend.' },
 ] as const
 export type ConsultationId = (typeof CONSULTATIONS)[number]['id']
+
+/**
+ * Client testimonials (CONTENT-CHECKLIST #1). REAL quotes only, each with the client's written consent to publish.
+ * Never invent or edit meaning. No cure / medical claims in quotes. Shown in the booking screen's "Client stories" sheet.
+ * e.g. { name: 'Monika', city: 'Vadodara', quote: '…', rating: 5 }
+ */
+export const TESTIMONIALS: { name: string; city?: string; quote: string; rating?: number }[] = []
+export const TESTIMONIALS_SOURCE = 'https://www.jitendrakhimlani.com'
+
+/** In-person studio (owner 2026-11-18; CONTENT-CHECKLIST #7). */
+const STUDIO_FULL = '102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007'
+export const STUDIO = {
+  name: 'BeWise studio',
+  line1: '102, Yogikrupa Apartment',
+  line2: '19/A, Nutan Bharat Society, Alkapuri',
+  city: 'Vadodara, Gujarat 390007',
+  short: 'Alkapuri, Vadodara',
+  full: STUDIO_FULL,
+  // Google Business listing "Be Wise Holistic Wellness" (owner's share link https://share.google/BrjgaRA5OBCBexeyK)
+  mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Be Wise Holistic Wellness, ${STUDIO_FULL}`)}`,
+  directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`Be Wise Holistic Wellness, ${STUDIO_FULL}`)}`,
+  shareUrl: 'https://share.google/BrjgaRA5OBCBexeyK',
+}
 
 export const CONSULTANT = {
   name: 'Jitu Bhaiya',

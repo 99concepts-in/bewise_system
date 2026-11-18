@@ -59,10 +59,11 @@
   .bw-wash {
     background: linear-gradient(180deg, #dce2f5 0%, #eef0fa 22%, #faf9f5 52%, #e6eee3 100%);
   }
+  /* keyboard focus only; follows each element's own radius (no shape change, no ring after taps) */
+  :focus { outline: none; }
   :focus-visible {
-    outline: 2px solid var(--color-navy);
-    outline-offset: 2px;
-    border-radius: 12px;
+    outline: 2px solid rgba(94, 127, 184, 0.55);
+    outline-offset: 3px;
   }
   button { cursor: pointer; }
   input, textarea { font: inherit; }

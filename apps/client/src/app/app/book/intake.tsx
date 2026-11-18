@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { Heart, Lock, Mic, Phone, Sparkles, Square, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { MoodImg } from '@/components/brand'
-import { Chip, Segmented, Toggle, buzz, cx, spring } from '@/components/ui'
+import { Chip, Segmented, buzz, cx, spring } from '@/components/ui'
 import { BODY_AREAS, FEELINGS, GOAL_FEELINGS, HELPLINES, LIFE_CHANGES, NUANCE, type Emotion } from '@/lib/data'
 import type { IntakeAnswers } from '@/lib/store'
 
@@ -27,18 +27,54 @@ export function StepTitle({ lead, em, sub }: { lead: string; em: string; sub?: s
 function Card({ children, className }: { children: ReactNode; className?: string }) { return <div className={cx('card p-5', className)}>{children}</div> }
 function Label({ children }: { children: ReactNode }) { return <p className="mb-3 text-[16px] font-bold text-navy">{children}</p> }
 
+/** IN-01 — a guided breath before the questions (owner 2026-11-18). 4 s in · 2 s hold · 6 s out, looping. */
+const BREATH = [{ t: 'Breathe in…', d: 4 }, { t: 'Hold', d: 2 }, { t: 'Breathe out…', d: 6 }] as const
 export function IntakeIntro() {
+  const [phase, setPhase] = useState(0)
+  const [cycles, setCycles] = useState(0)
+  useEffect(() => {
+    const t = setTimeout(() => { setPhase((p) => (p + 1) % 3); if (phase === 2) setCycles((c) => c + 1) }, BREATH[phase].d * 1000)
+    return () => clearTimeout(t)
+  }, [phase])
+  const scale = phase === 0 ? 1 : phase === 1 ? 1 : 0.62
+  const dur = BREATH[phase].d
   return (
-    <div>
-      <StepTitle lead="Before you" em="meet" sub="A few gentle questions so Jitu Bhaiya can prepare for you." />
-      <Card className="space-y-4">
-        {[['Private', 'Only Jitu Bhaiya reads your answers.'], ['Save anytime', 'Leave and finish later — nothing is lost.'], ['No wrong answers', 'Answer as much or as little as feels right.'], ['About 5 minutes', 'Eight short steps.']].map(([t, d], i) => (
-          <motion.div key={t} className="flex items-start gap-3" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.08 }}>
-            <span className="mt-0.5 grid size-7 place-items-center rounded-full bg-sage-100 text-sage-text">✓</span>
-            <div><p className="text-[15px] font-bold text-navy">{t}</p><p className="text-[14px] text-muted">{d}</p></div>
-          </motion.div>
+    <div className="flex flex-col items-center pt-2 text-center">
+      <motion.h1 className="h-duo text-[32px]" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+        Take a deep <em>breath</em>
+      </motion.h1>
+      <motion.p className="mt-2 max-w-[300px] text-[15px] leading-6 text-muted" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.8 }}>
+        Let your shoulders drop. There’s no rush here.
+      </motion.p>
+
+      <div className="relative mt-4 grid size-[min(300px,36dvh)] place-items-center" aria-hidden>
+        {/* soft outer petals rotate slowly */}
+        <motion.div className="absolute inset-0" animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}>
+          {Array.from({ length: 6 }).map((_, k) => (
+            <motion.span key={k} className="absolute left-1/2 top-1/2 block h-[46%] w-[30%] origin-[50%_100%] rounded-[50%] bg-[linear-gradient(180deg,rgba(185,203,242,.55),rgba(220,231,217,.25))] mix-blend-multiply"
+              style={{ translateX: '-50%', translateY: '-100%', rotate: k * 60 }}
+              animate={{ scaleY: phase === 2 ? 0.55 : 1, opacity: phase === 2 ? 0.45 : 0.9 }} transition={{ duration: dur, ease: [0.45, 0, 0.55, 1] }} />
+          ))}
+        </motion.div>
+        {/* breathing orb */}
+        <motion.div className="absolute size-[62%] rounded-full bg-[radial-gradient(circle_at_35%_30%,#ffffff,#dce2f5_55%,#c9d6f2)] shadow-[0_20px_60px_rgba(94,127,184,.35)]"
+          initial={{ scale: 0.62 }} animate={{ scale }} transition={{ duration: dur, ease: [0.45, 0, 0.55, 1] }} />
+        <motion.div className="absolute size-[62%] rounded-full border-2 border-white/80" initial={{ scale: 0.62, opacity: 0.6 }}
+          animate={{ scale: phase === 2 ? 0.7 : 1.18, opacity: phase === 1 ? 0.9 : 0.35 }} transition={{ duration: dur, ease: [0.45, 0, 0.55, 1] }} />
+        <AnimatePresence mode="wait">
+          <motion.p key={phase} className="relative text-[20px] font-bold text-navy" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.6 }}>
+            {BREATH[phase].t}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+      <p className="sr-only" aria-live="polite">{BREATH[phase].t}</p>
+
+      <motion.div className="mt-4 flex flex-wrap justify-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
+        {['Private to Jitu Bhaiya', 'Everything optional', 'About 5 minutes'].map((t) => (
+          <span key={t} className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[12px] font-semibold text-navy shadow-[var(--shadow-card)]"><span className="size-1.5 rounded-full bg-sage" />{t}</span>
         ))}
-      </Card>
+      </motion.div>
+      <AnimatePresence>{cycles >= 1 && <motion.p className="mt-4 text-[13px] text-muted" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Ready when you are.</motion.p>}</AnimatePresence>
     </div>
   )
 }
@@ -46,22 +82,7 @@ export function IntakeIntro() {
 export function StepWho({ a, set }: P) {
   return (
     <div className="space-y-4">
-      <StepTitle lead="What’s been on your" em="mind?" />
-      <Card>
-        <Label>Who is this for?</Label>
-        <Segmented value={a.who} onChange={(who) => set({ who })} options={[{ value: 'me', label: 'Me' }, { value: 'child', label: 'My child' }, { value: 'someone_else', label: 'Someone' }]} />
-        <AnimatePresence>
-          {a.who !== 'me' && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-              <div className="mt-4 grid grid-cols-[1fr_88px] gap-2">
-                <input aria-label="Their name" placeholder="Their name" value={a.dependent?.name ?? ''} onChange={(e) => set({ dependent: { relation: '', age: '', ...a.dependent, name: e.target.value } })} className="h-12 rounded-full bg-peri-50 px-4 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
-                <input aria-label="Age" placeholder="Age" inputMode="numeric" value={a.dependent?.age ?? ''} onChange={(e) => set({ dependent: { name: '', relation: '', ...a.dependent, age: e.target.value.replace(/\D/g, '').slice(0, 3) } })} className="h-12 rounded-full bg-peri-50 px-4 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
-              </div>
-              <p className="mt-2 text-[13px] text-muted">You’re answering on their behalf. If they’re 18+, it’s best they fill this in themselves.</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </Card>
+      <StepTitle lead="Anything you’d like to" em="share?" sub="In your own words, or record a voice note. Optional — Jitu Bhaiya will read it before you meet." />
       <Card>
         <Label>In your own words</Label>
         <textarea value={a.onMind} onChange={(e) => set({ onMind: e.target.value.slice(0, 1000) })} rows={4} placeholder="Work has felt heavy lately, and I can’t switch off at night…"
@@ -226,20 +247,30 @@ function Slider({ label, value, onChange }: { label: string; value: number; onCh
     </div>
   )
 }
+const SLEEP = ['Very poor', 'Poor', 'Okay', 'Good', 'Very good'] as const
 export function StepSleep({ a, set }: P) {
-  const Q: Emotion[] = ['tired', 'anxious', 'sad', 'joyful', 'calm']
   return (
     <div className="space-y-4">
       <StepTitle lead="Sleep &" em="energy" />
       <Card>
-        <Label>How do you sleep?</Label>
-        <div className="flex justify-between">
-          {Q.map((m) => (
-            <motion.button key={m} whileTap={{ scale: 0.88 }} aria-pressed={a.sleepQuality === m} onClick={() => { buzz(6); set({ sleepQuality: m }) }}
-              className={cx('flex flex-col items-center gap-1 rounded-[18px] p-1.5', a.sleepQuality === m && 'ring-2 ring-navy')}>
-              <MoodImg mood={m} size={48} /><span className="text-[12px] font-semibold capitalize text-navy">{m}</span>
-            </motion.button>
-          ))}
+        <Label>How well do you sleep?</Label>
+        {/* simple 5-step scale (owner 2026-11-18) — bars grow with quality */}
+        <div className="grid grid-cols-5 gap-1.5" role="radiogroup" aria-label="Sleep quality">
+          {SLEEP.map((label, i) => {
+            const v = (i + 1) as 1 | 2 | 3 | 4 | 5
+            const on = a.sleepQuality === v
+            return (
+              <motion.button key={label} type="button" role="radio" aria-checked={on} whileTap={{ scale: 0.92 }} onClick={() => { buzz(6); set({ sleepQuality: v }) }}
+                className={cx('flex flex-col items-center gap-2 rounded-[18px] px-1 pb-2.5 pt-3 transition-colors', on ? 'bg-navy text-white shadow-[0_6px_16px_rgba(24,41,87,.25)]' : 'bg-peri-50/80 text-navy')}>
+                <span className="flex h-7 items-end gap-[3px]" aria-hidden>
+                  {[0, 1, 2, 3, 4].map((k) => (
+                    <span key={k} className={cx('w-[4px] rounded-full', k <= i ? (on ? 'bg-white' : 'bg-navy') : (on ? 'bg-white/30' : 'bg-[#cfd5e5]'))} style={{ height: 8 + k * 5 }} />
+                  ))}
+                </span>
+                <span className="text-center text-[11.5px] font-semibold leading-tight">{label}</span>
+              </motion.button>
+            )
+          })}
         </div>
       </Card>
       <Card>
@@ -294,13 +325,15 @@ export function StepSafety({ a, set }: P) {
   return (
     <div>
       <StepTitle lead="For your" em="safety" sub="Helps us prepare your remedy and suggest products safely." />
+      <p className="mb-3 flex items-center gap-2 rounded-[18px] bg-sage-100/80 px-4 py-3 text-[14px] font-semibold text-sage-text">
+        <span aria-hidden>🌿</span> All BeWise remedy blends are alcohol-free.
+      </p>
       <div className="card divide-y divide-line px-5">
         <YesNo label="Seeing a doctor or therapist?" value={s.doctor} onChange={(doctor) => up({ doctor })} />
         <YesNo label="Taking any medicines?" value={s.medicines} onChange={(medicines) => up({ medicines })}>
           <input className={small} placeholder="Which ones? e.g. thyroid tablet" value={s.medicinesText} onChange={(e) => up({ medicinesText: e.target.value })} aria-label="Medicines" />
         </YesNo>
         <YesNo label="Pregnant or breastfeeding?" value={s.pregnant} onChange={(pregnant) => up({ pregnant })} />
-        <YesNo label="Prefer an alcohol-free remedy?" hint="Bach remedies usually contain a little brandy" value={s.alcoholFree} onChange={(alcoholFree) => up({ alcoholFree })} />
         <YesNo label="Allergies or sensitive skin?" value={s.allergies} onChange={(allergies) => up({ allergies })}>
           <input className={small} placeholder="e.g. lavender, citrus" value={s.allergiesText} onChange={(e) => up({ allergiesText: e.target.value })} aria-label="Allergies" />
         </YesNo>
@@ -366,9 +399,9 @@ export function StepReview({ a, set, edit }: P & { edit: (step: string) => void 
   const rows = [
     { k: 'who', icon: '💭', t: 'On your mind', d: [a.onMind.slice(0, 48) + (a.onMind.length > 48 ? '…' : ''), a.duration?.toLowerCase()].filter(Boolean).join(' · ') },
     { k: 'feelings', icon: '💗', t: 'Feelings', d: Object.values(a.nuance).flatMap((n) => n.statements).slice(0, 3).join(' · ') || a.feelings.join(' · ') },
-    { k: 'body', icon: '🌿', t: 'Body', d: a.bodyAny ? a.body.join(', ').toLowerCase() : 'nothing noted' },
-    { k: 'sleep', icon: '🌙', t: 'Sleep', d: `${a.hours ?? '—'} h · energy ${a.energy}/5 · stress ${a.stress}/5` },
-    { k: 'safety', icon: '🛡️', t: 'Safety', d: [a.safety.alcoholFree && 'alcohol-free', a.safety.allergies && a.safety.allergiesText && `${a.safety.allergiesText} allergy`, a.safety.pregnant && 'pregnant'].filter(Boolean).join(' · ') || 'nothing to flag' },
+    { k: 'body', icon: '🌿', t: 'Body', d: a.bodyAny === undefined ? '' : a.bodyAny ? a.body.join(', ').toLowerCase() : 'nothing noted' },
+    { k: 'sleep', icon: '🌙', t: 'Sleep', d: a.hours || a.sleepQuality ? [a.sleepQuality && SLEEP[a.sleepQuality - 1].toLowerCase(), a.hours && `${a.hours} h`, `energy ${a.energy}/5`, `stress ${a.stress}/5`].filter(Boolean).join(' · ') : '' },
+    { k: 'safety', icon: '🛡️', t: 'Safety', d: [a.safety.allergies && a.safety.allergiesText && `${a.safety.allergiesText} allergy`, a.safety.pregnant && 'pregnant'].filter(Boolean).join(' · ') || 'nothing to flag' },
     { k: 'goals', icon: '✨', t: 'You’d like to feel', d: [...a.goals, a.goalText].filter(Boolean).join(' · ').toLowerCase() || '—' },
   ]
   return (
@@ -377,15 +410,15 @@ export function StepReview({ a, set, edit }: P & { edit: (step: string) => void 
       {rows.map((r, i) => (
         <motion.div key={r.k} className="card flex items-center gap-3 p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
           <span className="grid size-11 shrink-0 place-items-center rounded-full bg-peri-50 text-[18px]" aria-hidden>{r.icon}</span>
-          <div className="min-w-0 flex-1"><p className="text-[15px] font-bold text-navy">{r.t}</p><p className="truncate text-[13px] text-muted">{r.d}</p></div>
+          <div className="min-w-0 flex-1"><p className="text-[15px] font-bold text-navy">{r.t}</p><p className="truncate text-[13px] text-muted">{r.d && r.d !== '—' ? r.d : 'Skipped'}</p></div>
           <button onClick={() => edit(r.k)} className="text-[14px] font-semibold text-navy underline underline-offset-4">Edit</button>
         </motion.div>
       ))}
-      <div className="card divide-y divide-line px-5">
-        <div className="flex items-center gap-3 py-4"><Lock className="size-5 text-navy" /><span className="flex-1 text-[15px] font-semibold text-navy">Share with my consultant</span><Toggle label="Share with my consultant" on onChange={() => {}} /></div>
-        <div className="flex items-center gap-3 py-4"><Sparkles className="size-5 text-navy" /><span className="flex-1 text-[15px] font-semibold text-navy">Let AI prepare a private summary for Jitu Bhaiya</span><Toggle label="AI summary" on={a.consentAi} onChange={(consentAi) => set({ consentAi })} /></div>
+      {/* owner 2026-11-18: sharing + AI summary are part of the service — stated plainly, not toggles */}
+      <div className="card space-y-3 p-5">
+        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Lock className="mt-0.5 size-5 shrink-0 text-navy" /><span>Your answers go <b className="text-navy">privately to Jitu Bhaiya</b> so he can prepare for your session.</span></p>
+        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Sparkles className="mt-0.5 size-5 shrink-0 text-navy" /><span>A secure AI assistant prepares a short summary for him. <b className="text-navy">Only he sees it</b> — it never decides your remedy.</span></p>
       </div>
-      <p className="px-2 text-[12px] text-muted">Sharing is needed so Jitu Bhaiya can prepare. The AI summary is optional and only he sees it.</p>
     </div>
   )
 }

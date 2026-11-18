@@ -7,11 +7,13 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowRight, BookOpen, ChevronRight, Lightbulb, Sparkles, Video } from 'lucide-react'
+import { ArrowRight, BookOpen, Check, ChevronRight, Lightbulb, Sparkles, Video } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Mascot, MoodButton, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
-import { Btn, BtnLink, Item, Reveal, buzz, spring, toast, useChrome, useNow } from '@/components/ui'
+import { ConsultInviteArt, SessionDateArt } from '@/components/session-art'
+import { BlendBottleCard } from '@/components/blend-bottle'
+import { Btn, BtnLink, Item, Reveal, Ring, buzz, spring, toast, useChrome, useNow } from '@/components/ui'
 import { CONSULTATIONS, QUICK_MOODS, moodOf, type Emotion } from '@/lib/data'
 import { useApp, type Appointment } from '@/lib/store'
 import { dayKey, firstName, fmtDay, fmtTime } from '@/lib/format'
@@ -23,7 +25,7 @@ export default function Home() {
   const journal = useApp((s) => s.journal)
   const logMood = useApp((s) => s.logMood)
   const blend = useApp((s) => s.blend)
-  const { openLog } = useChrome()
+  const { openLog, openEntry } = useChrome()
   const [burst, setBurst] = useState<{ mood: Emotion; n: number } | null>(null)
   const todays = journal.filter((e) => dayKey(e.at) === dayKey(new Date()))
   const lastToday = todays[0]
@@ -57,7 +59,8 @@ export default function Home() {
               <AnimatePresence mode="wait">
                 {lastToday ? (
                   <motion.p key={lastToday.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-[13px] text-muted">
-                    Logged <b className="text-navy">{moodOf(lastToday.emotion).label}</b> at {fmtTime(lastToday.at)}{todays.length > 1 ? ` · ${todays.length} today` : ''}
+                    Logged <b className="text-navy">{moodOf(lastToday.emotion).label}</b> at {fmtTime(lastToday.at)} ·{' '}
+                    <button onClick={() => openEntry(lastToday.id)} className="font-semibold text-navy underline underline-offset-2">{lastToday.note ? 'Edit note' : 'Add a note'}</button>
                   </motion.p>
                 ) : <motion.p key="none" className="text-[13px] text-muted">Nothing logged yet today</motion.p>}
               </AnimatePresence>
@@ -71,7 +74,9 @@ export default function Home() {
 
         <Item><ContextCard /></Item>
 
-        {blend && <Item><RitualCard /></Item>}
+        {blend && <Item><BlendBottleCard /></Item>}
+
+        <GoalsCard />
 
         <Item>
           <Link href="/app/ask" className="card group relative block overflow-hidden p-5 pr-[42%]">
@@ -123,13 +128,12 @@ function ContextCard() {
   }
   if (needsFeedback)
     return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitu Bhaiya." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} img={`${BP}/img/mood-grateful.webp`} />
-  if (blend && any)
-    return <Ctx tone="sage" kicker="Check in" title="Time for your follow-up" body="See how you’re doing and refresh your blend · ₹800, blend included." cta="Book follow-up" href="/app/book?type=followup" img={`${BP}/img/owl-bottle.webp`} />
-  return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm hour with Jitu Bhaiya · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" img={`${BP}/img/cat-consult.webp`} wide />
+  if (blend && any) return null // the "Your blend" card carries the follow-up pre-book (owner 2026-11-18)
+  return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm, unhurried conversation with Jitu Bhaiya · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" art={<ConsultInviteArt />} wide />
 }
 
 const TONES = { peri: 'bg-[linear-gradient(135deg,#ffffff_40%,#e9edfa)]', navy: 'bg-[linear-gradient(135deg,#182957,#3c5596)] text-white', rose: 'bg-[linear-gradient(135deg,#fff_40%,#fbe9ee)]', sage: 'bg-[linear-gradient(135deg,#fff_40%,#e5efe2)]' }
-function Ctx({ tone, kicker, title, body, cta, href, img, icon, wide }: { tone: keyof typeof TONES; kicker: string; title: string; body: string; cta: string; href: string; img?: string; icon?: React.ReactNode; wide?: boolean }) {
+function Ctx({ tone, kicker, title, body, cta, href, img, icon, wide, art }: { tone: keyof typeof TONES; kicker: string; title: string; body: string; cta: string; href: string; img?: string; icon?: React.ReactNode; wide?: boolean; art?: React.ReactNode }) {
   const dark = tone === 'navy'
   return (
     <section className={`relative overflow-hidden rounded-[28px] p-5 shadow-[var(--shadow-card)] ${TONES[tone]}`}>
@@ -139,6 +143,7 @@ function Ctx({ tone, kicker, title, body, cta, href, img, icon, wide }: { tone: 
         <p className={`mt-1 text-[14px] leading-5 ${dark ? 'text-white/80' : 'text-muted'}`}>{body}</p>
         <BtnLink href={href} size="sm" variant={dark ? 'white' : 'primary'} className="mt-4">{icon}{cta}<ArrowRight className="size-4" /></BtnLink>
       </div>
+      {art}
       {img && <motion.img src={img} alt="" aria-hidden className={`absolute bottom-0 object-contain ${wide ? 'multiply -right-2 h-[118px]' : 'right-3 h-[108px]'}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, ...spring }} />}
     </section>
   )
@@ -150,44 +155,12 @@ function NextSession({ a, onOpen }: { a: Appointment; onOpen: () => void }) {
     <section className="card relative overflow-hidden p-5">
       <h2 className="h-section">Next session</h2>
       <div className="mt-3 flex items-center gap-4">
-        <img src={`${BP}/img/cat-consult.webp`} alt="" aria-hidden className="multiply h-[96px] w-[118px] rounded-[18px] object-cover" />
+        <SessionDateArt startsAt={a.startsAt} mode={a.mode} />
         <div className="flex-1">
           <p className="text-[15px] font-semibold text-navy">{fmtDay(a.startsAt)} · {fmtTime(a.startsAt)}</p>
           <p className="text-[13px] text-muted">{c.name} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya</p>
           <Btn size="sm" className="mt-3 px-6" onClick={onOpen}>View</Btn>
         </div>
-      </div>
-    </section>
-  )
-}
-
-function RitualCard() {
-  const blend = useApp((s) => s.blend)!
-  const taken = useApp((s) => s.ritual[dayKey(new Date())] ?? 0)
-  const take = useApp((s) => s.takeDrop)
-  const untake = useApp((s) => s.untakeDrop)
-  const next = blend.reminderTimes[taken]
-  return (
-    <section className="card p-5" aria-label="Today's ritual">
-      <div className="flex items-start justify-between">
-        <div>
-          <h2 className="h-section">Today’s ritual</h2>
-          <p className="mt-0.5 text-[13px] text-muted">{blend.drops} drops, {blend.timesPerDay} times a day{next ? ` · next at ${next}` : ' · all done today'}</p>
-        </div>
-        <Link href="/app/remedies" className="text-[13px] font-semibold text-navy">Blend</Link>
-      </div>
-      <div className="mt-4 flex items-center gap-3">
-        {Array.from({ length: blend.timesPerDay }).map((_, k) => {
-          const on = k < taken
-          return (
-            <motion.button key={k} whileTap={{ scale: 0.85 }} aria-label={on ? `Dose ${k + 1} taken — tap to undo` : `Mark dose ${k + 1} taken`}
-              onClick={() => { if (on && k === taken - 1) untake(); else if (!on && k === taken) { take(); buzz(12); if (k + 1 === blend.timesPerDay) toast('All four done today — beautiful') } }}
-              className="relative grid h-14 flex-1 place-items-center overflow-hidden rounded-[18px] bg-[#f6f1e8]">
-              <motion.span className="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,#e7b768,#c48a3a)]" initial={false} animate={{ height: on ? '100%' : '0%' }} transition={{ type: 'spring', stiffness: 160, damping: 20 }} />
-              <svg viewBox="0 0 24 24" className={`relative size-6 ${on ? 'text-white' : 'text-[#c9a46a]'}`} aria-hidden><path fill="currentColor" d="M12 2.5c3.6 4.6 6 8 6 11a6 6 0 1 1-12 0c0-3 2.4-6.4 6-11Z" /></svg>
-            </motion.button>
-          )
-        })}
       </div>
     </section>
   )
@@ -210,5 +183,37 @@ function ProgressCompact() {
       </div>
       <p className="mt-3 flex items-center gap-1.5 text-[12px] text-soft"><BookOpen className="size-3.5" /> From your journal · not medical advice</p>
     </Link>
+  )
+}
+
+/** Goals the client set (CL-31) — shown on Home once there is at least one (owner 2026-11-18). */
+function GoalsCard() {
+  const goals = useApp((s) => s.goals)
+  const upd = useApp((s) => s.updateGoal)
+  if (!goals.length) return null
+  return (
+    <Item>
+      <section className="card p-5" aria-labelledby="goals-h">
+        <div className="flex items-center justify-between">
+          <h2 id="goals-h" className="h-section">Your goals</h2>
+          <Link href="/app/goals" className="inline-flex items-center gap-0.5 text-[13px] font-semibold text-navy">All<ChevronRight className="size-4" /></Link>
+        </div>
+        <ul className="mt-3 space-y-2.5">
+          {goals.map((g) => (
+            <li key={g.id} className="flex items-center gap-3">
+              <Ring value={g.progress / 100} size={44} stroke={5} color={g.done ? '#82977e' : '#182957'}>
+                {g.done ? <Check className="size-4 text-sage" strokeWidth={3} /> : <span className="text-[11px] font-bold text-navy tnum">{g.progress}</span>}
+              </Ring>
+              <span className={`flex-1 text-[15px] font-semibold ${g.done ? 'text-sage-text line-through decoration-sage/50' : 'text-navy'}`}>{g.title}</span>
+              {!g.done && (
+                <motion.button whileTap={{ scale: 0.88 }} aria-label={`Add progress to ${g.title}`}
+                  onClick={() => { const n = Math.min(100, g.progress + 10); buzz(8); upd(g.id, { progress: n, done: n === 100 }); if (n === 100) toast('Goal complete — well done') }}
+                  className="h-9 rounded-full bg-peri-50 px-3 text-[13px] font-bold text-navy">+10%</motion.button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    </Item>
   )
 }

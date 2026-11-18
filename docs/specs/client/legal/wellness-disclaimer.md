@@ -37,8 +37,7 @@ blend based on how you describe your feelings.
 - If you have **allergies or sensitive skin**, tell us in your intake. The app will warn you about products that contain something you noted — but please always read the ingredients yourself.
 
 ### About the remedy blend
-Bach flower remedies are traditionally preserved in a **small amount of brandy (alcohol)**. If you prefer, we prepare your blend
-**alcohol-free** — just say so in your intake or tell Jitu Bhaiya. ⚠️ OWNER TO CONFIRM the alcohol-free base used
+All BeWise remedy blends are prepared **alcohol-free** (owner, 2026-11-18). ⚠️ OWNER TO CONFIRM the base used (e.g. glycerine) so the label and this page can name it.
 
 ### About essential oils and aromatherapy products
 - For **external use only** unless the label clearly says otherwise. Do not swallow.

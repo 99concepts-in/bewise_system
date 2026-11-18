@@ -8,21 +8,24 @@
  */
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { CalendarPlus, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Info, Laptop, MapPin, Sparkles, Video } from 'lucide-react'
+import { CalendarPlus, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Info, Laptop, MapPin, Quote, Sparkles, Video } from 'lucide-react'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Mascot, Petals } from '@/components/brand'
 import { PaySheet } from '@/components/pay-sheet'
 import { AppHeader, useUi } from '@/components/shell'
 import { Btn, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, useStableCallback } from '@/components/ui'
-import { CONSULTANT, CONSULTATIONS, NUANCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
+import { CONSULTANT, CONSULTATIONS, NUANCE, STUDIO, TESTIMONIALS, TESTIMONIALS_SOURCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
+import { InPersonArt, OnlineArt } from '@/components/mode-art'
+import { parseIsoDay } from '@/lib/supply'
 import { emptyIntake, useApp, type Appointment, type IntakeAnswers } from '@/lib/store'
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
 import { downloadIcs, googleCalUrl, sessionIcs } from '@/lib/ics'
 import * as I from './intake'
 import { BP } from '@/lib/asset'
 
-const INTAKE = ['intro', 'who', 'feelings', 'nuance', 'body', 'sleep', 'life', 'safety', 'gentle', 'goals', 'review', 'saved'] as const
-const COUNTED = ['who', 'feelings', 'nuance', 'body', 'sleep', 'life', 'safety', 'gentle']
+// owner 2026-11-18: breathe first → feelings → … → personal message later ('who' = the share/voice-note step)
+const INTAKE = ['intro', 'feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle', 'goals', 'review', 'saved'] as const
+const COUNTED = ['feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle']
 const CHECKIN = ['ck-now', 'ck-changes', 'ck-news'] as const
 type Step = 'choose' | (typeof INTAKE)[number] | (typeof CHECKIN)[number] | 'mode' | 'time' | 'pay' | 'done'
 
@@ -48,6 +51,7 @@ function Book() {
   const [paying, setPaying] = useState(false)
   const [booked, setBooked] = useState<Appointment>()
   const [meet, setMeet] = useState(false)
+  const [stories, setStories] = useState(false)
   const [holdUntil, setHoldUntil] = useState(0)
 
   // decided once per visit: submitting the intake mid-flow must not remove the steps we're standing on
@@ -76,19 +80,8 @@ function Book() {
   const setA = (p: Partial<IntakeAnswers>) => setAnswers((a) => ({ ...a, ...p }))
   const c = CONSULTATIONS.find((x) => x.id === (type ?? 'first'))!
 
-  const can: Partial<Record<Step, boolean>> = {
-    who: (answers.onMind.trim().length >= 10) && !!answers.duration && (answers.who === 'me' || !!answers.dependent?.name),
-    feelings: answers.feelings.length > 0,
-    nuance: answers.feelings.filter((f) => NUANCE[f]).every((f) => (answers.nuance[f]?.statements.length ?? 0) > 0 && !!answers.nuance[f]?.intensity),
-    body: answers.bodyAny === false || (answers.bodyAny === true && answers.body.length > 0 && answers.bodyTypes.length > 0),
-    sleep: !!answers.sleepQuality && !!answers.hours && answers.wakes !== undefined,
-    life: answers.life.length > 0,
-    safety: ['doctor', 'medicines', 'pregnant', 'alcoholFree', 'allergies'].every((k) => answers.safety[k as keyof typeof answers.safety] !== undefined) && (!answers.safety.medicines || !!answers.safety.medicinesText.trim()) && (!answers.safety.allergies || !!answers.safety.allergiesText.trim()),
-    gentle: !!answers.selfHarm,
-    goals: answers.goals.length > 0 || answers.goalText.trim().length > 0,
-    'ck-now': !!checkin.now, 'ck-changes': true, 'ck-news': !!checkin.drops,
-    mode: !!mode, time: !!slot,
-  }
+  // owner 2026-11-18: every intake / check-in question is optional — only mode and time are needed to book
+  const can: Partial<Record<Step, boolean>> = { mode: !!mode, time: !!slot }
   const counted = COUNTED.indexOf(step as string)
   const isIntake = INTAKE.includes(step as never) && step !== 'saved'
 
@@ -108,7 +101,7 @@ function Book() {
             <IconBtn label="Back" onClick={back}><ChevronLeft className="size-5" /></IconBtn>
             {isIntake ? (
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-semibold text-navy">{step === 'intro' ? 'About 5 minutes' : counted >= 0 ? `Step ${counted + 1} of 8` : 'Almost done'}</p>
+                <p className="text-[13px] font-semibold text-navy">{step === 'intro' ? 'A moment for you' : counted >= 0 ? `Step ${counted + 1} of 8` : 'Almost done'}</p>
                 <ProgressBar value={step === 'intro' ? 0.02 : counted >= 0 ? (counted + 1) / 8 : 1} className="mt-1.5" />
               </div>
             ) : <Stepper at={CHECKIN.includes(step as never) || INTAKE.includes(step as never) ? 0 : step === 'pay' ? 2 : 1} />}
@@ -123,7 +116,7 @@ function Book() {
       <div className={cx('relative flex-1 pt-2', step === 'choose' ? 'pb-48' : 'pb-36')}>
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div key={step} custom={dir} initial={{ opacity: 0, x: dir * 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -40 }} transition={{ duration: 0.32, ease }}>
-            {step === 'choose' && <Choose type={type} setType={setType} canFollow={hasHistory} onMeet={() => setMeet(true)} />}
+            {step === 'choose' && <Choose type={type} setType={setType} canFollow={hasHistory} onMeet={() => setMeet(true)} onStories={() => setStories(true)} />}
             {step === 'intro' && <I.IntakeIntro />}
             {step === 'who' && <I.StepWho a={answers} set={setA} />}
             {step === 'feelings' && <I.StepFeelings a={answers} set={setA} />}
@@ -140,7 +133,7 @@ function Book() {
             {step === 'ck-changes' && <I.CheckinChanges c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} feelings={intake?.answers.feelings ?? []} />}
             {step === 'ck-news' && <I.CheckinNews c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} />}
             {step === 'mode' && <Mode mode={mode} setMode={setMode} />}
-            {step === 'time' && <TimePicker slot={slot} setSlot={setSlot} />}
+            {step === 'time' && <TimePicker slot={slot} setSlot={setSlot} initialDay={parseIsoDay(params.get('date'))} />}
             {step === 'pay' && slot && mode && <Review c={c} slot={slot} mode={mode} holdUntil={holdUntil} onExpire={() => { toast('Your held time was released — pick again'); go('time', -1) }} />}
           </motion.div>
         </AnimatePresence>
@@ -156,13 +149,14 @@ function Book() {
           </>
         ) : (
           <Btn full variant={can[step] === false ? 'primary' : 'gradient'} disabled={can[step] === false} onClick={next}>
-            {step === 'intro' ? 'Begin' : step === 'goals' ? 'Review answers' : step === 'review' ? 'Save & choose a time' : step === 'saved' ? 'Choose a time' : 'Continue'}
+            {step === 'intro' ? 'I’m ready — start' : step === 'goals' ? 'Review answers' : step === 'review' ? 'Save & choose a time' : step === 'saved' ? 'Choose a time' : 'Continue'}
           </Btn>
         )}
       </div>
 
       <PaySheet open={paying} amountPaise={c.feePaise} purpose={`${c.name} · ${slot ? fmtTime(slot) : ''}`} onClose={() => setPaying(false)} onPaid={confirmPaid} />
       <MeetSheet open={meet} onClose={() => setMeet(false)} />
+      <StoriesSheet open={stories} onClose={() => setStories(false)} />
     </main>
   )
 }
@@ -183,18 +177,21 @@ function Stepper({ at }: { at: number }) {
   )
 }
 
-function Choose({ type, setType, canFollow, onMeet }: { type: ConsultationId | null; setType: (t: ConsultationId) => void; canFollow: boolean; onMeet: () => void }) {
+function Choose({ type, setType, canFollow, onMeet, onStories }: { type: ConsultationId | null; setType: (t: ConsultationId) => void; canFollow: boolean; onMeet: () => void; onStories: () => void }) {
+  // returning clients who met Jitu Bhaiya before the app have no history here — offer follow-up quietly (owner 2026-11-18)
+  const [showFollow, setShowFollow] = useState(type === 'followup')
+  const follow = canFollow || showFollow
   return (
     <div className="space-y-4">
       <h1 className="h-duo pt-2">Book a <em>session</em></h1>
-      {CONSULTATIONS.filter((c) => c.id === 'first' || canFollow).map((c, i) => {
+      {CONSULTATIONS.filter((c) => c.id === 'first' || follow).map((c, i) => {
         const on = type === c.id
         return (
           <motion.button key={c.id} onClick={() => { buzz(); setType(c.id) }} aria-pressed={on} whileTap={{ scale: 0.98 }}
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.08, ease, duration: 0.5 }}
             className={cx('relative w-full overflow-hidden rounded-[28px] p-5 text-left transition-shadow', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white shadow-[var(--shadow-card)]')}>
             {c.id === 'first' && <span className={cx('absolute right-4 top-4 rounded-full px-2.5 py-1 text-[11px] font-bold', on ? 'bg-white/15 text-white' : 'bg-[#fbf3dc] text-[#8a6a2c]')}>Start here</span>}
-            <p className={cx('text-[13px] font-semibold', on ? 'text-white/70' : 'text-peri')}>{c.minutes} min</p>
+            <p className={cx('text-[13px] font-semibold', on ? 'text-white/70' : 'text-peri')}>Online or in person</p>
             <p className="mt-1 text-[22px] font-extrabold tracking-[-0.02em]">{c.name}</p>
             <p className={cx('mt-1 max-w-[80%] text-[14px] leading-5', on ? 'text-white/80' : 'text-muted')}>{c.blurb}</p>
             <div className="mt-4 flex items-end justify-between">
@@ -205,9 +202,22 @@ function Choose({ type, setType, canFollow, onMeet }: { type: ConsultationId | n
           </motion.button>
         )
       })}
+      {!follow && (
+        <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} onClick={() => { buzz(); setShowFollow(true); setType('followup') }}
+          className="mx-auto -mt-1 block rounded-full px-4 py-2 text-[14px] text-muted">
+          Seen Jitu Bhaiya before? <span className="font-semibold text-navy underline underline-offset-4">Book a follow-up · ₹800</span>
+        </motion.button>
+      )}
       <motion.button onClick={onMeet} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="card flex w-full items-center gap-4 p-4 text-left">
         <img src={`${BP}/img/jitu.webp`} alt="" className="size-14 rounded-full object-cover ring-4 ring-peri-50" />
         <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Meet Jitu Bhaiya</span><span className="text-[13px] text-muted">{CONSULTANT.title} · {CONSULTANT.stats[0]}</span></span>
+        <ChevronRight className="size-5 text-soft" />
+      </motion.button>
+      <motion.button onClick={onStories} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.36 }} className="card flex w-full items-center gap-4 p-4 text-left">
+        <span className="relative grid size-14 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,#fbf3dc,#fbe9ee)] ring-4 ring-peri-50">
+          <Quote className="size-6 text-gold" aria-hidden />
+        </span>
+        <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Client stories</span><span className="text-[13px] text-muted">{TESTIMONIALS.length ? `View ${TESTIMONIALS.length} testimonials` : 'View testimonials'}</span></span>
         <ChevronRight className="size-5 text-soft" />
       </motion.button>
       <p className="px-2 text-center text-[13px] text-muted">Online or in person — you choose next. Sessions are non-refundable, but you can reschedule.</p>
@@ -215,14 +225,57 @@ function Choose({ type, setType, canFollow, onMeet }: { type: ConsultationId | n
   )
 }
 
+/** Testimonials — swipeable quote cards; real, consented quotes only (TESTIMONIALS in lib/data.ts). */
+function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [k, setK] = useState(0)
+  useEffect(() => { if (open) setK(0) }, [open])
+  const n = TESTIMONIALS.length
+  const t = TESTIMONIALS[k]
+  return (
+    <Sheet open={open} onClose={onClose} title="Client stories">
+      <h2 className="h-duo text-[26px]">Client <em>stories</em></h2>
+      <p className="mt-1 text-[14px] text-muted">In their own words — shared with permission.</p>
+      {n ? (
+        <>
+          <div className="relative mt-5 min-h-[210px]">
+            <AnimatePresence mode="wait">
+              <motion.figure key={k} drag="x" dragConstraints={{ left: 0, right: 0 }} onDragEnd={(_, i) => { if (i.offset.x < -50) setK((k + 1) % n); else if (i.offset.x > 50) setK((k - 1 + n) % n) }}
+                initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.35, ease }}
+                className="rounded-[26px] bg-[linear-gradient(140deg,#fbf3dc,#f6efe4_55%,#eef1fb)] p-6">
+                <Quote className="size-8 text-gold" aria-hidden />
+                {t.rating ? <p className="mt-2 text-[15px] tracking-[2px] text-gold" aria-label={`${t.rating} out of 5`}>{'★'.repeat(t.rating)}</p> : null}
+                <blockquote className="mt-3 text-[17px] font-semibold leading-7 text-navy">“{t.quote}”</blockquote>
+                <figcaption className="mt-4 text-[14px] text-muted">— {t.name}{t.city ? `, ${t.city}` : ''}</figcaption>
+              </motion.figure>
+            </AnimatePresence>
+          </div>
+          {n > 1 && (
+            <div className="mt-4 flex items-center justify-between">
+              <button aria-label="Previous story" onClick={() => setK((k - 1 + n) % n)} className="grid size-11 place-items-center rounded-full bg-peri-50 text-navy"><ChevronLeft className="size-5" /></button>
+              <div className="flex gap-1.5">{TESTIMONIALS.map((_, j) => <span key={j} className={cx('h-2 rounded-full transition-all', j === k ? 'w-6 bg-navy' : 'w-2 bg-[#c7cde0]')} />)}</div>
+              <button aria-label="Next story" onClick={() => setK((k + 1) % n)} className="grid size-11 place-items-center rounded-full bg-peri-50 text-navy"><ChevronRight className="size-5" /></button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="mt-5 rounded-[26px] bg-[linear-gradient(140deg,#fbf3dc,#eef1fb)] p-6 text-center">
+          <Quote className="mx-auto size-8 text-gold" aria-hidden />
+          <p className="mt-3 text-[16px] font-bold text-navy">Stories are on their way</p>
+          <p className="mt-1 text-[14px] leading-5 text-muted">We’re gathering words from clients who’ve kindly agreed to share their experience.</p>
+          <a href={TESTIMONIALS_SOURCE} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-navy underline underline-offset-4">Read stories on Jitu Bhaiya’s website <ExternalLink className="size-4" /></a>
+        </div>
+      )}
+    </Sheet>
+  )
+}
+
 function MeetSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Sheet open={open} onClose={onClose} title="Meet your consultant" tall>
-      <div className="relative -mx-5 -mt-3 h-[300px] overflow-hidden">
+      <div className="relative mt-1 h-[280px] overflow-hidden rounded-[24px] bg-peri-50">
         <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitu Bhaiya, smiling" className="h-full w-full object-cover object-[50%_20%]" />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white to-transparent" />
       </div>
-      <h2 className="h-duo -mt-6 text-[28px]">Jitu <em>Bhaiya</em></h2>
+      <h2 className="h-duo mt-4 text-[28px]">Jitu <em>Bhaiya</em></h2>
       <p className="text-[14px] font-semibold text-peri">{CONSULTANT.fullName} · {CONSULTANT.title}</p>
       <p className="mt-3 text-[15px] leading-6 text-ink">{CONSULTANT.approach}</p>
       <div className="mt-4 grid grid-cols-2 gap-2">{CONSULTANT.stats.map((s) => <div key={s} className="rounded-[18px] bg-peri-50 p-3 text-[13px] font-semibold text-navy">{s}</div>)}</div>
@@ -248,37 +301,50 @@ function Saved() {
 
 function Mode({ mode, setMode }: { mode?: 'online' | 'in_person'; setMode: (m: 'online' | 'in_person') => void }) {
   const opts = [
-    { v: 'online' as const, icon: <Laptop className="size-7" />, t: 'Online', d: 'Video call · link shared in the app', img: `${BP}/img/cat-calm.webp` },
-    { v: 'in_person' as const, icon: <MapPin className="size-7" />, t: 'In person', d: 'BeWise studio, Vadodara · address shared after booking', img: `${BP}/img/cat-consult.webp` },
+    { v: 'online' as const, icon: <Laptop className="size-6" />, t: 'Online', d: 'Video call · link shared in the app' },
+    { v: 'in_person' as const, icon: <MapPin className="size-6" />, t: 'In person', d: `${STUDIO.name} · ${STUDIO.short}` },
   ]
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" role="radiogroup" aria-label="Online or in person">
       <h1 className="h-duo">Online or <em>in person?</em></h1>
       {opts.map((o, i) => {
         const on = mode === o.v
+        const pick = () => { buzz(); setMode(o.v) }
         return (
-          <motion.button key={o.v} onClick={() => { buzz(); setMode(o.v) }} aria-pressed={on} whileTap={{ scale: 0.98 }} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-            className={cx('relative flex h-[150px] w-full overflow-hidden rounded-[28px] p-5 text-left', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white shadow-[var(--shadow-card)]')}>
-            <div className="relative z-10 flex flex-col">
-              <span className={cx('grid size-12 place-items-center rounded-full', on ? 'bg-white/15' : 'bg-peri-50 text-navy')}>{o.icon}</span>
-              <span className="mt-auto text-[20px] font-extrabold">{o.t}</span>
-              <span className={cx('max-w-[200px] text-[13px] leading-4', on ? 'text-white/75' : 'text-muted')}>{o.d}</span>
+          <motion.div key={o.v} role="radio" aria-checked={on} tabIndex={0} onClick={pick} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick() } }}
+            whileTap={{ scale: 0.985 }} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+            className={cx('relative w-full cursor-pointer overflow-hidden rounded-[28px] p-5 text-left transition-colors duration-300', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white shadow-[var(--shadow-card)]')}>
+            {o.v === 'online' ? <OnlineArt on={on} /> : <InPersonArt on={on} />}
+            <div className="relative z-10 flex min-h-[118px] max-w-[58%] flex-col">
+              <span className={cx('grid size-11 place-items-center rounded-full', on ? 'bg-white/15' : 'bg-peri-50 text-navy')}>{o.icon}</span>
+              <span className="mt-auto pt-3 text-[20px] font-extrabold">{o.t}</span>
+              <span className={cx('text-[13px] leading-4', on ? 'text-white/75' : 'text-muted')}>{o.d}</span>
             </div>
-            <img src={o.img} alt="" aria-hidden className={cx('multiply absolute -right-4 bottom-0 h-[140px] object-contain transition-opacity', on && 'opacity-25')} />
-          </motion.button>
+            <AnimatePresence initial={false}>
+              {on && o.v === 'in_person' && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="relative z-10 overflow-hidden">
+                  <div className="mt-5 rounded-[18px] bg-white/10 p-3.5 text-[13px] leading-5">
+                    <p className="font-semibold">{STUDIO.line1}</p><p className="text-white/80">{STUDIO.line2}</p><p className="text-white/80">{STUDIO.city}</p>
+                    <a href={STUDIO.mapsUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="mt-2 inline-flex items-center gap-1.5 font-semibold text-white underline underline-offset-4">Open in Maps <ExternalLink className="size-3.5" /></a>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         )
       })}
     </div>
   )
 }
 
-function TimePicker({ slot, setSlot }: { slot?: Date; setSlot: (d: Date) => void }) {
+function TimePicker({ slot, setSlot, initialDay }: { slot?: Date; setSlot: (d: Date) => void; initialDay?: Date }) {
   const today = startOfDay()
   const monday = addDays(today, -((today.getDay() + 6) % 7))
-  const [week, setWeek] = useState(0)
+  // pre-book from Home passes ?date= → open that week with that day selected
+  const [week, setWeek] = useState(() => initialDay && initialDay >= today ? Math.min(7, Math.floor((startOfDay(initialDay).getTime() - monday.getTime()) / (7 * 86_400_000))) : 0)
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, week * 7 + i))
   const firstOpen = days.find((d) => d >= today && slotsFor(d).length) ?? days[0]
-  const [day, setDay] = useState<Date>(slot ? startOfDay(slot) : firstOpen)
+  const [day, setDay] = useState<Date>(slot ? startOfDay(slot) : initialDay && initialDay >= today && slotsFor(initialDay).length ? startOfDay(initialDay) : firstOpen)
   useEffect(() => { if (!days.some((d) => +d === +day)) setDay(days.find((d) => d >= today && slotsFor(d).length) ?? days[0]) }, [week]) // eslint-disable-line react-hooks/exhaustive-deps
   const times = day >= today ? slotsFor(day) : []
   const groups = [
@@ -355,7 +421,7 @@ function Review({ c, slot, mode, holdUntil, onExpire }: { c: (typeof CONSULTATIO
         {[
           { i: <Sparkles className="size-5" />, t: c.name },
           { i: <Clock className="size-5" />, t: `${fmtLongDay(slot)} · ${fmtTime(slot)}` },
-          { i: mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: `${mode === 'online' ? 'Online' : 'In person'} · ${c.minutes} min` },
+          { i: mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: mode === 'online' ? 'Online · video call' : `In person · ${STUDIO.short}` },
         ].map((r, k) => (
           <motion.div key={k} className="flex items-center gap-3 border-b border-line py-3.5 last:border-0" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + k * 0.06 }}>
             <span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{r.i}</span><span className="text-[15px] font-semibold text-ink">{r.t}</span>
@@ -381,7 +447,7 @@ function Booked({ a }: { a: Appointment }) {
   const router = useRouter()
   const [cal, setCal] = useState(false)
   const c = CONSULTATIONS.find((x) => x.id === a.type)!
-  const ev = { id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online — link in the BeWise app' : 'BeWise studio, Vadodara', description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
+  const ev = { id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online — link in the BeWise app' : `${STUDIO.name}, ${STUDIO.full}`, description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
   return (
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       <Petals />
