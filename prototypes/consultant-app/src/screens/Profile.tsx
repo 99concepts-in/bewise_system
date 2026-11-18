@@ -5,12 +5,13 @@ import { useMemo } from 'react'
 import { m } from 'motion/react'
 import { ArrowLeft, CalendarPlus, Leaf, MapPin, MessageCircle, Phone, Star, Video } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { Avatar, MoodFace, Empty, softSpring } from '../ui/kit'
+import { Avatar, MoodFace, Empty, go, softSpring } from '../ui/kit'
 import { useSheets, KIND_LABEL, STATUS_LABEL, waLink } from './Sheets'
 import { personView, sinceLastRemedy } from '../lib/derive'
+import { AdherenceCard } from '../ui/care'
 import { dayLabel, fmtLong, fmtShort, fmtTime, fmtWeekday, relative } from '../lib/time'
-import { DAY, startOfDay } from '../data/seed'
-import type { RemedyStage } from '../data/types'
+import { DAY, MIN, startOfDay } from '../data/seed'
+import { pron, type RemedyStage } from '../data/types'
 
 const STAGES: RemedyStage[] = ['given', 'preparing', 'dispatched', 'delivered']
 const STAGE_LABEL: Record<RemedyStage, string> = { given: 'Given', preparing: 'Preparing', dispatched: 'Dispatched', delivered: 'Delivered' }
@@ -29,8 +30,8 @@ export default function Profile({ id }: { id: string }) {
   const troublingHistory = v.past.filter((a) => a.troubling).slice(-5)
   const allConcerns = [...new Set(troublingHistory.flatMap((a) => a.troubling!))]
   const timeline = [...v.sessions].reverse()
-  const her = p.pronoun === 'she' ? 'her' : 'his'
-  const them = p.pronoun === 'she' ? 'her' : 'him'
+  const her = pron(p).poss
+  const them = pron(p).obj
   const doneCount = v.past.filter((a) => a.status === 'completed').length
 
   return (
@@ -48,9 +49,15 @@ export default function Profile({ id }: { id: string }) {
       <div className="pf-actions">
         <a className="btn btn-quiet" href={waLink(p.phone, `Namaste ${p.first}, this is Jitu Bhaiya from BeWise. `)} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a>
         <a className="btn btn-quiet" href={`tel:${p.phone.replace(/\s/g, '')}`}><Phone size={16} /> Call</a>
-        <button className="btn btn-primary" onClick={() => sheets.book(p.id)}><CalendarPlus size={16} /> Book</button>
+        <button className="btn btn-primary" onClick={() => sheets.express(p.id)}><CalendarPlus size={16} /> Book</button>
       </div>
 
+      {v.next && v.next.start - now < 60 * MIN && (
+        <m.button className="live-banner" onClick={() => go(`/session/${v.next!.id}`)} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+          <span className="live-dot" /><span><b>{v.next.status === 'in_session' ? 'Session in progress' : v.next.status === 'checked_in' ? `${p.first} has ${v.next.mode === 'online' ? 'joined' : 'arrived'}` : `Session ${relative(v.next.start, now)}`}</b><small>{fmtTime(v.next.start)}, {v.next.mode === 'online' ? 'online' : 'in person'}</small></span>
+          <span className="lb-cta">{v.next.status === 'in_session' ? 'Open' : 'Start'}</span>
+        </m.button>
+      )}
       <div className="pf-stats">
         <div><b>{doneCount}</b><span>{doneCount === 1 ? 'session' : 'sessions'}</span></div>
         <div>{v.avgRating ? <b>{v.avgRating.toFixed(1)}</b> : <b className="dim">None yet</b>}<span>avg rating</span></div>
@@ -58,11 +65,13 @@ export default function Profile({ id }: { id: string }) {
       </div>
 
       <section className="card pf-card">
-        <h2>Since {her} last remedy</h2>
+        <h2>{v.blend ? `Since ${her} last remedy` : 'Progress'}</h2>
         {lines ? <ul className="three">{lines.map((l, i) => <m.li key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.07 }}>{l}</m.li>)}</ul>
-          : <p className="muted small">Not enough check-ins yet to show progress.</p>}
+          : <p className="muted small">{v.blend ? 'Not enough check-ins yet to show progress.' : `Progress shows here after ${p.first}'s first remedy.`}</p>}
         <p className="tagline">Auto summary from {her} check-ins. Verify with {p.first}.</p>
       </section>
+
+      <AdherenceCard p={p} now={now} />
 
       <section className="card pf-card">
         <h2>{p.first}'s week</h2>

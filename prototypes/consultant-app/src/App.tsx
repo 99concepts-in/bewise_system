@@ -8,6 +8,7 @@ import Today from './screens/Today'
 import Sessions from './screens/Sessions'
 import People from './screens/People'
 import Profile from './screens/Profile'
+import Live from './screens/Live'
 import type { Bucket } from './lib/derive'
 
 const Growth = lazy(() => import('./screens/Growth'))
@@ -37,14 +38,15 @@ function Shell() {
   }, [key])
 
   let screen
-  if (top === 'sessions') screen = <Sessions />
+  if (top === 'session' && parts[1]) screen = <Live id={parts[1]} />
+  else if (top === 'sessions') screen = <Sessions />
   else if (top === 'people' && parts[1]) screen = <Profile id={parts[1]} />
   else if (top === 'people') screen = <People initialBucket={(q || undefined) as Bucket | undefined} />
   else if (top === 'growth') screen = <Suspense fallback={<div className="screen" />}><Growth /></Suspense>
   else screen = <Today />
 
   return (
-    <div className="app">
+    <div className={'app' + (top === 'session' ? ' is-focus' : '')}>
       <a className="skip" href="#main">Skip to content</a>
       <nav className="nav" aria-label="Main">
         <img className="nav-logo" src="./img/owl-drops.webp" width={40} height={40} alt="BeWise" />

@@ -13,16 +13,39 @@ export const FLOWERS = [
   'Star of Bethlehem', 'Sweet Chestnut', 'Vervain', 'Vine', 'Walnut', 'Water Violet', 'White Chestnut',
   'Wild Oat', 'Wild Rose', 'Willow', 'Rescue Remedy',
 ]
+/** One-line Bach description per flower (draft, pending Jitu Bhaiya's approval — D-10). Shown as the reason. */
+export const FLOWER_NOTE: Record<string, string> = {
+  Agrimony: 'worries hidden behind a cheerful face', Aspen: 'vague fear without a clear reason', Beech: 'critical, intolerant of others',
+  Centaury: "can't say no, pleases others", Cerato: 'doubts own judgement', 'Cherry Plum': 'fear of losing control',
+  'Chestnut Bud': 'repeating the same mistakes', Chicory: 'possessive, needs to be needed', Clematis: 'daydreaming, not present',
+  'Crab Apple': 'feels unclean, dislikes something about self', Elm: 'overwhelmed by responsibility', Gentian: 'discouraged after a setback',
+  Gorse: 'has given up hope', Heather: "can't bear being alone", Holly: 'jealousy, anger, suspicion', Honeysuckle: 'living in the past',
+  Hornbeam: 'Monday-morning heaviness', Impatiens: 'impatient, quick to irritate', Larch: 'expects to fail', Mimulus: 'fear of known things',
+  Mustard: 'gloom with no clear cause', Oak: 'keeps going past exhaustion', Olive: 'drained after long effort', Pine: 'guilt, self-blame',
+  'Red Chestnut': 'worry for loved ones', 'Rock Rose': 'panic, terror', 'Rock Water': 'hard on self, strict standards',
+  Scleranthus: "can't decide between two", 'Star of Bethlehem': 'shock or grief', 'Sweet Chestnut': 'at the end of what they can bear',
+  Vervain: 'over-enthusiastic, can\'t switch off', Vine: 'needs to control', Walnut: 'big life change', 'Water Violet': 'withdrawn, prefers to be alone',
+  'White Chestnut': 'same thoughts going round', 'Wild Oat': 'unsure of life direction', 'Wild Rose': 'resigned, apathetic', Willow: 'resentment, "why me?"',
+  'Rescue Remedy': 'acute stress',
+}
 export const CONCERNS = [
   'Anxiety', 'Fear', 'Overthinking', 'Sadness', 'Loneliness', 'Anger', 'Insecurity', 'Exhaustion', 'Grief',
   'Indecision', 'Overwhelm', 'Guilt',
 ]
-const CONCERN_FLOWERS: Record<string, string[]> = {
+export const CONCERN_FLOWERS: Record<string, string[]> = {
   Anxiety: ['Aspen', 'Mimulus', 'Red Chestnut'], Fear: ['Mimulus', 'Rock Rose', 'Aspen'],
   Overthinking: ['White Chestnut', 'Vervain'], Sadness: ['Mustard', 'Gentian'], Loneliness: ['Heather', 'Water Violet'],
   Anger: ['Holly', 'Impatiens', 'Willow'], Insecurity: ['Larch', 'Cerato', 'Centaury'], Exhaustion: ['Olive', 'Hornbeam', 'Oak'],
   Grief: ['Star of Bethlehem', 'Honeysuckle'], Indecision: ['Scleranthus', 'Wild Oat'], Overwhelm: ['Elm', 'Vervain'],
   Guilt: ['Pine', 'Crab Apple'],
+}
+/** Feedback tags a client can pick after a session (CL-23) — their words, never a claim by BeWise. */
+export const BENEFITS = ['Calmer', 'Felt heard', 'Sleeping better', 'Lighter', 'Clearer mind', 'More confident', 'Less anxious', 'More hopeful', 'More patient', 'More energy', 'At peace', 'More connected']
+const CONCERN_BENEFITS: Record<string, string[]> = {
+  Anxiety: ['Calmer', 'Less anxious', 'Sleeping better'], Fear: ['Less anxious', 'More confident'], Overthinking: ['Clearer mind', 'Sleeping better', 'Calmer'],
+  Sadness: ['Lighter', 'More hopeful'], Loneliness: ['Felt heard', 'More connected'], Anger: ['More patient', 'Calmer'],
+  Insecurity: ['More confident'], Exhaustion: ['More energy', 'Sleeping better'], Grief: ['At peace', 'Felt heard', 'Lighter'],
+  Indecision: ['Clearer mind', 'More confident'], Overwhelm: ['Calmer', 'Lighter'], Guilt: ['Lighter', 'At peace'],
 }
 const FEMALE = ['Priya', 'Ananya', 'Kavya', 'Meera', 'Nisha', 'Heena', 'Pooja', 'Riya', 'Sneha', 'Aditi', 'Tanvi', 'Zoya',
   'Simran', 'Jasmine', 'Ishita', 'Khushi', 'Bhavna', 'Dimple', 'Hetal', 'Komal', 'Mansi', 'Nidhi', 'Rupal', 'Shreya',
@@ -194,6 +217,34 @@ export function makeSeed(now: number): Seed {
   appts.push({ id: `a${aid++}`, personId: holdP.id, start: today + 2 * DAY + 17 * HOUR, durationMin: 60, kind: 'first', mode: 'online', status: 'awaiting_payment', note: NOTES[6] })
 
   appts.sort((a, b) => a.start - b.start)
+
+  // ---- benefits clients reported in their feedback (separate RNG so the rest of the demo stays stable)
+  const rb = mulberry32(777)
+  for (const a of appts) {
+    if (a.status !== 'completed' || !a.rating || a.rating < 4) continue
+    const pool = [...new Set([...(a.troubling ?? []).flatMap((t) => CONCERN_BENEFITS[t] ?? []), 'Felt heard'])]
+    const n = 1 + Math.floor(rb() * Math.min(3, pool.length))
+    const chosen: string[] = []
+    while (chosen.length < n) { const b = pool[Math.floor(rb() * pool.length)]; if (!chosen.includes(b)) chosen.push(b) }
+    a.benefits = chosen
+  }
+
+  // ---- "took my drops" log since the current blend was given (separate RNG)
+  const rd = mulberry32(4242)
+  for (const p of people) {
+    const blend = appts.filter((a) => a.personId === p.id && a.remedy && a.status === 'completed').at(-1)
+    if (!blend?.remedy || today - blend.remedy.givenAt > 40 * DAY) continue
+    const style = rd()
+    const takeP = style < 0.55 ? 0.94 : style < 0.82 ? 0.76 : 0.42
+    const logP = style < 0.82 ? 0.96 : 0.7
+    p.drops = []
+    for (let d = startOfDay(blend.remedy.givenAt) + DAY; d <= today; d += DAY) {
+      if (rd() > logP) continue
+      // irregular people tail off in the last week
+      const late = today - d < 7 * DAY && takeP < 0.5 ? 0.25 : takeP
+      p.drops.push({ day: d, taken: rd() < late })
+    }
+  }
 
   // ---- notices
   const notices: Notice[] = []

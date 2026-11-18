@@ -54,7 +54,7 @@ export function Segmented<T extends string>({ value, options, onChange, id }: { 
   return (
     <div className="segmented" role="tablist">
       {options.map((o) => (
-        <button key={o.value} role="tab" aria-selected={value === o.value} className="seg-btn" onClick={() => onChange(o.value)}>
+        <button type="button" key={o.value} role="tab" aria-selected={value === o.value} className="seg-btn" onClick={() => onChange(o.value)}>
           {value === o.value && <m.span layoutId={`seg-${id}`} className="seg-pill" transition={spring} />}
           <span className="seg-label">{o.label}{o.count !== undefined && <span className="seg-count">{o.count}</span>}</span>
         </button>
@@ -66,7 +66,7 @@ export function Segmented<T extends string>({ value, options, onChange, id }: { 
 // ---------------------------------------------------------------- chips
 export function Chip({ active, children, onClick, count }: { active?: boolean; children: ReactNode; onClick?: () => void; count?: number }) {
   return (
-    <button className={'chip' + (active ? ' is-on' : '')} aria-pressed={active} onClick={onClick}>
+    <button type="button" className={'chip' + (active ? ' is-on' : '')} aria-pressed={active} onClick={onClick}>
       {children}{count !== undefined && <span className="chip-count">{count}</span>}
     </button>
   )

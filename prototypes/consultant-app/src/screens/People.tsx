@@ -3,14 +3,15 @@
  */
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { m } from 'motion/react'
-import { ArrowDownAZ, CalendarClock, History, Search, X } from 'lucide-react'
+import { ArrowDownAZ, CalendarClock, History, Search, UserPlus, X, Zap } from 'lucide-react'
+import { useSheets } from './Sheets'
 import { useIndex, useStore } from '../state/store'
 import { Avatar, Chip, Empty, go } from '../ui/kit'
 import { personView, type Bucket } from '../lib/derive'
 import { dayLabel, fmtShort, relative } from '../lib/time'
 
 const BUCKETS: { v: Bucket; label: string }[] = [
-  { v: 'all', label: 'Everyone' }, { v: 'care', label: 'In care' }, { v: 'due', label: 'Follow-up due' }, { v: 'new', label: 'New this month' }, { v: 'quiet', label: 'Quiet 4+ months' },
+  { v: 'all', label: 'Everyone' }, { v: 'care', label: 'In care' }, { v: 'due', label: 'Follow-up due' }, { v: 'missing', label: 'Missing drops' }, { v: 'new', label: 'New this month' }, { v: 'quiet', label: 'Quiet 4+ months' },
 ]
 type Sort = 'recent' | 'az' | 'next'
 
@@ -20,6 +21,7 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
   const [bucket, setBucket] = useState<Bucket>(initialBucket ?? 'all')
   useEffect(() => { if (initialBucket) setBucket(initialBucket) }, [initialBucket])
   const [sort, setSort] = useState<Sort>('recent')
+  const sheets = useSheets()
   const [q, setQ] = useState('')
   const dq = useDeferredValue(q.trim().toLowerCase())
 
@@ -54,6 +56,10 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
         <h1 className="page-title">People<span className="title-count">{s.people.length} registered</span></h1>
         <button className="sort-btn" onClick={() => setSort(nextSort[sort])} aria-label={`Sorted by ${sortLabel}. Change sort`}><SortIcon size={16} />{sortLabel}</button>
       </div>
+      <div className="quick-actions">
+        <button className="btn btn-primary" onClick={() => sheets.addPerson('profile')}><UserPlus size={17} /> New person</button>
+        <button className="btn btn-quiet" onClick={() => sheets.express()}><Zap size={17} /> Express booking</button>
+      </div>
       <div className="search-wrap">
         <Search size={18} aria-hidden />
         <input className="search" placeholder="Search name, city or phone" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search people" />
@@ -63,7 +69,7 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
         {BUCKETS.map((b) => <Chip key={b.v} active={bucket === b.v} count={counts[b.v]} onClick={() => { setBucket(b.v); history.replaceState(null, '', b.v === 'all' ? '#/people' : `#/people?${b.v}`) }}>{b.label}</Chip>)}
       </div>
 
-      {list.length === 0 && <Empty img="owl-read" title={dq ? `No one matches “${q}”` : 'No one here right now'} body={dq ? 'Try a first name, a city, or the last digits of a phone number.' : 'This group is empty. That is usually good news.'} />}
+      {list.length === 0 && <Empty img="owl-read" title={dq ? `No one matches “${q}”` : 'No one here right now'} body={dq ? 'Try a first name, a city, or the last digits of a phone number. Or add them now.' : 'This group is empty. That is usually good news.'} action={dq ? <button className="btn btn-primary" onClick={() => sheets.addPerson('profile')}><UserPlus size={16} /> Add a new person</button> : undefined} />}
       <ul className="rows people">
         {list.slice(0, limit).map((v, i) => (
           <m.li key={v.p.id} layout="position" initial={i < 12 ? { opacity: 0, y: 8 } : false} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 12) * 0.025, duration: 0.22 }}>
