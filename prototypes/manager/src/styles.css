@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+/*
+  Layout concept: a calm control room on the Soft Bloom ground — one stage rail that every order travels,
+  and one big morphing button at the bottom that moves the work forward.
+*/
+:root {
+  /* Soft Bloom (v4) — light */
+  --ground-top: #dce2f5;      /* periwinkle mist */
+  --ground-mid: #faf9f5;      /* ivory paper */
+  --ground-bot: #dce7d9;      /* sage wash */
+  --surface: #ffffff;
+  --surface-2: #f4f6fb;       /* inset wells, rows */
+  --ink: #182957;             /* BeWise navy */
+  --ink-2: #646b80;           /* secondary text (AA on white) */
+  --ink-3: #8a90a0;           /* tertiary, large text only */
+  --line: rgb(24 41 87 / 0.09);
+  --accent: #5e7fb8;          /* periwinkle */
+  --accent-soft: #e6ebf7;
+  --sage: #5f7a5b;
+  --sage-soft: #e3ece1;
+  --gold: #a88848;
+  --gold-soft: #f4ecdc;
+  --ok: #2f7a50;   --ok-soft: #e0f0e6;
+  --warn: #9a6512; --warn-soft: #f8ecd6;
+  --bad: #b23a4c;  --bad-soft: #f8e1e5;
+  --nav: #182957;  --nav-fg: #c9d2ec; --nav-active: #ffffff; --nav-active-fg: #182957;
+  --cta-from: #182957; --cta-to: #5e7fb8; --cta-fg: #ffffff;
+  --shadow: 0 8px 24px rgb(24 41 87 / 0.06);
+  --shadow-lift: 0 18px 40px rgb(24 41 87 / 0.14);
+  --scrim: rgb(14 22 49 / 0.32);
+  --wa-bg: #e7f6e9; --wa-bubble: #ffffff; --wa-fg: #1b2a22;
+  --font: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground-top: #111b3d; --ground-mid: #0d1430; --ground-bot: #0f1f22;
+    --surface: #18224a; --surface-2: #1f2a55;
+    --ink: #eaeefb; --ink-2: #a9b1cb; --ink-3: #8790ad;
+    --line: rgb(234 238 251 / 0.09);
+    --accent: #9db4ea; --accent-soft: #263463;
+    --sage: #a9c4a4; --sage-soft: #213a33;
+    --gold: #d8bb7c; --gold-soft: #3a3324;
+    --ok: #7fd1a0; --ok-soft: #173a2b; --warn: #f0c070; --warn-soft: #3d3020; --bad: #f29aa8; --bad-soft: #452031;
+    --nav: #eaeefb; --nav-fg: #4a5680; --nav-active: #18224a; --nav-active-fg: #eaeefb;
+    --cta-from: #9db4ea; --cta-to: #c9d6f7; --cta-fg: #0d1430;
+    --shadow: 0 8px 24px rgb(0 0 0 / 0.25); --shadow-lift: 0 18px 40px rgb(0 0 0 / 0.45);
+    --scrim: rgb(0 0 0 / 0.5);
+    --wa-bg: #13291f; --wa-bubble: #1f4a35; --wa-fg: #e7f6e9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground-top: #111b3d; --ground-mid: #0d1430; --ground-bot: #0f1f22;
+  --surface: #18224a; --surface-2: #1f2a55;
+  --ink: #eaeefb; --ink-2: #a9b1cb; --ink-3: #8790ad;
+  --line: rgb(234 238 251 / 0.09);
+  --accent: #9db4ea; --accent-soft: #263463;
+  --sage: #a9c4a4; --sage-soft: #213a33;
+  --gold: #d8bb7c; --gold-soft: #3a3324;
+  --ok: #7fd1a0; --ok-soft: #173a2b; --warn: #f0c070; --warn-soft: #3d3020; --bad: #f29aa8; --bad-soft: #452031;
+  --nav: #eaeefb; --nav-fg: #4a5680; --nav-active: #18224a; --nav-active-fg: #eaeefb;
+  --cta-from: #9db4ea; --cta-to: #c9d6f7; --cta-fg: #0d1430;
+  --shadow: 0 8px 24px rgb(0 0 0 / 0.25); --shadow-lift: 0 18px 40px rgb(0 0 0 / 0.45);
+  --scrim: rgb(0 0 0 / 0.5);
+  --wa-bg: #13291f; --wa-bubble: #1f4a35; --wa-fg: #e7f6e9;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-sage: var(--sage);
+  --color-sage-soft: var(--sage-soft);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-nav: var(--nav);
+  --color-nav-fg: var(--nav-fg);
+  --color-nav-active: var(--nav-active);
+  --color-nav-active-fg: var(--nav-active-fg);
+  --color-cta-fg: var(--cta-fg);
+  --font-sans: var(--font);
+  --shadow-soft: var(--shadow);
+  --shadow-lift: var(--shadow-lift);
+}
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--ground-mid);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+  overscroll-behavior-y: none;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60;
+  background: var(--ground-top);
+}
+@layer components {
+.ground {
+  background: linear-gradient(180deg, var(--ground-top) 0%, var(--ground-mid) 42%, var(--ground-mid) 70%, var(--ground-bot) 100%);
+  background-attachment: fixed;
+}
+.gutter {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.cta {
+  background: linear-gradient(90deg, var(--cta-from) 0%, var(--cta-to) 140%);
+  color: var(--cta-fg);
+}
+.tnum { font-variant-numeric: tabular-nums; }
+}
+h1, h2, h3 { text-wrap: balance; }
+:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; border-radius: 12px; }
+button { cursor: pointer; -webkit-user-select: none; user-select: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+input, textarea, select { font: inherit; color: inherit; }
+::selection { background: var(--accent-soft); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

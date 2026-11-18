@@ -2,4 +2,54 @@
 
 > Only the OWNER chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
-_No entries yet._
+## 2026-11-18 — Owner prototype: responsive fixes (owner report: "Today so far" tiles clipped)
+**Status:** Fixed, merged and live
+**Done:** automated overflow audit (13 routes × 17 widths, 320–1536 px) found 35 issues, all fixed: Today card now uses
+label/value rows; new breakpoints (≤1320 narrower sidebar + 2-up rows, ≤1180 single-column pairs, ≤1023 tablet with pill nav,
+≤640 phone); list items adapt via container queries; big amounts scale (clamp); charts redraw at real pixel width so axis
+labels stay 13 px on phones (were ~4 px) and thin out when crowded; brand line no longer wraps; landing page header stacks on
+phones. Re-audit: 0 issues; interactions (approve, Ask BeWise, invite accountant) and resize re-checked, no JS errors.
+**Found in other apps (requests filed, not edited):** MANAGER money tiles overflow on phones; CONSULTANT 320 px sideways scroll.
+**Contracts changed:** none
+**Next:** owner feedback
+
+## 2026-11-18 — All previews merged and live on GitHub Pages (owner request)
+**Status:** Merged to main at the owner's request (PRs #1 client, #2 consultant, #3 manager, + this owner PR)
+**Done:** trial-merged all four chat branches (no conflicts); built client (Next static export, basePath
+`/bewise_system/preview/client`), consultant and manager (Vite) and owner (HTML) into `preview/`; landing page `index.html`
+at the repo root + `.nojekyll` (Pages source = main / root). Tested every page under `/bewise_system/` at 1366 px and 390 px:
+no console errors, no 404s, no horizontal scroll. Rebuild: `bash preview/build.sh`.
+**Contracts changed:** none · **Migrations:** none
+**Note for HUB:** root `index.html`, `.nojekyll` and `preview/` are new top-level files for GitHub Pages — previews must be
+rebuilt (`preview/build.sh`) after prototype changes, or Pages can be switched to an Actions build later.
+**Next:** owner feedback on the four previews
+
+## 2026-11-17 — Owner app v4 design prototype (branch claude/new-session-k130h4)
+**Status:** Design prototype ready for owner review — still waiting for `FOUNDATION: ✅` before O1
+**Done:** `docs/specs/owner/prototype/` — clickable v4 "Soft Bloom" prototype of the Owner app, desktop first + phone
+(floating navy pill nav). Layout from the owner's reference (mood-tracker dashboard): last 7 days as mood pebbles, daily sales
+bars with tooltip, Waiting for you / Alerts list, Ask BeWise owl card, daily insight. 13 screens: home, sales, operations,
+cash & dues, expenses, P&L, reports & GST, approvals (approve/reject works), Ask BeWise, team & permissions + invite
+accountant, business settings, integrations, activity. Light + dark. Sample data only.
+**Contracts changed:** none · **Events:** none · **Migrations:** none
+**Needs from others:** HUB: v4 restyle of owner boards can use this prototype as the reference
+**Breaking changes:** none
+**Next:** owner feedback on the prototype → O1 once the foundation lands
+
+## 2026-11-17 — Pre-foundation specs: finance engine & admin (branch claude/new-session-k130h4)
+**Status:** Specs drafted — waiting for `FOUNDATION: ✅` before O1
+**Done:** `docs/specs/owner/01…07` — chart of accounts (system keys, tax codes, accountant questions), posting rules per
+event (+ journal invariants, deferral of consultation fees until session held, perpetual WAC inventory, GST place of supply,
+inclusive-price rounding with ₹1,000/₹800 worked examples, period locks, test list), FY numbering & invoice/receipt/credit
+note PDF layout (Rule 46 checklist, privacy: no flower names on invoices), Razorpay flow (webhook = truth, runCapture in
+one tx, reconcile cron, payment links, settlements, no refund API), reminder schedules & 15 WhatsApp templates,
+settings keys, roles & permissions incl. accountant (TOTP, access end date, export audit)
+**Contracts changed:** none yet — proposals in `requests/20261117-owner-to-hub-finance-contract-alignment.md`
+**Events:** planned emits/handles listed in `02-POSTING-RULES.md` §3; proposes `payment.allocated`, `payment.disputed`, `settlement.processed`
+**Migrations:** none
+**Needs from others:** MANAGER: stock movement values + `stock.movement_recorded` / `goods.received` events
+(`requests/20261117-owner-to-manager-stock-valuation-events.md`) · HUB: contract clean-up of refund leftovers, sequences table
+· Business: GSTIN & registration scheme, accountant contact (D-13), Razorpay test keys (D-05), WhatsApp BSP (D-07), email domain (D-12), remedy reorder price
+**Breaking changes:** none
+**Next:** O1 Settings, users & roles as soon as the foundation lands; then O2 finance engine (replace HUB stubs for createCheckout/verifyCheckout first)
+
