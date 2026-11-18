@@ -145,3 +145,10 @@ test('back from checkout returns to the bag, then to the shop (no loop)', async 
   await page.getByRole('button', { name: 'Back' }).click(); await page.waitForURL('**/app/bag**')
   await page.getByRole('button', { name: 'Back' }).click(); await page.waitForURL(/\/app\/shop\/?$/)
 })
+
+test('?reset=1 starts the device fresh for a demo', async ({ page }) => {
+  await seed(page)
+  await page.goto('/?reset=1'); await page.waitForURL('**/welcome**')
+  const s = await state(page)
+  expect(s.profile).toBeNull(); expect(s.appointments).toEqual([]); expect(s.plan).toBeNull()
+})
