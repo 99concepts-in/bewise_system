@@ -16,7 +16,7 @@ export function OnlineArt({ on }: { on: boolean }) {
       <motion.div className="absolute bottom-1 left-6 h-[148px] w-[84px] overflow-hidden rounded-[20px] bg-white p-[5px] shadow-[0_18px_30px_rgba(24,41,87,.28)]"
         style={{ rotate: -8 }} animate={{ y: [0, -5, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
         <div className="relative h-full w-full overflow-hidden rounded-[15px] bg-[#e9edf8]">
-          <img src={`${BP}/img/jitu.webp`} alt="" className="h-full w-full object-cover object-[50%_25%]" />
+          <img src={`${BP}/img/jitu.webp`} alt="" className="h-full w-full object-cover object-top" />
           <span className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-white/90 px-1.5 py-[2px] text-[8px] font-bold text-navy">
             <motion.span className="size-1.5 rounded-full bg-rose" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />Live
           </span>

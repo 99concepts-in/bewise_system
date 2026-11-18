@@ -164,7 +164,7 @@ export default function Shop() {
 
 /** Category tile art: up to three product photos fanned out, or Jitu Bhaiya for the consultation tile. */
 function CatArt({ art, consult }: { art: string[]; consult?: boolean }) {
-  if (consult) return <img src={`${BP}/img/jitu.webp`} alt="" aria-hidden loading="lazy" className="absolute left-1/2 top-3 size-[66px] -translate-x-1/2 rounded-full object-cover ring-4 ring-white/80" />
+  if (consult) return <img src={`${BP}/img/jitu-portrait.webp`} alt="" aria-hidden loading="lazy" className="absolute left-1/2 top-1 h-[82px] w-auto -translate-x-1/2 object-contain" />
   const n = art.length
   return (
     <span className="absolute inset-x-0 top-2 flex h-[76px] items-end justify-center" aria-hidden>

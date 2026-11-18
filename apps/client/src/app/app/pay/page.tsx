@@ -79,7 +79,7 @@ function Pay() {
     <main className="px-5 pb-40">
       <AppHeader back="/app" />
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="mt-2 flex items-center gap-3">
-        <img src={`${BP}/img/jitu.webp`} alt="" className="size-14 rounded-full object-cover ring-4 ring-white shadow-[var(--shadow-card)]" />
+        <img src={`${BP}/img/jitu.webp`} alt="" className="size-16 shrink-0 rounded-[20px] bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)] object-cover object-top" />
         <div><p className="text-[13px] font-semibold text-peri">{a.payLater ? 'Your session with Jitu Bhaiya' : `${by} booked this for you`}</p><h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">{a.payLater ? <>Pay for your <span className="text-soft">session</span></> : <>Complete your <span className="text-soft">booking</span></>}</h1></div>
       </motion.div>
       <section className="card mt-5 p-5">

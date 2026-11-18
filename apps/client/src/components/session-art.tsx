@@ -22,7 +22,7 @@ export function SessionDateArt({ startsAt, mode }: { startsAt: string; mode: 'on
         <div className="text-center text-[30px] font-extrabold leading-[38px] tracking-[-0.03em] text-navy tnum">{day}</div>
         <div className="-mt-1 text-center text-[11px] font-semibold text-muted">{wk}</div>
       </motion.div>
-      <motion.img src={`${BP}/img/jitu.webp`} alt="" className="absolute -right-1 bottom-0 size-10 rounded-full object-cover ring-[3px] ring-white shadow-[0_6px_12px_rgba(24,41,87,.2)]"
+      <motion.img src={`${BP}/img/jitu.webp`} alt="" className="absolute -right-1 bottom-0 size-11 rounded-[14px] bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)] object-cover object-top shadow-[0_6px_12px_rgba(24,41,87,.18)]"
         initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 320, damping: 16 }} />
       <span className="absolute left-[70px] top-0 grid size-7 place-items-center rounded-full bg-sage-100 text-sage-text ring-[3px] ring-white shadow-[0_4px_10px_rgba(24,41,87,.15)]">
         {mode === 'online'
@@ -38,9 +38,7 @@ export function ConsultInviteArt() {
   return (
     <div className="pointer-events-none absolute bottom-3 right-3 h-[124px] w-[120px]" aria-hidden>
       <motion.span className="absolute right-1 top-0 size-[112px] rounded-full border-2 border-white/90" animate={{ scale: [1, 1.05, 1], opacity: [0.9, 0.5, 0.9] }} transition={{ duration: 4, repeat: Infinity }} />
-      <div className="absolute right-3 top-2 size-[96px] overflow-hidden rounded-full bg-white p-1 shadow-[0_14px_26px_rgba(24,41,87,.2)]">
-        <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="h-full w-full rounded-full object-cover object-[50%_18%]" />
-      </div>
+      <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="absolute bottom-0 right-2 h-[118px] w-auto object-contain drop-shadow-[0_12px_18px_rgba(24,41,87,.18)] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]" />
       <motion.img src={`${BP}/img/f-rose.webp`} alt="" className="absolute -bottom-1 left-0 h-[50px]" animate={{ rotate: [0, 6, 0] }} transition={{ duration: 6, repeat: Infinity }} />
     </div>
   )

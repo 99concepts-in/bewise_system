@@ -158,10 +158,10 @@ function ArtBook() {
   return (
     <div className="relative h-full">
       <Halo inner={0.74} />
-      <div className="absolute inset-0 grid place-items-center">
-        <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 18 }}
-          className="relative aspect-square h-[62%] overflow-hidden rounded-full bg-white p-1.5 shadow-[var(--shadow-float)]">
-          <FadeImg src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="h-full w-full rounded-full bg-[linear-gradient(135deg,#dce2f5,#f6efe4)] object-cover object-[50%_18%]" />
+      {/* owner 2026-11-18: background removed, no circular frame */}
+      <div className="absolute inset-x-0 bottom-[6%] top-[10%] flex items-end justify-center">
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="h-full">
+          <FadeImg src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="h-full w-auto object-contain drop-shadow-[0_18px_24px_rgba(24,41,87,.18)] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]" />
         </motion.div>
       </div>
       <Float className="left-[6%] top-[14%]" delay={0.3} dy={6}>

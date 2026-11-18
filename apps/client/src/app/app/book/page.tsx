@@ -304,7 +304,7 @@ function Choose({ type, setType, canFollow, plan, planPick, setPlanPick, onMeet,
         </motion.button>
       )}
       <motion.button onClick={onMeet} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="card flex w-full items-center gap-4 p-4 text-left">
-        <img src={`${BP}/img/jitu.webp`} alt="" className="size-14 rounded-full object-cover ring-4 ring-peri-50" />
+        <img src={`${BP}/img/jitu.webp`} alt="" className="size-16 shrink-0 rounded-[20px] bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)] object-cover object-top" />
         <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Meet Jitu Bhaiya</span><span className="text-[13px] text-muted">{CONSULTANT.title} · {CONSULTANT.stats[0]}</span></span>
         <ChevronRight className="size-5 text-soft" />
       </motion.button>
@@ -367,8 +367,8 @@ function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void })
 function MeetSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Sheet open={open} onClose={onClose} title="Meet your consultant" tall>
-      <div className="relative mt-1 h-[280px] overflow-hidden rounded-[24px] bg-peri-50">
-        <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitu Bhaiya, smiling" className="h-full w-full object-cover object-[50%_20%]" />
+      <div className="relative mt-1 flex h-[300px] items-end justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)]">
+        <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitu Bhaiya, smiling" className="h-[96%] w-auto object-contain" />
       </div>
       <h2 className="h-duo mt-4 text-[28px]">Jitu <em>Bhaiya</em></h2>
       <p className="text-[14px] font-semibold text-peri">{CONSULTANT.fullName} · {CONSULTANT.title}</p>
@@ -449,9 +449,9 @@ function Review({ c, mode, fee, feeLabel, inPlan, canLater, payWhen, setPayWhen 
     <div className="space-y-4">
       <h1 className="h-duo">Review & <em>book</em></h1>
       <div className="card p-5">
-        <div className="flex items-center gap-4 border-b border-line pb-4">
-          <img src={`${BP}/img/jitu.webp`} alt="" className="size-16 rounded-full object-cover" />
-          <div><p className="text-[19px] font-extrabold text-navy">Jitu Bhaiya</p><p className="text-[13px] text-muted">{CONSULTANT.title}</p></div>
+        <div className="-mx-5 -mt-5 mb-1 flex items-end gap-4 overflow-hidden rounded-t-[28px] border-b border-line bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)] px-5 pt-4">
+          <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="h-[140px] w-auto shrink-0 object-contain" />
+          <div className="pb-5"><p className="text-[20px] font-extrabold text-navy">Jitu Bhaiya</p><p className="text-[13px] text-muted">{CONSULTANT.title}</p></div>
         </div>
         {[
           { i: <Sparkles className="size-5" />, t: feeLabel === c.name ? c.name : `${c.name} · ${feeLabel}` },

@@ -36,8 +36,7 @@ function BookingLink() {
       <header className="flex items-center gap-2.5 pt-3"><LogoMark size={36} /><span className="text-[15px] font-extrabold text-navy">BeWise <span className="font-semibold text-muted">· Holistic Wellness</span></span></header>
       <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }} className="mt-6 flex flex-col items-center text-center">
         <div className="relative">
-          <motion.span className="absolute -inset-3 rounded-full border-2 border-white" animate={{ scale: [1, 1.06, 1], opacity: [0.9, 0.4, 0.9] }} transition={{ duration: 4, repeat: Infinity }} />
-          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="relative size-[148px] rounded-full object-cover object-[50%_18%] ring-[6px] ring-white shadow-[var(--shadow-float)]" />
+          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="relative h-[210px] w-auto object-contain drop-shadow-[0_18px_24px_rgba(24,41,87,.18)] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]" />
         </div>
         <h1 className="h-duo mt-6 text-[30px]">Book with <em>Jitu Bhaiya</em></h1>
         <p className="mt-1 text-[14px] font-semibold text-peri">{CONSULTANT.fullName} · {CONSULTANT.title}</p>
