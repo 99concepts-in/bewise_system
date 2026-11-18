@@ -8,7 +8,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { Heart, Search, ShoppingBag, X } from 'lucide-react'
+import { ChevronRight, Heart, Search, ShoppingBag, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { ProductCard } from '@/components/product-card'
 import { AppHeader } from '@/components/shell'
@@ -16,6 +16,8 @@ import { IconBtn, Item, Reveal, buzz, cx, spring } from '@/components/ui'
 import { CATEGORIES, INTENTS, PRODUCTS, productBySlug, productTitle, type Category, type Intent } from '@/lib/data'
 import { couponOk, useApp } from '@/lib/store'
 import { BP } from '@/lib/asset'
+import { useBagTotals } from '@/lib/bag'
+import { formatINR } from '@/lib/format'
 
 const PILLS: { key: Category | 'all'; label: string }[] = [
   { key: 'all', label: 'All' }, { key: 'rollons', label: 'Roll-ons' }, { key: 'sprays', label: 'Sprays' },
@@ -49,7 +51,7 @@ export default function Shop() {
   const intentInfo = INTENTS.find((x) => x.key === intent)
 
   return (
-    <main className="px-5 pb-32">
+    <main className={cx('px-5', bag ? 'pb-52' : 'pb-32')}>
       <AppHeader right={<>
         <IconBtn label="Search" onClick={() => setSearching(true)}><Search className="size-5" /></IconBtn>
         <IconBtn label={`Bag, ${bag} items`} href="/app/bag" badge={bag || undefined}><ShoppingBag className="size-5" /></IconBtn>
@@ -155,6 +157,7 @@ export default function Shop() {
           <p className="mt-5 px-2 text-center text-[12px] leading-5 text-muted">Aromatherapy and Bach remedies support comfort and emotional wellbeing. They are not medicines and do not replace your doctor’s care.</p>
         </Item>
       </Reveal>
+      <CheckoutBar />
     </main>
   )
 }
@@ -224,5 +227,29 @@ function HeroSlides({ onPick }: { onPick: (k: Intent | 'bath') => void }) {
         ))}
       </div>
     </div>
+  )
+}
+
+/** owner 2026-11-18: once something is in the cart, keep a checkout button at the bottom of the shop. */
+function CheckoutBar() {
+  const router = useRouter()
+  const { lines, total } = useBagTotals()
+  const count = lines.reduce((n, x) => n + x.l.qty, 0)
+  return (
+    <AnimatePresence>
+      {count > 0 && (
+        <motion.div key="bar" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }} transition={spring}
+          className="fixed inset-x-0 bottom-[calc(max(env(safe-area-inset-bottom),12px)+80px)] z-30 mx-auto max-w-[480px] px-5">
+          <button aria-label={`Checkout, ${count} item${count > 1 ? 's' : ''}, ${formatINR(total)}`} onClick={() => { buzz(10); router.push('/app/checkout') }}
+            className="flex h-14 w-full items-center gap-3 rounded-full bg-[linear-gradient(90deg,#f6de8d,#e9c46a)] pl-2 pr-5 text-left text-navy shadow-[0_14px_30px_rgba(181,138,60,.35)]">
+            <span className="relative grid size-10 place-items-center rounded-full bg-navy text-white"><ShoppingBag className="size-5" />
+              <motion.span key={count} initial={{ scale: 0.4 }} animate={{ scale: 1 }} className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-white text-[11px] font-extrabold text-navy shadow tnum">{count}</motion.span></span>
+            <span className="flex-1"><span className="block text-[15px] font-extrabold leading-tight">Checkout</span><span className="block text-[12px] text-navy/80">{count} item{count > 1 ? 's' : ''} in your cart</span></span>
+            <span className="text-[17px] font-extrabold tnum">{formatINR(total)}</span>
+            <ChevronRight className="size-5" />
+          </button>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

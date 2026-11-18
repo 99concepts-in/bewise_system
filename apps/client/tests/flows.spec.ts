@@ -160,3 +160,10 @@ test('My remedies shows the booked session when there is no blend yet', async ({
   await expect(page.getByText('Your session is booked')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Book a consultation' })).toHaveCount(0)
 })
+
+test('shop shows a checkout bar once the cart has items', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/shop')
+  await page.getByRole('button', { name: /^Checkout/ }).click()
+  await page.waitForURL('**/app/checkout**')
+})
