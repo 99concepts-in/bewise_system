@@ -97,7 +97,7 @@ export function LaunchOffer({ open, onClose, start = 'yearly' }: { open: boolean
               <button onClick={close} aria-label="Close offer" className="absolute right-4 top-4 z-10 grid size-10 place-items-center rounded-full bg-white/12 safe-t"><X className="size-5" /></button>
             )}
             <AnimatePresence mode="wait">
-              {stage === 'yearly' && <OfferBody key="y" id="yearly" onClaim={() => setPaying('yearly')} />}
+              {stage === 'yearly' && <OfferBody key="y" id="yearly" onClaim={() => setPaying('yearly')} onSmaller={() => { setOffer({ downsellAt: new Date().toISOString() }); setStage('half') }} />}
               {stage === 'half' && <OfferBody key="h" id="half" onClaim={() => setPaying('half')} onSkip={close} />}
               {stage === 'congrats' && <Congrats key="c" onDone={onClose} />}
             </AnimatePresence>
@@ -130,7 +130,7 @@ export function LaunchOffer({ open, onClose, start = 'yearly' }: { open: boolean
   )
 }
 
-function OfferBody({ id, onClaim, onSkip }: { id: PlanId; onClaim: () => void; onSkip?: () => void }) {
+function OfferBody({ id, onClaim, onSkip, onSmaller }: { id: PlanId; onClaim: () => void; onSkip?: () => void; onSmaller?: () => void }) {
   const p = PLANS[id]
   const full = planFull(id), price = planPrice(id), save = planSaving(id)
   const [phase, setPhase] = useState(0) // 0 intro · 1 full price · 2 cut · 3 new price + badges
@@ -152,13 +152,13 @@ function OfferBody({ id, onClaim, onSkip }: { id: PlanId; onClaim: () => void; o
       </div>
 
       <motion.p className="mt-4 text-center text-[12px] font-bold uppercase tracking-[0.3em] text-[#f6de8d]" initial={{ opacity: 0, letterSpacing: '0.6em' }} animate={{ opacity: 1, letterSpacing: '0.3em' }} transition={{ delay: 0.2, duration: 0.7 }}>
-        {half ? 'Wait, one more gift' : 'Launch offer'}
+        {half ? 'Recommended minimum' : 'Launch offer'}
       </motion.p>
       <motion.h2 className="mt-2 text-center text-[30px] font-extrabold leading-tight tracking-[-0.03em]" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
         {p.name}
       </motion.h2>
       <motion.p className="mx-auto mt-1 max-w-[300px] text-center text-[14px] leading-5 text-white/75" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
-        A consultation with Jitu Bhaiya every month for {p.months} months, your remedy blend included each time.
+        {half ? <><b className="font-semibold text-white">Scared of a big commitment? Try 6 months first.</b><br />The minimum we recommend to feel the change: a consultation with Jitu Bhaiya every month, your remedy blend included each time.</> : <>A consultation with Jitu Bhaiya every month for {p.months} months, your remedy blend included each time.</>}
       </motion.p>
 
       <motion.div className="relative mx-auto mt-6 w-full max-w-[340px] rounded-[30px] bg-white/10 p-5 text-center ring-1 ring-white/15 backdrop-blur" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5, type: 'spring', stiffness: 220, damping: 20 }}>
@@ -195,6 +195,7 @@ function OfferBody({ id, onClaim, onSkip }: { id: PlanId; onClaim: () => void; o
           className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white/12 text-[15px] font-semibold text-white ring-1 ring-white/20">
           <MessageCircle className="size-5" /> Ask on WhatsApp
         </a>
+        {onSmaller && <button onClick={onSmaller} className="block w-full py-2 text-center text-[14px] font-semibold text-white/80">Not ready for a whole year? <span className="text-[#f6de8d] underline underline-offset-4">Try 6 months</span></button>}
         {onSkip && <button onClick={onSkip} className="block w-full py-2 text-center text-[14px] font-semibold text-white/70 underline underline-offset-4">Skip offer</button>}
       </div>
     </motion.div>

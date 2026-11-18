@@ -167,3 +167,11 @@ test('shop shows a checkout bar once the cart has items', async ({ page }) => {
   await page.getByRole('button', { name: /^Checkout/ }).click()
   await page.waitForURL('**/app/checkout**')
 })
+
+test('launch offer: yearly screen links straight to the 6-month option', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app'); await page.getByRole('button', { name: 'Reveal your introductory offer' }).click()
+  await page.getByRole('button', { name: /Try 6 months/ }).click()
+  await expect(page.getByText('Scared of a big commitment? Try 6 months first.')).toBeVisible()
+  await expect(page.getByText('Recommended minimum')).toBeVisible()
+})
