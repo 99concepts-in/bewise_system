@@ -19,7 +19,7 @@ We don't ship outside India yet.
 Working days are Monday to Saturday, excluding public holidays. ⚠️ OWNER TO CONFIRM
 Remote areas and festival periods can take a little longer.
 
-**Collecting at the studio:** if you have an in-person session, you can choose to collect your blend at [[STUDIO_ADDRESS]]. ⚠️ OWNER TO CONFIRM
+**Collecting at the studio:** if you have an in-person session, you can choose to collect your blend at 102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007. ⚠️ OWNER TO CONFIRM
 
 ## Delivery charges
 - **[[SHIPPING_FEE]]** per order, **free above [[FREE_SHIPPING_ABOVE]]**. ⚠️ OWNER TO CONFIRM

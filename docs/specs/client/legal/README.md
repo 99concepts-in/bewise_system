@@ -26,7 +26,7 @@ clear "no refunds" statements (D-16).
 | `[[LEGAL_ENTITY_NAME]]` | Registered business name (proprietorship / LLP / Pvt Ltd) that operates BeWise | ⏳ |
 | `[[GSTIN]]` | GST number printed on invoices | ⏳ (D-05) |
 | `[[REGISTERED_ADDRESS]]` | Registered office address | ⏳ |
-| `[[STUDIO_ADDRESS]]` | Where in-person sessions happen (Vadodara) | ⏳ CONTENT-CHECKLIST #7 |
+| `102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007` | Where in-person sessions happen (Vadodara) | ⏳ CONTENT-CHECKLIST #7 |
 | `[[GRIEVANCE_OFFICER_NAME]]` | Named person for privacy & consumer grievances (DPDP + Consumer Protection (E-Commerce) Rules) | ⏳ |
 | `[[GRIEVANCE_EMAIL]]` | Grievance officer email (can equal support email) | ⏳ |
 | `[[SUPPORT_EMAIL]]` | e.g. `care@<domain>` | ⏳ D-12 |

@@ -11,7 +11,7 @@ for using [[DOMAIN]] and the BeWise app. By signing in or booking you agree to t
 [Shipping Policy](shipping-policy.md), [Replacement Policy](replacement-policy.md) and [Wellness Disclaimer](wellness-disclaimer.md).
 
 ## 1. What BeWise offers
-- **Consultations** with Jitu Bhaiya (Jitendra Khimlani), Bach Remedy Therapist — online by video link or in person at our studio, [[STUDIO_ADDRESS]].
+- **Consultations** with Jitu Bhaiya (Jitendra Khimlani), Bach Remedy Therapist — online by video link or in person at our studio, 102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007.
 - A **personal Bach flower remedy blend** prepared after your session.
 - **Aromatherapy products** (oils, sprays, bath salts and more) from our shop.
 - App features: mood journal, goals, ritual reminders and **Ask BeWise**, an AI companion.

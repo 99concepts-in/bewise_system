@@ -81,6 +81,21 @@ export type ConsultationId = (typeof CONSULTATIONS)[number]['id']
 export const TESTIMONIALS: { name: string; city?: string; quote: string; rating?: number }[] = []
 export const TESTIMONIALS_SOURCE = 'https://www.jitendrakhimlani.com'
 
+/** In-person studio (owner 2026-11-18; CONTENT-CHECKLIST #7). */
+const STUDIO_FULL = '102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007'
+export const STUDIO = {
+  name: 'BeWise studio',
+  line1: '102, Yogikrupa Apartment',
+  line2: '19/A, Nutan Bharat Society, Alkapuri',
+  city: 'Vadodara, Gujarat 390007',
+  short: 'Alkapuri, Vadodara',
+  full: STUDIO_FULL,
+  // Google Business listing "Be Wise Holistic Wellness" (owner's share link https://share.google/BrjgaRA5OBCBexeyK)
+  mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Be Wise Holistic Wellness, ${STUDIO_FULL}`)}`,
+  directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`Be Wise Holistic Wellness, ${STUDIO_FULL}`)}`,
+  shareUrl: 'https://share.google/BrjgaRA5OBCBexeyK',
+}
+
 export const CONSULTANT = {
   name: 'Jitu Bhaiya',
   fullName: 'Jitendra Khimlani',

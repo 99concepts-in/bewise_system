@@ -14,7 +14,8 @@ import { Mascot, Petals } from '@/components/brand'
 import { PaySheet } from '@/components/pay-sheet'
 import { AppHeader, useUi } from '@/components/shell'
 import { Btn, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, useStableCallback } from '@/components/ui'
-import { CONSULTANT, CONSULTATIONS, NUANCE, TESTIMONIALS, TESTIMONIALS_SOURCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
+import { CONSULTANT, CONSULTATIONS, NUANCE, STUDIO, TESTIMONIALS, TESTIMONIALS_SOURCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
+import { InPersonArt, OnlineArt } from '@/components/mode-art'
 import { emptyIntake, useApp, type Appointment, type IntakeAnswers } from '@/lib/store'
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
 import { downloadIcs, googleCalUrl, sessionIcs } from '@/lib/ics'
@@ -299,24 +300,36 @@ function Saved() {
 
 function Mode({ mode, setMode }: { mode?: 'online' | 'in_person'; setMode: (m: 'online' | 'in_person') => void }) {
   const opts = [
-    { v: 'online' as const, icon: <Laptop className="size-7" />, t: 'Online', d: 'Video call · link shared in the app', img: `${BP}/img/cat-calm.webp` },
-    { v: 'in_person' as const, icon: <MapPin className="size-7" />, t: 'In person', d: 'BeWise studio, Vadodara · address shared after booking', img: `${BP}/img/cat-consult.webp` },
+    { v: 'online' as const, icon: <Laptop className="size-6" />, t: 'Online', d: 'Video call · link shared in the app' },
+    { v: 'in_person' as const, icon: <MapPin className="size-6" />, t: 'In person', d: `${STUDIO.name} · ${STUDIO.short}` },
   ]
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" role="radiogroup" aria-label="Online or in person">
       <h1 className="h-duo">Online or <em>in person?</em></h1>
       {opts.map((o, i) => {
         const on = mode === o.v
+        const pick = () => { buzz(); setMode(o.v) }
         return (
-          <motion.button key={o.v} onClick={() => { buzz(); setMode(o.v) }} aria-pressed={on} whileTap={{ scale: 0.98 }} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-            className={cx('relative flex h-[150px] w-full overflow-hidden rounded-[28px] p-5 text-left', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white shadow-[var(--shadow-card)]')}>
-            <div className="relative z-10 flex flex-col">
-              <span className={cx('grid size-12 place-items-center rounded-full', on ? 'bg-white/15' : 'bg-peri-50 text-navy')}>{o.icon}</span>
-              <span className="mt-auto text-[20px] font-extrabold">{o.t}</span>
-              <span className={cx('max-w-[200px] text-[13px] leading-4', on ? 'text-white/75' : 'text-muted')}>{o.d}</span>
+          <motion.div key={o.v} role="radio" aria-checked={on} tabIndex={0} onClick={pick} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick() } }}
+            whileTap={{ scale: 0.985 }} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+            className={cx('relative w-full cursor-pointer overflow-hidden rounded-[28px] p-5 text-left transition-colors duration-300', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white shadow-[var(--shadow-card)]')}>
+            {o.v === 'online' ? <OnlineArt on={on} /> : <InPersonArt on={on} />}
+            <div className="relative z-10 flex min-h-[118px] max-w-[58%] flex-col">
+              <span className={cx('grid size-11 place-items-center rounded-full', on ? 'bg-white/15' : 'bg-peri-50 text-navy')}>{o.icon}</span>
+              <span className="mt-auto pt-3 text-[20px] font-extrabold">{o.t}</span>
+              <span className={cx('text-[13px] leading-4', on ? 'text-white/75' : 'text-muted')}>{o.d}</span>
             </div>
-            <img src={o.img} alt="" aria-hidden className={cx('multiply absolute -right-4 bottom-0 h-[140px] object-contain transition-opacity', on && 'opacity-25')} />
-          </motion.button>
+            <AnimatePresence initial={false}>
+              {on && o.v === 'in_person' && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="relative z-10 overflow-hidden">
+                  <div className="mt-5 rounded-[18px] bg-white/10 p-3.5 text-[13px] leading-5">
+                    <p className="font-semibold">{STUDIO.line1}</p><p className="text-white/80">{STUDIO.line2}</p><p className="text-white/80">{STUDIO.city}</p>
+                    <a href={STUDIO.mapsUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="mt-2 inline-flex items-center gap-1.5 font-semibold text-white underline underline-offset-4">Open in Maps <ExternalLink className="size-3.5" /></a>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         )
       })}
     </div>
@@ -406,7 +419,7 @@ function Review({ c, slot, mode, holdUntil, onExpire }: { c: (typeof CONSULTATIO
         {[
           { i: <Sparkles className="size-5" />, t: c.name },
           { i: <Clock className="size-5" />, t: `${fmtLongDay(slot)} · ${fmtTime(slot)}` },
-          { i: mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: mode === 'online' ? 'Online · video call' : 'In person · BeWise studio' },
+          { i: mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: mode === 'online' ? 'Online · video call' : `In person · ${STUDIO.short}` },
         ].map((r, k) => (
           <motion.div key={k} className="flex items-center gap-3 border-b border-line py-3.5 last:border-0" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + k * 0.06 }}>
             <span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{r.i}</span><span className="text-[15px] font-semibold text-ink">{r.t}</span>
@@ -432,7 +445,7 @@ function Booked({ a }: { a: Appointment }) {
   const router = useRouter()
   const [cal, setCal] = useState(false)
   const c = CONSULTATIONS.find((x) => x.id === a.type)!
-  const ev = { id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online — link in the BeWise app' : 'BeWise studio, Vadodara', description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
+  const ev = { id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online — link in the BeWise app' : `${STUDIO.name}, ${STUDIO.full}`, description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
   return (
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       <Petals />

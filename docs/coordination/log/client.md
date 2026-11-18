@@ -11,6 +11,7 @@
 **Intake flow (owner):** guided breathing first ("Take a deep breath", 4-2-6 rhythm) → feelings → detail → body → sleep → life → personal message/voice note → safety → gentle question → goals
 **Also:** sleep quality is a simple 5-step scale (Very poor → Very good); all remedy blends alcohol-free — question removed, note shown, legal drafts updated
 **Also:** IN-11 sharing + AI summary are now a plain notice, not toggles (owner) — privacy draft updated; counsel to confirm wording
+**Also:** studio address added (102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara 390007) — mode card, session Directions (Google Maps listing "Be Wise Holistic Wellness"), calendar invites, legal drafts; CL-13 art replaced with code-drawn video-call phone + Alkapuri map tile
 **Needs from owner:** consented testimonials (Monika, Mitul Shah, Dhaval Gohil, Shivam S. + more); counsel view on pre-ticked consents
 
 ## 2026-11-17 — Auto-deploy to Hostinger on every commit · branch claude/new-session-94881h
