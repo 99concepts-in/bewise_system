@@ -1,0 +1,4 @@
+:HL["/bewise_system/preview/client/_next/static/chunks/40iaqwa32wlxs.css","style"]
+:HC["/",""]
+1:[["children",{"s":"__PAGE__","h":160}]]
+0:{"b":"0kROjs9wI6iloc1i-xbeI","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
