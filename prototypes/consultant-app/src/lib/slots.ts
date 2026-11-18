@@ -1,0 +1,49 @@
+/**
+ * Slot engine (prototype of docs/specs/consultant/K1-SCHEDULING-AND-CALENDAR-SYNC.md §3).
+ * Every busy thing occupies [start, end + gap); a candidate [s, s + duration + gap) must overlap none.
+ */
+import type { Appt } from '../data/types'
+import { DAY, HOUR, MIN, startOfDay } from '../data/seed'
+
+export interface Availability { saturdayMorning: boolean }
+const GAP = 10 * MIN
+const STEP = 30 * MIN
+const NOTICE = 60 * MIN
+
+function openHours(day: number, av: Availability): [number, number][] {
+  const dow = new Date(day).getDay()
+  if (dow === 0) return []
+  if (dow === 6) return av.saturdayMorning ? [[10, 13], [16, 19]] : [[16, 19]]
+  return [[10, 13], [16, 20]]
+}
+
+export function slotsForDay(day: number, durationMin: number, appts: Appt[], av: Availability, now: number, ignoreId?: string) {
+  const busy = appts
+    .filter((a) => a.id !== ignoreId && a.status !== 'no_show' && startOfDay(a.start) === day)
+    .map((a) => [a.start, a.start + a.durationMin * MIN + GAP] as const)
+  const out: number[] = []
+  for (const [h0, h1] of openHours(day, av)) {
+    for (let s = day + h0 * HOUR; s + durationMin * MIN <= day + h1 * HOUR; s += STEP) {
+      if (s < now + NOTICE) continue
+      const e = s + durationMin * MIN + GAP
+      if (busy.some(([b0, b1]) => s < b1 && b0 < e)) continue
+      out.push(s)
+    }
+  }
+  return out
+}
+
+export function nextDays(now: number, n: number) {
+  const t = startOfDay(now)
+  return Array.from({ length: n }, (_, i) => t + i * DAY)
+}
+
+/** Share of open hours already booked in the next 7 days (for the capacity insight). */
+export function weekLoad(appts: Appt[], av: Availability, now: number) {
+  let open = 0, booked = 0
+  for (const day of nextDays(now + DAY, 7)) {
+    for (const [a, b] of openHours(day, av)) open += (b - a) * 60
+    booked += appts.filter((x) => startOfDay(x.start) === day && x.status !== 'no_show').reduce((s, x) => s + x.durationMin + 10, 0)
+  }
+  return open ? booked / open : 0
+}
