@@ -48,14 +48,14 @@ export function LaunchBanner() {
     <>
       {show && <motion.button onClick={() => { buzz(10); setOpen(true) }} whileTap={{ scale: 0.98 }} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
         className="relative flex w-full items-center gap-3 overflow-hidden rounded-[24px] bg-[linear-gradient(120deg,#182957,#2c4384_55%,#b58a3c)] p-3.5 pr-4 text-left text-white shadow-[var(--shadow-float)]"
-        aria-label="Open the launch offer">
+        aria-label="Reveal your introductory offer">
         <motion.span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-white/20 blur-md"
           animate={{ x: ['0%', '480%'] }} transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' }} />
         <motion.span className="grid size-11 shrink-0 place-items-center rounded-full bg-white/15 text-[22px]" animate={{ rotate: [0, -10, 10, -6, 0] }} transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2.5 }} aria-hidden>🎁</motion.span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#f6de8d]">Secret launch offer</span>
-          <span className="block text-[15px] font-bold leading-tight">2 months free on the yearly plan</span>
-          <span className="block text-[12px] text-white/75">Ends in <Countdown compact /></span>
+          <span className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#f6de8d]">Just for you</span>
+          <span className="block text-[15px] font-bold leading-tight">A new introductory offer for you</span>
+          <span className="block text-[12px] text-white/75">Valid till 1 December · <Countdown compact /> left</span>
         </span>
         <span className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[12px] font-bold text-navy">Reveal</span>
       </motion.button>}

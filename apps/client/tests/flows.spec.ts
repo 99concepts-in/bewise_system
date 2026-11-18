@@ -87,7 +87,7 @@ test('pay after session: due shown on the session, paying keeps it booked', asyn
 
 test('launch offer: yearly reveal → are you sure → 6-month offer → pay → congrats + 15% coupon at checkout', async ({ page }) => {
   await seed(page)
-  await page.goto('/app'); await page.getByRole('button', { name: 'Open the launch offer' }).click()
+  await page.goto('/app'); await page.getByRole('button', { name: 'Reveal your introductory offer' }).click()
   await expect(page.getByRole('heading', { name: 'Yearly plan' })).toBeVisible()
   await expect(page.getByText('You save ₹1,600')).toBeVisible({ timeout: 5000 })
   await expect(page.getByText('2 months FREE', { exact: true })).toBeVisible()
