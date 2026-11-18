@@ -32,7 +32,7 @@ export type IntakeAnswers = {
   onMind: string; duration?: 'Days' | 'Weeks' | 'Months' | 'Years'
   feelings: string[]; nuance: Record<string, { statements: string[]; intensity?: 'Mild' | 'Moderate' | 'Strong' }>
   bodyAny?: boolean; body: string[]; bodyTypes: string[]
-  sleepQuality?: Emotion; hours?: string; wakes?: boolean; energy: number; stress: number
+  sleepQuality?: 1 | 2 | 3 | 4 | 5; hours?: string; wakes?: boolean; energy: number; stress: number
   life: string[]; lifeOther: string
   safety: { doctor?: boolean; medicines?: boolean; medicinesText: string; pregnant?: boolean; alcoholFree?: boolean; allergies?: boolean; allergiesText: string }
   selfHarm?: 'No' | 'Sometimes' | 'Often'

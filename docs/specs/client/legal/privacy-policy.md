@@ -21,7 +21,7 @@ Under the DPDP Act we are the **Data Fiduciary** for the personal data you share
 | Account details | Mobile number, name, date of birth, city, gender (optional) | Sign you in with a one-time code, address you by name, check age |
 | Contact & delivery | Email (optional), delivery addresses, pincode | Send confirmations, deliver remedies and products |
 | **Case-taking (intake) answers** — *sensitive* | What's on your mind, feelings and how strongly you feel them, voice notes, body map of discomfort, sleep & energy, life changes, goals | So Jitu Bhaiya understands you before your session |
-| **Safety answers** — *sensitive* | Doctor/therapist, medicines, pregnancy or breastfeeding, alcohol-free preference, allergies, the "one gentle question" about self-harm | Your safety, and preparing your remedy and product suggestions safely |
+| **Safety answers** — *sensitive* | Doctor/therapist, medicines, pregnancy or breastfeeding, allergies, the "one gentle question" about self-harm | Your safety, and preparing your remedy and product suggestions safely |
 | Mood journal & goals | The feeling you logged and when; your personal goals | Show you your patterns; shared with your consultant only if you allow it |
 | Session feedback | Rating, tags, notes for Jitu Bhaiya | Help him care for you better |
 | Appointments & remedies | Bookings, session mode, your current blend and ritual | Run your consultations and reminders |
@@ -44,7 +44,7 @@ You can withdraw consent anytime in **Me → Privacy & data**. Withdrawing doesn
 |---|---|---|
 | **You** | Everything you've entered, your remedy, orders, invoices | Your consultant's private notes |
 | **Jitu Bhaiya (Jitendra Khimlani), Bach Remedy Therapist** | Your intake and check-in answers, feedback, journal (if shared), AI summary (if allowed) | — |
-| **Office manager** | Your name, delivery address, order and payment status, and only what's needed to prepare your remedy (e.g. "alcohol-free base") | Your answers, journal, feedback or chats |
+| **Office manager** | Your name, delivery address, order and payment status, and only what's needed to prepare your remedy (e.g. which flowers go in your blend and the bottle size) | Your answers, journal, feedback or chats |
 | **Owner** | Business totals and anonymous statistics, session ratings | Your answers, journal, notes or chats |
 | **Accountant** | Invoices and payment records for tax | Anything about your wellbeing |
 

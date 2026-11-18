@@ -247,20 +247,30 @@ function Slider({ label, value, onChange }: { label: string; value: number; onCh
     </div>
   )
 }
+const SLEEP = ['Very poor', 'Poor', 'Okay', 'Good', 'Very good'] as const
 export function StepSleep({ a, set }: P) {
-  const Q: Emotion[] = ['tired', 'anxious', 'sad', 'joyful', 'calm']
   return (
     <div className="space-y-4">
       <StepTitle lead="Sleep &" em="energy" />
       <Card>
-        <Label>How do you sleep?</Label>
-        <div className="flex justify-between">
-          {Q.map((m) => (
-            <motion.button key={m} whileTap={{ scale: 0.88 }} aria-pressed={a.sleepQuality === m} onClick={() => { buzz(6); set({ sleepQuality: m }) }}
-              className={cx('flex flex-col items-center gap-1 rounded-[18px] p-1.5', a.sleepQuality === m && 'ring-2 ring-navy')}>
-              <MoodImg mood={m} size={48} /><span className="text-[12px] font-semibold capitalize text-navy">{m}</span>
-            </motion.button>
-          ))}
+        <Label>How well do you sleep?</Label>
+        {/* simple 5-step scale (owner 2026-11-18) — bars grow with quality */}
+        <div className="grid grid-cols-5 gap-1.5" role="radiogroup" aria-label="Sleep quality">
+          {SLEEP.map((label, i) => {
+            const v = (i + 1) as 1 | 2 | 3 | 4 | 5
+            const on = a.sleepQuality === v
+            return (
+              <motion.button key={label} type="button" role="radio" aria-checked={on} whileTap={{ scale: 0.92 }} onClick={() => { buzz(6); set({ sleepQuality: v }) }}
+                className={cx('flex flex-col items-center gap-2 rounded-[18px] px-1 pb-2.5 pt-3 transition-colors', on ? 'bg-navy text-white shadow-[0_6px_16px_rgba(24,41,87,.25)]' : 'bg-peri-50/80 text-navy')}>
+                <span className="flex h-7 items-end gap-[3px]" aria-hidden>
+                  {[0, 1, 2, 3, 4].map((k) => (
+                    <span key={k} className={cx('w-[4px] rounded-full', k <= i ? (on ? 'bg-white' : 'bg-navy') : (on ? 'bg-white/30' : 'bg-[#cfd5e5]'))} style={{ height: 8 + k * 5 }} />
+                  ))}
+                </span>
+                <span className="text-center text-[11.5px] font-semibold leading-tight">{label}</span>
+              </motion.button>
+            )
+          })}
         </div>
       </Card>
       <Card>
@@ -315,13 +325,15 @@ export function StepSafety({ a, set }: P) {
   return (
     <div>
       <StepTitle lead="For your" em="safety" sub="Helps us prepare your remedy and suggest products safely." />
+      <p className="mb-3 flex items-center gap-2 rounded-[18px] bg-sage-100/80 px-4 py-3 text-[14px] font-semibold text-sage-text">
+        <span aria-hidden>🌿</span> All BeWise remedy blends are alcohol-free.
+      </p>
       <div className="card divide-y divide-line px-5">
         <YesNo label="Seeing a doctor or therapist?" value={s.doctor} onChange={(doctor) => up({ doctor })} />
         <YesNo label="Taking any medicines?" value={s.medicines} onChange={(medicines) => up({ medicines })}>
           <input className={small} placeholder="Which ones? e.g. thyroid tablet" value={s.medicinesText} onChange={(e) => up({ medicinesText: e.target.value })} aria-label="Medicines" />
         </YesNo>
         <YesNo label="Pregnant or breastfeeding?" value={s.pregnant} onChange={(pregnant) => up({ pregnant })} />
-        <YesNo label="Prefer an alcohol-free remedy?" hint="Bach remedies usually contain a little brandy" value={s.alcoholFree} onChange={(alcoholFree) => up({ alcoholFree })} />
         <YesNo label="Allergies or sensitive skin?" value={s.allergies} onChange={(allergies) => up({ allergies })}>
           <input className={small} placeholder="e.g. lavender, citrus" value={s.allergiesText} onChange={(e) => up({ allergiesText: e.target.value })} aria-label="Allergies" />
         </YesNo>
@@ -388,8 +400,8 @@ export function StepReview({ a, set, edit }: P & { edit: (step: string) => void 
     { k: 'who', icon: '💭', t: 'On your mind', d: [a.onMind.slice(0, 48) + (a.onMind.length > 48 ? '…' : ''), a.duration?.toLowerCase()].filter(Boolean).join(' · ') },
     { k: 'feelings', icon: '💗', t: 'Feelings', d: Object.values(a.nuance).flatMap((n) => n.statements).slice(0, 3).join(' · ') || a.feelings.join(' · ') },
     { k: 'body', icon: '🌿', t: 'Body', d: a.bodyAny === undefined ? '' : a.bodyAny ? a.body.join(', ').toLowerCase() : 'nothing noted' },
-    { k: 'sleep', icon: '🌙', t: 'Sleep', d: a.hours || a.sleepQuality ? `${a.hours ?? '—'} h · energy ${a.energy}/5 · stress ${a.stress}/5` : '' },
-    { k: 'safety', icon: '🛡️', t: 'Safety', d: [a.safety.alcoholFree && 'alcohol-free', a.safety.allergies && a.safety.allergiesText && `${a.safety.allergiesText} allergy`, a.safety.pregnant && 'pregnant'].filter(Boolean).join(' · ') || 'nothing to flag' },
+    { k: 'sleep', icon: '🌙', t: 'Sleep', d: a.hours || a.sleepQuality ? [a.sleepQuality && SLEEP[a.sleepQuality - 1].toLowerCase(), a.hours && `${a.hours} h`, `energy ${a.energy}/5`, `stress ${a.stress}/5`].filter(Boolean).join(' · ') : '' },
+    { k: 'safety', icon: '🛡️', t: 'Safety', d: [a.safety.allergies && a.safety.allergiesText && `${a.safety.allergiesText} allergy`, a.safety.pregnant && 'pregnant'].filter(Boolean).join(' · ') || 'nothing to flag' },
     { k: 'goals', icon: '✨', t: 'You’d like to feel', d: [...a.goals, a.goalText].filter(Boolean).join(' · ').toLowerCase() || '—' },
   ]
   return (

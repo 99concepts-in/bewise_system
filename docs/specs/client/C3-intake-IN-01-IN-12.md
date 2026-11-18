@@ -28,7 +28,7 @@ interface IntakeAnswers {
   body: { any: boolean; areas: BodyArea[]; types: ('pain'|'stiffness'|'tension'|'other')[]; otherText?: string }
   sleep: { quality: 1|2|3|4|5; hours: 'lt5'|'5_6'|'7_8'|'8plus'; wakesAtNight: boolean; energy: 1|2|3|4|5; stress: 1|2|3|4|5; appetite: 'less'|'same'|'more' }
   life: { changes: LifeChangeKey[]; otherText?: string }
-  safety: { seeingDoctor: boolean; medicines?: string | null; pregnantOrBreastfeeding: boolean; alcoholFree: boolean; allergies?: string | null; condition?: string | null }
+  safety: { seeingDoctor: boolean; medicines?: string | null; pregnantOrBreastfeeding: boolean; allergies?: string | null; condition?: string | null }
   selfHarm: 'no' | 'sometimes' | 'often'
   goals: { feelings: GoalKey[]; text?: string }
   templateVersion: string
@@ -50,7 +50,7 @@ Statements and chip labels come from `getIntakeForm().template` (data, not hard-
 | **IN-05** Body | "Any physical *discomfort*?" | No / Yes → front + back figure (tap regions toggle, highlighted rose) **synced** with area chips; type chips Pain · Stiffness · Tension · Other | if Yes: ≥ 1 area + ≥ 1 type | Figure is SVG with `<button>` regions + `aria-label` ("Lower back, selected"); chips are the accessible primary control. Footer (always visible): "We don't diagnose or treat medical conditions — please keep seeing your doctor." |
 | **IN-06** Sleep & energy | "Sleep & *energy*" | Sleep quality (5 mood characters, mapped 1–5: Tired=1, Anxious=2, Sad=3, Joyful=4, Calm=5 — labels shown), Hours pills, Waking at night Y/N, Energy slider 1–5, Stress slider 1–5, Appetite Less/Same/More | all required except appetite | Sliders: native `input[type=range]` styled, value text "2/5", step 1 |
 | **IN-07** Life changes | "Anything changing in *life*?" | 2-col chips with mood characters (board) + "Anything else you'd like to share" text | ≥ 1 (incl. "Nothing major", exclusive) | |
-| **IN-08** Safety | "For your *safety*" · sub "Helps us prepare your remedy and suggest products safely" | Yes/No rows; Yes reveals a short text field for Medicines, Allergies, Condition. Alcohol-free row hint "Bach remedies usually contain a little brandy" | every row answered; text required when Yes for medicines/allergies | Allergies text → also parsed server-side into `allergens[]` used by shop warnings (CL-35) — see shop spec |
+| **IN-08** Safety | "For your *safety*" · sub "Helps us prepare your remedy and suggest products safely" | Yes/No rows; Yes reveals a short text field for Medicines, Allergies, Condition. No alcohol-free question — **all blends are alcohol-free** (owner 2026-11-18); a sage note says so | every row answered; text required when Yes for medicines/allergies | Allergies text → also parsed server-side into `allergens[]` used by shop warnings (CL-35) — see shop spec |
 | **IN-09** One gentle question | "One gentle *question*" | Exact wording from `01-INTAKE` §3 (template-driven). Pills No · Sometimes · Often | required | §4 safety protocol |
 | **IN-10** Goals | "How would you like to *feel*?" | Multi chips (10) + "In your own words —" text | ≥ 1 chip or text | CTA **Review answers** |
 | **IN-11** Review & consent | "Your *answers*" | Section cards (On your mind · Feelings · Body · Sleep · Life · Safety · Goals) each with summary + **Edit** (→ step, then "Back to review") · Toggles: 🔒 **Share with my consultant** (on) · ✨ **Let AI prepare a private summary for Jitu Bhaiya** (on, optional) + "What is this?" sheet | Share must be on to continue: if turned off → CTA disabled + note "Jitu Bhaiya needs your answers to prepare. You can keep them brief." | CTA **Save & choose a time** → `submitIntake({ intakeId, answers, consent:{ shareWithConsultant:true, aiSummary } })` |
@@ -61,7 +61,7 @@ Statements and chip labels come from `getIntakeForm().template` (data, not hard-
 |---|---|---|
 | a | "How are you *now*?" — 5 mood characters (overall) | yes |
 | b | "Since we last *met*" — each feeling from the last intake/check-in as a row: Better · Same · Harder; "+ Something new" → IN-03 chip picker (single sheet) | each row |
-| c | "Anything *new*?" — text/voice (optional) + "Took my drops": Every day · Most days · Sometimes · Rarely · Safety recap: "Still alcohol-free? Still allergic to lavender?" quick confirm (edit opens IN-08 rows) | drops |
+| c | "Anything *new*?" — text/voice (optional) + "Took my drops": Every day · Most days · Sometimes · Rarely · Safety recap: "Still allergic to lavender?" quick confirm (edit opens IN-08 rows) | drops |
 | submit | `intake.submitCheckin(...)` (**not in contract yet** — request) → "Thanks — Jitu Bhaiya will see how you've been." → CL-13 | |
 
 ## 4. Safety protocol UI (IN-09 → Sometimes / Often)

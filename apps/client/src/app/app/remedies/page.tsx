@@ -70,7 +70,7 @@ export default function Remedies() {
             <motion.img src={`${BP}/img/p-dropper.webp`} alt="" aria-hidden className="absolute bottom-3 right-6 h-[170px] drop-shadow-[0_18px_18px_rgba(24,41,87,.22)]" initial={{ y: 30, opacity: 0 }} animate={{ y: [0, -8, 0], opacity: 1 }} transition={{ y: { duration: 5, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.6 } }} />
             <p className="text-[13px] font-semibold text-[#8a6a2c]">Since {fmtDay(blend.startedOn)}</p>
             <h2 className="relative mt-1 max-w-[62%] text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">{blend.name} <span className="text-soft">v{blend.version}</span></h2>
-            <p className="relative mt-1 max-w-[62%] text-[14px] text-muted">{blend.drops} drops · {blend.timesPerDay}× a day{blend.alcoholFree ? ' · alcohol-free' : ''}</p>
+            <p className="relative mt-1 max-w-[62%] text-[14px] text-muted">{blend.drops} drops · {blend.timesPerDay}× a day{' · alcohol-free'}</p>
             <div className="relative mt-5 flex max-w-[62%] items-center gap-3">
               <Ring value={dayN / blend.days} size={74} stroke={8} color="#c48a3a" track="#ffffffaa"><span className="text-center leading-none"><b className="text-[18px] text-navy tnum">{left}</b><br /><span className="text-[11px] text-muted">days left</span></span></Ring>
               <p className="text-[13px] leading-4 text-muted">Day {dayN} of {blend.days}. A follow-up refreshes your blend.</p>
