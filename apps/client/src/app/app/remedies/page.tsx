@@ -60,7 +60,7 @@ export default function Remedies() {
   const reorder = () => {
     addToCart('remedy-reorder'); buzz(12)
     const r = reorderRef.current?.getBoundingClientRect(); if (r) flyToBag(r, `${BP}/img/products/bach-remedy-dropper.webp`)
-    toast(`Blend added to your bag · ${formatINR(REORDER_PRICE_PAISE)}`)
+    toast(`Blend added to cart · ${formatINR(REORDER_PRICE_PAISE)}`)
   }
 
   return (

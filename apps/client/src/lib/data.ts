@@ -209,6 +209,7 @@ export type Product = {
   art: string; color: string; tint: [string, string]; wide?: boolean
   /** made for each client after a consultation: reorder only */
   personal?: 'dropper' | 'spray'
+  soldOut?: boolean
   variants: { id: string; label: string; pricePaise: number; mrpPaise?: number }[]
   allergens: string[]; about: string; feel: string[]; ingredients: string; howTo: string; safety: string
 }
@@ -283,14 +284,19 @@ export const PRODUCTS: Product[] = [
     'Close your eyes and mist lightly over your face and body from about 20 cm. Use whenever your skin needs a refresh.'),
     category: 'care' as const, safety: 'Keep your eyes closed while misting. Patch test first. Stop use if any irritation appears.' },
   { slug: 'aura-bath-salt', name: 'Aura', tagline: 'Bath salt to cleanse your aura', format: 'Bath salt', category: 'bath', intents: ['protection', 'calm'],
-    art: 'products/aura-bath-salt', color: '#5B78B8', tint: ['#e7ecfa', '#fbe9ee'], wide: true,
+    art: 'products/aura-bath-salt', color: '#5B78B8', tint: ['#e7ecfa', '#fbe9ee'],
     variants: [{ id: 'aura-bath-salt-200', label: '200 g', pricePaise: 50000 }], allergens: [],
     about: 'A soothing bath ritual to help cleanse your aura and leave you feeling light and renewed.', feel: ['Cleansed', 'Light', 'Renewed'],
     ingredients: 'Natural salts, dried flower petals and essential oils. Full list on the pack.', howTo: SALT_HOW, safety: 'For external use only. Do not use on broken skin. Not for eating. Keep away from children.' },
   { slug: 'abundance-bath-salt', name: 'Abundance', tagline: 'Bath salt for positivity and self-love', format: 'Bath salt', category: 'bath', intents: ['abundance'],
-    art: 'products/abundance-bath-salt', color: '#B58A3C', tint: ['#fbf3dc', '#fbe9ee'], wide: true,
+    art: 'products/abundance-bath-salt', color: '#B58A3C', tint: ['#fbf3dc', '#fbe9ee'],
     variants: [{ id: 'abundance-bath-salt-200', label: '200 g', pricePaise: 50000 }], allergens: [],
     about: 'A warm bath ritual to welcome abundance, positivity and self-love into your day.', feel: ['Positive', 'Abundant', 'Self-love'],
+    ingredients: 'Natural salts, dried flower petals and essential oils. Full list on the pack.', howTo: SALT_HOW, safety: 'For external use only. Do not use on broken skin. Not for eating. Keep away from children.' },
+  { slug: 'happiness-bath-salt', name: 'Happiness', tagline: 'Bath salt for a lighter, happier mood', format: 'Bath salt', category: 'bath', intents: ['calm'],
+    art: 'products/happiness-bath-salt', color: '#C7892E', tint: ['#fbf3dc', '#fbf0dc'], soldOut: true,
+    variants: [{ id: 'happiness-bath-salt-200', label: '200 g', pricePaise: 50000 }], allergens: [],
+    about: 'A sunny bath ritual to lift your mood and invite a little more joy into your day.', feel: ['Joyful', 'Light', 'Uplifted'],
     ingredients: 'Natural salts, dried flower petals and essential oils. Full list on the pack.', howTo: SALT_HOW, safety: 'For external use only. Do not use on broken skin. Not for eating. Keep away from children.' },
 ]
 /** Product line name as shown on cards: "Abundance" + "Roll-on" etc. */
@@ -299,7 +305,7 @@ export const CATEGORIES: { key: Category | 'consult'; label: string; sub: string
   { key: 'rollons', label: 'Roll-on oils', sub: '7 blends', tint: '#e7ecfa', art: ['products/sleep-rollon', 'products/abundance-rollon', 'products/immutime-rollon'] },
   { key: 'sprays', label: 'Aura sprays', sub: '4 mists', tint: '#efe9fb', art: ['products/protection-spray', 'products/aura-spray'] },
   { key: 'remedies', label: 'Bach remedies', sub: 'Made for you', tint: '#e5efe2', art: ['products/bach-remedy-dropper', 'products/rescue-remedy-spray'] },
-  { key: 'bath', label: 'Bath salts', sub: '2 rituals', tint: '#fbe9ee', art: ['products/aura-bath-salt'] },
+  { key: 'bath', label: 'Bath salts', sub: '3 rituals', tint: '#fbe9ee', art: ['products/aura-bath-salt', 'products/abundance-bath-salt'] },
   { key: 'care', label: 'Hair & beauty', sub: 'Oil & mist', tint: '#fbf0dc', art: ['products/hair-oil', 'products/beauty-spray'] },
   { key: 'consult', label: 'Consultation', sub: 'With Jitu Bhaiya', tint: '#f1ece4', art: [] },
 ]

@@ -14,6 +14,7 @@ import { PaySheet } from '@/components/pay-sheet'
 import { AppHeader } from '@/components/shell'
 import { Btn, Sheet, Toggle, cx, ease, spring } from '@/components/ui'
 import { useApp, type Order } from '@/lib/store'
+import { STUDIO } from '@/lib/data'
 import { addDays, fmtDay, formatINR } from '@/lib/format'
 import { useBagTotals } from '@/lib/bag'
 
@@ -30,6 +31,8 @@ export default function Checkout() {
   const [adding, setAdding] = useState(addresses.length === 0)
   const [f, setF] = useState({ name: profile?.name ?? '', phone: profile?.phone ?? '', pin: '', line1: '', line2: '', city: '', state: '' })
   const [pay, setPay] = useState(false)
+  const [how, setHow] = useState<'ship' | 'pickup'>('ship')
+  const payable = how === 'pickup' ? total - ship : total
   const [ask, setAsk] = useState(false)
   const [subs, setSubs] = useState<string[]>([])
   const products = lines.filter((x) => x.i!.kind === 'product')
@@ -49,7 +52,9 @@ export default function Checkout() {
       <motion.div className="mx-auto mt-6" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 13 }}><Mascot pose="bottle" height={240} priority /></motion.div>
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="card mt-4 flex items-center gap-4 p-5">
         <span className="grid size-12 place-items-center rounded-full bg-sage-100 text-sage-text"><Truck className="size-6" /></span>
-        <div><p className="text-[16px] font-bold text-navy">Arriving by {fmtDay(eta)}</p><p className="text-[13px] text-muted">We’ll message you when it ships.</p></div>
+        {done.pickup
+          ? <div><p className="text-[16px] font-bold text-navy">Ready for pickup in 1 to 2 days</p><p className="text-[13px] text-muted">{STUDIO.short}. We’ll message you on WhatsApp when it’s packed.</p></div>
+          : <div><p className="text-[16px] font-bold text-navy">Arriving by {fmtDay(eta)}</p><p className="text-[13px] text-muted">We’ll message you when it ships.</p></div>}
       </motion.div>
       <div className="mt-auto space-y-3 pb-3 pt-6 safe-b">
         <Btn full onClick={() => router.replace(`/app/orders/view?id=${done.id}`)}>Track order</Btn>
@@ -61,8 +66,34 @@ export default function Checkout() {
   return (
     <main className="px-5 pb-40">
       <AppHeader back="/app/bag" title="Checkout" />
-      <h1 className="h-duo pt-2">Where should it <em>go?</em></h1>
-      <div className="mt-5 space-y-3">
+      <h1 className="h-duo pt-2">How would you like <em>it?</em></h1>
+      {/* owner 2026-11-18: pick up from the studio as well as home delivery */}
+      <div role="radiogroup" aria-label="Delivery or pickup" className="mt-5 grid grid-cols-2 gap-2.5">
+        {([
+          { k: 'ship', e: '🚚', t: 'Home delivery', d: ship ? `${formatINR(ship)} · 4 to 6 days` : 'Free · 4 to 6 days' },
+          { k: 'pickup', e: '🏡', t: 'Pick up from studio', d: `Free · ${STUDIO.short}` },
+        ] as const).map((o) => {
+          const on = how === o.k
+          return (
+            <motion.button key={o.k} type="button" role="radio" aria-checked={on} whileTap={{ scale: 0.97 }} onClick={() => setHow(o.k)}
+              className={cx('relative rounded-[22px] p-4 text-left transition-colors', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
+              <span className="text-[22px]" aria-hidden>{o.e}</span>
+              <span className="mt-1.5 block text-[15px] font-bold leading-tight">{o.t}</span>
+              <span className={cx('block text-[12px] leading-4', on ? 'text-white/75' : 'text-muted')}>{o.d}</span>
+              <AnimatePresence>{on && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring} className="absolute right-3 top-3 grid size-6 place-items-center rounded-full bg-white text-navy"><Check className="size-3.5" strokeWidth={3} /></motion.span>}</AnimatePresence>
+            </motion.button>
+          )
+        })}
+      </div>
+      {how === 'pickup' ? (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card mt-3 flex items-start gap-3 p-4">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage-100 text-sage-text"><MapPin className="size-5" /></span>
+          <span className="flex-1 text-[14px] leading-5"><b className="block text-[15px] text-navy">{STUDIO.name}</b><span className="text-muted">{STUDIO.full}</span>
+            <span className="mt-1 block text-[13px] text-sage-text">Ready in 1 to 2 days. We’ll message you on WhatsApp when it’s packed.</span>
+            <a href={STUDIO.directionsUrl} target="_blank" rel="noopener noreferrer" className="mt-1.5 inline-block text-[13px] font-semibold text-navy underline underline-offset-4">Get directions</a></span>
+        </motion.div>
+      ) : (
+      <div className="mt-3 space-y-3">
         {addresses.map((a) => (
           <motion.button key={a.id} layout onClick={() => setSel(a.id)} aria-pressed={sel === a.id} className={cx('card flex w-full items-start gap-3 p-4 text-left transition', sel === a.id && 'ring-2 ring-navy')}>
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-peri-50 text-navy"><Home className="size-5" /></span>
@@ -90,6 +121,7 @@ export default function Checkout() {
           )}
         </AnimatePresence>
       </div>
+      )}
 
       <h2 className="h-section mt-7">Review</h2>
       <section className="card mt-3 p-5">
@@ -97,16 +129,16 @@ export default function Checkout() {
         <div className="mt-3 space-y-1.5 border-t border-line pt-3 text-[14px]">
           <div className="flex justify-between"><span className="text-muted">Subtotal (GST incl.)</span><span className="tnum">{formatINR(sub)}</span></div>
           {discount > 0 && <div className="flex justify-between font-semibold text-sage-text"><span>🎁 {coupon?.code} · {coupon?.pct}% off</span><span className="tnum">−{formatINR(discount)}</span></div>}
-          <div className="flex justify-between"><span className="text-muted">Delivery</span><span className="tnum">{ship ? formatINR(ship) : 'Free'}</span></div>
-          <div className="flex justify-between pt-1 text-[18px] font-extrabold text-navy"><span>Total</span><span className="tnum">{formatINR(total)}</span></div>
+          <div className="flex justify-between"><span className="text-muted">Delivery</span><span className="tnum">{how === 'pickup' ? 'Pickup · Free' : ship ? formatINR(ship) : 'Free'}</span></div>
+          <div className="flex justify-between pt-1 text-[18px] font-extrabold text-navy"><span>Total</span><span className="tnum">{formatINR(payable)}</span></div>
         </div>
         <p className="mt-3 flex items-center gap-2 text-[13px] text-muted"><Package className="size-4" /> Arrives in 4 to 6 days · No returns for change of mind. Damaged or wrong items are replaced.</p>
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
-        <Btn full variant="gradient" disabled={!sel || adding} onClick={() => (products.length ? setAsk(true) : setPay(true))}><span aria-hidden>🔒</span> Pay {formatINR(total)}</Btn>
+        <Btn full variant="gradient" disabled={how === 'ship' && (!sel || adding)} onClick={() => (products.length ? setAsk(true) : setPay(true))}><span aria-hidden>🔒</span> Pay {formatINR(payable)}</Btn>
       </div>
-      <PaySheet open={pay} amountPaise={total} purpose="Your order" onClose={() => setPay(false)} onPaid={() => { if (!sel) return; const o = placeOrder(sel, subs); setPay(false); setDone(o) }} />
+      <PaySheet open={pay} amountPaise={payable} purpose="Your order" onClose={() => setPay(false)} onPaid={() => { if (how === 'ship' && !sel) return; const o = placeOrder(how === 'pickup' ? 'pickup' : sel!, subs); setPay(false); setDone(o) }} />
       {/* owner 2026-11-18: offer a subscription before the order; the order is only placed once they confirm */}
       <Sheet open={ask} onClose={() => setAsk(false)} title="Make it a ritual?">
         <div className="text-center">

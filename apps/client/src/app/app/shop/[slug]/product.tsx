@@ -98,12 +98,12 @@ export default function ProductPage() {
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-[480px] items-center gap-3 bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
-        {!p.personal && <div className="flex h-14 items-center gap-1 rounded-full bg-white px-2 shadow-[var(--shadow-card)]">
+        {!p.personal && !p.soldOut && <div className="flex h-14 items-center gap-1 rounded-full bg-white px-2 shadow-[var(--shadow-card)]">
           <button aria-label="Fewer" onClick={() => setQty(Math.max(1, qty - 1))} className="grid size-10 place-items-center rounded-full text-navy"><Minus className="size-4" /></button>
           <AnimatePresence mode="popLayout"><motion.span key={qty} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-6 text-center text-[17px] font-bold text-navy tnum">{qty}</motion.span></AnimatePresence>
           <button aria-label="More" onClick={() => setQty(Math.min(10, qty + 1))} className="grid size-10 place-items-center rounded-full text-navy"><Plus className="size-4" /></button>
         </div>}
-        <Btn full variant="gradient" onClick={() => (hit ? setConfirm(true) : doAdd())}>{bookFirst ? 'Book a consultation' : p.personal ? 'Reorder my blend' : 'Add to bag'}</Btn>
+        {p.soldOut ? <Btn full variant="primary" disabled>Sold out</Btn> : <Btn full variant="gradient" onClick={() => (hit ? setConfirm(true) : doAdd())}>{bookFirst ? 'Book a consultation' : p.personal ? 'Reorder my blend' : 'Add to cart'}</Btn>}
       </div>
 
       <Sheet open={confirm} onClose={() => setConfirm(false)} title="Add anyway?">

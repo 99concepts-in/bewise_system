@@ -11,6 +11,8 @@ import { ArrowRight, BookOpen, Check, ChevronRight, Lightbulb, Sparkles, Video }
 import { useMemo, useState } from 'react'
 import { Mascot, MoodButton, MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
+import { GoalCheck } from '@/components/goal-check'
+import { doneToday, kindOf, streak } from '@/lib/goals'
 import { AppHeader } from '@/components/shell'
 import { ConsultInviteArt, SessionDateArt } from '@/components/session-art'
 import { BlendBottleCard } from '@/components/blend-bottle'
@@ -198,29 +200,31 @@ function ProgressCompact() {
 /** Goals the client set (CL-31) — shown on Home once there is at least one (owner 2026-11-18). */
 function GoalsCard() {
   const goals = useApp((s) => s.goals)
-  const upd = useApp((s) => s.updateGoal)
   if (!goals.length) return null
+  const left = goals.filter((g) => kindOf(g) === 'daily' && !doneToday(g)).length
   return (
     <Item>
       <section className="card p-5" aria-labelledby="goals-h">
         <div className="flex items-center justify-between">
-          <h2 id="goals-h" className="h-section">Your goals</h2>
+          <div>
+            <h2 id="goals-h" className="h-section">Today’s check-in</h2>
+            <p className="text-[12px] text-muted">{left ? `${left} daily goal${left > 1 ? 's' : ''} to tick` : 'All daily goals done. Lovely 🌿'}</p>
+          </div>
           <Link href="/app/goals" className="inline-flex items-center gap-0.5 text-[13px] font-semibold text-navy">All<ChevronRight className="size-4" /></Link>
         </div>
         <ul className="mt-3 space-y-2.5">
-          {goals.map((g) => (
-            <li key={g.id} className="flex items-center gap-3">
-              <Ring value={g.progress / 100} size={44} stroke={5} color={g.done ? '#82977e' : '#182957'}>
-                {g.done ? <Check className="size-4 text-sage" strokeWidth={3} /> : <span className="text-[11px] font-bold text-navy tnum">{g.progress}</span>}
-              </Ring>
-              <span className={`flex-1 text-[15px] font-semibold ${g.done ? 'text-sage-text line-through decoration-sage/50' : 'text-navy'}`}>{g.title}</span>
-              {!g.done && (
-                <motion.button whileTap={{ scale: 0.88 }} aria-label={`Add progress to ${g.title}`}
-                  onClick={() => { const n = Math.min(100, g.progress + 10); buzz(8); upd(g.id, { progress: n, done: n === 100 }); if (n === 100) toast('Goal complete. Well done!') }}
-                  className="h-9 rounded-full bg-peri-50 px-3 text-[13px] font-bold text-navy">+10%</motion.button>
-              )}
-            </li>
-          ))}
+          {goals.map((g) => {
+            const once = kindOf(g) === 'once', s = streak(g)
+            return (
+              <li key={g.id} className="flex items-center gap-3">
+                <GoalCheck g={g} size="sm" />
+                <span className="min-w-0 flex-1">
+                  <span className={`block text-[15px] font-semibold ${once && g.done ? 'text-sage-text line-through decoration-sage/50' : 'text-navy'}`}>{g.title}</span>
+                  <span className="text-[12px] text-muted">{once ? (g.done ? '🎯 Achieved' : '🎯 Long-term') : s ? `☀️ Daily · 🔥 ${s}-day streak` : '☀️ Daily'}</span>
+                </span>
+              </li>
+            )
+          })}
         </ul>
       </section>
     </Item>

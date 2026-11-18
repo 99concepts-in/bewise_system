@@ -156,7 +156,7 @@ export function StepFeelings({ a, set }: P) {
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: (i % 9) * 0.03 }} whileTap={{ scale: 0.94 }}
               className={cx('relative flex min-h-[96px] flex-col items-center justify-center gap-1.5 rounded-[22px] px-1.5 py-2.5 text-center transition-colors duration-200',
                 on ? 'bg-navy text-white shadow-[0_8px_18px_rgba(24,41,87,.22)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
-              <MoodFace color={ic.color} face={ic.face} size={40} />
+              <MoodFace face={ic.face} size={40} ink={on ? '#ffffff' : undefined} />
               <span className="text-[13px] font-semibold leading-tight">{f}</span>
               <AnimatePresence>{on && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring} className="absolute right-2 top-2 grid size-5 place-items-center rounded-full bg-white text-navy"><Check className="size-3" strokeWidth={3.5} aria-hidden /></motion.span>}</AnimatePresence>
             </motion.button>
@@ -282,7 +282,7 @@ export function StepSleep({ a, set }: P) {
               <motion.button key={label} type="button" role="radio" aria-checked={on} whileTap={{ scale: 0.92 }} onClick={() => { buzz(6); set({ sleepQuality: v }) }}
                 className={cx('flex flex-col items-center gap-1.5 rounded-[18px] px-1 pb-2.5 pt-2.5 transition-colors', on ? 'bg-navy text-white shadow-[0_6px_16px_rgba(24,41,87,.25)]' : 'bg-peri-50/80 text-navy')}>
                 <motion.span animate={on ? { scale: [1, 1.15, 1] } : { scale: 1 }} transition={{ duration: 0.35 }} className="block" aria-hidden>
-                  <MoodFace color={SLEEP_FACES[i].color} face={SLEEP_FACES[i].face} size={36} />
+                  <MoodFace face={SLEEP_FACES[i].face} size={36} ink={on ? '#ffffff' : undefined} />
                 </motion.span>
                 <span className="text-center text-[11.5px] font-semibold leading-tight">{label}</span>
               </motion.button>

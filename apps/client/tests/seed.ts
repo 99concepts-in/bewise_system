@@ -10,7 +10,7 @@ export function seedState(opts: { onboarded?: boolean } = {}) {
     state: {
       profile: { name: 'Priya Shah', phone: '9876543210', dob: '1994-05-12', city: 'Vadodara', consents: { wellbeing: true, whatsapp: true, offers: true }, allergies: ['lavender'], ...(opts.onboarded === false ? {} : { onboardedAt: iso(now - 20 * D) }) },
       journal: Array.from({ length: 10 }, (_, i) => ({ id: 'j' + i, emotion: ['calm', 'anxious', 'happy', 'tired', 'grateful'][i % 5], at: iso(now - i * D), ...(i === 0 ? { note: 'Good chat with my sister' } : {}) })),
-      goals: [{ id: 'g1', title: 'Sleep by 11 PM', progress: 40, done: false }],
+      goals: [{ id: 'g1', title: 'Sleep by 11 PM', progress: 0, done: false, kind: 'daily', days: [day(-1), day(-2)] }, { id: 'g2', title: 'Read one book this month', progress: 0, done: false, kind: 'once' }],
       appointments: [
         { id: 'a1', code: 'BW-A-00038', type: 'first', mode: 'online', startsAt: at(-14, 11), status: 'completed', amountPaise: 100000, createdAt: iso(now - 17 * D) },
         { id: 'a2', code: 'BW-A-00041', type: 'followup', mode: 'in_person', startsAt: at(4, 11), status: 'confirmed', amountPaise: 80000, createdAt: iso(now - D) },

@@ -11,7 +11,8 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { ConsultationId, Emotion } from './data'
-import { PRODUCTS, REORDER_PRICE_PAISE, productTitle, variantById } from './data'
+import { PRODUCTS, REORDER_PRICE_PAISE, STUDIO, productTitle, variantById } from './data'
+import { isoDay } from './supply'
 import { COUPON_DAYS, COUPON_PCT, PLANS, type PlanId } from './offer'
 import { uid, dayKey } from './format'
 
@@ -22,7 +23,8 @@ export type Profile = {
 }
 // @decision(D-19) owner 2026-11-18: journal entries may carry an optional note (was emotion + time only)
 export type JournalEntry = { id: string; emotion: Emotion; at: string; note?: string }
-export type Goal = { id: string; title: string; progress: number; done: boolean }
+/** owner 2026-11-18: daily goals get a check-in each day; long-term goals are checked off once. `progress` is legacy. */
+export type Goal = { id: string; title: string; progress: number; done: boolean; kind?: 'daily' | 'once'; days?: string[]; doneAt?: string }
 export type Feedback = { rating: number; tags: string[]; notes: string; benefits?: string[] } // benefits: 'How do you feel after the session?' (client's words, owner 2026-11-18)
 export type Appointment = {
   id: string; code: string; type: ConsultationId; mode: 'online' | 'in_person'; startsAt: string
@@ -56,7 +58,7 @@ export type Blend = { name: string; version: number; flowers: string[]; drops: n
 export type CartLine = { key: string; qty: number } // key = variantId | 'remedy-reorder' | 'remedy-reorder-spray'
 export type Address = { id: string; name: string; phone: string; line1: string; line2: string; city: string; state: string; pin: string }
 export type OrderLine = { key: string; name: string; label: string; qty: number; pricePaise: number; kind: 'product' | 'remedy' }
-export type Order = { id: string; code: string; lines: OrderLine[]; totalPaise: number; address: Address; placedAt: string; stage: 0 | 1 | 2 | 3; discountPaise?: number; coupon?: string; subscribed?: string[]; review?: { rating: number; text: string; at: string } }
+export type Order = { id: string; code: string; lines: OrderLine[]; totalPaise: number; address: Address; placedAt: string; stage: 0 | 1 | 2 | 3; pickup?: boolean; discountPaise?: number; coupon?: string; subscribed?: string[]; review?: { rating: number; text: string; at: string } }
 export type ChatMsg = { id: string; role: 'user' | 'bot'; text: string; products?: string[]; actions?: { id: string; label: string }[]; safety?: boolean; at: string }
 export type Notice = { id: string; title: string; body: string; at: string; read: boolean; href?: string }
 
@@ -93,7 +95,8 @@ type State = {
   logMood: (e: Emotion, at?: Date, note?: string) => JournalEntry   // journal.createEntry
   updateMood: (id: string, patch: Partial<Pick<JournalEntry, 'emotion' | 'note'>>) => void
   removeMood: (id: string) => void
-  addGoal: (title: string) => void
+  addGoal: (title: string, kind?: 'daily' | 'once') => void
+  checkGoal: (id: string) => boolean                         // daily: toggles today · once: toggles done → returns new checked state
   updateGoal: (id: string, patch: Partial<Goal>) => void
   removeGoal: (id: string) => void
   saveIntake: (answers: IntakeAnswers, step: number) => void // intake.saveIntakeDraft
@@ -156,7 +159,19 @@ export const useApp = create<State>()(
       },
       updateMood: (id, patch) => set((s) => ({ journal: s.journal.map((j) => (j.id === id ? { ...j, ...patch, note: patch.note !== undefined ? (patch.note.trim().slice(0, 500) || undefined) : j.note } : j)) })),
       removeMood: (id) => set((s) => ({ journal: s.journal.filter((j) => j.id !== id) })),
-      addGoal: (title) => set((s) => ({ goals: [...s.goals, { id: uid(), title, progress: 0, done: false }].slice(0, 3) })),
+      addGoal: (title, kind = 'daily') => set((s) => ({ goals: [...s.goals, { id: uid(), title, progress: 0, done: false, kind, days: [] }].slice(0, 5) })),
+      checkGoal: (id) => {
+        const g = get().goals.find((x) => x.id === id); if (!g) return false
+        if ((g.kind ?? 'daily') === 'once') {
+          const done = !g.done
+          set((s) => ({ goals: s.goals.map((x) => (x.id === id ? { ...x, done, progress: done ? 100 : 0, doneAt: done ? new Date().toISOString() : undefined } : x)) }))
+          return done
+        }
+        const today = isoDay(new Date()); const days = g.days ?? []
+        const on = !days.includes(today)
+        set((s) => ({ goals: s.goals.map((x) => (x.id === id ? { ...x, days: on ? [...days, today].slice(-120) : days.filter((d) => d !== today) } : x)) }))
+        return on
+      },
       updateGoal: (id, patch) => set((s) => ({ goals: s.goals.map((g) => (g.id === id ? { ...g, ...patch } : g)) })),
       removeGoal: (id) => set((s) => ({ goals: s.goals.filter((g) => g.id !== id) })),
       saveIntake: (answers, step) => set((s) => ({ intake: { ...(s.intake ?? {}), answers, step } })),
@@ -223,7 +238,8 @@ export const useApp = create<State>()(
         const discountPaise = couponDiscount(s, lines)
         const order: Order = {
           id: uid(), code: `BW-${String(seq).padStart(5, '0')}`, lines, totalPaise: lines.reduce((t, l) => t + l.pricePaise * l.qty, 0) - discountPaise,
-          address: s.addresses.find((a) => a.id === addressId)!, placedAt: new Date().toISOString(), stage: 0,
+          address: addressId === 'pickup' ? { id: 'pickup', name: STUDIO.name, phone: '', line1: STUDIO.line1, line2: STUDIO.line2, city: 'Vadodara', state: 'Gujarat', pin: '390007' } : s.addresses.find((a) => a.id === addressId)!,
+          placedAt: new Date().toISOString(), stage: 0, ...(addressId === 'pickup' ? { pickup: true } : {}),
           ...(discountPaise ? { discountPaise, coupon: s.coupon!.code } : {}), ...(subscribe?.length ? { subscribed: subscribe } : {}),
         }
         set({ orders: [order, ...s.orders], cart: [], seq, ...(discountPaise ? { coupon: { ...s.coupon!, usedAt: new Date().toISOString() } } : {}) })
@@ -281,7 +297,7 @@ function demoState(s: State): Partial<State> {
     drops,
     appointments: [first, next],
     blend: { name: 'Personal blend', version: 1, flowers: ['Mimulus', 'White Chestnut', 'Larch', 'Impatiens', 'Walnut'], drops: 4, timesPerDay: 4, startedOn: d(-13).toISOString(), days: 25, reminderTimes: ['08:00', '13:00', '18:00', '22:00'], alcoholFree: true },
-    goals: s.goals.length ? s.goals : [{ id: uid(), title: 'Sleep by 11 PM', progress: 60, done: false }, { id: uid(), title: 'Morning walk 3× a week', progress: 35, done: false }],
+    goals: s.goals.length ? s.goals : [{ id: uid(), title: 'Sleep by 11 PM', progress: 0, done: false, kind: 'daily', days: [-1, -2, -3].map((n) => isoDay(d(n))) }, { id: uid(), title: 'Finish a 30-day morning walk habit', progress: 0, done: false, kind: 'once' }],
     addresses: s.addresses.length ? s.addresses : [addr],
     orders: [{ id: 'demo-o1', code: 'BW-00040', lines: [{ key: 'remedy', name: 'Personal blend v1', label: '30 ml', qty: 1, pricePaise: 0, kind: 'remedy' }, { key: 'sleep-roll-on-15', name: 'Sleep Roll-on', label: '15 ml', qty: 1, pricePaise: 60000, kind: 'product' }], totalPaise: 60000, address: addr, placedAt: d(-12).toISOString(), stage: 3 }],
     profile: s.profile ? { ...s.profile, allergies: s.profile.allergies.length ? s.profile.allergies : ['lavender'] } : s.profile,

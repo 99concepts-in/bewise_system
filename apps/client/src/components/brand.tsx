@@ -40,9 +40,9 @@ export function Mascot({ pose = 'wave', height = 160, float = true, className, p
   )
 }
 
-export function MoodImg({ mood, size = 56, className }: { mood: Emotion; size?: number; className?: string }) {
+export function MoodImg({ mood, size = 56, className, ink }: { mood: Emotion; size?: number; className?: string; ink?: string }) {
   const m = moodOf(mood)
-  return <MoodFace color={m.color} face={MOOD_FACES[m.key] ?? MOOD_FACES.calm} size={size} className={cx('drop-shadow-[0_6px_8px_rgba(24,41,87,.10)]', className)} />
+  return <MoodFace face={MOOD_FACES[m.key] ?? MOOD_FACES.calm} size={size} className={className} ink={ink} />
 }
 
 /** Tap-to-log mood character with squash bounce + sparkle burst. */

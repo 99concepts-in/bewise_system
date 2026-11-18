@@ -110,7 +110,7 @@ export default function Ask() {
                     <motion.div key={slug} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.1 }} className="card ml-11 flex items-center gap-3 p-3">
                       <ProductArt product={p} size="sm" className="w-[84px] shrink-0" />
                       <div className="flex-1"><p className="text-[16px] font-bold text-navy">{productTitle(p)}</p><p className="text-[13px] text-muted">{v.label} · {formatINR(v.pricePaise)}</p>
-                        <button onClick={(e) => { s.addToCart(v.id); flyToBag(e.currentTarget.getBoundingClientRect(), `${BP}/img/${p.art}.webp`); toast(`${productTitle(p)} added to your bag`) }} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white"><ShoppingBag className="size-3.5" /> Add to bag</button>
+                        <button onClick={(e) => { s.addToCart(v.id); flyToBag(e.currentTarget.getBoundingClientRect(), `${BP}/img/${p.art}.webp`); toast(`${productTitle(p)} added to cart`) }} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white"><ShoppingBag className="size-3.5" /> Add to cart</button>
                       </div>
                     </motion.div>
                   )
