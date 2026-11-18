@@ -58,7 +58,8 @@ function Detail() {
         <div className="card divide-y divide-line px-5">
           <Row icon={<img src={`${BP}/img/jitu.webp`} alt="" className="size-10 rounded-full object-cover" />} t="Jitu Bhaiya" d="Bach Remedy Therapist" />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{a.mode === 'online' ? <Laptop className="size-5" /> : <MapPin className="size-5" />}</span>} t={c.name} d={a.mode === 'online' ? 'Online video call' : STUDIO.full} />
-          <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><FileText className="size-5" /></span>} t={`Paid ${formatINR(a.amountPaise)}`} d="Remedy blend included · receipt in Payments" />
+          <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><FileText className="size-5" /></span>} t={a.payLater && !a.paidAt ? `${formatINR(a.amountPaise)} due after your session` : `Paid ${formatINR(a.amountPaise)}`} d={a.payLater && !a.paidAt ? 'Pay by UPI, card or at the studio' : 'Remedy blend included · receipt in Payments'} />
+          {a.payLater && !a.paidAt && <Btn size="md" variant={past ? 'gradient' : 'white'} className="mt-3" onClick={() => router.push(`/app/pay?appointment=${a.id}`)}>Pay {formatINR(a.amountPaise)} now</Btn>}
         </div>
 
         {!past && (

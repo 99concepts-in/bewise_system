@@ -30,6 +30,8 @@ export type Appointment = {
   source?: 'client' | 'consultant' | 'manager'
   /** paid after the hold expired → no time yet; client picks a new one at no cost (consultant K1 §4.3) */
   needsNewTime?: boolean; paidAt?: string
+  /** owner 2026-11-18: client chose to pay after the consultation (UPI, card or at the studio) */
+  payLater?: boolean
 }
 export type IntakeAnswers = {
   who: 'me' | 'child' | 'someone_else'; dependent?: { name: string; age: string; relation: string }
@@ -157,6 +159,7 @@ export const useApp = create<State>()(
       payAppointment: (id) => {
         const a = get().appointments.find((x) => x.id === id)
         if (!a) return
+        if (a.payLater) { set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString() } : x)) })); get().notify({ title: 'Payment received', body: 'Thank you. Your receipt is in Payments.', href: `/app/sessions/view?id=${id}` }); return }
         const late = a.status === 'expired'
         set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString(), ...(late ? { needsNewTime: true } : { status: 'confirmed' as const }) } : x)) }))
         get().notify(late ? { title: 'Payment received', body: 'Please pick a new time for your session, no extra cost.', href: `/app/pay?appointment=${id}` } : { title: 'You’re booked', body: 'Payment received. See you soon.', href: `/app/sessions/view?id=${id}` })
@@ -237,7 +240,7 @@ function demoState(s: State): Partial<State> {
     journal: [...journal, ...s.journal],
     drops,
     appointments: [first, next],
-    blend: { name: 'Personal blend', version: 1, flowers: ['Mimulus', 'White Chestnut', 'Larch', 'Impatiens', 'Walnut'], drops: 4, timesPerDay: 4, startedOn: d(-13).toISOString(), days: 30, reminderTimes: ['08:00', '13:00', '18:00', '22:00'], alcoholFree: true },
+    blend: { name: 'Personal blend', version: 1, flowers: ['Mimulus', 'White Chestnut', 'Larch', 'Impatiens', 'Walnut'], drops: 4, timesPerDay: 4, startedOn: d(-13).toISOString(), days: 25, reminderTimes: ['08:00', '13:00', '18:00', '22:00'], alcoholFree: true },
     goals: s.goals.length ? s.goals : [{ id: uid(), title: 'Sleep by 11 PM', progress: 60, done: false }, { id: uid(), title: 'Morning walk 3× a week', progress: 35, done: false }],
     addresses: s.addresses.length ? s.addresses : [addr],
     orders: [{ id: 'demo-o1', code: 'BW-00040', lines: [{ key: 'remedy', name: 'Personal blend v1', label: '30 ml', qty: 1, pricePaise: 0, kind: 'remedy' }, { key: 'sleep-roll-on-15', name: 'Sleep Roll-on', label: '15 ml', qty: 1, pricePaise: 60000, kind: 'product' }], totalPaise: 60000, address: addr, placedAt: d(-12).toISOString(), stage: 3 }],

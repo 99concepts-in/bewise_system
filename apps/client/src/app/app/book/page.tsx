@@ -8,7 +8,7 @@
  */
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { CalendarPlus, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Info, Laptop, MapPin, Quote, Sparkles, Video } from 'lucide-react'
+import { CalendarPlus, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Info, Laptop, MapPin, Quote, Sparkles, Video, CalendarCheck2 } from 'lucide-react'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Mascot, Petals } from '@/components/brand'
 import { PaySheet } from '@/components/pay-sheet'
@@ -55,6 +55,7 @@ function Book() {
   const [stories, setStories] = useState(false)
   const [holdUntil, setHoldUntil] = useState(0)
   const [skipAsk, setSkipAsk] = useState(false)
+  const [payWhen, setPayWhen] = useState<'now' | 'later'>('now')
 
   // decided once per visit: submitting the intake mid-flow must not remove the steps we're standing on
   const [needIntake] = useState(() => !intake?.submittedAt)
@@ -92,9 +93,9 @@ function Book() {
   const counted = steps.indexOf(step as string)
   const isIntake = INTAKE.includes(step as never) && step !== 'saved'
 
-  const confirmPaid = () => {
+  const confirmPaid = (later = false) => {
     if (!slot || !mode) return
-    const a = book({ type: c.id, mode, startsAt: slot.toISOString(), amountPaise: c.feePaise })
+    const a = book({ type: c.id, mode, startsAt: slot.toISOString(), amountPaise: c.feePaise, ...(later ? { payLater: true } : {}) })
     setPaying(false); setBooked(a); go('done')
   }
 
@@ -140,7 +141,7 @@ function Book() {
             {step === 'ck-news' && <I.CheckinNews c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} />}
             {step === 'mode' && <Mode mode={mode} setMode={setMode} />}
             {step === 'time' && <TimePicker slot={slot} setSlot={setSlot} initialDay={parseIsoDay(params.get('date'))} />}
-            {step === 'pay' && slot && mode && <Review c={c} slot={slot} mode={mode} holdUntil={holdUntil} onExpire={() => { toast('Your held time was released. Please pick again'); go('time', -1) }} />}
+            {step === 'pay' && slot && mode && <Review c={c} slot={slot} mode={mode} holdUntil={holdUntil} payWhen={payWhen} setPayWhen={setPayWhen} onExpire={() => { toast('Your held time was released. Please pick again'); go('time', -1) }} />}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -150,8 +151,13 @@ function Book() {
           <Btn full variant="gradient" disabled={!type} onClick={next}>{type === 'followup' ? 'Start 2-minute check-in' : 'Continue'}</Btn>
         ) : step === 'pay' ? (
           <>
-            <Btn full variant="gradient" onClick={() => setPaying(true)}><span aria-hidden>🔒</span> Pay {formatINR(c.feePaise)}</Btn>
-            <p className="mt-2 text-center text-[12px] text-muted">Secured by Razorpay · UPI, cards, netbanking</p>
+            {payWhen === 'now' ? <>
+              <Btn full variant="gradient" onClick={() => setPaying(true)}><span aria-hidden>🔒</span> Pay {formatINR(c.feePaise)}</Btn>
+              <p className="mt-2 text-center text-[12px] text-muted">Secured by Razorpay · UPI, cards, netbanking</p>
+            </> : <>
+              <Btn full variant="gradient" onClick={() => confirmPaid(true)}><CalendarCheck2 className="size-5" /> Confirm booking</Btn>
+              <p className="mt-2 text-center text-[12px] text-muted">Pay {formatINR(c.feePaise)} after your session</p>
+            </>}
           </>
         ) : (
           <Btn full variant={can[step] === false ? 'primary' : 'gradient'} disabled={can[step] === false} onClick={next}>
@@ -354,14 +360,14 @@ function Mode({ mode, setMode }: { mode?: 'online' | 'in_person'; setMode: (m: '
   )
 }
 
-function Review({ c, slot, mode, holdUntil, onExpire }: { c: (typeof CONSULTATIONS)[number]; slot: Date; mode: 'online' | 'in_person'; holdUntil: number; onExpire: () => void }) {
+function Review({ c, slot, mode, holdUntil, onExpire, payWhen, setPayWhen }: { c: (typeof CONSULTATIONS)[number]; slot: Date; mode: 'online' | 'in_person'; holdUntil: number; onExpire: () => void; payWhen: 'now' | 'later'; setPayWhen: (v: 'now' | 'later') => void }) {
   const [left, setLeft] = useState(Math.max(0, holdUntil - Date.now()))
   const expire = useStableCallback(onExpire)
   useEffect(() => { const t = setInterval(() => { const l = Math.max(0, holdUntil - Date.now()); setLeft(l); if (l === 0) { clearInterval(t); expire() } }, 1000); return () => clearInterval(t) }, [holdUntil, expire])
   const mm = Math.floor(left / 60000), ss = Math.floor((left % 60000) / 1000)
   return (
     <div className="space-y-4">
-      <h1 className="h-duo">Review & <em>pay</em></h1>
+      <h1 className="h-duo">Review & <em>book</em></h1>
       <div className="card p-5">
         <div className="flex items-center gap-4 border-b border-line pb-4">
           <img src={`${BP}/img/jitu.webp`} alt="" className="size-16 rounded-full object-cover" />
@@ -384,8 +390,25 @@ function Review({ c, slot, mode, holdUntil, onExpire }: { c: (typeof CONSULTATIO
       <div className="flex items-center justify-between px-1">
         <span className="text-[14px] text-muted">We’re holding this time for <b className="tnum text-navy">{mm}:{String(ss).padStart(2, '0')}</b></span>
       </div>
+      <div role="radiogroup" aria-label="When would you like to pay?" className="grid grid-cols-2 gap-2.5">
+        {([
+          { k: 'now', e: '💳', t: 'Pay now', d: 'UPI, cards, netbanking' },
+          { k: 'later', e: '🤝', t: 'Pay after session', d: 'UPI, card or at the studio' },
+        ] as const).map((o) => {
+          const on = payWhen === o.k
+          return (
+            <motion.button key={o.k} type="button" role="radio" aria-checked={on} whileTap={{ scale: 0.97 }} onClick={() => { buzz(6); setPayWhen(o.k) }}
+              className={cx('relative rounded-[22px] p-4 text-left transition-colors', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
+              <span className="text-[22px]" aria-hidden>{o.e}</span>
+              <span className="mt-1.5 block text-[15px] font-bold">{o.t}</span>
+              <span className={cx('block text-[12px] leading-4', on ? 'text-white/75' : 'text-muted')}>{o.d}</span>
+              <AnimatePresence>{on && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring} className="absolute right-3 top-3 grid size-6 place-items-center rounded-full bg-white text-navy"><Check className="size-3.5" strokeWidth={3} /></motion.span>}</AnimatePresence>
+            </motion.button>
+          )
+        })}
+      </div>
       <div className="card flex items-center justify-between p-5">
-        <span className="text-[20px] font-extrabold text-navy">Total</span>
+        <span className="text-[20px] font-extrabold text-navy">{payWhen === 'later' ? 'Due after session' : 'Total'}</span>
         <span className="text-[30px] font-extrabold tracking-[-0.02em] text-navy tnum">{formatINR(c.feePaise)}</span>
       </div>
     </div>
@@ -408,7 +431,7 @@ function Booked({ a }: { a: Appointment }) {
         <span className="grid size-12 place-items-center rounded-full bg-peri-50 text-navy"><CalendarPlus className="size-6" /></span>
         <div><p className="text-[16px] font-bold text-navy">{fmtLongDay(a.startsAt)}</p><p className="text-[14px] text-muted">{fmtTime(a.startsAt)} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya</p></div>
       </motion.div>
-      <p className="mt-3 text-center text-[13px] text-muted">Receipt {a.code} is in Payments. Jitu Bhaiya will read your answers before you meet.</p>
+      <p className="mt-3 text-center text-[13px] text-muted">{a.payLater ? `Booking ${a.code}. You can pay ${formatINR(a.amountPaise)} after your session.` : `Receipt ${a.code} is in Payments.`} Jitu Bhaiya will read your answers before you meet.</p>
       <div className="mt-auto space-y-3 pb-3 pt-6 safe-b">
         <Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View appointment</Btn>
         <Btn full variant="white" onClick={() => setCal(true)}><CalendarPlus className="size-5" /> Add to calendar</Btn>

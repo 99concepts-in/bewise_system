@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — Real product range, shop redesign, owner intake + booking feedback · branch claude/new-session-94881h
+**Status:** Pushed (preview in `apps/client`)
+**Done:** all 18 products from `Bewise Products Range.xlsx` (7 roll-ons ₹600, 4 aura sprays ₹1,200, Bach remedy dropper/spray ₹800 as reorder of the client's own blend, Rescue Remedy, Hair Oil, Beauty mist, 2 bath salts ₹500) · product images made from the owner's photos (cutouts, recoloured roll-on bands, BeWise labels) · shop: categories, "How do you want to feel?" intents, most loved, disclaimer · first consultation pre-selected; follow-up link only · "Skip" with a recommendation dialog (new clients) · feelings as face tiles + "More feelings"; nuance step skipped when empty; sleep faces; duration + goals screens removed; alcohol notes removed; privacy line rewritten · **pay after session** option (booking stays confirmed; pay later from the session) · no em/en dashes in any copy · brochure testimonials (3, verbatim) + WhatsApp 90542 20952 · remedy label facts (lasts up to 25 days, storage, personal use)
+**Tests:** `pnpm build && pnpm test:e2e`: 41 green (6 flows incl. pay later, 11 sizes, axe)
+**Flags for OWNER:** product names "Diabetes", "BP", "Cough & Cold" and sheet claims (blood sugar, BP, immunity, relief from cold) were softened to wellbeing language with "not a medicine" notes because of the DMR Act / no-medical-claims rule; please confirm or have counsel review. Ingredient lists not in the sheet ("full list on the label"). Confirm the brochure clients consent to in-app use. Pay-later needs a staff "mark paid" step in the manager app.
+**Next:** owner review
+
 ## 2026-11-18 — Consultant request + owner rules: drops tick, feedback benefits, booking link, staff-booking pay, check-in link · branch claude/new-session-94881h
 **Status:** Pushed — preview in `apps/client`; merged `origin/main` + consultant branch `claude/new-session-1j1y0u` first
 **Done:** daily "Took my drops" tick (Home + My Remedies, 2 days editable, 14-day strip, gentle copy) · feedback "How do you feel after the session?" → `benefits[]` · public link `/book/jitu-bhaiya?type=` (landing → sign-in → onboarding → booking, type kept) · `/app/pay?appointment=` for consultant/manager-made bookings (no slot picking) + "Payment received — pick a new time" (consultant point 8) · `/app/checkin?appointment=` deep link · welcome slide 3 story: dropper lifts out, 4 drops, Sad → Happy · speed: CSS skeleton, `loading.tsx`, idle prefetch · AA: muted #5F667A, small grey text → muted, peri/rose/sage tokens darkened, roles on labelled elements

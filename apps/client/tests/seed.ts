@@ -17,7 +17,7 @@ export function seedState(opts: { onboarded?: boolean } = {}) {
         { id: 'a3', code: 'BW-A-00042', type: 'followup', mode: 'online', startsAt: at(9, 15), status: 'awaiting_payment', amountPaise: 80000, createdAt: iso(now), source: 'consultant' },
       ],
       intake: { answers: { who: 'me', onMind: '', feelings: ['Fear', 'Overthinking'], nuance: {}, body: [], bodyTypes: [], energy: 3, stress: 3, life: [], lifeOther: '', safety: { medicinesText: '', allergiesText: '' }, goals: [], goalText: '', consentAi: true }, step: 99, submittedAt: iso(now - 16 * D) },
-      blend: { name: 'Personal blend', version: 1, flowers: ['Mimulus', 'White Chestnut', 'Larch'], drops: 4, timesPerDay: 4, startedOn: iso(now - 13 * D), days: 30, reminderTimes: ['08:00', '13:00', '18:00', '22:00'], alcoholFree: true },
+      blend: { name: 'Personal blend', version: 1, flowers: ['Mimulus', 'White Chestnut', 'Larch'], drops: 4, timesPerDay: 4, startedOn: iso(now - 13 * D), days: 25, reminderTimes: ['08:00', '13:00', '18:00', '22:00'], alcoholFree: true },
       drops: { [day(-1)]: true, [day(-2)]: false, [day(-3)]: true },
       checkins: {}, cart: [{ key: 'sleep-roll-on-15', qty: 1 }], wishlist: ['aura-spray'],
       addresses: [{ id: 'ad1', name: 'Priya Shah', phone: '9876543210', line1: '12, Shanti Kunj', line2: 'Alkapuri', city: 'Vadodara', state: 'Gujarat', pin: '390007' }],

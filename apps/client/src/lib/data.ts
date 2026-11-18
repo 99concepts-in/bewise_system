@@ -115,7 +115,14 @@ export type ConsultationId = (typeof CONSULTATIONS)[number]['id']
  * Never invent or edit meaning. No cure / medical claims in quotes. Shown in the booking screen's "Client stories" sheet.
  * e.g. { name: 'Monika', city: 'Vadodara', quote: '…', rating: 5 }
  */
-export const TESTIMONIALS: { name: string; city?: string; quote: string; rating?: number }[] = []
+/** Client words as published in the owner's BeWise Holistic Wellness brochure (supplied 2026-11-18), quoted verbatim. */
+export const TESTIMONIALS: { name: string; city?: string; quote: string; rating?: number }[] = [
+  { name: 'Akshay Magnani', quote: 'His bach flower remedy, aroma therapy and consultation on important decisions of my life has literally helped me change my life. He has amazing intuitive skills.' },
+  { name: 'Divya Solanki', quote: 'His bach flower and aroma therapy work like magic; drastic changes in my thoughts, goals and nature; in short, I received a life upgrade.' },
+  { name: 'Khushboo Gurnani', quote: 'Jitendra Khimlani has the best Bach flower & aroma oils therapy. I’ve benefited drastically mentally. It gave me a sense of calm and sound sleep after I took the treatment.' },
+]
+/** BeWise contact from the brochure and remedy label. */
+export const CONTACT = { whatsapp: '919054220952', whatsappLabel: '90542 20952', social: '@bewiseglobal' }
 export const TESTIMONIALS_SOURCE = 'https://www.jitendrakhimlani.com'
 
 /** In-person studio (owner 2026-11-18; CONTENT-CHECKLIST #7). */
@@ -249,15 +256,15 @@ export const PRODUCTS: Product[] = [
     variants: [{ id: 'bach-remedy-dropper-30', label: '30 ml', pricePaise: 80000 }], allergens: [],
     about: 'A personalised blend of Bach flower essences, chosen by Jitu Bhaiya for how you feel. Your first blend comes with your consultation; reorder the same blend here anytime.',
     feel: ['Made for you', 'Gentle', 'Natural'], ingredients: 'Bach flower essences chosen for you by Jitu Bhaiya.',
-    howTo: 'Take 4 drops, 4 times a day, directly or in any drink you like, or as your Bach expert suggests.',
-    safety: 'Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor. Please don’t stop any medicine without medical advice.' },
+    howTo: 'Take 4 drops, 4 times a day, directly or in any drink you like, or as your Bach expert suggests. A bottle lasts up to 25 days when taken regularly.',
+    safety: 'An individual, customised remedy for personal use only. Store at room temperature, away from direct sunlight, and keep away from children. Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor.' },
   { slug: 'bach-remedy-spray', name: 'Bach Remedy Spray', tagline: 'Your personal blend, spray', format: 'Spray', category: 'remedies', intents: ['calm'],
     art: 'products/bach-remedy-spray', color: '#5E8F6A', tint: ['#e5efe2', '#eef1fb'], personal: 'spray',
     variants: [{ id: 'bach-remedy-spray-30', label: '30 ml', pricePaise: 80000 }], allergens: [],
     about: 'Your personalised Bach flower blend in an easy spray, handy on the go. Available once Jitu Bhaiya has prepared your blend.',
     feel: ['Made for you', 'On the go', 'Gentle'], ingredients: 'Bach flower essences chosen for you by Jitu Bhaiya.',
     howTo: 'Spray directly into your mouth, 3 sprays per dose, 4 times a day, or as your Bach expert recommends.',
-    safety: 'Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor. Please don’t stop any medicine without medical advice.' },
+    safety: 'An individual, customised remedy for personal use only. Store at room temperature, away from direct sunlight, and keep away from children. Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor.' },
   { slug: 'rescue-remedy', name: 'Rescue Remedy', tagline: 'For stressful moments', format: 'Spray', category: 'remedies', intents: ['calm'],
     art: 'products/rescue-remedy-spray', color: '#C7892E', tint: ['#fbf0dc', '#fbf3dc'],
     variants: [{ id: 'rescue-remedy-30', label: '30 ml', pricePaise: 80000 }], allergens: [],

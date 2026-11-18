@@ -57,7 +57,7 @@ function Pay() {
   )
 
   // ---- already paid
-  if (a.status === 'confirmed' && !done) return (
+  if ((a.paidAt || (a.status === 'confirmed' && !a.payLater)) && !done) return (
     <main className="px-5 pb-32"><AppHeader back="/app" />
       <div className="card mt-6 p-8 text-center"><CalendarCheck2 className="mx-auto size-10 text-sage" /><p className="mt-3 text-[17px] font-bold text-navy">This session is already paid</p>
         <Btn className="mt-5" size="md" onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View session</Btn></div>
@@ -67,7 +67,7 @@ function Pay() {
   if (done) return (
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       <Petals />
-      <h1 className="h-duo mt-12 text-[36px]">You’re <em>booked</em></h1>
+      <h1 className="h-duo mt-12 text-[36px]">{a.payLater ? <>Thank <em>you</em></> : <>You’re <em>booked</em></>}</h1>
       <motion.div className="mx-auto mt-4" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 13 }}><Mascot pose="wave" height={230} priority /></motion.div>
       <p className="mt-3 text-center text-[15px] text-muted">{fmtLongDay(a.startsAt)} · {fmtTime(a.startsAt)}</p>
       <div className="mt-auto pb-3 pt-6 safe-b"><Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View appointment</Btn></div>
@@ -80,7 +80,7 @@ function Pay() {
       <AppHeader back="/app" />
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="mt-2 flex items-center gap-3">
         <img src={`${BP}/img/jitu.webp`} alt="" className="size-14 rounded-full object-cover ring-4 ring-white shadow-[var(--shadow-card)]" />
-        <div><p className="text-[13px] font-semibold text-peri">{by} booked this for you</p><h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">Complete your <span className="text-soft">booking</span></h1></div>
+        <div><p className="text-[13px] font-semibold text-peri">{a.payLater ? 'Your session with Jitu Bhaiya' : `${by} booked this for you`}</p><h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">{a.payLater ? <>Pay for your <span className="text-soft">session</span></> : <>Complete your <span className="text-soft">booking</span></>}</h1></div>
       </motion.div>
       <section className="card mt-5 p-5">
         {[

@@ -66,3 +66,21 @@ test('check-in deep link saves against the appointment', async ({ page }) => {
   expect((await state(page)).checkins.a2.answers.now).toBe('calm')
   await page.goto('/app/sessions/view?id=a2'); await expect(page.getByText('Check-in shared')).toBeVisible()
 })
+
+test('pay after session: due shown on the session, paying keeps it booked', async ({ page }) => {
+  await seed(page)
+  await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem('bewise-client-v1')!)
+    raw.state.appointments = raw.state.appointments.map((a: { id: string }) => (a.id === 'a2' ? { ...a, payLater: true, status: 'confirmed' } : a))
+    localStorage.setItem('bewise-client-v1', JSON.stringify(raw))
+  })
+  await page.goto('/app/sessions/view?id=a2')
+  await expect(page.getByText(/due after your session/)).toBeVisible()
+  await page.getByRole('button', { name: /now$/ }).click()
+  await expect(page.getByText('Your session with Jitu Bhaiya')).toBeVisible()
+  await page.getByRole('button', { name: /Pay ₹/ }).click(); await page.getByRole('button', { name: 'Google Pay' }).click()
+  await expect(page.getByRole('heading', { name: 'Thank you' })).toBeVisible({ timeout: 8000 })
+  const s = await state(page)
+  const a = s.appointments.find((x: { id: string }) => x.id === 'a2')
+  expect(a.status).toBe('confirmed'); expect(a.paidAt).toBeTruthy()
+})
