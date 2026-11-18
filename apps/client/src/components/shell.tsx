@@ -31,6 +31,27 @@ const NAV_ROOTS = new Set(['/app', '/app/remedies', '/app/book', '/app/shop', '/
 /** Static hosting serves /app/ (trailing slash) — compare routes without it. */
 export const usePath = () => { const p = usePathname() || '/'; return p.length > 1 ? p.replace(/\/+$/, '') : p }
 
+// In-app history (paths only), so Back steps back instead of pushing a new page: pushing the parent made
+// Checkout → Bag → (back) Checkout loop forever (owner 2026-11-18).
+const trail: string[] = []
+function useTrail() {
+  const path = usePath()
+  useEffect(() => {
+    if (trail[trail.length - 1] === path) return
+    if (trail[trail.length - 2] === path) trail.pop() // went back
+    else trail.push(path)
+    if (trail.length > 50) trail.shift()
+  }, [path])
+}
+function useBack(target?: string) {
+  const router = useRouter()
+  return () => {
+    const prev = trail[trail.length - 2]
+    if (prev && (!target || prev === target)) return router.back()
+    router.replace(target ?? '/app')
+  }
+}
+
 function BottomNav() {
   const path = usePath()
   const hidden = useUi((s) => s.navHidden)
@@ -66,7 +87,7 @@ function BottomNav() {
 }
 
 export function AppHeader({ back, right, title }: { back?: boolean | string; right?: ReactNode; title?: string }) {
-  const router = useRouter()
+  const goBack = useBack(typeof back === 'string' ? back : undefined)
   const { openNotices } = useChrome()
   const unread = useApp((s) => s.notices.filter((n) => !n.read).length)
   const profile = useApp((s) => s.profile)
@@ -74,7 +95,7 @@ export function AppHeader({ back, right, title }: { back?: boolean | string; rig
     <header className="sticky top-0 z-30 -mx-5 flex items-center justify-between gap-3 bg-[linear-gradient(180deg,#dce2f5_0%,#dfe4f6_72%,rgba(223,228,246,0)_100%)] px-5 pb-4 pt-2 safe-t">
       {back ? (
         <div className="flex items-center gap-3">
-          <IconBtn label="Back" onClick={() => (typeof back === 'string' ? router.push(back) : router.back())}><ChevronLeft className="size-5" /></IconBtn>
+          <IconBtn label="Back" onClick={goBack}><ChevronLeft className="size-5" /></IconBtn>
           {title ? <span className="text-[16px] font-bold text-navy">{title}</span> : null}
         </div>
       ) : (
@@ -253,6 +274,7 @@ function IdlePrefetch() {
 }
 
 export function AppChrome({ children }: { children: ReactNode }) {
+  useTrail()
   const [log, setLog] = useState(false)
   const [notes, setNotes] = useState(false)
   const [entry, setEntry] = useState<string | null>(null)

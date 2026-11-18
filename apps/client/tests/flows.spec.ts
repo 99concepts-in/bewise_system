@@ -123,3 +123,25 @@ test('follow-up with a plan: pay first, then request a preferred time', async ({
   const a = s.appointments[s.appointments.length - 1]
   expect(a.timeRequested).toBe(true); expect(a.planId).toBe('yearly'); expect(s.plan.used).toBe(1)
 })
+
+test('checkout: pick up from studio, pay, then say yes to subscribing', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/checkout')
+  await page.getByRole('radio', { name: /Pick up from studio/ }).click()
+  await expect(page.getByText('Ready in 1 to 2 days', { exact: false })).toBeVisible()
+  await page.getByRole('button', { name: /^🔒 Pay|Pay ₹/ }).click(); await page.getByRole('button', { name: 'Google Pay' }).click()
+  await expect(page.getByRole('heading', { name: /Thank you/ })).toBeVisible({ timeout: 8000 })
+  await expect(page.getByText('Never run out')).toBeVisible({ timeout: 5000 })
+  await page.getByRole('button', { name: 'Yes, subscribe' }).click()
+  const s = await state(page)
+  expect(s.orders[0].pickup).toBe(true); expect(s.orders[0].subscribed).toEqual(['sleep-roll-on-15'])
+})
+
+test('back from checkout returns to the bag, then to the shop (no loop)', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/shop')
+  await page.getByRole('link', { name: /^Bag/ }).first().click(); await page.waitForURL('**/app/bag**')
+  await page.getByRole('link', { name: /checkout/i }).or(page.getByRole('button', { name: /checkout/i })).first().click(); await page.waitForURL('**/app/checkout**')
+  await page.getByRole('button', { name: 'Back' }).click(); await page.waitForURL('**/app/bag**')
+  await page.getByRole('button', { name: 'Back' }).click(); await page.waitForURL(/\/app\/shop\/?$/)
+})

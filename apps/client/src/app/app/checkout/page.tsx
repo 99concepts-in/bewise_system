@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { Mascot, Petals } from '@/components/brand'
 import { PaySheet } from '@/components/pay-sheet'
 import { AppHeader } from '@/components/shell'
-import { Btn, Sheet, Toggle, cx, ease, spring } from '@/components/ui'
+import { Btn, Sheet, cx, ease, spring, toast } from '@/components/ui'
 import { useApp, type Order } from '@/lib/store'
 import { STUDIO } from '@/lib/data'
 import { addDays, fmtDay, formatINR } from '@/lib/format'
@@ -34,8 +34,6 @@ export default function Checkout() {
   const [how, setHow] = useState<'ship' | 'pickup'>('ship')
   const payable = how === 'pickup' ? total - ship : total
   const [ask, setAsk] = useState(false)
-  const [subs, setSubs] = useState<string[]>([])
-  const products = lines.filter((x) => x.i!.kind === 'product')
   const [done, setDone] = useState<Order>()
   useEffect(() => { if (!lines.length && !done) router.replace('/app/bag') }, [lines.length, done, router])
   useEffect(() => { const h = PIN_HINT[f.pin.slice(0, 3)]; if (f.pin.length === 6 && h && !f.city) setF((x) => ({ ...x, city: h[0], state: h[1] })) }, [f.pin, f.city])
@@ -60,6 +58,7 @@ export default function Checkout() {
         <Btn full onClick={() => router.replace(`/app/orders/view?id=${done.id}`)}>Track order</Btn>
         <Btn full variant="ghost" size="md" onClick={() => router.replace('/app/shop')}>Continue browsing</Btn>
       </div>
+      <SubscribeSheet open={ask} order={done} onClose={() => setAsk(false)} />
     </main>
   )
 
@@ -136,33 +135,49 @@ export default function Checkout() {
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
-        <Btn full variant="gradient" disabled={how === 'ship' && (!sel || adding)} onClick={() => (products.length ? setAsk(true) : setPay(true))}><span aria-hidden>🔒</span> Pay {formatINR(payable)}</Btn>
+        <Btn full variant="gradient" disabled={how === 'ship' && (!sel || adding)} onClick={() => setPay(true)}><span aria-hidden>🔒</span> Pay {formatINR(payable)}</Btn>
       </div>
-      <PaySheet open={pay} amountPaise={payable} purpose="Your order" onClose={() => setPay(false)} onPaid={() => { if (how === 'ship' && !sel) return; const o = placeOrder(how === 'pickup' ? 'pickup' : sel!, subs); setPay(false); setDone(o) }} />
-      {/* owner 2026-11-18: offer a subscription before the order; the order is only placed once they confirm */}
-      <Sheet open={ask} onClose={() => setAsk(false)} title="Make it a ritual?">
-        <div className="text-center">
-          <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#fbf3dc] text-[26px]" aria-hidden>🔁</span>
-          <h2 className="h-duo mt-3 text-[26px]">Make it a <em>ritual?</em></h2>
-          <p className="mx-auto mt-1 max-w-[300px] text-[14px] leading-5 text-muted">Subscribe and we’ll send a fresh bottle every 30 days. Pause or cancel anytime on WhatsApp.</p>
-        </div>
-        <ul className="mt-4 space-y-2">
-          {products.map(({ l, i }) => {
-            const on = subs.includes(l.key)
-            return (
-              <li key={l.key} className="flex items-center gap-3 rounded-[18px] bg-peri-50/70 px-4 py-3">
-                <span className="min-w-0 flex-1"><span className="block truncate text-[15px] font-bold text-navy">{i!.name}</span><span className="text-[12px] text-muted">{i!.label} · every 30 days</span></span>
-                <Toggle label={`Subscribe to ${i!.name}`} on={on} onChange={() => setSubs(on ? subs.filter((k) => k !== l.key) : [...subs, l.key])} />
-              </li>
-            )
-          })}
-        </ul>
-        <div className="mt-5 space-y-2 pb-1">
-          <Btn full onClick={() => { setAsk(false); setPay(true) }}>{subs.length ? `Confirm & subscribe` : 'Confirm order'}</Btn>
-          {subs.length > 0 && <p className="text-center text-[12px] text-muted">You pay for this order now. Each refill is confirmed with you on WhatsApp first.</p>}
-        </div>
-      </Sheet>
+      <PaySheet open={pay} amountPaise={payable} purpose="Your order" onClose={() => setPay(false)} onPaid={() => { if (how === 'ship' && !sel) return; const o = placeOrder(how === 'pickup' ? 'pickup' : sel!); setPay(false); setDone(o); if (o.lines.some((l) => l.kind === 'product')) setTimeout(() => setAsk(true), 1400) }} />
     </main>
+  )
+}
+
+const PERKS = [
+  { e: '🌿', t: 'Never run out', d: 'A fresh bottle reaches you every 30 days, so your ritual keeps going.' },
+  { e: '💬', t: 'Nothing ships without your OK', d: 'We confirm every refill with you on WhatsApp first.' },
+  { e: '🔔', t: 'A gentle heads-up', d: 'We remind you a few days before each refill, so it always suits you.' },
+  { e: '⏸️', t: 'Pause or cancel anytime', d: 'One message on WhatsApp. No lock-in, no questions.' },
+]
+
+/** owner 2026-11-18: after purchase, ask (Yes / No) whether to subscribe to what they just bought, with what it means. */
+function SubscribeSheet({ open, order, onClose }: { open: boolean; order: Order; onClose: () => void }) {
+  const subscribe = useApp((s) => s.subscribeOrder)
+  const items = order.lines.filter((l) => l.kind === 'product')
+  const names = items.map((l) => l.name).join(', ')
+  return (
+    <Sheet open={open} onClose={onClose} title="Make it a ritual?">
+      <div className="text-center">
+        <motion.div className="mx-auto w-fit origin-bottom" aria-hidden initial={{ y: 24, opacity: 0, scale: 0.8 }} animate={{ y: 0, opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 16 }}>
+          <motion.div className="origin-bottom" animate={{ rotate: [0, -8, 8, -6, 6, 0], y: [0, -6, 0, -3, 0, 0] }} transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 1.4, ease: 'easeInOut' }}>
+            <Mascot pose="wave" height={104} float={false} priority />
+          </motion.div>
+        </motion.div>
+        <h2 className="h-duo mt-2 text-[26px]">Make it a <em>ritual?</em></h2>
+        <p className="mx-auto mt-1 max-w-[310px] text-[14px] leading-5 text-muted">Would you like {names} delivered every 30 days? Rituals work best when they’re regular.</p>
+      </div>
+      <ul className="mt-4 space-y-2.5">
+        {PERKS.map((p, i) => (
+          <motion.li key={p.t} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.07 }} className="flex items-start gap-3 rounded-[18px] bg-peri-50/70 px-4 py-3">
+            <span className="text-[20px] leading-6" aria-hidden>{p.e}</span>
+            <span><span className="block text-[14px] font-bold text-navy">{p.t}</span><span className="block text-[12px] leading-4 text-muted">{p.d}</span></span>
+          </motion.li>
+        ))}
+      </ul>
+      <div className="mt-5 grid grid-cols-2 gap-2.5 pb-1">
+        <Btn full variant="white" onClick={onClose}>No, thanks</Btn>
+        <Btn full onClick={() => { subscribe(order.id, items.map((l) => l.key)); toast('Subscribed. We’ll check with you on WhatsApp before each refill'); onClose() }}>Yes, subscribe</Btn>
+      </div>
+    </Sheet>
   )
 }
 

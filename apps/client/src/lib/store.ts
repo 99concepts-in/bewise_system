@@ -119,6 +119,7 @@ type State = {
   setOffer: (o: { skippedAt?: string; downsellAt?: string }) => void
   confirmTime: (id: string) => void                            // preview only: Jitu Bhaiya / Haresh bhai approve the preferred time
   reviewOrder: (id: string, rating: number, text: string) => void
+  subscribeOrder: (id: string, keys: string[]) => void          // commerce.createSubscription (refills confirmed on WhatsApp)
   pushChat: (m: Omit<ChatMsg, 'id' | 'at'>) => void
   clearChat: () => void
   readNotices: () => void
@@ -259,6 +260,7 @@ export const useApp = create<State>()(
         set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, timeRequested: false } : x)) }))
         get().notify({ title: 'Your time is confirmed', body: 'Jitu Bhaiya will see you then.', href: `/app/sessions/view?id=${id}` })
       },
+      subscribeOrder: (id, keys) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, subscribed: keys } : o)) })),
       reviewOrder: (id, rating, text) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, review: { rating, text, at: new Date().toISOString() } } : o)) })),
       pushChat: (m) => set((s) => ({ chat: [...s.chat, { ...m, id: uid(), at: new Date().toISOString() }].slice(-80) })),
       clearChat: () => set({ chat: [] }),
