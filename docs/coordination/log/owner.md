@@ -2,6 +2,23 @@
 
 > Only the OWNER chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — Staff bookings: greet then auto payment link; settings keys; requests answered (branch claude/new-session-k130h4)
+**Status:** Specs done — build waits for `FOUNDATION: ✅` (O1 settings, O2 links, O3 templates)
+**Done:** merged origin/main + `claude/new-session-1j1y0u`. New `docs/specs/owner/08-BOOKING-GREETING-AND-AUTOPAY.md`: staff greet
+first, BeWise creates + sends the appointment payment link automatically (staff can't send links), WhatsApp 24 h window vs templates
+`booking_greeting` / `payment_link_appointment` / `checkin_form_ask` / `drops_nudge` / `intake_unfinished_24h`, safety alert to Jitu
+Bhaiya only with a nameless lock-screen text, "Your impact" counts-only API. `06-SETTINGS-KEYS.md`: `remedy.reorder_price`,
+`policy.reschedule`, `consultant.weekly_goal` (25), `consultant.lifetime_reach`, `booking.link_slug`, `booking.staff_hold_hours`,
+`safety.helplines`, `privacy.intake_retention_months` + all MANAGER keys. Replied in 4 requests (all ACCEPTED). Manager Money tiles
+fixed in shared `Stat` (owner asked; MANAGER to review). Owner prototype + landing page use `--muted #5F667A` (AA).
+**Contracts proposed (additive):** `appointment.greeting_sent` (CONSULTANT), `holdAppointment.source/holdHours`,
+`notifications.getWhatsAppWindow`, `analytics.getConsultantImpact`, `approvals.requestApproval` + `approval.decided`,
+`createCheckout` ZERO_AMOUNT error for ₹0 orders.
+**Requests:** to HUB `20261118-owner-to-hub-decisions-ai-blends-contrast.md` (D-36 required, alcohol-free blends, AI data leaves
+India, muted token, open owner questions).
+**Blocked:** foundation (no app yet); WhatsApp BSP + Meta template approval (D-07); Razorpay test keys (D-05); GSTIN/accountant (D-13); domain (D-12).
+**Next:** O1 settings + roles as soon as the foundation lands.
+
 ## 2026-11-18 — Owner prototype: responsive fixes (owner report: "Today so far" tiles clipped)
 **Status:** Fixed, merged and live
 **Done:** automated overflow audit (13 routes × 17 widths, 320–1536 px) found 35 issues, all fixed: Today card now uses
