@@ -11,6 +11,7 @@ import { ArrowRight, BookOpen, Check, ChevronRight, Lightbulb, Sparkles, Video }
 import { useMemo, useState } from 'react'
 import { Mascot, MoodButton, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
+import { ConsultInviteArt, SessionDateArt } from '@/components/session-art'
 import { Btn, BtnLink, Item, Reveal, Ring, buzz, spring, toast, useChrome, useNow } from '@/components/ui'
 import { CONSULTATIONS, QUICK_MOODS, moodOf, type Emotion } from '@/lib/data'
 import { useApp, type Appointment } from '@/lib/store'
@@ -128,11 +129,11 @@ function ContextCard() {
     return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitu Bhaiya." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} img={`${BP}/img/mood-grateful.webp`} />
   if (blend && any)
     return <Ctx tone="sage" kicker="Check in" title="Time for your follow-up" body="See how you’re doing and refresh your blend · ₹800, blend included." cta="Book follow-up" href="/app/book?type=followup" img={`${BP}/img/owl-bottle.webp`} />
-  return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm, unhurried conversation with Jitu Bhaiya · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" img={`${BP}/img/cat-consult.webp`} wide />
+  return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm, unhurried conversation with Jitu Bhaiya · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" art={<ConsultInviteArt />} wide />
 }
 
 const TONES = { peri: 'bg-[linear-gradient(135deg,#ffffff_40%,#e9edfa)]', navy: 'bg-[linear-gradient(135deg,#182957,#3c5596)] text-white', rose: 'bg-[linear-gradient(135deg,#fff_40%,#fbe9ee)]', sage: 'bg-[linear-gradient(135deg,#fff_40%,#e5efe2)]' }
-function Ctx({ tone, kicker, title, body, cta, href, img, icon, wide }: { tone: keyof typeof TONES; kicker: string; title: string; body: string; cta: string; href: string; img?: string; icon?: React.ReactNode; wide?: boolean }) {
+function Ctx({ tone, kicker, title, body, cta, href, img, icon, wide, art }: { tone: keyof typeof TONES; kicker: string; title: string; body: string; cta: string; href: string; img?: string; icon?: React.ReactNode; wide?: boolean; art?: React.ReactNode }) {
   const dark = tone === 'navy'
   return (
     <section className={`relative overflow-hidden rounded-[28px] p-5 shadow-[var(--shadow-card)] ${TONES[tone]}`}>
@@ -142,6 +143,7 @@ function Ctx({ tone, kicker, title, body, cta, href, img, icon, wide }: { tone: 
         <p className={`mt-1 text-[14px] leading-5 ${dark ? 'text-white/80' : 'text-muted'}`}>{body}</p>
         <BtnLink href={href} size="sm" variant={dark ? 'white' : 'primary'} className="mt-4">{icon}{cta}<ArrowRight className="size-4" /></BtnLink>
       </div>
+      {art}
       {img && <motion.img src={img} alt="" aria-hidden className={`absolute bottom-0 object-contain ${wide ? 'multiply -right-2 h-[118px]' : 'right-3 h-[108px]'}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, ...spring }} />}
     </section>
   )
@@ -153,7 +155,7 @@ function NextSession({ a, onOpen }: { a: Appointment; onOpen: () => void }) {
     <section className="card relative overflow-hidden p-5">
       <h2 className="h-section">Next session</h2>
       <div className="mt-3 flex items-center gap-4">
-        <img src={`${BP}/img/cat-consult.webp`} alt="" aria-hidden className="multiply h-[96px] w-[118px] rounded-[18px] object-cover" />
+        <SessionDateArt startsAt={a.startsAt} mode={a.mode} />
         <div className="flex-1">
           <p className="text-[15px] font-semibold text-navy">{fmtDay(a.startsAt)} · {fmtTime(a.startsAt)}</p>
           <p className="text-[13px] text-muted">{c.name} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya</p>
