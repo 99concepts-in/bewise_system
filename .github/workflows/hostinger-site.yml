@@ -1,0 +1,89 @@
+# @owner HUB · Builds the WHOLE BeWise system (landing + client + consultant + manager + owner) and deploys it to Hostinger.
+#   Every push to main →
+#     1. zip artifact "bewise-hostinger-site" (manual upload)            — always
+#     2. branch hostinger-site (for hPanel → Advanced → Git)             — always
+#     3. FTP sync of changed files to Hostinger                         — when secrets HOSTINGER_FTP_SERVER/USERNAME/PASSWORD exist
+#     4. ping Hostinger Git auto-deploy webhook                         — when secret HOSTINGER_WEBHOOK_URL exists
+# Setup guide: hosting/HOSTINGER-WHOLE-SITE.md. Prototypes with sample data only.
+name: Whole system → Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hostinger-site
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      FTP_SERVER: ${{ secrets.HOSTINGER_FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+      WEBHOOK_URL: ${{ secrets.HOSTINGER_WEBHOOK_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pillow
+
+      - name: Build whole site
+        run: bash hosting/build-hostinger-site.sh
+        env:
+          SITE_BASE: ${{ vars.HOSTINGER_BASE_PATH }}
+          NEXT_TELEMETRY_DISABLED: '1'
+
+      - name: Zip for manual upload (Actions → this run → Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bewise-hostinger-site
+          path: dist/bewise-hostinger-site.zip
+          retention-days: 30
+
+      - name: Publish to hostinger-site branch (for hPanel → Advanced → Git)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist/hostinger-site
+          publish_branch: hostinger-site
+          force_orphan: true
+          enable_jekyll: true
+          commit_message: 'Hostinger whole-site build ${{ github.sha }}'
+
+      - name: Deploy to Hostinger over FTP (only changed files)
+        if: env.FTP_SERVER != '' && env.FTP_USERNAME != '' && env.FTP_PASSWORD != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_SERVER }}
+          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          protocol: ${{ vars.HOSTINGER_FTP_PROTOCOL || 'ftps' }}
+          port: ${{ vars.HOSTINGER_FTP_PORT || 21 }}
+          local-dir: dist/hostinger-site/
+          server-dir: ${{ vars.HOSTINGER_FTP_DIR || './' }}
+
+      - name: Trigger Hostinger Git auto-deploy
+        if: env.WEBHOOK_URL != ''
+        run: curl -fsS -X POST "$WEBHOOK_URL" -o /dev/null && echo "Hostinger deploy triggered"
+
+      - name: Summary
+        run: |
+          {
+            echo "### BeWise whole system → Hostinger"
+            if [ -n "$FTP_SERVER" ]; then echo "- ✅ FTP sync to Hostinger (\`${{ vars.HOSTINGER_FTP_DIR || './' }}\`)"; else echo "- ⏭️ FTP skipped — add secrets HOSTINGER_FTP_SERVER / HOSTINGER_FTP_USERNAME / HOSTINGER_FTP_PASSWORD"; fi
+            if [ -n "$WEBHOOK_URL" ]; then echo "- ✅ Hostinger Git webhook pinged"; fi
+            echo "- 📦 Zip artifact + branch \`hostinger-site\` updated · $(cat dist/hostinger-site/version.txt)"
+          } >> "$GITHUB_STEP_SUMMARY"

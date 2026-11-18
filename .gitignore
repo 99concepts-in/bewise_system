@@ -1,0 +1,4 @@
+# build output (HUB)
+/dist/
+node_modules/
+.DS_Store
