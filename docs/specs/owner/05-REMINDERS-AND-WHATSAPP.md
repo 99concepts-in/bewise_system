@@ -42,7 +42,11 @@ provider webhook (/api/webhooks/whatsapp) ─▶ delivery status sent/delivered/
 | Expense decided | submitter | `expense.approved/rejected` | in-app | — |
 | Low stock / failed delivery | Haresh (+ owner alert tile) | `stock.low`, `shipment.failed` | in-app | — |
 | Daily summary | owner | 20:00 IST | push + in-app | — |
-| Safety flag | **Jitu Bhaiya only** (D-38) | `intake.safety_flagged` | push + in-app, priority | — never to owner |
+| Safety flag | **Jitu Bhaiya only** (D-38) | `intake.safety_flagged` | push + in-app, priority; lock screen says only "a client needs your attention" (no name, 08 §4) | — never to owner |
+| Staff booking greeting → payment link | client | `appointment.greeting_sent` | WhatsApp (session text or template) → link sent automatically | paid / hold expired (08) |
+| Unfinished intake | client | 24 h after last edit of a draft (`intake.draft_abandoned`) | WhatsApp + in-app, once | submitted |
+| Check-in ask before follow-up | client | 48 h before a follow-up without a check-in | WhatsApp + in-app, once | check-in done |
+| Drops nudge (opt-in) | client | daily at the ritual time, if no drops logged | in-app (+ WhatsApp if opted in) | logged / opt-out |
 
 ## 3. WhatsApp templates (submitted to Meta for approval)
 Category **utility** unless noted. `{{n}}` = variables. Buttons: URL buttons point to `https://{domain}/app/...` deep links (D-12).
@@ -65,6 +69,7 @@ Tone: warm, short, no medical claims (brand guide §7).
 | `followup_due` | Hi {{1}}, it's time for your follow-up with Jitu Bhaiya. Book a time that suits you. | name | Book follow-up |
 | `remedy_reorder_nudge` — **marketing** (Meta may reclassify) | Hi {{1}}, your blend has about {{2}} days left. Reorder in one tap. | name, days | Reorder |
 | `otp_login` — **authentication** (HUB / SMS provider D-04) | {{1}} is your BeWise code. | code | Copy code |
+| `booking_greeting`, `payment_link_appointment`, `checkin_form_ask`, `drops_nudge`, `intake_unfinished_24h` | see `08-BOOKING-GREETING-AND-AUTOPAY.md` §4 | | |
 
 Staff messages (owner, Haresh, Jitu Bhaiya) use **in-app + web push**, not WhatsApp, in v1. No template approval is needed and there are no per-message costs.
 
