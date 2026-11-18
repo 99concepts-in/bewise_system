@@ -5,6 +5,7 @@
  * @screens  CL-01 Splash · CL-02 Welcome story — owner copy 2026-11-18: welcome · book with Jitendra Khimlani · Bach flower benefits
  */
 import { useRouter } from 'next/navigation'
+import { preload } from 'react-dom'
 import { AnimatePresence, motion, type PanInfo } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { LogoMark, Mascot, MoodImg } from '@/components/brand'
@@ -18,7 +19,11 @@ const SLIDES = [
   { lead: 'Bach flower remedy', em: 'benefits', sub: '38 natural flower essences that gently support emotional balance, chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'A few drops a day'] },
 ] as { lead: string; em: string; sub: string; chips?: string[] }[]
 
+// owner 2026-11-18: slide images felt slow; fetch them all up front (during the 1.9 s splash) at high priority
+const WELCOME_IMAGES = ['img/owl-wave.webp', 'img/jitu-portrait.webp', 'img/f-rose.webp', 'img/f-mimulus.webp']
+
 export default function Welcome() {
+  for (const src of WELCOME_IMAGES) preload(`${BP}/${src}`, { as: 'image', fetchPriority: 'high' })
   const router = useRouter()
   const [phase, setPhase] = useState<'splash' | 'story'>('splash')
   const [i, setI] = useState(0)
@@ -156,7 +161,7 @@ function ArtBook() {
       <div className="absolute inset-0 grid place-items-center">
         <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 18 }}
           className="relative aspect-square h-[62%] overflow-hidden rounded-full bg-white p-1.5 shadow-[var(--shadow-float)]">
-          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="h-full w-full rounded-full object-cover object-[50%_18%]" />
+          <FadeImg src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="h-full w-full rounded-full bg-[linear-gradient(135deg,#dce2f5,#f6efe4)] object-cover object-[50%_18%]" />
         </motion.div>
       </div>
       <Float className="left-[6%] top-[14%]" delay={0.3} dy={6}>
@@ -267,4 +272,11 @@ function ArtEssence() {
       </div>
     </div>
   )
+}
+
+/** Image that fades in once decoded (no pop-in), with a soft tinted placeholder behind it. */
+function FadeImg({ className, ...p }: React.ImgHTMLAttributes<HTMLImageElement>) {
+  const [ok, setOk] = useState(false)
+  return <img {...p} decoding="async" fetchPriority="high" onLoad={() => setOk(true)} ref={(el) => { if (el?.complete) setOk(true) }}
+    className={cx(className, 'transition-opacity duration-300', ok ? 'opacity-100' : 'opacity-0')} />
 }

@@ -5,14 +5,15 @@
  * @screens  CL-26 My Remedies · CL-27 Flower detail · CL-28 Ritual & reminders · CL-29 Past blends · CL-56 Progress
  */
 import { motion } from 'motion/react'
-import { Bell, ChevronRight, Lightbulb, RotateCcw, ShoppingBag } from 'lucide-react'
+import { Bell, CalendarHeart, ChevronRight, Lightbulb, RotateCcw, ShoppingBag } from 'lucide-react'
+import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { Mascot, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
 import { Btn, BtnLink, Item, Reveal, Ring, Sheet, buzz, ease, toast, useChrome } from '@/components/ui'
 import { moodOf, REORDER_PRICE_PAISE } from '@/lib/data'
 import { useApp } from '@/lib/store'
-import { dayKey, fmtDay, formatINR } from '@/lib/format'
+import { dayKey, fmtDay, fmtTime, formatINR } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
 import { DropsTick } from '@/components/drops-tick'
 import { blendSupply } from '@/lib/supply'
@@ -38,6 +39,8 @@ export default function Remedies() {
   const [times, setTimes] = useState(false)
   const reorderRef = useRef<HTMLButtonElement>(null)
 
+  const next = appointments.filter((a) => (a.status === 'confirmed' || a.status === 'awaiting_payment' || a.needsNewTime) && (a.needsNewTime || +new Date(a.startsAt) + 3600_000 > Date.now()))
+    .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))[0]
   if (!blend) return (
     <main className="px-5 pb-32">
       <AppHeader />
@@ -46,7 +49,20 @@ export default function Remedies() {
         <Mascot pose="sleep" height={150} />
         <p className="mt-4 text-[18px] font-extrabold text-navy">Your blend will bloom here</p>
         <p className="mt-1 max-w-[280px] text-[14px] leading-5 text-muted">After your first session, Jitu Bhaiya prepares a personal blend of flower essences, included in your consultation.</p>
-        <BtnLink href="/app/book" size="md" className="mt-5">Book a consultation</BtnLink>
+        {/* owner 2026-11-18: if a session is already booked, show it instead of asking to book */}
+        {next ? (
+          <Link href={next.needsNewTime ? `/app/pay?appointment=${next.id}` : `/app/sessions/view?id=${next.id}`} className="mt-5 flex w-full items-center gap-3 rounded-[22px] bg-peri-50 p-4 text-left">
+            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-navy text-white"><CalendarHeart className="size-6" /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[12px] font-semibold text-peri">{next.needsNewTime ? 'Booked · choose your time' : next.timeRequested ? 'Booked · time awaiting confirmation' : 'Your session is booked'}</span>
+              <span className="block text-[16px] font-bold text-navy">{next.needsNewTime ? 'Pick a preferred time' : `${fmtDay(next.startsAt)} · ${fmtTime(next.startsAt)}`}</span>
+              <span className="block text-[12px] text-muted">{next.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya · your blend comes after</span>
+            </span>
+            <ChevronRight className="size-5 text-navy" />
+          </Link>
+        ) : (
+          <BtnLink href="/app/book" size="md" className="mt-5">Book a consultation</BtnLink>
+        )}
       </div>
     </main>
   )

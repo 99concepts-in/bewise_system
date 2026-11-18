@@ -1,6 +1,7 @@
 'use client'
 /** @module onboarding @owner CLIENT @screens CL-06 Your privacy — consents (crm.recordConsent). DPDP Act 2023. */
 import { useRouter } from 'next/navigation'
+import { goSafe } from '@/lib/nav'
 import Link from 'next/link'
 import { useState } from 'react'
 import { motion } from 'motion/react'
@@ -37,7 +38,7 @@ export default function Privacy() {
       </motion.div>
       <p className="mt-4 text-center text-[13px] text-muted">Read our <Link href="/app/help#privacy" className="font-semibold text-navy underline underline-offset-2">privacy policy</Link></p>
       <div className="mt-auto pb-3 pt-8 safe-b">
-        <Btn full variant="gradient" onClick={() => { setProfile({ consents: { ...c, wellbeing: true }, onboardedAt: new Date().toISOString() }); router.replace('/onboarding/done') }}>I agree</Btn>
+        <Btn full variant="gradient" onClick={() => { setProfile({ consents: { ...c, wellbeing: true }, onboardedAt: new Date().toISOString() }); goSafe(router, '/onboarding/done', 'replace') }}>I agree</Btn>
       </div>
     </OnboardShell>
   )
