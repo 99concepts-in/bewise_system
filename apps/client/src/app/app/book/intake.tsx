@@ -27,18 +27,54 @@ export function StepTitle({ lead, em, sub }: { lead: string; em: string; sub?: s
 function Card({ children, className }: { children: ReactNode; className?: string }) { return <div className={cx('card p-5', className)}>{children}</div> }
 function Label({ children }: { children: ReactNode }) { return <p className="mb-3 text-[16px] font-bold text-navy">{children}</p> }
 
+/** IN-01 — a guided breath before the questions (owner 2026-11-18). 4 s in · 2 s hold · 6 s out, looping. */
+const BREATH = [{ t: 'Breathe in…', d: 4 }, { t: 'Hold', d: 2 }, { t: 'Breathe out…', d: 6 }] as const
 export function IntakeIntro() {
+  const [phase, setPhase] = useState(0)
+  const [cycles, setCycles] = useState(0)
+  useEffect(() => {
+    const t = setTimeout(() => { setPhase((p) => (p + 1) % 3); if (phase === 2) setCycles((c) => c + 1) }, BREATH[phase].d * 1000)
+    return () => clearTimeout(t)
+  }, [phase])
+  const scale = phase === 0 ? 1 : phase === 1 ? 1 : 0.62
+  const dur = BREATH[phase].d
   return (
-    <div>
-      <StepTitle lead="Before you" em="meet" sub="A few gentle questions so Jitu Bhaiya can prepare for you." />
-      <Card className="space-y-4">
-        {[['Private', 'Only Jitu Bhaiya reads your answers.'], ['Save anytime', 'Leave and finish later — nothing is lost.'], ['No wrong answers', 'Answer as much or as little as feels right.'], ['About 5 minutes', 'Eight short steps.']].map(([t, d], i) => (
-          <motion.div key={t} className="flex items-start gap-3" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.08 }}>
-            <span className="mt-0.5 grid size-7 place-items-center rounded-full bg-sage-100 text-sage-text">✓</span>
-            <div><p className="text-[15px] font-bold text-navy">{t}</p><p className="text-[14px] text-muted">{d}</p></div>
-          </motion.div>
+    <div className="flex flex-col items-center pt-2 text-center">
+      <motion.h1 className="h-duo text-[32px]" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+        Take a deep <em>breath</em>
+      </motion.h1>
+      <motion.p className="mt-2 max-w-[300px] text-[15px] leading-6 text-muted" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.8 }}>
+        Let your shoulders drop. There’s no rush here.
+      </motion.p>
+
+      <div className="relative mt-4 grid size-[min(300px,36dvh)] place-items-center" aria-hidden>
+        {/* soft outer petals rotate slowly */}
+        <motion.div className="absolute inset-0" animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}>
+          {Array.from({ length: 6 }).map((_, k) => (
+            <motion.span key={k} className="absolute left-1/2 top-1/2 block h-[46%] w-[30%] origin-[50%_100%] rounded-[50%] bg-[linear-gradient(180deg,rgba(185,203,242,.55),rgba(220,231,217,.25))] mix-blend-multiply"
+              style={{ translateX: '-50%', translateY: '-100%', rotate: k * 60 }}
+              animate={{ scaleY: phase === 2 ? 0.55 : 1, opacity: phase === 2 ? 0.45 : 0.9 }} transition={{ duration: dur, ease: [0.45, 0, 0.55, 1] }} />
+          ))}
+        </motion.div>
+        {/* breathing orb */}
+        <motion.div className="absolute size-[62%] rounded-full bg-[radial-gradient(circle_at_35%_30%,#ffffff,#dce2f5_55%,#c9d6f2)] shadow-[0_20px_60px_rgba(94,127,184,.35)]"
+          initial={{ scale: 0.62 }} animate={{ scale }} transition={{ duration: dur, ease: [0.45, 0, 0.55, 1] }} />
+        <motion.div className="absolute size-[62%] rounded-full border-2 border-white/80" initial={{ scale: 0.62, opacity: 0.6 }}
+          animate={{ scale: phase === 2 ? 0.7 : 1.18, opacity: phase === 1 ? 0.9 : 0.35 }} transition={{ duration: dur, ease: [0.45, 0, 0.55, 1] }} />
+        <AnimatePresence mode="wait">
+          <motion.p key={phase} className="relative text-[20px] font-bold text-navy" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.6 }}>
+            {BREATH[phase].t}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+      <p className="sr-only" aria-live="polite">{BREATH[phase].t}</p>
+
+      <motion.div className="mt-4 flex flex-wrap justify-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
+        {['Private to Jitu Bhaiya', 'Everything optional', 'About 5 minutes'].map((t) => (
+          <span key={t} className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[12px] font-semibold text-navy shadow-[var(--shadow-card)]"><span className="size-1.5 rounded-full bg-sage" />{t}</span>
         ))}
-      </Card>
+      </motion.div>
+      <AnimatePresence>{cycles >= 1 && <motion.p className="mt-4 text-[13px] text-muted" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Ready when you are.</motion.p>}</AnimatePresence>
     </div>
   )
 }
@@ -46,7 +82,7 @@ export function IntakeIntro() {
 export function StepWho({ a, set }: P) {
   return (
     <div className="space-y-4">
-      <StepTitle lead="What’s been on your" em="mind?" sub="Everything here is optional — share as much or as little as you like." />
+      <StepTitle lead="Anything you’d like to" em="share?" sub="In your own words, or record a voice note. Optional — Jitu Bhaiya will read it before you meet." />
       <Card>
         <Label>In your own words</Label>
         <textarea value={a.onMind} onChange={(e) => set({ onMind: e.target.value.slice(0, 1000) })} rows={4} placeholder="Work has felt heavy lately, and I can’t switch off at night…"

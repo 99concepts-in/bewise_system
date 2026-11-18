@@ -8,6 +8,7 @@
 **Verified:** Apache 2.4 + static export, full journeys, 0 errors / 0 broken assets
 **Contracts changed:** proposals in `20261117-client-to-hub-contract-drift.md` §9 (journal note, Emotion enum, OTP length)
 **Also (late round 1):** intake fully optional (every question skippable; review shows "Skipped"), "Who is this for?" removed — dependent bookings parked until the owner asks again
+**Intake flow (owner):** guided breathing first ("Take a deep breath", 4-2-6 rhythm) → feelings → detail → body → sleep → life → personal message/voice note → safety → gentle question → goals
 **Needs from owner:** consented testimonials (Monika, Mitul Shah, Dhaval Gohil, Shivam S. + more); counsel view on pre-ticked consents
 
 ## 2026-11-17 — Auto-deploy to Hostinger on every commit · branch claude/new-session-94881h

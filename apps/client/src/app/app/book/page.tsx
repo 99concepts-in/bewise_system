@@ -21,8 +21,9 @@ import { downloadIcs, googleCalUrl, sessionIcs } from '@/lib/ics'
 import * as I from './intake'
 import { BP } from '@/lib/asset'
 
-const INTAKE = ['intro', 'who', 'feelings', 'nuance', 'body', 'sleep', 'life', 'safety', 'gentle', 'goals', 'review', 'saved'] as const
-const COUNTED = ['who', 'feelings', 'nuance', 'body', 'sleep', 'life', 'safety', 'gentle']
+// owner 2026-11-18: breathe first → feelings → … → personal message later ('who' = the share/voice-note step)
+const INTAKE = ['intro', 'feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle', 'goals', 'review', 'saved'] as const
+const COUNTED = ['feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle']
 const CHECKIN = ['ck-now', 'ck-changes', 'ck-news'] as const
 type Step = 'choose' | (typeof INTAKE)[number] | (typeof CHECKIN)[number] | 'mode' | 'time' | 'pay' | 'done'
 
@@ -98,7 +99,7 @@ function Book() {
             <IconBtn label="Back" onClick={back}><ChevronLeft className="size-5" /></IconBtn>
             {isIntake ? (
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-semibold text-navy">{step === 'intro' ? 'About 5 minutes' : counted >= 0 ? `Step ${counted + 1} of 8` : 'Almost done'}</p>
+                <p className="text-[13px] font-semibold text-navy">{step === 'intro' ? 'A moment for you' : counted >= 0 ? `Step ${counted + 1} of 8` : 'Almost done'}</p>
                 <ProgressBar value={step === 'intro' ? 0.02 : counted >= 0 ? (counted + 1) / 8 : 1} className="mt-1.5" />
               </div>
             ) : <Stepper at={CHECKIN.includes(step as never) || INTAKE.includes(step as never) ? 0 : step === 'pay' ? 2 : 1} />}
@@ -146,7 +147,7 @@ function Book() {
           </>
         ) : (
           <Btn full variant={can[step] === false ? 'primary' : 'gradient'} disabled={can[step] === false} onClick={next}>
-            {step === 'intro' ? 'Begin' : step === 'goals' ? 'Review answers' : step === 'review' ? 'Save & choose a time' : step === 'saved' ? 'Choose a time' : 'Continue'}
+            {step === 'intro' ? 'I’m ready — start' : step === 'goals' ? 'Review answers' : step === 'review' ? 'Save & choose a time' : step === 'saved' ? 'Choose a time' : 'Continue'}
           </Btn>
         )}
       </div>
