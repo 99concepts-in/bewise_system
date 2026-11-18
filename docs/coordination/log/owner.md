@@ -2,6 +2,17 @@
 
 > Only the OWNER chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — Owner prototype: responsive fixes (owner report: "Today so far" tiles clipped)
+**Status:** Fixed, merged and live
+**Done:** automated overflow audit (13 routes × 17 widths, 320–1536 px) found 35 issues, all fixed: Today card now uses
+label/value rows; new breakpoints (≤1320 narrower sidebar + 2-up rows, ≤1180 single-column pairs, ≤1023 tablet with pill nav,
+≤640 phone); list items adapt via container queries; big amounts scale (clamp); charts redraw at real pixel width so axis
+labels stay 13 px on phones (were ~4 px) and thin out when crowded; brand line no longer wraps; landing page header stacks on
+phones. Re-audit: 0 issues; interactions (approve, Ask BeWise, invite accountant) and resize re-checked, no JS errors.
+**Found in other apps (requests filed, not edited):** MANAGER money tiles overflow on phones; CONSULTANT 320 px sideways scroll.
+**Contracts changed:** none
+**Next:** owner feedback
+
 ## 2026-11-18 — All previews merged and live on GitHub Pages (owner request)
 **Status:** Merged to main at the owner's request (PRs #1 client, #2 consultant, #3 manager, + this owner PR)
 **Done:** trial-merged all four chat branches (no conflicts); built client (Next static export, basePath
