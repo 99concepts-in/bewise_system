@@ -17,7 +17,7 @@ export default function Bag() {
   const setQty = useApp((s) => s.setQty)
   const add = useApp((s) => s.addToCart)
   const allergies = useApp((s) => s.profile?.allergies ?? [])
-  const { lines, sub, ship, total } = useBagTotals()
+  const { lines, sub, ship, discount, coupon, total } = useBagTotals()
   return (
     <main className="px-5 pb-40">
       <AppHeader back />
@@ -62,6 +62,7 @@ export default function Bag() {
           </ul>
           <section className="card mt-4 space-y-3 p-5">
             <div className="flex justify-between text-[15px]"><span className="text-muted">Subtotal <span className="block text-[12px]">GST included</span></span><span className="font-bold text-navy tnum">{formatINR(sub)}</span></div>
+            {discount > 0 && <div className="flex justify-between text-[15px] font-semibold text-sage-text"><span>🎁 {coupon?.code} · {coupon?.pct}% off products</span><span className="tnum">−{formatINR(discount)}</span></div>}
             <div className="flex justify-between text-[15px]"><span className="text-muted">Delivery</span><span className={ship ? 'font-bold text-navy tnum' : 'font-bold text-sage-text'}>{ship ? formatINR(ship) : 'Free'}</span></div>
             {ship > 0 && <p className="rounded-[14px] bg-peri-50 px-3 py-2 text-[12px] text-navy">Add {formatINR(FREE_SHIP_PAISE - sub)} more for free delivery</p>}
             <div className="flex justify-between border-t border-line pt-3"><span className="text-[20px] font-extrabold text-navy">Total</span><span className="text-[26px] font-extrabold text-navy tnum">{formatINR(total)}</span></div>

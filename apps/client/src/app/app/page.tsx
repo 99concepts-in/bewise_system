@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { ArrowRight, BookOpen, Check, ChevronRight, Lightbulb, Sparkles, Video } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Mascot, MoodButton, MoodImg } from '@/components/brand'
+import { LaunchBanner } from '@/components/launch-offer'
 import { AppHeader } from '@/components/shell'
 import { ConsultInviteArt, SessionDateArt } from '@/components/session-art'
 import { BlendBottleCard } from '@/components/blend-bottle'
@@ -39,7 +40,8 @@ export default function Home() {
     <main className="px-5 pb-32">
       <AppHeader />
       <Reveal className="space-y-4">
-        <Item className="pt-3">
+        <Item className="pt-2"><LaunchBanner /></Item>
+        <Item>
           <h1 className="text-[34px] font-extrabold leading-[1.05] tracking-[-0.03em] text-navy">Hi {firstName(profile?.name)}</h1>
           <p className="mt-1 text-[24px] font-bold leading-tight tracking-[-0.02em] text-soft">how are you feeling today?</p>
         </Item>
@@ -121,7 +123,7 @@ function ContextCard() {
   const appts = useApp.getState().appointments
   const toPay = appts.find((x) => x.needsNewTime || ((x.status === 'awaiting_payment' || x.status === 'expired') && !x.paidAt))
   if (toPay?.needsNewTime)
-    return <Ctx tone="sage" kicker="Payment received" title="Pick a new time" body="The held time was released before your payment arrived. Choose any time at no extra cost." cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
+    return <Ctx tone="sage" kicker={toPay.payLater ? 'Almost booked' : 'Payment received'} title={toPay.status === 'expired' ? 'Pick a new time' : 'Choose your preferred time'} body={toPay.status === 'expired' ? 'The held time was released before your payment arrived. Choose any time at no extra cost.' : 'Pick a time that suits you. Jitu Bhaiya or Haresh bhai will confirm it.'} cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
   if (toPay)
     return <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitu Bhaiya'} title="Complete your booking" body={`${fmtDay(toPay.startsAt)} · ${fmtTime(toPay.startsAt)}, pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
 

@@ -1,10 +1,10 @@
 'use client'
 /** @module client-help @owner CLIENT @screens CL-51 Help — FAQs, contact, policies (drafts in docs/specs/client/legal/) */
 import { AnimatePresence, motion } from 'motion/react'
-import { ChevronDown, MessageCircle } from 'lucide-react'
+import { ChevronDown, MessageCircle, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { AppHeader } from '@/components/shell'
-import { Btn, toast } from '@/components/ui'
+import { HELPLINE, waLink } from '@/lib/offer'
 import { SafetyCard } from '../book/intake'
 
 const FAQ = [
@@ -40,7 +40,16 @@ export default function Help() {
           </div>
         ))}
       </div>
-      <Btn full variant="gradient" className="mt-5" onClick={() => toast('WhatsApp opens here once the business number is added')}><MessageCircle className="size-5" /> WhatsApp us</Btn>
+      <div className="mt-5 grid grid-cols-2 gap-2.5">
+        <a href={waLink('Hi BeWise, I need help with my appointment')} target="_blank" rel="noopener noreferrer" className="card flex flex-col items-start gap-1 p-4">
+          <span className="grid size-10 place-items-center rounded-full bg-sage-100 text-sage-text"><MessageCircle className="size-5" /></span>
+          <span className="mt-1 text-[15px] font-bold text-navy">WhatsApp</span><span className="text-[12px] text-muted">Appointments · 90542 20952</span>
+        </a>
+        <a href={`tel:${HELPLINE.tel}`} className="card flex flex-col items-start gap-1 p-4">
+          <span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><Phone className="size-5" /></span>
+          <span className="mt-1 text-[15px] font-bold text-navy">Helpline</span><span className="text-[12px] text-muted">{HELPLINE.name} · {HELPLINE.label}</span>
+        </a>
+      </div>
       <h2 className="h-section mt-8">Need to talk to someone now?</h2>
       <div className="mt-3"><SafetyCard /></div>
       <h2 className="h-section mt-8" id="privacy">Policies</h2>

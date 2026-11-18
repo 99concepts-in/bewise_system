@@ -45,12 +45,12 @@ function Pay() {
       <AppHeader back="/app" />
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-2 flex items-start gap-3 rounded-[24px] bg-sage-100/80 p-4">
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage-text text-white"><Check className="size-5" strokeWidth={3} /></span>
-        <div><p className="text-[16px] font-extrabold text-navy">Payment received. Pick a new time</p><p className="text-[13px] leading-5 text-sage-text">The time we were holding was released before the payment arrived. Choose any time below at no extra cost.</p></div>
+        <div><p className="text-[16px] font-extrabold text-navy">{a.status === 'expired' ? 'Payment received. Pick a new time' : 'Choose your preferred time'}</p><p className="text-[13px] leading-5 text-sage-text">{a.status === 'expired' ? 'The time we were holding was released before the payment arrived. Choose any time below at no extra cost.' : 'Jitu Bhaiya or Haresh bhai will confirm it. If it doesn’t suit, our team will call you.'}</p></div>
       </motion.div>
       <div className="mt-5"><TimePicker slot={slot} setSlot={setSlot} /></div>
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
-        <Btn full variant="gradient" disabled={!slot} onClick={() => { if (!slot) return; pickNewTime(a.id, slot.toISOString()); toast('You’re booked'); router.replace(`/app/sessions/view?id=${a.id}`) }}>
-          {slot ? `Confirm ${fmtLongDay(slot).split(',')[0]} · ${fmtTime(slot)}` : 'Choose a time'}
+        <Btn full variant="gradient" disabled={!slot} onClick={() => { if (!slot) return; pickNewTime(a.id, slot.toISOString()); toast('Time requested. We’ll confirm soon'); router.replace(`/app/sessions/view?id=${a.id}`) }}>
+          {slot ? `Request ${fmtLongDay(slot).split(',')[0]} · ${fmtTime(slot)}` : 'Choose a time'}
         </Btn>
       </div>
     </main>

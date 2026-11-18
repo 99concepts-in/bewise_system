@@ -49,10 +49,13 @@ function OrderDetail() {
       <section className="card mt-4 p-5">
         <h2 className="h-section">Items</h2>
         <ul className="mt-3 space-y-2">{o.lines.map((l) => <li key={l.key} className="flex justify-between text-[14px]"><span>{l.name} · {l.label} × {l.qty}{l.kind === 'remedy' && l.pricePaise === 0 && <span className="ml-1.5 rounded-full bg-sage-100 px-2 py-0.5 text-[11px] font-bold text-sage-text">Included</span>}</span><span className="font-semibold tnum">{l.pricePaise ? formatINR(l.pricePaise * l.qty) : '₹0'}</span></li>)}</ul>
+        {o.discountPaise ? <div className="mt-2 flex justify-between text-[14px] font-semibold text-sage-text"><span>🎁 {o.coupon}</span><span className="tnum">−{formatINR(o.discountPaise)}</span></div> : null}
+        {o.subscribed?.length ? <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-peri-50 px-3 py-1 text-[12px] font-bold text-navy">🔁 Subscribed · every 30 days</p> : null}
         <div className="mt-3 flex justify-between border-t border-line pt-3 text-[16px] font-extrabold text-navy"><span>Paid</span><span className="tnum">{formatINR(o.totalPaise)}</span></div>
         <p className="mt-2 text-[13px] text-muted">To {o.address.name}, {o.address.line1}, {o.address.city} {o.address.pin}</p>
       </section>
 
+      {st === 3 && <ReviewCard id={o.id} review={o.review} />}
       {st === 3 && <Btn full variant="white" className="mt-4" onClick={() => setRep(true)}><Package className="size-5" /> Request a replacement</Btn>}
       <ReplacementSheet open={rep} onClose={() => setRep(false)} lines={o.lines.map((l) => l.name)} />
     </main>
@@ -90,5 +93,33 @@ function ReplacementSheet({ open, onClose, lines }: { open: boolean; onClose: ()
         )}
       </AnimatePresence>
     </Sheet>
+  )
+}
+
+/** owner 2026-11-18: ask for a product review after delivery (also sent on WhatsApp a few days after delivery by the team). */
+function ReviewCard({ id, review }: { id: string; review?: { rating: number; text: string } }) {
+  const save = useApp((s) => s.reviewOrder)
+  const [rating, setRating] = useState(review?.rating ?? 0)
+  const [text, setText] = useState(review?.text ?? '')
+  if (review) return (
+    <section className="card mt-4 flex items-center gap-3 p-5">
+      <span className="text-[24px]" aria-hidden>💛</span>
+      <p className="flex-1 text-[14px] text-muted"><b className="text-navy">Thank you for your review.</b> {'★'.repeat(review.rating)}</p>
+    </section>
+  )
+  return (
+    <section className="card mt-4 p-5">
+      <h2 className="h-section">How are you liking it?</h2>
+      <p className="mt-1 text-[13px] text-muted">Your review helps others find their ritual. We’ll also check in on WhatsApp.</p>
+      <div className="mt-3 flex gap-1.5" role="radiogroup" aria-label="Rating">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <motion.button key={n} type="button" role="radio" aria-checked={rating === n} aria-label={`${n} of 5`} whileTap={{ scale: 0.85 }} onClick={() => setRating(n)}
+            className={cx('grid size-11 place-items-center rounded-full text-[22px]', n <= rating ? 'bg-[#fbf3dc] text-[#b58a3c]' : 'bg-peri-50 text-[#c7cbe0]')}>★</motion.button>
+        ))}
+      </div>
+      <textarea value={text} onChange={(e) => setText(e.target.value.slice(0, 500))} rows={2} placeholder="A line about how it feels (optional)" aria-label="Your review"
+        className="mt-3 w-full resize-none rounded-[18px] bg-peri-50/70 p-3.5 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
+      <Btn size="md" className="mt-3" disabled={!rating} onClick={() => { save(id, rating, text.trim()); toast('Thank you for your review') }}>Send review</Btn>
+    </section>
   )
 }

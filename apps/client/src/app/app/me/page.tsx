@@ -72,6 +72,7 @@ export default function Me() {
           <div className="mt-3 flex flex-wrap gap-2">
             <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(); router.push(`/app/pay?appointment=${a.id}`) }}>Booking from Jitu Bhaiya</Btn>
             <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(true); router.push(`/app/pay?appointment=${a.id}`) }}>…paid after hold expired</Btn>
+            <Btn size="sm" variant="white" onClick={() => { const a = s.appointments.find((x) => x.timeRequested); if (a) { s.confirmTime(a.id); toast('Time confirmed by the team') } else toast('No time waiting for confirmation') }}>Team confirms my time</Btn>
           </div>
         </Item>
         <Item><Btn full variant="ghost" size="md" onClick={() => setSheet('signout')}><LogOut className="size-4" /> Sign out</Btn></Item>

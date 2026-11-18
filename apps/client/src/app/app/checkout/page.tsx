@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { Mascot, Petals } from '@/components/brand'
 import { PaySheet } from '@/components/pay-sheet'
 import { AppHeader } from '@/components/shell'
-import { Btn, cx, ease, spring } from '@/components/ui'
+import { Btn, Sheet, Toggle, cx, ease, spring } from '@/components/ui'
 import { useApp, type Order } from '@/lib/store'
 import { addDays, fmtDay, formatINR } from '@/lib/format'
 import { useBagTotals } from '@/lib/bag'
@@ -25,11 +25,14 @@ export default function Checkout() {
   const addresses = useApp((s) => s.addresses)
   const upsert = useApp((s) => s.upsertAddress)
   const placeOrder = useApp((s) => s.placeOrder)
-  const { lines, sub, ship, total } = useBagTotals()
+  const { lines, sub, ship, discount, coupon, total } = useBagTotals()
   const [sel, setSel] = useState(addresses[0]?.id)
   const [adding, setAdding] = useState(addresses.length === 0)
   const [f, setF] = useState({ name: profile?.name ?? '', phone: profile?.phone ?? '', pin: '', line1: '', line2: '', city: '', state: '' })
   const [pay, setPay] = useState(false)
+  const [ask, setAsk] = useState(false)
+  const [subs, setSubs] = useState<string[]>([])
+  const products = lines.filter((x) => x.i!.kind === 'product')
   const [done, setDone] = useState<Order>()
   useEffect(() => { if (!lines.length && !done) router.replace('/app/bag') }, [lines.length, done, router])
   useEffect(() => { const h = PIN_HINT[f.pin.slice(0, 3)]; if (f.pin.length === 6 && h && !f.city) setF((x) => ({ ...x, city: h[0], state: h[1] })) }, [f.pin, f.city])
@@ -93,6 +96,7 @@ export default function Checkout() {
         <ul className="space-y-2">{lines.map(({ l, i }) => <li key={l.key} className="flex justify-between text-[14px]"><span className="text-ink">{i!.name} · {i!.label} × {l.qty}</span><span className="font-semibold text-navy tnum">{formatINR(i!.pricePaise * l.qty)}</span></li>)}</ul>
         <div className="mt-3 space-y-1.5 border-t border-line pt-3 text-[14px]">
           <div className="flex justify-between"><span className="text-muted">Subtotal (GST incl.)</span><span className="tnum">{formatINR(sub)}</span></div>
+          {discount > 0 && <div className="flex justify-between font-semibold text-sage-text"><span>🎁 {coupon?.code} · {coupon?.pct}% off</span><span className="tnum">−{formatINR(discount)}</span></div>}
           <div className="flex justify-between"><span className="text-muted">Delivery</span><span className="tnum">{ship ? formatINR(ship) : 'Free'}</span></div>
           <div className="flex justify-between pt-1 text-[18px] font-extrabold text-navy"><span>Total</span><span className="tnum">{formatINR(total)}</span></div>
         </div>
@@ -100,9 +104,32 @@ export default function Checkout() {
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
-        <Btn full variant="gradient" disabled={!sel || adding} onClick={() => setPay(true)}><span aria-hidden>🔒</span> Pay {formatINR(total)}</Btn>
+        <Btn full variant="gradient" disabled={!sel || adding} onClick={() => (products.length ? setAsk(true) : setPay(true))}><span aria-hidden>🔒</span> Pay {formatINR(total)}</Btn>
       </div>
-      <PaySheet open={pay} amountPaise={total} purpose="Your order" onClose={() => setPay(false)} onPaid={() => { if (!sel) return; const o = placeOrder(sel); setPay(false); setDone(o) }} />
+      <PaySheet open={pay} amountPaise={total} purpose="Your order" onClose={() => setPay(false)} onPaid={() => { if (!sel) return; const o = placeOrder(sel, subs); setPay(false); setDone(o) }} />
+      {/* owner 2026-11-18: offer a subscription before the order; the order is only placed once they confirm */}
+      <Sheet open={ask} onClose={() => setAsk(false)} title="Make it a ritual?">
+        <div className="text-center">
+          <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#fbf3dc] text-[26px]" aria-hidden>🔁</span>
+          <h2 className="h-duo mt-3 text-[26px]">Make it a <em>ritual?</em></h2>
+          <p className="mx-auto mt-1 max-w-[300px] text-[14px] leading-5 text-muted">Subscribe and we’ll send a fresh bottle every 30 days. Pause or cancel anytime on WhatsApp.</p>
+        </div>
+        <ul className="mt-4 space-y-2">
+          {products.map(({ l, i }) => {
+            const on = subs.includes(l.key)
+            return (
+              <li key={l.key} className="flex items-center gap-3 rounded-[18px] bg-peri-50/70 px-4 py-3">
+                <span className="min-w-0 flex-1"><span className="block truncate text-[15px] font-bold text-navy">{i!.name}</span><span className="text-[12px] text-muted">{i!.label} · every 30 days</span></span>
+                <Toggle label={`Subscribe to ${i!.name}`} on={on} onChange={() => setSubs(on ? subs.filter((k) => k !== l.key) : [...subs, l.key])} />
+              </li>
+            )
+          })}
+        </ul>
+        <div className="mt-5 space-y-2 pb-1">
+          <Btn full onClick={() => { setAsk(false); setPay(true) }}>{subs.length ? `Confirm & subscribe` : 'Confirm order'}</Btn>
+          {subs.length > 0 && <p className="text-center text-[12px] text-muted">You pay for this order now. Each refill is confirmed with you on WhatsApp first.</p>}
+        </div>
+      </Sheet>
     </main>
   )
 }

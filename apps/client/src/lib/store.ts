@@ -12,6 +12,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { ConsultationId, Emotion } from './data'
 import { PRODUCTS, REORDER_PRICE_PAISE, productTitle, variantById } from './data'
+import { COUPON_DAYS, COUPON_PCT, PLANS, type PlanId } from './offer'
 import { uid, dayKey } from './format'
 
 export type Profile = {
@@ -32,7 +33,13 @@ export type Appointment = {
   needsNewTime?: boolean; paidAt?: string
   /** owner 2026-11-18: client chose to pay after the consultation (UPI, card or at the studio) */
   payLater?: boolean
+  /** owner 2026-11-18: the client picks a preferred time after paying; Jitu Bhaiya or Haresh bhai confirm it (else the team calls) */
+  timeRequested?: boolean
+  /** covered by a consultation plan */
+  planId?: PlanId
 }
+export type Plan = { id: PlanId; months: number; pricePaise: number; startedAt: string; used: number }
+export type Coupon = { code: string; pct: number; expiresAt: string; usedAt?: string }
 export type IntakeAnswers = {
   who: 'me' | 'child' | 'someone_else'; dependent?: { name: string; age: string; relation: string }
   onMind: string; duration?: 'Days' | 'Weeks' | 'Months' | 'Years'
@@ -49,7 +56,7 @@ export type Blend = { name: string; version: number; flowers: string[]; drops: n
 export type CartLine = { key: string; qty: number } // key = variantId | 'remedy-reorder' | 'remedy-reorder-spray'
 export type Address = { id: string; name: string; phone: string; line1: string; line2: string; city: string; state: string; pin: string }
 export type OrderLine = { key: string; name: string; label: string; qty: number; pricePaise: number; kind: 'product' | 'remedy' }
-export type Order = { id: string; code: string; lines: OrderLine[]; totalPaise: number; address: Address; placedAt: string; stage: 0 | 1 | 2 | 3 }
+export type Order = { id: string; code: string; lines: OrderLine[]; totalPaise: number; address: Address; placedAt: string; stage: 0 | 1 | 2 | 3; discountPaise?: number; coupon?: string; subscribed?: string[]; review?: { rating: number; text: string; at: string } }
 export type ChatMsg = { id: string; role: 'user' | 'bot'; text: string; products?: string[]; actions?: { id: string; label: string }[]; safety?: boolean; at: string }
 export type Notice = { id: string; title: string; body: string; at: string; read: boolean; href?: string }
 
@@ -77,6 +84,9 @@ type State = {
   orders: Order[]
   chat: ChatMsg[]
   notices: Notice[]
+  plan: Plan | null
+  coupon: Coupon | null
+  offer: { skippedAt?: string; downsellAt?: string }
   seq: number
   // actions
   setProfile: (p: Partial<Profile>) => void
@@ -101,7 +111,11 @@ type State = {
   setQty: (key: string, qty: number) => void
   toggleWish: (slug: string) => void
   upsertAddress: (a: Omit<Address, 'id'> & { id?: string }) => Address // crm.upsertAddress
-  placeOrder: (addressId: string) => Order                   // commerce.createOrderFromCart + payment
+  placeOrder: (addressId: string, subscribe?: string[]) => Order // commerce.createOrderFromCart + payment (coupon applied, subscriptions confirmed)
+  buyPlan: (id: PlanId, pricePaise: number) => Plan            // finance: plan purchase → unlocks the first-purchase coupon
+  setOffer: (o: { skippedAt?: string; downsellAt?: string }) => void
+  confirmTime: (id: string) => void                            // preview only: Jitu Bhaiya / Haresh bhai approve the preferred time
+  reviewOrder: (id: string, rating: number, text: string) => void
   pushChat: (m: Omit<ChatMsg, 'id' | 'at'>) => void
   clearChat: () => void
   readNotices: () => void
@@ -112,8 +126,14 @@ type State = {
 
 const initial = {
   profile: null, journal: [], goals: [], appointments: [], intake: null, blend: null, drops: {}, checkins: {}, cart: [], wishlist: [],
-  addresses: [], orders: [], chat: [], notices: [], seq: 41,
+  addresses: [], orders: [], chat: [], notices: [], plan: null, coupon: null, offer: {}, seq: 41,
 }
+
+/** a valid, unused coupon (owner 2026-11-18: 15% off every product on the first shop order, 7 days) */
+export const couponOk = (c: Coupon | null, now = Date.now()) => !!c && !c.usedAt && +new Date(c.expiresAt) > now
+export const couponDiscount = (s: { coupon: Coupon | null }, lines: { pricePaise: number; qty: number; kind: string }[]) =>
+  couponOk(s.coupon) ? Math.round(lines.filter((l) => l.kind === 'product').reduce((t, l) => t + l.pricePaise * l.qty, 0) * s.coupon!.pct / 100) : 0
+export const planLeft = (p: Plan | null) => (p ? p.months - p.used : 0)
 
 export const cartLineInfo = (l: CartLine) => {
   if (l.key === 'remedy-reorder') return { name: 'Personal blend', label: '30 ml dropper', pricePaise: REORDER_PRICE_PAISE, kind: 'remedy' as const, art: 'products/bach-remedy-dropper' }
@@ -149,8 +169,8 @@ export const useApp = create<State>()(
       book: (a) => {
         const seq = get().seq + 1
         const appt: Appointment = { ...a, id: uid(), code: `BW-A-${String(seq).padStart(5, '0')}`, createdAt: new Date().toISOString(), status: 'confirmed' }
-        set((s) => ({ appointments: [...s.appointments, appt], seq }))
-        get().notify({ title: 'You’re booked', body: 'Jitu Bhaiya will read your answers before you meet.', href: `/app/sessions/view?id=${appt.id}` })
+        set((s) => ({ appointments: [...s.appointments, appt], seq, ...(a.planId && s.plan ? { plan: { ...s.plan, used: s.plan.used + 1 } } : {}) }))
+        if (!appt.needsNewTime) get().notify(appt.timeRequested ? { title: 'Time requested', body: 'Jitu Bhaiya or Haresh bhai will confirm your time soon. If it doesn’t suit, our team will call you.', href: `/app/sessions/view?id=${appt.id}` } : { title: 'You’re booked', body: 'Jitu Bhaiya will read your answers before you meet.', href: `/app/sessions/view?id=${appt.id}` })
         return appt
       },
       reschedule: (id, startsAt) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, startsAt, rescheduled: (a.rescheduled ?? 0) + 1 } : a)) })),
@@ -164,7 +184,11 @@ export const useApp = create<State>()(
         set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString(), ...(late ? { needsNewTime: true } : { status: 'confirmed' as const }) } : x)) }))
         get().notify(late ? { title: 'Payment received', body: 'Please pick a new time for your session, no extra cost.', href: `/app/pay?appointment=${id}` } : { title: 'You’re booked', body: 'Payment received. See you soon.', href: `/app/sessions/view?id=${id}` })
       },
-      pickNewTime: (id, startsAt) => set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, startsAt, status: 'confirmed' as const, needsNewTime: false } : x)) })),
+      // owner 2026-11-18: a chosen time is a request until Jitu Bhaiya or Haresh bhai confirm it
+      pickNewTime: (id, startsAt) => {
+        set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, startsAt, status: 'confirmed' as const, needsNewTime: false, timeRequested: true } : x)) }))
+        get().notify({ title: 'Time requested', body: 'Jitu Bhaiya or Haresh bhai will confirm your time soon. If it doesn’t suit, our team will call you.', href: `/app/sessions/view?id=${id}` })
+      },
       submitCheckin: (appointmentId, answers) => set((s) => ({ checkins: { ...s.checkins, [appointmentId]: { at: new Date().toISOString(), answers } } })),
       simulateStaffBooking: (late = false) => {
         const seq = get().seq + 1
@@ -190,20 +214,36 @@ export const useApp = create<State>()(
         set((s) => ({ addresses: [addr, ...s.addresses.filter((x) => x.id !== addr.id)] }))
         return addr
       },
-      placeOrder: (addressId) => {
+      placeOrder: (addressId, subscribe) => {
         const s = get()
         const lines: OrderLine[] = s.cart.flatMap((l) => {
           const i = cartLineInfo(l); return i ? [{ key: l.key, name: i.name, label: i.label, qty: l.qty, pricePaise: i.pricePaise, kind: i.kind }] : []
         })
         const seq = s.seq + 1
+        const discountPaise = couponDiscount(s, lines)
         const order: Order = {
-          id: uid(), code: `BW-${String(seq).padStart(5, '0')}`, lines, totalPaise: lines.reduce((t, l) => t + l.pricePaise * l.qty, 0),
+          id: uid(), code: `BW-${String(seq).padStart(5, '0')}`, lines, totalPaise: lines.reduce((t, l) => t + l.pricePaise * l.qty, 0) - discountPaise,
           address: s.addresses.find((a) => a.id === addressId)!, placedAt: new Date().toISOString(), stage: 0,
+          ...(discountPaise ? { discountPaise, coupon: s.coupon!.code } : {}), ...(subscribe?.length ? { subscribed: subscribe } : {}),
         }
-        set({ orders: [order, ...s.orders], cart: [], seq })
+        set({ orders: [order, ...s.orders], cart: [], seq, ...(discountPaise ? { coupon: { ...s.coupon!, usedAt: new Date().toISOString() } } : {}) })
         get().notify({ title: 'Order placed', body: `${order.code}, we’ll let you know when it ships.`, href: `/app/orders/view?id=${order.id}` })
         return order
       },
+      buyPlan: (id, pricePaise) => {
+        const plan: Plan = { id, months: PLANS[id].months, pricePaise, startedAt: new Date().toISOString(), used: 0 }
+        const s = get()
+        const coupon = s.coupon ?? { code: 'WELCOME15', pct: COUPON_PCT, expiresAt: new Date(Date.now() + COUPON_DAYS * 864e5).toISOString() }
+        set({ plan, coupon })
+        get().notify({ title: `${PLANS[id].name} active`, body: `${COUPON_PCT}% off your first shop order. Code ${coupon.code}, valid ${COUPON_DAYS} days.`, href: '/app/shop' })
+        return plan
+      },
+      setOffer: (o) => set((s) => ({ offer: { ...s.offer, ...o } })),
+      confirmTime: (id) => {
+        set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, timeRequested: false } : x)) }))
+        get().notify({ title: 'Your time is confirmed', body: 'Jitu Bhaiya will see you then.', href: `/app/sessions/view?id=${id}` })
+      },
+      reviewOrder: (id, rating, text) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, review: { rating, text, at: new Date().toISOString() } } : o)) })),
       pushChat: (m) => set((s) => ({ chat: [...s.chat, { ...m, id: uid(), at: new Date().toISOString() }].slice(-80) })),
       clearChat: () => set({ chat: [] }),
       readNotices: () => set((s) => ({ notices: s.notices.map((n) => ({ ...n, read: true })) })),

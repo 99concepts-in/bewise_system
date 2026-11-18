@@ -14,7 +14,7 @@ import { ProductCard } from '@/components/product-card'
 import { AppHeader } from '@/components/shell'
 import { IconBtn, Item, Reveal, buzz, cx, spring } from '@/components/ui'
 import { CATEGORIES, INTENTS, PRODUCTS, productBySlug, productTitle, type Category, type Intent } from '@/lib/data'
-import { useApp } from '@/lib/store'
+import { couponOk, useApp } from '@/lib/store'
 import { BP } from '@/lib/asset'
 
 const PILLS: { key: Category | 'all'; label: string }[] = [
@@ -31,6 +31,7 @@ export default function Shop() {
   const [searching, setSearching] = useState(false)
   const [saved, setSaved] = useState(false)
   const wishlist = useApp((s) => s.wishlist)
+  const coupon = useApp((s) => s.coupon)
   const bag = useApp((s) => s.cart.reduce((n, l) => n + l.qty, 0))
   const list = useMemo(() => {
     const ql = q.trim().toLowerCase()
@@ -58,6 +59,15 @@ export default function Shop() {
           <h1 className="h-duo pt-2">Little <em>rituals</em></h1>
           <p className="mt-1 text-[14px] text-muted">Aromatherapy and Bach remedies, made with care 🌿</p>
         </Item>
+        {couponOk(coupon) && (
+          <Item>
+            <div className="flex items-center gap-3 rounded-[22px] border border-dashed border-[#d9b35a] bg-[#fbf3dc] p-3.5">
+              <span className="text-[24px]" aria-hidden>🎁</span>
+              <span className="flex-1 text-[14px] leading-5 text-[#6b5320]"><b>{coupon!.pct}% off everything</b> on your first order. Applied at checkout · code {coupon!.code}</span>
+              <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[12px] font-bold text-rose">{Math.max(1, Math.ceil((+new Date(coupon!.expiresAt) - Date.now()) / 864e5))}d left</span>
+            </div>
+          </Item>
+        )}
 
         <AnimatePresence>
           {searching && (

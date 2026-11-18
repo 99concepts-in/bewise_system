@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — Launch offer, plans, coupon, subscriptions, pay-first booking with time approval · branch claude/new-session-94881h
+**Status:** Pushed (preview in `apps/client`)
+**Done:** top-of-Home launch banner → full-screen animated offer: Yearly ₹9,600 cut to ₹8,000 (2 months free, save ₹1,600), Pay or WhatsApp 90542 20952 "I want to avail the yearly offer"; ✕ → "Are you sure?" → 6-month offer ₹4,800 → ₹4,000 (1 month free) with claim / skip; live countdown to 1 Dec · after paying: congratulations animation + 15% first-purchase coupon WELCOME15 (7 days, applied at bag/checkout on products) · checkout asks to subscribe per product (every 30 days) and places the order only after confirm · delivered orders ask for a review (stars + note) · follow-up booking offers 6 months (Recommended) / Yearly (Best value) / One time; plans cover later follow-ups · booking order is now pay → preferred time → "Time requested" (confirmed by Jitu Bhaiya or Haresh bhai, else the team calls) · helpline Mr. Haresh 96013 45289 on Help, booking done and session screens
+**Tests:** 43 green (8 flows incl. launch offer + plan booking, 11 sizes, axe)
+**Needs MANAGER/CONSULTANT:** approve/adjust requested times (`timeRequested`), mark pay-after-session payments, refill subscriptions confirmation and the WhatsApp review message a few days after delivery
+**Needs OWNER:** confirm plan meaning (one consultation a month at the ₹800 follow-up fee, so yearly = 12 × ₹800) and that launch prices end 1 Dec 23:59 IST
+
 ## 2026-11-18 — Real product range, shop redesign, owner intake + booking feedback · branch claude/new-session-94881h
 **Status:** Pushed (preview in `apps/client`)
 **Done:** all 18 products from `Bewise Products Range.xlsx` (7 roll-ons ₹600, 4 aura sprays ₹1,200, Bach remedy dropper/spray ₹800 as reorder of the client's own blend, Rescue Remedy, Hair Oil, Beauty mist, 2 bath salts ₹500) · product images made from the owner's photos (cutouts, recoloured roll-on bands, BeWise labels) · shop: categories, "How do you want to feel?" intents, most loved, disclaimer · first consultation pre-selected; follow-up link only · "Skip" with a recommendation dialog (new clients) · feelings as face tiles + "More feelings"; nuance step skipped when empty; sleep faces; duration + goals screens removed; alcohol notes removed; privacy line rewritten · **pay after session** option (booking stays confirmed; pay later from the session) · no em/en dashes in any copy · brochure testimonials (3, verbatim) + WhatsApp 90542 20952 · remedy label facts (lasts up to 25 days, storage, personal use)
