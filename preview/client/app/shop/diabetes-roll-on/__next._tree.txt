@@ -1,7 +1,0 @@
-:HL["/bewise_system/preview/client/_next/static/chunks/0xs7oc5i0rmnq.css","style"]
-:HC["/",""]
-4:[["children",{"s":"__PAGE__","h":160}]]
-3:[["children",{"s":{"n":"slug","t":"d","k":"diabetes-roll-on","s":[]},"h":65632,"c":"$Q4"}]]
-2:[["children",{"s":"shop","h":131168,"c":"$Q3"}]]
-1:[["children",{"s":"app","h":131172,"c":"$Q2"}]]
-0:{"b":"618l3CE7vGKBZiNATWJlc","t":{"t":{"s":"","h":131160,"c":"$Q1"}}}

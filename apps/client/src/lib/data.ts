@@ -239,10 +239,12 @@ export const PRODUCTS: Product[] = [
     'A bright blend for your cleanse and reset days, to help you feel fresh, light and well.', ['Fresh', 'Light', 'Renewed']),
   rollon('cough-cold', 'Cough & Cold', '#2E918E', ['#dff0ee', '#e7ecfa'], ['wellness'], 'A comforting aroma for the cold season',
     'A warm, comforting aromatic blend for the cold season, for cosy moments of rest when you feel under the weather.', ['Comforted', 'Cosy', 'Soothed'], ' Not a cough or cold medicine.'),
-  rollon('diabetes', 'Diabetes', '#7A4E9F', ['#efe9fb', '#f4eef8'], ['wellness', 'calm'], 'A calm companion for your daily routine',
-    'A gentle aromatherapy blend to complement your daily wellness routine and help you feel calm and steady. It does not lower or manage blood sugar.', ['Calm', 'Steady', 'Cared for'], ' Keep taking your medicines exactly as your doctor advises.'),
-  rollon('bp', 'BP', '#B6475E', ['#fbe9ee', '#f8f1f4'], ['calm', 'wellness'], 'Unwind and ease everyday stress',
-    'A calming blend to help you relax and ease everyday stress, for slower, steadier moments in your day. It does not lower blood pressure.', ['Calm', 'Relaxed', 'Unwound'], ' Keep taking your medicines exactly as your doctor advises.'),
+// owner 2026-11-19: Diabetes and BP roll-ons removed for now (medical-sounding names; Razorpay review)
+  //   rollon('diabetes', 'Diabetes', '#7A4E9F', ['#efe9fb', '#f4eef8'], ['wellness', 'calm'], 'A calm companion for your daily routine',
+  //     'A gentle aromatherapy blend to complement your daily wellness routine and help you feel calm and steady. It does not lower or manage blood sugar.', ['Calm', 'Steady', 'Cared for'], ' Keep taking your medicines exactly as your doctor advises.'),
+// owner 2026-11-19: Diabetes and BP roll-ons removed for now (medical-sounding names; Razorpay review)
+  //   rollon('bp', 'BP', '#B6475E', ['#fbe9ee', '#f8f1f4'], ['calm', 'wellness'], 'Unwind and ease everyday stress',
+  //     'A calming blend to help you relax and ease everyday stress, for slower, steadier moments in your day. It does not lower blood pressure.', ['Calm', 'Relaxed', 'Unwound'], ' Keep taking your medicines exactly as your doctor advises.'),
   // owner 2026-11-18: Migraine Go Roll On, 15 ml, ₹600 (copy kept to aromatherapy comfort, no treatment claim)
   rollon('migraine-go', 'Migraine Go', '#7F6BC0', ['#efe9fb', '#e7ecfa'], ['calm', 'wellness'], 'Calm, cool comfort for tense days',
     'A soothing aromatherapy blend for moments of head tension and stress. Helps relax the mind, ease tension and bring a sense of freshness and well-being.', ['Soothed', 'Relaxed', 'Fresh'], ' Not a migraine or headache medicine. If headaches are frequent or severe, please see your doctor.'),
