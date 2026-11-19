@@ -122,7 +122,7 @@ function Book() {
 
   return (
     <main className="flex min-h-dvh flex-col px-5">
-      {step === 'choose' ? <AppHeader /> : (
+      {step === 'choose' ? <AppHeader back="/app/remedies" /> : (
         <header className="sticky top-0 z-30 -mx-5 bg-[linear-gradient(180deg,#dce2f5_0%,#dce2f5_75%,rgba(220,226,245,0)_100%)] px-5 pb-5 pt-2 safe-t">
           <div className="flex items-center gap-3">
             <IconBtn label="Back" onClick={back}><ChevronLeft className="size-5" /></IconBtn>

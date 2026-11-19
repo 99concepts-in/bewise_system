@@ -12,10 +12,10 @@ import { Mascot, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
 import { Btn, BtnLink, Item, Reveal, Ring, Sheet, buzz, ease, toast, useChrome } from '@/components/ui'
 import { moodOf, REORDER_PRICE_PAISE } from '@/lib/data'
-import { useApp } from '@/lib/store'
+import { useApp, type Appointment } from '@/lib/store'
 import { dayKey, fmtDay, fmtTime, formatINR } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
-import { DropsTick } from '@/components/drops-tick'
+import { DoseTracker } from '@/components/dose-tracker'
 import { blendSupply } from '@/lib/supply'
 import { BP } from '@/lib/asset'
 
@@ -39,31 +39,17 @@ export default function Remedies() {
   const [times, setTimes] = useState(false)
   const reorderRef = useRef<HTMLButtonElement>(null)
 
-  const next = appointments.filter((a) => (a.status === 'confirmed' || a.status === 'awaiting_payment' || a.needsNewTime) && (a.needsNewTime || +new Date(a.startsAt) + 3600_000 > Date.now()))
-    .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))[0]
   if (!blend) return (
     <main className="px-5 pb-32">
       <AppHeader />
-      <h1 className="h-duo pt-2">My <em>remedies</em></h1>
-      <div className="card mt-6 flex flex-col items-center p-8 text-center">
+      <h1 className="h-duo pt-2">My <em>care</em></h1>
+      <div className="mt-5"><Upcoming /></div>
+      <div className="card mt-4 flex flex-col items-center p-8 text-center">
         <Mascot pose="sleep" height={150} />
         <p className="mt-4 text-[18px] font-extrabold text-navy">Your blend will bloom here</p>
         <p className="mt-1 max-w-[280px] text-[14px] leading-5 text-muted">After your first session, Jitu Bhaiya prepares a personal blend of flower essences, included in your consultation.</p>
-        {/* owner 2026-11-18: if a session is already booked, show it instead of asking to book */}
-        {next ? (
-          <Link href={next.needsNewTime ? `/app/pay?appointment=${next.id}` : `/app/sessions/view?id=${next.id}`} className="mt-5 flex w-full items-center gap-3 rounded-[22px] bg-peri-50 p-4 text-left">
-            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-navy text-white"><CalendarHeart className="size-6" /></span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[12px] font-semibold text-peri">{next.needsNewTime ? 'Booked · choose your time' : next.timeRequested ? 'Booked · time awaiting confirmation' : 'Your session is booked'}</span>
-              <span className="block text-[16px] font-bold text-navy">{next.needsNewTime ? 'Pick a preferred time' : `${fmtDay(next.startsAt)} · ${fmtTime(next.startsAt)}`}</span>
-              <span className="block text-[12px] text-muted">{next.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya · your blend comes after</span>
-            </span>
-            <ChevronRight className="size-5 text-navy" />
-          </Link>
-        ) : (
-          <BtnLink href="/app/book" size="md" className="mt-5">Book a consultation</BtnLink>
-        )}
       </div>
+      <div className="mt-4"><PastSessions /></div>
     </main>
   )
 
@@ -83,7 +69,8 @@ export default function Remedies() {
     <main className="px-5 pb-32">
       <AppHeader />
       <Reveal className="space-y-4">
-        <Item><h1 className="h-duo pt-2">My <em>remedies</em></h1></Item>
+        <Item><h1 className="h-duo pt-2">My <em>care</em></h1></Item>
+        <Item><Upcoming /></Item>
         <Item>
           <section className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(150deg,#fbf3dc_0%,#f6efe4_45%,#eef1fb_100%)] p-6 shadow-[var(--shadow-card)]">
             <motion.img src={`${BP}/img/f-mimulus.webp`} alt="" aria-hidden className="absolute -right-10 top-2 h-[150px] opacity-80" animate={{ rotate: [0, 4, 0] }} transition={{ duration: 6, repeat: Infinity }} />
@@ -147,6 +134,7 @@ export default function Remedies() {
           </section>
         </Item>
 
+        <Item><PastSessions /></Item>
         <Item>
           <section className="card p-5">
             <h2 className="h-section">Past blends</h2>
@@ -198,7 +186,7 @@ function RitualToday({ onTimes }: { onTimes: () => void }) {
         <div><h2 id="drops-h" className="h-section">Your daily drops</h2><p className="text-[13px] text-muted">{blend.drops} drops, {blend.timesPerDay}× a day · {blend.reminderTimes.join(', ')}</p></div>
         <button onClick={onTimes} className="inline-flex items-center gap-1.5 rounded-full bg-peri-50 px-3 py-2 text-[13px] font-semibold text-navy"><Bell className="size-4" /> Times</button>
       </div>
-      <div className="mt-4"><DropsTick full /></div>
+      <div className="mt-4"><DoseTracker full /></div>
     </section>
   )
 }
@@ -223,5 +211,68 @@ function ReminderSheet({ open, onClose }: { open: boolean; onClose: () => void }
       <Btn full className="mt-5" onClick={() => { set([...t].sort()); toast('Reminders updated'); onClose() }}>Save times</Btn>
       <p className="mt-3 flex items-center justify-center gap-1 text-[12px] text-muted">Notifications arrive once the app is installed <ChevronRight className="size-3" /></p>
     </Sheet>
+  )
+}
+
+const isUpcoming = (a: Appointment, now: number) => (a.status === 'confirmed' || a.status === 'awaiting_payment' || !!a.needsNewTime) && (!!a.needsNewTime || +new Date(a.startsAt) + 3600_000 > now)
+
+/** owner 2026-11-18: sessions live here too, with booking one tap away (the separate Book tab is gone). */
+function Upcoming() {
+  const appts = useApp((s) => s.appointments)
+  const now = Date.now()
+  const up = appts.filter((a) => isUpcoming(a, now)).sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))
+  const hasHistory = appts.length > 0
+  return (
+    <section className="card p-5" aria-labelledby="up-h">
+      <div className="flex items-center justify-between">
+        <h2 id="up-h" className="h-section">{up.length ? 'Upcoming sessions' : 'Your sessions'}</h2>
+        {appts.length > 0 && <Link href="/app/sessions" className="inline-flex items-center gap-0.5 text-[13px] font-semibold text-navy">All<ChevronRight className="size-4" /></Link>}
+      </div>
+      {up.length ? (
+        <ul className="mt-3 space-y-2.5">
+          {up.map((a) => (
+            <li key={a.id}>
+              <Link href={a.needsNewTime || a.status === 'awaiting_payment' ? `/app/pay?appointment=${a.id}` : `/app/sessions/view?id=${a.id}`} className="flex items-center gap-3 rounded-[20px] bg-peri-50/70 p-3.5">
+                <span className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-navy text-white"><CalendarHeart className="size-6" /></span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[12px] font-semibold text-peri">{a.needsNewTime ? 'Booked · choose your time' : a.status === 'awaiting_payment' ? 'Awaiting payment' : a.timeRequested ? 'Time awaiting confirmation' : a.type === 'first' ? 'First consultation' : 'Follow-up'}</span>
+                  <span className="block text-[16px] font-bold text-navy">{a.needsNewTime ? 'Pick a preferred time' : `${fmtDay(a.startsAt)} · ${fmtTime(a.startsAt)}`}</span>
+                  <span className="block text-[12px] text-muted">{a.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya</span>
+                </span>
+                <ChevronRight className="size-5 text-navy" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="mt-1 text-[14px] text-muted">Nothing booked right now.</p>}
+      <BtnLink href={hasHistory ? '/app/book?type=followup' : '/app/book'} size="md" variant={up.length ? 'white' : 'gradient'} className="mt-4 w-full">
+        <CalendarHeart className="size-4" /> {hasHistory ? 'Book a new session' : 'Book your first consultation'}
+      </BtnLink>
+    </section>
+  )
+}
+
+function PastSessions() {
+  const appts = useApp((s) => s.appointments)
+  const now = Date.now()
+  const past = appts.filter((a) => a.status === 'completed' || (a.status === 'confirmed' && !a.needsNewTime && +new Date(a.startsAt) + 3600_000 <= now))
+    .sort((a, b) => +new Date(b.startsAt) - +new Date(a.startsAt)).slice(0, 5)
+  if (!past.length) return null
+  return (
+    <section className="card p-5" aria-labelledby="past-h">
+      <h2 id="past-h" className="h-section">Past sessions</h2>
+      <ul className="mt-2 divide-y divide-line">
+        {past.map((a) => (
+          <li key={a.id}>
+            <Link href={`/app/sessions/view?id=${a.id}`} className="flex items-center gap-3 py-3">
+              <span className="min-w-0 flex-1"><span className="block text-[15px] font-semibold text-navy">{a.type === 'first' ? 'First consultation' : 'Follow-up'}</span>
+                <span className="text-[13px] text-muted">{fmtDay(a.startsAt)} · {a.mode === 'online' ? 'Online' : 'In person'}</span></span>
+              {!a.feedback && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose">Add feedback</span>}
+              <ChevronRight className="size-4 text-soft" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }

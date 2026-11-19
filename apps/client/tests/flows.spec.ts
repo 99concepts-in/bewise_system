@@ -4,16 +4,19 @@ import { seed } from './seed'
 
 const state = (page: import('@playwright/test').Page) => page.evaluate(() => JSON.parse(localStorage.getItem('bewise-client-v1') || '{}').state)
 
-test('drops tick: yes today, change, edit yesterday, gentle copy', async ({ page }) => {
+test('dose check-ins: dots light up, streak, 25-day calendar with past days', async ({ page }) => {
   await seed(page)
-  await page.goto('/app'); await page.getByRole('button', { name: 'Not today' }).click()
-  await expect(page.getByText('Not today, that’s okay.')).toBeVisible()
-  await page.getByRole('button', { name: 'Change' }).click()
-  await expect(page.getByText('Drops taken today.')).toBeVisible()
-  await page.goto('/app/remedies'); await page.getByRole('button', { name: 'Took them' }).first().click()
+  await page.goto('/app')
+  await expect(page.getByRole('group', { name: 'Today: 0 of 4 doses' })).toBeVisible()
+  for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Took a dose' }).click()
+  await expect(page.getByRole('group', { name: 'Today: 4 of 4 doses' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'All done' })).toBeDisabled()
+  await page.getByRole('button', { name: /See all 25 days/ }).click()
+  await expect(page.getByRole('grid', { name: 'Doses by day' })).toBeVisible()
+  const pastDay = page.getByRole('grid', { name: 'Doses by day' }).getByRole('button').filter({ hasNotText: '' }).first()
+  await pastDay.click(); await page.getByRole('button', { name: 'All 4' }).click()
   const s = await state(page)
-  expect(Object.values(s.drops).filter(Boolean).length).toBeGreaterThanOrEqual(3)
-  await expect(page.getByText(/You took them on \d+ of the last \d+ days/)).toBeVisible()
+  expect(Object.values(s.doses).filter((n) => n === 4).length).toBeGreaterThanOrEqual(2)
 })
 
 test('feedback sends benefits[]', async ({ page }) => {
@@ -157,8 +160,8 @@ test('My remedies shows the booked session when there is no blend yet', async ({
   await seed(page)
   await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('bewise-client-v1')!); r.state.blend = null; localStorage.setItem('bewise-client-v1', JSON.stringify(r)) })
   await page.goto('/app/remedies')
-  await expect(page.getByText('Your session is booked')).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Book a consultation' })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Upcoming sessions' })).toBeVisible()
+  await expect(page.getByRole('link', { name: /Book a new session/ })).toBeVisible()
 })
 
 test('shop shows a checkout bar once the cart has items', async ({ page }) => {

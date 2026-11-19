@@ -7,7 +7,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { Bell, CalendarDays, ChevronLeft, Home, Leaf, Search, ShoppingBag, User, X } from 'lucide-react'
+import { Bell, ChevronLeft, Home, Leaf, Search, ShoppingBag, User, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { create } from 'zustand'
 import { Avatar, Logo, MoodButton, MoodImg } from './brand'
@@ -21,8 +21,8 @@ export const useUi = create<{ navHidden: boolean; setNavHidden: (v: boolean) => 
 
 const NAV = [
   { href: '/app', label: 'Home', icon: Home, match: (p: string) => p === '/app' || p.startsWith('/app/journal') || p.startsWith('/app/goals') || p.startsWith('/app/ask') },
-  { href: '/app/remedies', label: 'Remedies', icon: Leaf, match: (p: string) => p.startsWith('/app/remedies') },
-  { href: '/app/book', label: 'Book', icon: CalendarDays, match: (p: string) => p.startsWith('/app/book') || p.startsWith('/app/sessions') },
+  // owner 2026-11-18: no separate Book tab; remedies, sessions and booking live together under My care
+  { href: '/app/remedies', label: 'My care', icon: Leaf, match: (p: string) => p.startsWith('/app/remedies') || p.startsWith('/app/book') || p.startsWith('/app/sessions') },
   { href: '/app/shop', label: 'Shop', icon: ShoppingBag, match: (p: string) => p.startsWith('/app/shop') || p.startsWith('/app/bag') || p.startsWith('/app/checkout') || p.startsWith('/app/orders') },
   { href: '/app/me', label: 'Me', icon: User, match: (p: string) => p.startsWith('/app/me') || p.startsWith('/app/help') },
 ]

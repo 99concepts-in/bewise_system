@@ -36,7 +36,7 @@ export default function Ask() {
     buzz(6); setText(''); s.pushChat({ role: 'user', text: m })
     const crisis = crisisCheck(m)
     setTyping(true)
-    const reply = respond(m, { name: firstName(s.profile?.name), blend: s.blend, droppedToday: s.drops[dayKey(new Date())], journal: s.journal, appointments: s.appointments, orders: s.orders, allergies: s.profile?.allergies ?? [] })
+    const reply = respond(m, { name: firstName(s.profile?.name), blend: s.blend, droppedToday: (s.doses[dayKey(new Date())] ?? 0) > 0 || s.drops[dayKey(new Date())], journal: s.journal, appointments: s.appointments, orders: s.orders, allergies: s.profile?.allergies ?? [] })
     setTimeout(() => {
       setTyping(false)
       s.pushChat({ role: 'bot', text: reply.text, products: reply.products, actions: [...(reply.actions ?? []), ...((reply.quick ?? []).map((q) => ({ id: `q:${q}`, label: q })))], safety: reply.safety })

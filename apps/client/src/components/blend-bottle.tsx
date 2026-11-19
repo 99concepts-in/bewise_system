@@ -11,7 +11,7 @@ import { CalendarPlus, ChevronRight } from 'lucide-react'
 import { useId } from 'react'
 import { BtnLink, cx, useNow } from './ui'
 import { useApp } from '@/lib/store'
-import { DropsTick } from './drops-tick'
+import { DoseTracker } from './dose-tracker'
 import { fmtDay, fmtTime } from '@/lib/format'
 import { blendSupply, isoDay } from '@/lib/supply'
 
@@ -74,7 +74,7 @@ export function BlendBottleCard() {
         </div>
       </div>
 
-      <div className="mt-4"><DropsTick /></div>
+      <div className="mt-4"><DoseTracker /></div>
 
       {/* next appointment / pre-book */}
       <div className="mt-4 rounded-[20px] bg-white/85 p-3.5 ring-1 ring-[#efe5d4]">

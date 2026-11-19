@@ -79,6 +79,8 @@ type State = {
   blend: Blend | null
   /** daily "Took my drops" tick — remedies.logDrops({ date, taken }) (consultant request 2026-11-18) */
   drops: Record<string, boolean>
+  /** owner 2026-11-18: each dose checked in (4 drops, up to timesPerDay a day) → count per day */
+  doses: Record<string, number>
   checkins: Record<string, { at: string; answers: CheckinAnswers }>
   cart: CartLine[]
   wishlist: string[]
@@ -105,6 +107,7 @@ type State = {
   reschedule: (id: string, startsAt: string) => void         // scheduling.rescheduleAppointment
   giveFeedback: (id: string, f: Feedback) => void            // scheduling.submitSessionFeedback
   logDrops: (date: string, taken: boolean) => void            // remedies.logDrops
+  logDoses: (date: string, n: number) => void                  // remedies.logDrops({ date, doses })
   payAppointment: (id: string) => void                         // finance checkout for an existing appointment → payment.captured
   pickNewTime: (id: string, startsAt: string) => void          // scheduling.rescheduleAppointment (no cost) → confirmed
   submitCheckin: (appointmentId: string, answers: CheckinAnswers) => void // intake.submitCheckin
@@ -129,7 +132,7 @@ type State = {
 }
 
 const initial = {
-  profile: null, journal: [], goals: [], appointments: [], intake: null, blend: null, drops: {}, checkins: {}, cart: [], wishlist: [],
+  profile: null, journal: [], goals: [], appointments: [], intake: null, blend: null, drops: {}, doses: {}, checkins: {}, cart: [], wishlist: [],
   addresses: [], orders: [], chat: [], notices: [], plan: null, coupon: null, offer: {}, seq: 41,
 }
 
@@ -191,7 +194,11 @@ export const useApp = create<State>()(
       },
       reschedule: (id, startsAt) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, startsAt, rescheduled: (a.rescheduled ?? 0) + 1 } : a)) })),
       giveFeedback: (id, f) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, feedback: f } : a)) })),
-      logDrops: (date, taken) => set((s) => ({ drops: { ...s.drops, [date]: taken } })),
+      logDrops: (date, taken) => set((s) => ({ drops: { ...s.drops, [date]: taken }, doses: { ...s.doses, [date]: taken ? (s.blend?.timesPerDay ?? 4) : 0 } })),
+      logDoses: (date, n) => set((s) => {
+        const max = s.blend?.timesPerDay ?? 4, v = Math.max(0, Math.min(max, n))
+        return { doses: { ...s.doses, [date]: v }, drops: { ...s.drops, [date]: v > 0 } }
+      }),
       payAppointment: (id) => {
         const a = get().appointments.find((x) => x.id === id)
         if (!a) return
@@ -291,12 +298,14 @@ function demoState(s: State): Partial<State> {
   }).reverse()
   const drops: Record<string, boolean> = {}
   for (let i = 1; i <= 12; i++) drops[dayKey(d(-i))] = i % 5 !== 0
+  const doses: Record<string, number> = {}
+  for (let i = 1; i <= 12; i++) doses[dayKey(d(-i))] = i % 5 === 0 ? 1 : i % 3 === 0 ? 3 : 4
   const first: Appointment = { id: 'demo-a1', code: 'BW-A-00038', type: 'first', mode: 'online', startsAt: d(-14, 11).toISOString(), status: 'completed', amountPaise: 100000, createdAt: d(-17).toISOString() }
   const next: Appointment = { id: 'demo-a2', code: 'BW-A-00041', type: 'followup', mode: 'online', startsAt: d(3, 11).toISOString(), status: 'confirmed', amountPaise: 80000, createdAt: d(-1).toISOString() }
   const addr: Address = { id: 'demo-addr', name: s.profile?.name || 'Priya Shah', phone: s.profile?.phone || '9876543210', line1: '12, Shanti Kunj', line2: 'Alkapuri', city: 'Vadodara', state: 'Gujarat', pin: '390007' }
   return {
     journal: [...journal, ...s.journal],
-    drops,
+    drops, doses,
     appointments: [first, next],
     blend: { name: 'Personal blend', version: 1, flowers: ['Mimulus', 'White Chestnut', 'Larch', 'Impatiens', 'Walnut'], drops: 4, timesPerDay: 4, startedOn: d(-13).toISOString(), days: 25, reminderTimes: ['08:00', '13:00', '18:00', '22:00'], alcoholFree: true },
     goals: s.goals.length ? s.goals : [{ id: uid(), title: 'Sleep by 11 PM', progress: 0, done: false, kind: 'daily', days: [-1, -2, -3].map((n) => isoDay(d(n))) }, { id: uid(), title: 'Finish a 30-day morning walk habit', progress: 0, done: false, kind: 'once' }],
