@@ -87,17 +87,32 @@ export function Avatar({ photo, name, size = 44, ring }: { photo?: string; name?
 
 type ArtInput = Pick<Product, 'art' | 'tint' | 'name'> & { color?: string; wide?: boolean }
 /** Product photo on a soft BeWise tile: tint gradient, a glow in the product's colour, floor shadow. */
+/**
+ * Premium podium "stage" behind each product (Higgsfield, HUB 2026-11-19 — design/assets/v4/stages), picked by the
+ * product's tint hue so colours stay on-brand. Same stages as bewiseglobal.in.
+ */
+const STAGE_MASK = 'linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent)'
+export function stageFor(tint: string): string {
+  const h = tint.replace('#', ''), r = parseInt(h.slice(0, 2), 16) / 255, g = parseInt(h.slice(2, 4), 16) / 255, b = parseInt(h.slice(4, 6), 16) / 255
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn
+  let hue = 0
+  if (d) hue = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4
+  hue = (hue * 60 + 360) % 360
+  const n = hue < 15 || hue >= 290 ? 'blush' : hue < 62 ? 'butter' : hue < 150 ? 'sage' : hue < 200 ? 'aqua' : hue < 238 ? 'periwinkle' : 'lavender'
+  return `${BP}/img/stages/${n}.webp`
+}
+
 export function ProductArt({ product, size = 'md', className }: { product: ArtInput; size?: 'sm' | 'md' | 'lg'; className?: string }) {
   const h = size === 'lg' ? 'h-[240px]' : size === 'md' ? 'h-[150px]' : 'h-[84px]'
-  const img = product.wide
-    ? (size === 'lg' ? 'bottom-6 w-[78%]' : size === 'md' ? 'bottom-3 w-[88%]' : 'bottom-2 w-[90%]')
-    : (size === 'lg' ? 'bottom-5 h-[78%]' : size === 'md' ? 'bottom-3 h-[124px]' : 'bottom-1.5 h-[72px]')
+  // the product stands on the podium (podium top ≈ 84% down the square stage)
+  const img = product.wide ? 'bottom-[15%] w-[62%]' : size === 'sm' ? 'bottom-[15%] h-[58%]' : 'bottom-[15%] h-[66%]'
   return (
     <div className={cx('relative overflow-hidden rounded-[24px]', h, className)} style={{ background: `linear-gradient(155deg, ${product.tint[0]}, ${product.tint[1]})` }}>
-      <span className="absolute left-1/2 top-[14%] aspect-square w-[70%] -translate-x-1/2 rounded-full opacity-[.16] blur-xl" style={{ background: product.color ?? '#5b78b8' }} />
-      <span className="absolute bottom-[6%] left-1/2 h-[10%] w-[60%] -translate-x-1/2 rounded-[50%] bg-[#182957]/12 blur-md" />
+      <img src={stageFor(product.tint[0])} alt="" aria-hidden loading="lazy" decoding="async" draggable={false}
+        className="absolute left-1/2 top-0 aspect-square h-full max-w-none -translate-x-1/2 object-cover"
+        style={{ maskImage: STAGE_MASK, WebkitMaskImage: STAGE_MASK }} />
       <img src={`${BP}/img/${product.art}.webp`} alt={product.name} loading="lazy" decoding="async" draggable={false}
-        className={cx('absolute left-1/2 -translate-x-1/2 object-contain drop-shadow-[0_10px_12px_rgba(24,41,87,.16)]', img)} />
+        className={cx('absolute left-1/2 -translate-x-1/2 object-contain drop-shadow-[0_12px_12px_rgba(24,41,87,.2)]', img)} />
     </div>
   )
 }

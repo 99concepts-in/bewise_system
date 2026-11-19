@@ -9,6 +9,16 @@
   var api = window.BeWise
   var PRODUCTS = window.BW_PRODUCTS || []
   var IMG = function (art) { return 'assets/img/' + String(art || '').replace(/^products\//, 'products/') + '.webp' }
+  /** Premium podium "stage" (Higgsfield, design/assets/v4/stages) matched to the product's tint hue. */
+  function stageFor(tint) {
+    var h = String((tint || ['#e7ecfa'])[0]).replace('#', ''), r = parseInt(h.slice(0, 2), 16) / 255, g = parseInt(h.slice(2, 4), 16) / 255, b = parseInt(h.slice(4, 6), 16) / 255
+    var mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn, hue = 0
+    if (d) hue = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4
+    hue = (hue * 60 + 360) % 360
+    var n = hue < 15 || hue >= 290 ? 'blush' : hue < 62 ? 'butter' : hue < 150 ? 'sage' : hue < 200 ? 'aqua' : hue < 238 ? 'periwinkle' : 'lavender'
+    return 'assets/img/stages/' + n + '.webp'
+  }
+  function art(p, cls) { return '<div class="art ' + (cls || '') + '" style="background:' + esc((p.tint || ['#eef1fb'])[0]) + '"><img class="stage" src="' + stageFor(p.tint) + '" alt="" loading="lazy"><img class="p" loading="lazy" src="' + IMG(p.art) + '" alt="' + esc(p.name + ' ' + p.format) + '"></div>' }
 
   function toast(t) { var el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(function () { el.classList.remove('show') }, 2600) }
   function note(el, text, kind) { if (!el) return; el.className = 'note' + (kind ? ' ' + kind : ''); el.textContent = text || '' }
@@ -84,8 +94,7 @@
   function card(p) {
     var v = p.variants[0] || { pricePaise: 0, label: '' }
     var personal = !!p.personal
-    return '<a class="prod" href="#' + esc(p.slug) + '" data-slug="' + esc(p.slug) + '"><div class="art" style="background:linear-gradient(160deg,' + esc((p.tint || ['#eef1fb', '#f6f3ec'])[0]) + ',' + esc((p.tint || ['#eef1fb', '#f6f3ec'])[1]) + ')">' +
-      '<img loading="lazy" src="' + IMG(p.art) + '" alt="' + esc(p.name + ' ' + p.format) + '"></div><div class="body"><span class="fmt">' + esc(p.format) + ' · ' + esc(v.label) + '</span><h3>' + esc(p.name) + '</h3><p>' + esc(p.tagline) + '</p>' +
+    return '<a class="prod" href="#' + esc(p.slug) + '" data-slug="' + esc(p.slug) + '">' + art(p) + '<div class="body"><span class="fmt">' + esc(p.format) + ' · ' + esc(v.label) + '</span><h3>' + esc(p.name) + '</h3><p>' + esc(p.tagline) + '</p>' +
       '<div class="row"><b>' + inr(v.pricePaise) + '</b>' + (p.soldOut ? '<span class="tag">Sold out</span>' : personal ? '<span class="tag" style="background:#e5efe2;color:#3d6b48">After consultation</span>' : '<span class="btn sm">View</span>') + '</div></div></a>'
   }
   function detail(p) {
@@ -93,7 +102,7 @@
     var buy = p.soldOut ? '<p class="tag">Sold out — back soon</p>'
       : p.personal ? '<div class="note">Your personal blend is prepared by Jitu Bhaiya after a consultation — the first bottle is included in the consultation fee. Reorders are ' + inr(v.pricePaise) + ' from <a href="account.html">My account</a> or the BeWise app.</div><div class="actions"><a class="btn" href="consultations.html">Book a consultation</a></div>'
       : '<div class="actions"><button class="btn" data-add="' + esc(v.id) + '">Add to bag · ' + inr(v.pricePaise) + '</button><a class="btn ghost" href="cart.html">View bag</a></div>'
-    return '<div class="pd"><div class="art" style="background:linear-gradient(160deg,' + esc((p.tint || ['#eef1fb'])[0]) + ',' + esc((p.tint || ['#eef1fb', '#f6f3ec'])[1]) + ')"><img src="' + IMG(p.art) + '" alt=""></div><div>' +
+    return '<div class="pd">' + art(p, 'big') + '<div>' +
       '<span class="fmt muted small" style="font-weight:700;text-transform:uppercase;letter-spacing:.05em">' + esc(p.format) + ' · ' + esc(v.label) + '</span><h2 style="margin-top:6px">' + esc(p.name) + '</h2><p class="lead" style="font-size:17px">' + esc(p.about || p.tagline) + '</p>' +
       '<div class="price">' + inr(v.pricePaise) + ' <small>incl. taxes</small></div>' + buy +
       (p.feel && p.feel.length ? '<p class="small muted" style="margin-top:16px">Helps you feel: ' + p.feel.map(esc).join(' · ') + '</p>' : '') +
@@ -134,7 +143,7 @@
       $('#checkout').hidden = false
       var sub = 0
       cartEl.innerHTML = b.map(function (l) { var x = variant(l.key); sub += x.v.pricePaise * l.qty
-        return '<div class="line"><img src="' + IMG(x.p.art) + '" alt="" style="background:' + esc((x.p.tint || ['#eef1fb'])[0]) + '"><div class="grow"><b>' + esc(x.p.name) + '</b> <span class="muted small">' + esc(x.p.format) + ' · ' + esc(x.v.label) + '</span><br><span class="small">' + inr(x.v.pricePaise) + '</span></div>' +
+        return '<div class="line">' + art(x.p, 'thumb') + '<div class="grow"><b>' + esc(x.p.name) + '</b> <span class="muted small">' + esc(x.p.format) + ' · ' + esc(x.v.label) + '</span><br><span class="small">' + inr(x.v.pricePaise) + '</span></div>' +
           '<div class="qty"><button data-dec="' + esc(l.key) + '" aria-label="less">−</button><span>' + l.qty + '</span><button data-inc="' + esc(l.key) + '" aria-label="more">+</button></div></div>' }).join('') +
         '<div style="padding-top:12px"><div class="sum"><span>Subtotal</span><b>' + inr(sub) + '</b></div><div class="sum"><span>Delivery</span><span data-ship>Free</span></div><div class="sum total"><span>Total</span><span>' + inr(sub) + '</span></div><p class="small muted">Prices include taxes. Final amount is confirmed on the payment screen.</p></div>'
     }

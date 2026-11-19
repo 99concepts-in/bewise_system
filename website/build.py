@@ -93,15 +93,15 @@ consult_cards = f'''<div class="grid g2">
 pages = {}
 
 pages['index.html'] = page('index.html', 'Bach flower remedies & aromatherapy in Vadodara', 'Personal Bach flower consultations with Jitu Bhaiya (Jitendra Khimlani) and natural aromatherapy roll-ons, aura sprays and bath salts. Book online or shop across India.', f'''
-<section class="hero"><div class="wrap"><div>
+<section class="hero"><div class="wrap"><div class="copy">
 <span class="eyebrow">Bach flower remedies · Aromatherapy</span>
 <h1>Feel lighter, <em>one drop</em> at a time.</h1>
 <p class="lead">Talk to Jitu Bhaiya about what’s been on your mind. He prepares a Bach flower blend just for how you feel — and our aromatherapy blends support your everyday calm, sleep and confidence.</p>
 <div class="actions"><a class="btn" href="consultations.html">Book a consultation</a><a class="btn ghost" href="shop.html">Shop the range</a></div>
 <div class="stats"><div><b>12+ years</b><span>of workshops</span></div><div><b>2,00,000+</b><span>people guided</span></div><div><b>Online & Vadodara</b><span>consultations</span></div></div></div>
-<div class="hero-art"><img class="b b1" src="assets/img/products/bach-remedy-dropper.webp" alt=""><img class="owl" src="assets/img/owl-bottle.webp" alt="BeWise owl holding a remedy bottle"><img class="b b2" src="assets/img/products/sleep-rollon.webp" alt=""></div>
+<div class="hero-art"><img class="owl" src="assets/img/owl-bottle.webp" alt="BeWise owl holding a remedy bottle"><img class="b1" src="assets/img/products/bach-remedy-dropper.webp" alt="Bach flower remedy dropper"><img class="b2" src="assets/img/products/sleep-rollon.webp" alt="Sleep roll-on"></div>
 </div></section>
-<section><div class="wrap"><div class="center"><span class="eyebrow">How it works</span><h2>Three gentle steps</h2></div>
+<section><div class="wrap"><div class="center"><span class="divider"></span><span class="eyebrow">How it works</span><h2>Three gentle steps</h2></div>
 <div class="grid g3" style="margin-top:26px">
 <div class="card step"><span class="n">1</span><h3>Share how you feel</h3><p class="muted">Book online and answer a few private questions — worries, sleep, energy, what you’d like to feel instead.</p></div>
 <div class="card step"><span class="n">2</span><h3>Meet Jitu Bhaiya</h3><p class="muted">A calm, unhurried consultation online or at our Alkapuri studio. He listens first.</p></div>
@@ -109,11 +109,11 @@ pages['index.html'] = page('index.html', 'Bach flower remedies & aromatherapy in
 <section><div class="wrap"><div class="center"><span class="eyebrow">Consultations</span><h2>Simple, clear pricing</h2><p class="lead">Your remedy blend is included. No hidden charges.</p></div><div style="margin-top:26px">{consult_cards}</div></div></section>
 <section><div class="wrap"><div style="display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap"><div><span class="eyebrow">Shop</span><h2>Aromatherapy for every day</h2></div><a class="btn ghost" href="shop.html">See all products</a></div>
 <div class="grid g4" id="featured" style="margin-top:22px"></div></div></section>
-<section><div class="wrap"><div class="card person"><img src="assets/img/jitu-portrait.webp" alt="Jitu Bhaiya (Jitendra Khimlani)"><div><span class="eyebrow" style="box-shadow:none;background:var(--peri)">Your consultant</span>
+<section><div class="wrap"><div class="card person sprig r" style="overflow:hidden"><img src="assets/img/jitu-portrait.webp" alt="Jitu Bhaiya (Jitendra Khimlani)"><div><span class="eyebrow" style="box-shadow:none;background:var(--peri)">Your consultant</span>
 <h2>Jitu Bhaiya <em>· Jitendra Khimlani</em></h2><p class="lead" style="font-size:17px">Bach Remedy Therapist. Jitu Bhaiya listens first. Then he prepares a blend of Bach flower essences chosen for how you feel.</p>
 <div class="actions"><a class="btn ghost" href="about.html">About Jitu Bhaiya</a><a class="btn ghost" href="https://www.jitendrakhimlani.com" rel="noopener">jitendrakhimlani.com</a></div></div></div></div></section>
-<section><div class="wrap"><div class="center"><span class="eyebrow">Kind words</span><h2>From people we’ve guided</h2></div><div class="grid g3" style="margin-top:26px">{quotes}</div></div></section>
-<section><div class="wrap"><div class="card center" style="background:linear-gradient(160deg,#fff,#eef1fb)"><h2>Ready when you are</h2><p class="lead">Book your first consultation today — online, or at our studio in Alkapuri, Vadodara.</p><div class="actions" style="justify-content:center"><a class="btn" href="consultations.html">Book now · {inr(T["first"])}</a><a class="btn ghost" href="https://wa.me/{B["whatsapp"]}">WhatsApp us</a></div></div></div></section>''')
+<section><div class="wrap"><div class="center"><span class="divider"></span><span class="eyebrow">Kind words</span><h2>From people we’ve guided</h2></div><div class="grid g3" style="margin-top:26px">{quotes}</div></div></section>
+<section><div class="wrap"><div class="card center sprig r" style="background:linear-gradient(160deg,#fff,#eef1fb);overflow:hidden"><span class="divider"></span><h2>Ready when you are</h2><p class="lead">Book your first consultation today — online, or at our studio in Alkapuri, Vadodara.</p><div class="actions" style="justify-content:center"><a class="btn" href="consultations.html">Book now · {inr(T["first"])}</a><a class="btn ghost" href="https://wa.me/{B["whatsapp"]}">WhatsApp us</a></div></div></div></section>''')
 
 pages['consultations.html'] = page('consultations.html', 'Book a consultation', 'Book a Bach flower consultation with Jitu Bhaiya online or at the studio in Alkapuri, Vadodara. First consultation ₹1,000, follow-up ₹800 — personal remedy blend included.', f'''
 <section style="padding-bottom:10px"><div class="wrap"><span class="eyebrow">Consultations</span><h1>Book a consultation</h1><p class="lead">Choose your session, pick a time that suits you and pay securely. Your personalised Bach flower blend is included in the fee.</p></div></section>
@@ -176,7 +176,7 @@ pages['pricing.html'] = page('pricing.html', 'Pricing', 'All BeWise prices in In
 pages['about.html'] = page('about.html', 'About us', 'BeWise Holistic Wellness — Bach flower consultations by Jitu Bhaiya (Jitendra Khimlani) and natural aromatherapy, Vadodara.', f'''
 <section><div class="wrap"><span class="eyebrow">About us</span><h1>Wellness that starts <em>with listening.</em></h1>
 <p class="lead">{B["brand"]} was founded in Vadodara to make Bach flower remedies and aromatherapy simple, personal and accessible — online across India and at our studio in Alkapuri.</p></div></section>
-<section style="padding-top:0"><div class="wrap"><div class="card person"><img src="assets/img/jitu-portrait.webp" alt="Jitu Bhaiya"><div><h2>Jitu Bhaiya <em>· Jitendra Khimlani</em></h2>
+<section style="padding-top:0"><div class="wrap"><div class="card person sprig r" style="overflow:hidden"><img src="assets/img/jitu-portrait.webp" alt="Jitu Bhaiya"><div><h2>Jitu Bhaiya <em>· Jitendra Khimlani</em></h2>
 <p>Bach Remedy Therapist with 12+ years of workshops and more than 2,00,000 people guided. In every consultation he listens first, understands what you’ve been feeling, and prepares a blend from the 38 Bach flower essences for your emotional state.</p>
 <p>Learn more at <a href="https://www.jitendrakhimlani.com" rel="noopener">www.jitendrakhimlani.com</a>.</p></div></div>
 <div class="grid g3" style="margin-top:20px">
@@ -267,6 +267,7 @@ shutil.copy(ROOT / 'api/sdk/bewise-api.js', OUT / 'assets/bewise-api.js')
 (OUT / 'assets/products.js').write_text('window.BW_PRODUCTS=' + json.dumps(PUBLIC, ensure_ascii=False) + ';\n')
 img = ROOT / 'apps/client/public/img'
 for f in ['logo-mark.png', 'logo-mark-white.png', 'jitu-portrait.webp', 'owl-bottle.webp', 'owl-wave.webp']: shutil.copy(img / f, OUT / 'assets/img' / f)
+shutil.copytree(SRC / 'assets/img', OUT / 'assets/img', dirs_exist_ok=True)   # Higgsfield stages, hero scene, sprig, texture
 for f in (img / 'products').glob('*.webp'): shutil.copy(f, OUT / 'assets/img/products' / f.name)
 try:
     from PIL import Image

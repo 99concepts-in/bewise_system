@@ -1,7 +1,7 @@
-:HL["/bewise_system/preview/client/_next/static/chunks/0xs7oc5i0rmnq.css","style"]
+:HL["/bewise_system/preview/client/_next/static/chunks/1l1h8h-em1x-c.css","style"]
 :HC["/",""]
 4:[["children",{"s":"__PAGE__","h":160}]]
 3:[["children",{"s":{"n":"slug","t":"d","k":"migraine-go-roll-on","s":[]},"h":65632,"c":"$Q4"}]]
 2:[["children",{"s":"shop","h":131168,"c":"$Q3"}]]
 1:[["children",{"s":"app","h":131172,"c":"$Q2"}]]
-0:{"b":"QtKBmMMvuCmay_6FF7ln0","t":{"t":{"s":"","h":131160,"c":"$Q1"}}}
+0:{"b":"euYHsLzQQ6XGnf83kPg0C","t":{"t":{"s":"","h":131160,"c":"$Q1"}}}
