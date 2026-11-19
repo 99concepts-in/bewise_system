@@ -12,6 +12,7 @@ require __DIR__ . '/lib/auth.php';
 require __DIR__ . '/lib/mail.php';
 require __DIR__ . '/lib/events.php';
 require_once __DIR__ . '/lib/seed.php';
+require_once __DIR__ . '/lib/whatsapp.php';
 date_default_timezone_set('UTC');
 
 header('Content-Type: text/html; charset=utf-8');
@@ -35,6 +36,15 @@ button{margin-top:16px;padding:12px 22px;border:0;border-radius:999px;background
 table{width:100%;border-collapse:collapse;font-size:14px}td{padding:6px 4px;border-bottom:1px solid #eef0f7}.pill{display:inline-block;padding:2px 10px;border-radius:999px;background:#eef1fb;font-size:12px}
 @media(max-width:560px){.row{grid-template-columns:1fr}}</style></head><body><main>' . $body . '</main></body></html>';
     exit;
+}
+
+function tools_write_config(array $cfg): void
+{
+    $path = bw_config_path();
+    if (!$path || !is_writable($path)) bw_fail('not_writable', 'The private config file is read-only — edit it in hPanel → File Manager instead.');
+    file_put_contents($path, "<?php\n// BeWise private config — updated by tools.php on " . gmdate('c') . ". Never commit or share.\nreturn " . var_export($cfg, true) . ";\n");
+    if (function_exists('opcache_invalidate')) @opcache_invalidate($path, true);
+    unset($GLOBALS['__bw_cfg']);
 }
 
 if (!bw_config('db')) tools_page('<section><h1>Not set up yet</h1><p>Run <a href="install.php">install.php</a> first.</p></section>');
@@ -92,6 +102,40 @@ if ($post && hash_equals($csrf(), $f('csrf'))) {
                     audit('tools.test_login', 'user', $uid);
                     $msg[] = "Test login ready: username “{$user}”. It signs in on bewiseglobal.in (Account) as a normal client — use it only for Razorpay's review.";
                     break;
+                case 'whatsapp':
+                    $uidv = $f('vendor_uid'); $tok = (string)($_POST['token'] ?? '');
+                    if ($uidv === '') bw_fail('invalid_input', 'Paste your Mart2Meta vendor UID (Console → API & Webhook).');
+                    $cfg = bw_config(); $old = $cfg['whatsapp'] ?? [];
+                    $cfg['whatsapp'] = ['base' => rtrim($f('base') ?: 'https://login.mart2meta.com', '/'), 'vendor_uid' => $uidv,
+                        'token' => $tok !== '' ? $tok : (string)($old['token'] ?? ''), 'from_phone_number_id' => $f('from_phone_number_id'), 'transport' => 'api'];
+                    if ($cfg['whatsapp']['token'] === '') bw_fail('invalid_input', 'Paste the API access token.');
+                    tools_write_config($cfg);
+                    audit('tools.whatsapp', 'config');
+                    $msg[] = 'WhatsApp (Mart2Meta) saved. Send a test below.';
+                    break;
+                case 'watest':
+                    unset($GLOBALS['__bw_cfg']);
+                    if (!bw_config('whatsapp.token')) bw_fail('invalid_input', 'Connect WhatsApp first.');
+                    $to = wa_phone($f('phone'));
+                    if (!$to) bw_fail('invalid_input', 'Enter a valid mobile number.');
+                    $body = ['phone_number' => $to, 'template_name' => $f('template') ?: 'hello_world', 'template_language' => $f('language') ?: 'en_US'];
+                    [$ok, $code, $resp] = wa_http('contact/send-template-message', $body);
+                    insert('whatsapp_log', ['id' => uuid(), 'to_phone' => $to, 'template_key' => 'test', 'template_name' => $body['template_name'], 'status' => $ok ? 'sent' : 'failed', 'http_code' => $code, 'response' => is_array($resp) ? $resp : ['raw' => $resp]]);
+                    if (!$ok) bw_fail('wa_failed', "Mart2Meta answered (HTTP $code): " . mb_strimwidth(is_array($resp) ? json_encode($resp, JSON_UNESCAPED_UNICODE) : (string)$resp, 0, 300, '…'));
+                    $msg[] = "Test sent to …" . substr($to, -4) . " ✓ — check WhatsApp.";
+                    break;
+                case 'watemplates':
+                    $tpls = [];
+                    foreach (array_keys(BW_WA_TEMPLATES) as $k) {
+                        $params = json_decode((string)($_POST["params_$k"] ?? ''), true);
+                        if (!is_array($params)) bw_fail('invalid_input', "Parameters for $k must be JSON like {\"field_1\":\"{name}\"}");
+                        $tpls[$k] = ['name' => $f("name_$k"), 'language' => $f("lang_$k") ?: 'en', 'params' => $params, 'off' => empty($_POST["on_$k"])];
+                    }
+                    set_setting('whatsapp.templates', $tpls);
+                    set_setting('whatsapp.login_enabled', !empty($_POST['login_enabled']));
+                    audit('tools.whatsapp_templates', 'setting');
+                    $msg[] = 'WhatsApp messages saved.';
+                    break;
                 case 'razorpay':
                     $id = $f('key_id'); $secret = (string)($_POST['key_secret'] ?? ''); $wh = (string)($_POST['webhook_secret'] ?? '');
                     if (!preg_match('/^rzp_(test|live)_[A-Za-z0-9]{6,}$/', $id)) bw_fail('invalid_input', 'Key id looks like rzp_test_… or rzp_live_…');
@@ -99,9 +143,7 @@ if ($post && hash_equals($csrf(), $f('csrf'))) {
                     $path = bw_config_path();
                     $cfg = bw_config();
                     $cfg['razorpay'] = ['key_id' => $id, 'key_secret' => $secret, 'webhook_secret' => $wh !== '' ? $wh : (string)($cfg['razorpay']['webhook_secret'] ?? '')];
-                    if (!$path || !is_writable($path)) bw_fail('not_writable', 'The private config file is read-only — add the keys in hPanel → File Manager instead.');
-                    file_put_contents($path, "<?php\n// BeWise private config — updated by tools.php on " . gmdate('c') . ". Never commit or share.\nreturn " . var_export($cfg, true) . ";\n");
-                    if (function_exists('opcache_invalidate')) @opcache_invalidate($path, true);
+                    tools_write_config($cfg);
                     audit('tools.razorpay_keys', 'config', null, ['mode' => str_starts_with($id, 'rzp_live') ? 'live' : 'test']);
                     $msg[] = 'Razorpay keys saved (' . (str_starts_with($id, 'rzp_live') ? 'LIVE' : 'test') . ' mode). Checkout now opens Razorpay.';
                     break;
@@ -117,6 +159,20 @@ $team = all("SELECT u.name, u.email, u.username, GROUP_CONCAT(r.role) roles, u.l
 $rows = implode('', array_map(fn($t) => '<tr><td>' . $h($t['name']) . '</td><td>' . $h($t['email'] ?: '@' . $t['username']) . '</td><td><span class=pill>' . $h($t['roles']) . '</span></td></tr>', $team));
 $rz = bw_config('razorpay.key_id');
 $rzState = $rz ? (str_starts_with((string)$rz, 'rzp_live') ? 'LIVE keys' : 'Test keys') . ' · webhook ' . (bw_config('razorpay.webhook_secret') ? 'set' : 'not set') : 'Not set up — checkout shows “pay at the studio”';
+$wa = bw_config('whatsapp', []);
+$waState = !empty($wa['token']) ? 'Connected · vendor ' . substr((string)$wa['vendor_uid'], 0, 6) . '…' : 'Not connected';
+$waRows = '';
+foreach (wa_templates() as $k => $tp) {
+    $waRows .= '<tr><td><label style="margin:0;font-weight:600"><input type=checkbox name="on_' . $k . '" value=1 style="width:auto"' . (empty($tp['off']) ? ' checked' : '') . '> ' . $h(str_replace('_', ' ', $k)) . '</label></td>'
+        . '<td><input name="name_' . $k . '" value="' . $h($tp['name']) . '"></td><td style="width:70px"><input name="lang_' . $k . '" value="' . $h($tp['language'] ?? 'en') . '"></td>'
+        . '<td><input name="params_' . $k . '" value="' . $h(json_encode($tp['params'] ?? [], JSON_UNESCAPED_UNICODE)) . '" style="font-family:monospace;font-size:12px"></td></tr>';
+}
+$waLog = implode('', array_map(fn($r) => '<tr><td>' . $h(substr($r['created_at'], 5, 11)) . '</td><td>' . $h($r['template_key']) . '</td><td>…' . $h(substr($r['to_phone'], -4)) . '</td><td><span class=pill>' . $h($r['status']) . '</span></td></tr>',
+    all('SELECT created_at, template_key, to_phone, status FROM whatsapp_log ORDER BY created_at DESC LIMIT 8')));
+$loginOn = setting('whatsapp.login_enabled', false) ? ' checked' : '';
+$cronKey = hash_hmac('sha256', 'cron', (string)bw_config('app_key'));
+$cronUrl = $h(bw_public_url('api/cron.php?key=' . $cronKey));
+$cronCli = $h('/usr/bin/php ' . __DIR__ . '/cron.php');
 $hasConsultant = (bool)val("SELECT 1 FROM user_roles WHERE role = 'consultant'");
 $ok = $msg ? '<div class=ok>' . $h(implode(' ', $msg)) . '</div>' : '';
 $bad = $err ? '<div class=err>' . $h(implode(' ', $err)) . '</div>' : '';
@@ -133,7 +189,7 @@ tools_page(<<<HTML
 <form method=post><input type=hidden name=action value=team><input type=hidden name=csrf value="$t">
 <div class=row><div><label>Role</label><select name=role><option value=consultant>Consultant (Jitu Bhaiya)</option><option value=manager>Manager (Haresh)</option><option value=accountant>Accountant / CA</option></select></div>
 <div><label>Name</label><input name=name required></div></div>
-<div class=row><div><label>Email</label><input type=email name=email required></div><div><label>Phone</label><input name=phone></div></div>
+<div class=row><div><label>Email</label><input type=email name=email required></div><div><label>WhatsApp number <small>(for alerts)</small></label><input name=phone placeholder="98xxxxxxxx"></div></div>
 <label>Temporary password <small>(10+ characters)</small></label><input type=password name=password required minlength=10>
 <button>Add</button></form></section>
 
@@ -141,6 +197,24 @@ tools_page(<<<HTML
 <form method=post><input type=hidden name=action value=testlogin><input type=hidden name=csrf value="$t">
 <div class=row><div><label>Username</label><input name=username value="test" required></div><div><label>Password <small>(8+)</small></label><input type=password name=password required minlength=8></div></div>
 <input type=hidden name=name value="Razorpay Review"><button>Create / update test login</button></form></section>
+
+<section><h2>WhatsApp (Mart2Meta)</h2><p><small>Status: <b>{$h($waState)}</b>. In Mart2Meta: Console → <b>API &amp; Webhook</b> (or Settings → API Access) → copy the <b>Vendor UID</b> and generate an <b>Access token</b>.</small></p>
+<form method=post autocomplete=off><input type=hidden name=action value=whatsapp><input type=hidden name=csrf value="$t">
+<label>Mart2Meta address</label><input name=base value="{$h($wa['base'] ?? 'https://login.mart2meta.com')}">
+<div class=row><div><label>Vendor UID</label><input name=vendor_uid value="{$h($wa['vendor_uid'] ?? '')}" required></div><div><label>Access token <small>(leave empty to keep)</small></label><input type=password name=token></div></div>
+<label>Phone number ID <small>(optional — only if you have more than one WhatsApp number)</small></label><input name=from_phone_number_id value="{$h($wa['from_phone_number_id'] ?? '')}">
+<button>Save WhatsApp</button></form>
+<form method=post style="margin-top:18px"><input type=hidden name=action value=watest><input type=hidden name=csrf value="$t">
+<div class=row><div><label>Send a test to (your mobile)</label><input name=phone placeholder="98xxxxxxxx" required></div><div class=row><div><label>Template</label><input name=template value="hello_world"></div><div><label>Language</label><input name=language value="en_US"></div></div></div>
+<button>Send test</button></form></section>
+
+<section><h2>WhatsApp messages</h2><p><small>Create these templates in Mart2Meta (Templates → New, category <b>Utility</b>; login code = <b>Authentication</b>) with the texts in the guide, wait for Meta's approval, then tick them here. Unticked messages are not sent. <b>Parameters</b> map Mart2Meta fields to our values.</small></p>
+<form method=post><input type=hidden name=action value=watemplates><input type=hidden name=csrf value="$t">
+<table><tr><td><b>Message</b></td><td><b>Template name</b></td><td><b>Lang</b></td><td><b>Parameters</b></td></tr>$waRows</table>
+<label style="font-weight:600"><input type=checkbox name=login_enabled value=1 style="width:auto"$loginOn> Let clients sign in with a WhatsApp code (needs the <b>login code</b> template approved)</label>
+<button>Save messages</button></form>
+<p style="margin-top:16px"><small><b>Reminders</b> (24 h and 2 h before each session) need a cron job: hPanel → Advanced → <b>Cron Jobs</b> → every 30 minutes → command:<br><code style="word-break:break-all">$cronCli</code><br>or the URL <code style="word-break:break-all">$cronUrl</code></small></p>
+<table>$waLog</table></section>
 
 <section><h2>Razorpay keys</h2><p><small>Razorpay Dashboard → Settings → API Keys (start with <b>Test mode</b>). Webhook: Settings → Webhooks → URL <b>$webhook</b>, events payment.captured + payment.failed.</small></p>
 <form method=post autocomplete=off><input type=hidden name=action value=razorpay><input type=hidden name=csrf value="$t">

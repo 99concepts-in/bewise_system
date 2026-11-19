@@ -48,6 +48,7 @@ Events::on('payment.captured', function (array $p) {
     fulfilment_create_tasks($o['id']);
     Events::emit('order.paid', ['salesOrderId' => $o['id'], 'clientId' => $o['client_id'], 'kind' => $o['kind']]);
     notify(['clientId' => $o['client_id']], 'Order confirmed', "Thank you! Order {$o['code']} is being prepared.", '/client/app/orders', 'normal', true);
+    if ((int)$o['total_paise'] > 0) wa_send(wa_client_phone($o['client_id']), 'order_confirmed', ['name' => wa_client_name($o['client_id']), 'order' => $o['code'], 'amount' => '₹' . number_format($o['total_paise'] / 100)], "order:{$o['id']}", $o['id']);
     notify(['role' => 'manager'], 'New paid order', "{$o['code']} · ₹" . number_format($o['total_paise'] / 100), '/manager/');
 });
 

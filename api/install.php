@@ -11,6 +11,7 @@ require __DIR__ . '/lib/auth.php';
 require __DIR__ . '/lib/mail.php';
 require __DIR__ . '/lib/events.php';
 require_once __DIR__ . '/lib/seed.php';
+require_once __DIR__ . '/lib/whatsapp.php';
 
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: no-store');

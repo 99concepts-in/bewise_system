@@ -15,6 +15,7 @@ return [
             'settings' => $settings,
             'consultationTypes' => scheduling_types(true),
             'payments' => ['razorpay' => bw_config('razorpay.key_id') ? ['keyId' => bw_config('razorpay.key_id'), 'mode' => str_starts_with((string)bw_config('razorpay.key_id'), 'rzp_live') ? 'live' : 'test'] : null],
+            'whatsappLogin' => (bool)setting('whatsapp.login_enabled', false) && wa_configured(),
             'me' => Auth::user(),
         ];
     },

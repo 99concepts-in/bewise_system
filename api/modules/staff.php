@@ -33,8 +33,8 @@ return [
         $pass = (string)req_str($in, 'tempPassword', 200);
         if (mb_strlen($pass) < 10) bw_fail('weak_password', 'Temporary password: at least 10 characters.');
         $u = one('SELECT * FROM users WHERE email = ?', [$email]);
-        if (!$u) { insert('users', ['id' => $uid = uuid(), 'email' => $email, 'name' => req_str($in, 'name', 120), 'phone' => req_str($in, 'phone', 20, false), 'password_hash' => password_hash($pass, PASSWORD_DEFAULT), 'status' => 'invited']); }
-        else { $uid = $u['id']; q('UPDATE users SET password_hash = ?, name = COALESCE(NULLIF(?, \'\'), name), status = IF(status = \'disabled\', \'invited\', status) WHERE id = ?', [password_hash($pass, PASSWORD_DEFAULT), (string)($in['name'] ?? ''), $uid]); }
+        if (!$u) { insert('users', ['id' => $uid = uuid(), 'email' => $email, 'name' => req_str($in, 'name', 120), 'phone' => wa_phone((string)($in['phone'] ?? '')), 'password_hash' => password_hash($pass, PASSWORD_DEFAULT), 'status' => 'invited']); }
+        else { $uid = $u['id']; q('UPDATE users SET password_hash = ?, name = COALESCE(NULLIF(?, \'\'), name), phone = COALESCE(NULLIF(?, \'\'), phone), status = IF(status = \'disabled\', \'invited\', status) WHERE id = ?', [password_hash($pass, PASSWORD_DEFAULT), (string)($in['name'] ?? ''), (string)(wa_phone((string)($in['phone'] ?? '')) ?? ''), $uid]); }
         q('INSERT IGNORE INTO user_roles (user_id, role) VALUES (?, ?)', [$uid, $role]);
         if ($role === 'consultant') staff_default_hours($uid);
         audit('staff.invite', 'user', $uid, ['role' => $role]);

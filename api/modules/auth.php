@@ -8,8 +8,45 @@ declare(strict_types=1);
 
 const BW_OTP_MINUTES = 10;
 
+/** Finds (or creates) the client account for a WhatsApp number. */
+function auth_client_by_phone(string $phone, string $name = ''): string
+{
+    $last10 = substr($phone, -10);
+    $uid = val("SELECT id FROM users WHERE phone = ? AND status <> 'disabled' LIMIT 1", [$phone]);
+    if (!$uid) {
+        $c = one("SELECT id, user_id FROM clients WHERE REPLACE(REPLACE(REPLACE(phone, ' ', ''), '+', ''), '-', '') LIKE ? ORDER BY user_id IS NULL, created_at LIMIT 1", ['%' . $last10]);
+        if ($c && $c['user_id']) $uid = $c['user_id'];
+        else {
+            $uid = uuid();
+            insert('users', ['id' => $uid, 'phone' => $phone, 'name' => $name]);
+            q("INSERT IGNORE INTO user_roles (user_id, role) VALUES (?, 'client')", [$uid]);
+            if ($c) q('UPDATE clients SET user_id = ? WHERE id = ?', [$uid, $c['id']]);
+            else { $cid = uuid(); insert('clients', ['id' => $cid, 'code' => make_code('client'), 'user_id' => $uid, 'phone' => $phone, 'name' => $name]); Events::emit('client.created', ['clientId' => $cid]); }
+        }
+    }
+    q("INSERT IGNORE INTO user_roles (user_id, role) VALUES (?, 'client')", [$uid]);
+    if (!val('SELECT 1 FROM clients WHERE user_id = ?', [$uid])) insert('clients', ['id' => uuid(), 'code' => make_code('client'), 'user_id' => $uid, 'phone' => $phone, 'name' => $name]);
+    return $uid;
+}
+
 return [
+    /** { email } → code by email · { phone } → code on WhatsApp (when the owner has turned WhatsApp sign-in on). */
     'requestOtp' => function (array $in) {
+        if (!empty($in['phone'])) {
+            $phone = wa_phone((string)$in['phone']);
+            if (!$phone) bw_fail('invalid_phone', 'Please enter a valid mobile number.');
+            if (!setting('whatsapp.login_enabled', false) || !wa_configured()) bw_fail('whatsapp_off', 'WhatsApp sign-in isn\'t available yet — please use your email.', 409);
+            rate_limit('otp:ip:' . client_ip(), 20, 3600);
+            rate_limit('otp:wa:' . $phone, 5, 900);
+            $code = (string)random_int(100000, 999999);
+            insert('otp_codes', ['id' => uuid(), 'identifier' => "wa:$phone", 'code_hash' => hash_hmac('sha256', $code, (string)bw_config('app_key')),
+                'expires_at' => gmdate('Y-m-d H:i:s', time() + BW_OTP_MINUTES * 60)]);
+            commit_now();
+            if (!wa_send($phone, 'login_code', ['code' => $code])) bw_fail('whatsapp_failed', 'We couldn\'t send the WhatsApp message. Please try email instead.', 502);
+            $out = ['sent' => true, 'channel' => 'whatsapp', 'expiresInSeconds' => BW_OTP_MINUTES * 60];
+            if (bw_config('debug_show_otp') === true) $out['devCode'] = $code;
+            return $out;
+        }
         $email = req_email($in);
         rate_limit('otp:ip:' . client_ip(), 20, 3600);
         rate_limit('otp:email:' . $email, 5, 900);
@@ -26,10 +63,11 @@ return [
     },
 
     'verifyOtp' => function (array $in) {
-        $email = req_email($in);
+        $phone = !empty($in['phone']) ? wa_phone((string)$in['phone']) : null;
+        $email = $phone ? null : req_email($in);
         $code = preg_replace('/\D/', '', (string)req_str($in, 'code', 10));
         rate_limit('otpv:ip:' . client_ip(), 40, 3600);
-        $row = one('SELECT * FROM otp_codes WHERE identifier = ? AND used_at IS NULL AND expires_at > UTC_TIMESTAMP() ORDER BY created_at DESC LIMIT 1', [$email]);
+        $row = one('SELECT * FROM otp_codes WHERE identifier = ? AND used_at IS NULL AND expires_at > UTC_TIMESTAMP() ORDER BY created_at DESC LIMIT 1', [$phone ? "wa:$phone" : $email]);
         if (!$row) bw_fail('code_expired', 'That code has expired. Please ask for a new one.');
         if ($row['attempts'] >= 5) bw_fail('too_many_attempts', 'Too many wrong tries. Please ask for a new code.', 429);
         if (!hash_equals($row['code_hash'], hash_hmac('sha256', $code, (string)bw_config('app_key')))) {
@@ -38,6 +76,12 @@ return [
             bw_fail('wrong_code', 'That code doesn\'t match. Please check and try again.');
         }
         q('UPDATE otp_codes SET used_at = UTC_TIMESTAMP() WHERE id = ?', [$row['id']]);
+        if ($phone) {
+            $uid = auth_client_by_phone($phone, (string)($in['name'] ?? ''));
+            if (val("SELECT status FROM users WHERE id = ?", [$uid]) === 'disabled') bw_fail('disabled', 'This account is turned off. Please contact BeWise.', 403);
+            audit('login', 'user', $uid, ['method' => 'whatsapp']);
+            return Auth::startSession($uid);
+        }
         $existing = one('SELECT id, status FROM users WHERE email = ?', [$email]);
         if ($existing && $existing['status'] === 'disabled') bw_fail('disabled', 'This account is turned off. Please contact BeWise.', 403);
         if ($existing && $existing['status'] === 'invited') q("UPDATE users SET status = 'active' WHERE id = ?", [$existing['id']]);

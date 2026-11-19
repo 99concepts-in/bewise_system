@@ -17,10 +17,9 @@ require __DIR__ . '/lib/auth.php';
 require __DIR__ . '/lib/mail.php';
 require __DIR__ . '/lib/events.php';
 require_once __DIR__ . '/lib/seed.php';
+require_once __DIR__ . '/lib/whatsapp.php';
+require_once __DIR__ . '/lib/registry.php';
 date_default_timezone_set('UTC');
-
-const BW_MODULES = ['system', 'auth', 'crm', 'scheduling', 'intake', 'remedies', 'consultation', 'journal', 'catalog',
-    'commerce', 'fulfilment', 'finance', 'notifications', 'settings', 'staff', 'analytics', 'companion'];
 
 function bw_respond(int $http, array $body): never
 {
@@ -32,18 +31,6 @@ function bw_respond(int $http, array $body): never
     exit;
 }
 
-/** Loads every module (each registers its functions + event handlers). */
-function bw_registry(): array
-{
-    static $fns = null;
-    if ($fns !== null) return $fns;
-    $fns = [];
-    foreach (BW_MODULES as $m) {
-        $defs = require __DIR__ . "/modules/$m.php";
-        foreach ($defs as $name => $fn) $fns["$m.$name"] = $fn;
-    }
-    return $fns;
-}
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $path = preg_replace('#^.*?/api/#', '', $path);   // works at the domain root or in a sub-folder

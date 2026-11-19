@@ -127,6 +127,7 @@ pages['consultations.html'] = page('consultations.html', 'Book a consultation', 
 <label for="bnote">Anything you’d like Jitu Bhaiya to know? <span class="muted">(optional, private)</span></label><textarea id="bnote" rows="3" maxlength="2000" placeholder="e.g. I’ve been anxious about work and not sleeping well"></textarea>
 </div>
 <div class="card" style="position:sticky;top:90px"><h3>4 · Confirm &amp; pay</h3><div id="bwho"></div><div id="bsignin"></div>
+<div id="bphoneBox" hidden><label for="bphone">WhatsApp number <span class="muted">(confirmation &amp; reminders)</span></label><input id="bphone" inputmode="tel" autocomplete="tel" placeholder="98xxxxxxxx"></div>
 <button class="btn block" id="confirm" disabled style="margin-top:16px">Confirm &amp; pay</button><div class="note" id="bmsg" style="margin-top:12px"></div>
 <p class="small muted" style="margin-top:14px">Times are shown in Indian Standard Time. You can move your session for free up to 24 hours before. See our <a href="refund-policy.html">cancellation policy</a>.</p></div>
 </div></div></section>

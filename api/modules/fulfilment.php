@@ -32,6 +32,11 @@ function fulfilment_sync_order(string $salesOrderId): void
         q('UPDATE sales_orders SET status = ? WHERE id = ?', [$status, $salesOrderId]);
         $msg = ['dispatched' => ['Your order is on its way', "Order {$o['code']} has been dispatched."], 'delivered' => ['Delivered', "Order {$o['code']} was delivered. We hope you love it."]][$status] ?? null;
         if ($msg) notify(['clientId' => $o['client_id']], $msg[0], $msg[1], '/client/app/orders', 'normal', true);
+        if ($status === 'dispatched') {
+            $t = one("SELECT courier, awb, tracking_url FROM fulfilment_tasks WHERE sales_order_id = ? AND stage = 'dispatched' ORDER BY updated_at DESC LIMIT 1", [$salesOrderId]);
+            wa_send(wa_client_phone($o['client_id']), 'order_dispatched', ['name' => wa_client_name($o['client_id']), 'order' => $o['code'], 'courier' => $t['courier'] ?: 'our courier partner',
+                'tracking' => $t['tracking_url'] ?: ($t['awb'] ? 'AWB ' . $t['awb'] : 'we’ll share it shortly')], "dispatched:$salesOrderId", $salesOrderId);
+        }
     }
 }
 
@@ -69,7 +74,9 @@ return [
         if ($stage === 'dispatched') Events::emit('shipment.dispatched', ['salesOrderId' => $t['sales_order_id'], 'courier' => $set['courier'] ?? null, 'awb' => $set['awb'] ?? null, 'trackingUrl' => $set['tracking_url'] ?? null]);
         if ($stage === 'delivered') Events::emit('shipment.delivered', ['salesOrderId' => $t['sales_order_id'], 'deliveredAt' => iso(now_utc())]);
         if ($t['type'] === 'remedy_prep' && $stage === 'ready_to_dispatch' && (int)val('SELECT pickup FROM sales_orders WHERE id = ?', [$t['sales_order_id']])) {
-            notify(['clientId' => val('SELECT client_id FROM sales_orders WHERE id = ?', [$t['sales_order_id']])], 'Your blend is ready', 'Collect it at the studio anytime.', '/client/app/remedies', 'normal', true);
+            $cid = (string)val('SELECT client_id FROM sales_orders WHERE id = ?', [$t['sales_order_id']]);
+            notify(['clientId' => $cid], 'Your blend is ready', 'Collect it at the studio anytime.', '/client/app/remedies', 'normal', true);
+            wa_send(wa_client_phone($cid), 'remedy_ready', ['name' => wa_client_name($cid), 'how' => 'Collect it from the BeWise studio, Alkapuri (Mon–Sat 10–1 & 4–7).'], "ready:{$t['id']}", $t['id']);
         }
         fulfilment_sync_order($t['sales_order_id']);
         return fulfilment_task_view(one('SELECT * FROM fulfilment_tasks WHERE id = ?', [$t['id']]));

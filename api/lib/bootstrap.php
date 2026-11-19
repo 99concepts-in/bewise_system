@@ -34,6 +34,7 @@ function bw_config_candidates(): array
     if ($env = getenv('BEWISE_CONFIG')) $c[] = $env;
     $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
     if ($docRoot !== '') $c[] = dirname(rtrim($docRoot, '/')) . '/bewise-private/config.php';
+    $c[] = dirname(__DIR__, 3) . '/bewise-private/config.php';   // CLI (cron): public_html/api/lib → domain folder
     $c[] = dirname(__DIR__) . '/storage/config.php';
     return $c;
 }

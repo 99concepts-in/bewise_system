@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 const BW_SETTING_KEYS = ['business.profile', 'remedy.reorder_price_paise', 'policy.reschedule', 'booking.hold_minutes', 'booking.pay_later_allowed',
-    'booking.days_ahead', 'booking.meeting_url', 'shipping.rates', 'tax.rates', 'owner.greeting_name', 'integrations.razorpay'];
+    'booking.days_ahead', 'booking.meeting_url', 'shipping.rates', 'tax.rates', 'owner.greeting_name', 'integrations.razorpay', 'whatsapp.templates', 'whatsapp.login_enabled'];
 
 return [
     'getAll' => function (array $in) {
@@ -12,7 +12,7 @@ return [
         foreach (all('SELECT `key`, value, is_public, updated_at FROM settings ORDER BY `key`') as $r) $out[$r['key']] = ['value' => json_decode($r['value'], true), 'public' => (bool)$r['is_public'], 'updatedAt' => iso($r['updated_at'])];
         $out['_integrations'] = ['razorpay' => bw_config('razorpay.key_id') ? (str_starts_with((string)bw_config('razorpay.key_id'), 'rzp_live') ? 'live' : 'test') : 'not_set_up',
             'razorpayWebhook' => bw_config('razorpay.webhook_secret') ? 'set' : 'not_set_up', 'email' => bw_config('mail.transport', 'mail'),
-            'whatsapp' => 'not_set_up', 'shiprocket' => 'not_set_up', 'googleCalendar' => 'ics_feed', 'ai' => bw_config('anthropic.api_key') ? 'set' : 'not_set_up'];
+            'whatsapp' => bw_config('whatsapp.token') ? 'connected (Mart2Meta)' : 'not_set_up', 'shiprocket' => 'not_set_up', 'googleCalendar' => 'ics_feed', 'ai' => bw_config('anthropic.api_key') ? 'set' : 'not_set_up'];
         return $out;
     },
     'get' => function (array $in) {

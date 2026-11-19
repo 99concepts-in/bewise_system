@@ -173,6 +173,8 @@ function scheduling_create(string $clientId, array $in, string $source): array
     Events::emit('appointment.held', ['appointmentId' => $id, 'clientId' => $clientId]);
     if ($payLater) scheduling_confirmed($id);
     if ($staffBooked) notify(['clientId' => $clientId], 'A consultation was booked for you', 'Open the app to see the time and pay.', '/client/app/appointments', 'normal', true);
+    if ($staffBooked && !$payLater) wa_send(wa_client_phone($clientId), 'payment_due', ['name' => wa_client_name($clientId), 'what' => $t['name'] . ' on ' . wa_when($startDb),
+        'amount' => '₹' . number_format($t['fee_paise'] / 100), 'link' => bw_config('public_site', 'https://bewiseglobal.in') . '/account.html'], "due:$id", $id);
     return one('SELECT * FROM appointments WHERE id = ?', [$id]);
 }
 
@@ -186,6 +188,10 @@ function scheduling_confirmed(string $id): void
     notify(['clientId' => $a['client_id']], 'Your consultation is booked', "See you on $when (" . ($a['mode'] === 'online' ? 'online' : 'at the studio') . ').', '/client/app/appointments', 'normal', true);
     notify(['userId' => $a['consultant_id']], 'New booking', ($c['name'] ?: 'A client') . " · $when", '/consultant/', 'normal');
     notify(['role' => 'manager'], 'New booking', ($c['name'] ?: 'A client') . " · $when", '/manager/', 'normal');
+    $type = (string)val('SELECT name FROM consultation_types WHERE id = ?', [$a['consultation_type_id']]);
+    wa_send(wa_client_phone($a['client_id']), 'booking_confirmed', ['name' => wa_client_name($a['client_id']), 'session' => $type, 'when' => $when,
+        'place' => $a['mode'] === 'online' ? 'online — we’ll share the video link before your session' : 'at the BeWise studio, Alkapuri, Vadodara', 'code' => $a['code']], "booked:{$a['id']}:" . ($a['starts_at'] ?? 'tbc'), $a['id']);
+    wa_staff('consultant', 'New booking — ' . ($c['name'] ?: 'a client') . " · $type · $when", $a['consultant_id']);
 }
 
 /** Payment captured for an appointment (finance → scheduling). */
@@ -343,6 +349,9 @@ return [
         $when = (new DateTimeImmutable($starts))->setTimezone(new DateTimeZone(BW_TZ))->format('D j M, g:i a');
         if ($isClient) notify(['userId' => $a['consultant_id']], 'Appointment moved', "Now on $when", '/consultant/');
         else notify(['clientId' => $a['client_id']], 'Your consultation time changed', "New time: $when", '/client/app/appointments', 'normal', true);
+        if ($a['status'] === 'confirmed') wa_send(wa_client_phone($a['client_id']), 'booking_confirmed', ['name' => wa_client_name($a['client_id']),
+            'session' => (string)val('SELECT name FROM consultation_types WHERE id = ?', [$a['consultation_type_id']]), 'when' => $when,
+            'place' => $a['mode'] === 'online' ? 'online — we’ll share the video link before your session' : 'at the BeWise studio, Alkapuri, Vadodara', 'code' => $a['code']], "booked:{$a['id']}:" . to_db_time($starts), $a['id']);
         return scheduling_view(one('SELECT * FROM appointments WHERE id = ?', [$a['id']]));
     },
 

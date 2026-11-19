@@ -18,6 +18,9 @@ Prototypes with sample data only — no real payments, OTP or messages. Rebuild:
 - **bewiseglobal.in** — Razorpay-ready site (`website/`, branch `website-site`, guide `hosting/BEWISEGLOBAL-WEBSITE.md`): home, consultations booking, shop + checkout, pricing, about, contact, T&C, privacy, cancellation & refund, shipping. Uses the live API at app.bewiseglobal.in (CORS).
 - **app.bewiseglobal.in** — apps + API, database installed 2026-11-19 ✅. Owner tools: `/api/tools.php` (team, Razorpay test login, Razorpay keys).
 
+## 💬 WhatsApp (2026-11-19)
+- Mart2Meta connected in code: booking confirmed, payment due, 24 h / 2 h reminders (cron), blend ready, order confirmed / dispatched, staff alerts (safety → Jitu Bhaiya only), optional WhatsApp sign-in code. Owner connects on `/api/tools.php`; guide `hosting/WHATSAPP-MART2META.md`. Log table `whatsapp_log`.
+
 ## Foundation
 
 **FOUNDATION: ✅ BACKEND LIVE-READY (2026-11-18, D-44)** — real backend in `api/` (PHP 8 + Hostinger MySQL): 17 modules, 116 functions named as in contracts §5,

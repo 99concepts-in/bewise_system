@@ -41,6 +41,7 @@
   }).catch(function () { return false }) : Promise.resolve(false)
 
   // ── signed-in user ──
+  var cfgP = api ? fetch(api.base() + '/v1/system.publicConfig', { credentials: 'include' }).then(function (r) { return r.json() }).then(function (j) { return j.ok ? j.data : {} }).catch(function () { return {} }) : Promise.resolve({})
   var meP = api ? api.call('auth.me').then(function (j) { return j.ok ? j.data : null }) : Promise.resolve(null)
   meP.then(function (me) { $$('[data-account-label]').forEach(function (a) { a.textContent = me ? 'My account' : 'Sign in' }) })
 
@@ -53,7 +54,21 @@
       '<div data-p="pass" hidden><label>Email or username</label><input name="login" autocomplete="username"><label>Password</label><input type="password" name="password" autocomplete="current-password">' +
       '<button class="btn block" data-login style="margin-top:14px">Sign in</button></div><div class="note" data-msg style="margin-top:12px"></div>'
     var msg = $('[data-msg]', box)
-    $$('.tabs button', box).forEach(function (t) { t.onclick = function () { $$('.tabs button', box).forEach(function (x) { x.classList.toggle('on', x === t) }); $$('[data-p]', box).forEach(function (p) { p.hidden = p.getAttribute('data-p') !== t.getAttribute('data-t') }); note(msg, '') } })
+    cfgP.then(function (c) {
+      if (!c.whatsappLogin) return
+      $('.tabs', box).insertAdjacentHTML('afterbegin', '<button data-t="wa">WhatsApp code</button>')
+      $('[data-p="code"]', box).insertAdjacentHTML('beforebegin', '<div data-p="wa" hidden><label>Mobile number</label><input name="wphone" inputmode="tel" autocomplete="tel" placeholder="98xxxxxxxx">' +
+        '<div data-wstep2 hidden><label>6-digit code from WhatsApp</label><input name="wcode" inputmode="numeric" maxlength="6" placeholder="••••••"></div><button class="btn block" data-wgo style="margin-top:14px">Send code on WhatsApp</button></div>')
+      bindTabs(); $('[data-t="wa"]', box).click()
+      var wsent = false
+      $('[data-wgo]', box).onclick = function () {
+        var ph = $('[name=wphone]', box).value.trim(), btn = this; btn.disabled = true
+        if (!wsent) api.call('auth.requestOtp', { phone: ph }).then(function (j) { btn.disabled = false; if (!j.ok) return note(msg, j.error.message, 'err'); wsent = true; $('[data-wstep2]', box).hidden = false; btn.textContent = 'Sign in'; note(msg, 'We sent a 6-digit code to your WhatsApp.', 'ok'); $('[name=wcode]', box).focus() })
+        else api.call('auth.verifyOtp', { phone: ph, code: $('[name=wcode]', box).value.trim() }).then(function (j) { btn.disabled = false; if (!j.ok) return note(msg, j.error.message, 'err'); onDone(j.data) })
+      }
+    })
+    function bindTabs() { $$('.tabs button', box).forEach(function (t) { t.onclick = function () { $$('.tabs button', box).forEach(function (x) { x.classList.toggle('on', x === t) }); $$('[data-p]', box).forEach(function (p) { p.hidden = p.getAttribute('data-p') !== t.getAttribute('data-t') }); note(msg, '') } }) }
+    bindTabs()
     var sent = false
     $('[data-go]', box).onclick = function () {
       var email = $('[name=email]', box).value.trim(), btn = this
@@ -170,6 +185,8 @@
         name: $('[name=a_name]').value, phone: $('[name=a_phone]').value, line1: $('[name=a_line1]').value, line2: $('[name=a_line2]').value,
         city: $('[name=a_city]').value, state: $('[name=a_state]').value, pin: $('[name=a_pin]').value, isDefault: true }).then(function (j) { if (!j.ok) throw new Error(j.error.message); return j.data.id })
       addrP.then(function (addressId) {
+        var ph = $('[name=a_phone]').value.trim()
+        if (ph) api.call('crm.getMyProfile').then(function (j) { if (j.ok && !j.data.phone) api.call('crm.updateClientProfile', { phone: ph }) })
         return api.call('commerce.createOrder', deliv === 'pickup' ? { lines: lines, pickup: true } : { lines: lines, addressId: addressId })
       }).then(function (j) {
         if (!j.ok) throw new Error(j.error.message)
@@ -211,7 +228,9 @@
     }
     loadSlots()
     var showWho = function (me) {
-      $('#bsignin').hidden = !!me; $('#bwho').innerHTML = me ? '<p class="small muted">Booking as <b>' + esc(me.email || me.name) + '</b></p>' : ''
+      $('#bsignin').hidden = !!me; $('#bwho').innerHTML = me ? '<p class="small muted">Booking as <b>' + esc(me.email || me.phone || me.name) + '</b></p>' : ''
+      $('#bphoneBox').hidden = !me
+      if (me && me.clientId) api.call('crm.getMyProfile').then(function (j) { if (j.ok && j.data.phone && !$('#bphone').value) $('#bphone').value = j.data.phone })
       if (!me) signIn($('#bsignin'), showWho)
     }
     meP.then(showWho)
@@ -219,8 +238,10 @@
       var btn = this
       meP.then(function () { return api.call('auth.me') }).then(function (j) {
         if (!j.ok || !j.data) { note(msgB, 'Please sign in first (below).', 'err'); return }
+        var ph = $('#bphone').value.trim()
+        if (ph.replace(/\D/g, '').length < 10) { note(msgB, 'Please add your WhatsApp number — we send your confirmation and reminders there.', 'err'); $('#bphone').focus(); return }
         btn.disabled = true; note(msgB, 'Holding your time…')
-        api.call('scheduling.holdAppointment', { consultationTypeId: st.type, mode: st.mode, startsAt: st.slot, clientNote: $('#bnote').value.trim() || undefined }).then(function (h) {
+        api.call('crm.updateClientProfile', { phone: ph }).then(function () { return api.call('scheduling.holdAppointment', { consultationTypeId: st.type, mode: st.mode, startsAt: st.slot, clientNote: $('#bnote').value.trim() || undefined }) }).then(function (h) {
           btn.disabled = false
           if (!h.ok) { note(msgB, h.error.message, 'err'); if (h.status === 409) loadSlots(); return }
           payFlow('appointment', h.data.id, msgB, function (paid) { if (paid) btn.hidden = true })

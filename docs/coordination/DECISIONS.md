@@ -11,7 +11,7 @@
 | D-04 | Client sign-in method | Phone OTP (+91) primary, email fallback; staff email + password | Phase 0 | OPEN — needs SMS provider (MSG91/Twilio) |
 | D-05 | Payment account | Razorpay test keys in dev; live keys at go-live; GSTIN & legal entity name for invoices | O2 | OPEN — credentials needed |
 | D-06 | Courier partner | **DECIDED: Shiprocket** (multiple couriers, rates, labels, pickups, tracking); manual AWB fallback. Needs Shiprocket API credentials | M2 | ✅ DECIDED |
-| D-07 | WhatsApp provider | Meta WhatsApp Cloud API (or BSP like Interakt/AiSensy); templates need Meta approval | O3 | OPEN |
+| D-07 | WhatsApp provider | **DECIDED 2026-11-19: Mart2Meta** (WhatsJet-based WhatsApp Cloud API panel, login.mart2meta.com). Template messages via `api/lib/whatsapp.php`; credentials on `/api/tools.php` (private config); templates & texts `hosting/WHATSAPP-MART2META.md` | O3 | ✅ DECIDED |
 | D-08 | Cancellation / reschedule policy | **No refunds** (D-16). Default: reschedule free ≥24h before; <24h one reschedule; no-show forfeits — owner to confirm the reschedule window | K1, C2 | PARTLY DECIDED |
 | D-09 | Consultation types & fees | **DECIDED 2026-11-17: First consultation ₹1,000 · Follow-up ₹800 — both include the remedy blend.** Durations default 60 / 30 min (confirm); online link = consultant's Google Meet/Zoom | K1, O1 | ✅ DECIDED (fees) |
 | D-10 | Source & approval of Bach Flower library content | Names + 7 groups seeded; descriptions written/approved by Jitu Bhaiya before go-live | K4 | OPEN |

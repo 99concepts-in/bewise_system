@@ -3,6 +3,7 @@
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 if (preg_match('#^/api/install\.php#', $path)) { require __DIR__ . '/../install.php'; return true; }
 if (preg_match('#^/api/tools\.php#', $path)) { require __DIR__ . '/../tools.php'; return true; }
+if (preg_match('#^/api/cron\.php#', $path)) { require __DIR__ . '/../cron.php'; return true; }
 if (preg_match('#^/api/sdk/#', $path)) return false;
 if (str_starts_with($path, '/api/')) { require __DIR__ . '/../index.php'; return true; }
 return false;
