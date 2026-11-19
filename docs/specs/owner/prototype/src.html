@@ -243,7 +243,7 @@ tr.subtotal td{font-weight:700;background:var(--surface-2)}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:14px}
 .kv dt{color:var(--ink-2)}
 .kv dd{margin:0;font-weight:600;text-align:right}
-textarea,input[type=text],input[type=email],select{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px;font-size:14px}
+textarea,input[type=text],input[type=email],input[type=password],select{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px;font-size:14px}
 textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent)}
 label.f{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
 .form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
@@ -349,6 +349,35 @@ small svg.i,.hint svg.i{width:13px;height:13px;vertical-align:-2px}
   .tabs button{padding:0 10px}
   .month .val{font-size:20px}
 }
+/* sign-in gate (OW-01) + profile menu */
+body.gated .shell,body.gated .mnav,body.gated .sheet{display:none!important}
+.gate{min-height:calc(100vh - 48px);display:grid;place-items:center;padding-block:24px}
+.gate[hidden]{display:none!important}
+.gatecard{width:min(440px,100%);background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);padding:32px 28px;display:flex;flex-direction:column;gap:16px}
+.gatecard .gbrand{display:flex;align-items:center;gap:12px}
+.gatecard .gbrand .mark{width:48px;height:48px;border-radius:50%;background:#F7F7F9;overflow:hidden;flex:none}
+.gatecard .gbrand .mark img{width:100%;height:100%;object-fit:cover}
+.gatecard h1{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.gatecard .owl{width:96px;align-self:center}
+.gatecard form{display:flex;flex-direction:column;gap:14px}
+.gatecard .err{background:var(--bad-soft);color:var(--bad);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:600}
+.gatecard .err[hidden]{display:none!important}
+.gatecard .alt{text-align:center;font-size:14px}
+.gatecard .demo{font-size:13px;color:var(--warn);background:var(--warn-soft);border-radius:12px;padding:8px 12px}
+.pwwrap{position:relative}
+.pwwrap input{padding-right:64px}
+.pwwrap button{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--accent-ink);font-weight:700;font-size:13px;padding:6px 8px}
+.menu{position:fixed;z-index:45;width:270px;max-width:calc(100vw - 32px);background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);border:1px solid var(--line);padding:10px}
+.menu[hidden]{display:none!important}
+.menu .who{display:flex;gap:12px;align-items:center;padding:8px 8px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.menu .who b{display:block;font-size:15px;overflow-wrap:anywhere}
+.menu .who small{display:block;color:var(--ink-2);font-size:12px;overflow-wrap:anywhere}
+.menu a,.menu button.mi{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border-radius:12px;border:0;background:none;text-decoration:none;color:var(--ink);font-weight:600;font-size:14px;text-align:left}
+.menu a:hover,.menu button.mi:hover{background:var(--surface-2)}
+.menu button.mi.out{color:var(--bad)}
+button.navlink{border:0;background:none;width:100%;text-align:left;cursor:pointer;font-family:inherit}
+.navlink.logout:hover{color:var(--bad)}
+.sheet .panel button.tile{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;border-radius:20px;background:var(--bad-soft);border:0;color:var(--bad);font-size:13px;font-weight:600}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .fade{animation:fade .35s ease both}
 @keyframes fade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -379,6 +408,7 @@ small svg.i,.hint svg.i{width:13px;height:13px;vertical-align:-2px}
     <a class="navlink top" href="#business"><svg class="i"><use href="#i-gear"/></svg>Business settings</a>
     <a class="navlink top" href="#integrations"><svg class="i"><use href="#i-plug"/></svg>Integrations</a>
     <a class="navlink top" href="#activity"><svg class="i"><use href="#i-activity"/></svg>Activity log</a>
+    <button class="navlink top logout" data-logout><svg class="i"><use href="#i-logout"/></svg>Log out</button>
     <div class="helpcard">
       <b>Need an answer?</b>
       <p>Ask about sales, stock or who owes you.</p>
@@ -393,7 +423,7 @@ small svg.i,.hint svg.i{width:13px;height:13px;vertical-align:-2px}
       <b>BeWise</b>
       <div class="sp">
         <button class="iconbtn" data-toast="3 new notifications: 1 approval, 1 failed delivery, daily summary" aria-label="Notifications"><svg class="i"><use href="#i-bell"/></svg><span class="ping"></span></button>
-        <button class="avatar" aria-label="Your profile">Y</button>
+        <button class="avatar" data-menu aria-haspopup="menu" aria-label="Your profile and log out">Y</button>
       </div>
     </div>
     <div id="view"></div>
@@ -420,9 +450,12 @@ small svg.i,.hint svg.i{width:13px;height:13px;vertical-align:-2px}
     <a href="#business"><svg class="i"><use href="#i-gear"/></svg>Settings</a>
     <a href="#integrations"><svg class="i"><use href="#i-plug"/></svg>Integrations</a>
     <a href="#activity"><svg class="i"><use href="#i-activity"/></svg>Activity</a>
+    <button class="tile" data-logout><svg class="i"><use href="#i-logout"/></svg>Log out</button>
   </div>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
+<main class="gate" id="gate" hidden></main>
+<div class="menu" id="menu" role="menu" aria-label="Profile" hidden></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
@@ -452,9 +485,13 @@ small svg.i,.hint svg.i{width:13px;height:13px;vertical-align:-2px}
   <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12M6 11l6 6 6-6M5 21h14"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><path d="M3 5h18v14H3zM3 6l9 7 9-7"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol>
 </svg>
 
+<!-- Real backend (D-44): present on the live site (app.bewiseglobal.in/api), absent on previews → demo mode -->
+<script src="../api/sdk/bewise-api.js"></script>
 <script>
 "use strict";
 const IMG={wave:"%%OWL_WAVE%%",bottle:"%%OWL_BOTTLE%%",read:"%%OWL_READ%%",sleep:"%%OWL_SLEEP%%"};
@@ -564,7 +601,7 @@ function donut(items,total,center){
 const header=(title,sub,extra='')=>`<div class="pagehead"><div><h1>${title}</h1><p>${sub}</p>${extra}</div><div class="right">
   <span class="pill">${ic('cal')}November 2026</span>
   <button class="iconbtn" data-toast="3 new notifications: 1 approval, 1 failed delivery, daily summary" aria-label="Notifications">${ic('bell')}<span class="ping"></span></button>
-  <button class="avatar" aria-label="Your profile">Y</button></div></div>`;
+  <button class="avatar" data-menu aria-haspopup="menu" aria-label="Your profile and log out">${initials()}</button></div></div>`;
 const sampleTag=`<span class="sample">${ic('alert')}Sample data — prototype</span>`;
 const draftTag=`<span class="chip warn">Draft — pending accountant</span>`;
 const listItem=(it,sel)=>`<button class="item ${sel?'sel':''}" data-appr="${it.id}"><span class="ico ${it.tone}">${ic(it.ic)}</span><span class="t"><b>${it.t}</b><small>${it.kind} · ${it.d}</small></span><span class="amt num">${inr(it.v)}</span><span class="go">${ic('arrow')}</span></button>`;
@@ -574,7 +611,7 @@ const V={};
 V.home=()=>{
   const k=last7.map(dayKind), w7=sum(last7,'total'), p7=sum(prev7,'total');
   const best=last7.reduce((a,b)=>b.total>a.total?b:a);
-  return `${header('Good morning','Here is your business today, Tuesday 17 November.',sampleTag)}
+  return `${header('Good morning'+(firstName()?', '+firstName():''),'Here is your business today, Tuesday 17 November.',sampleTag)}
   <div class="grid g-home-1">
     <section class="card todaycard">
       <h2>Today so far</h2>
@@ -917,6 +954,118 @@ $('#moreBtn').addEventListener('click',()=>$('#sheet').hidden=false);
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')e.currentTarget.hidden=true;});
 document.addEventListener('click',e=>{const t=e.target.closest('[data-toast]');if(t)toast(t.dataset.toast);});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#sheet').hidden=true;});
-window.addEventListener('hashchange',route);
-route();
+window.addEventListener('hashchange',()=>{ if(!document.body.classList.contains('gated')) route(); });
+
+/* ---------- sign-in, roles & log out (OW-01) ----------
+   live: the HUB backend (api/, D-44) — HttpOnly session cookie, auth.login / auth.requestOtp+verifyOtp / auth.me / auth.logout
+   demo: no backend (GitHub Pages, Claude preview) — any email + password, remembered for this tab only */
+const AUTH={mode:'demo',me:null};
+const ALLOWED_ROLES=['owner'];
+const APP_FOR_ROLE={consultant:['Jitu Bhaiya\'s app','../consultant/'],manager:['the office app','../manager/'],client:['the client app','../client/'],accountant:['the accountant view','#']};
+const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function firstName(){const n=(AUTH.me&&AUTH.me.name||'').trim();return n&&!/^owner\b/i.test(n)&&!/demo/i.test(n)?esc(n.split(/\s+/)[0]):'';}
+function initials(){const n=(AUTH.me&&(AUTH.me.name||(AUTH.mode==='live'?AUTH.me.email:''))||'You').trim();return esc(n.split(/[\s@.]+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'Y');}
+const ss={get:k=>{try{return sessionStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{v==null?sessionStorage.removeItem(k):sessionStorage.setItem(k,v)}catch(e){}}};
+
+async function boot(){
+  if(window.BeWise){
+    let live=false; try{live=await BeWise.available();}catch(e){}
+    if(live){AUTH.mode='live'; const r=await BeWise.call('auth.me'); AUTH.me=r.ok?r.data:null;
+      BeWise.on('signedout',()=>{ if(AUTH.me){AUTH.me=null; showGate('signin','Your session ended. Please sign in again.');} });}
+  }
+  if(AUTH.mode==='demo'){ const d=ss.get('bw_owner_demo'); AUTH.me= d==='out'?null:(d?JSON.parse(d):{name:'',email:'owner@demo',roles:['owner']}); }
+  decide();
+}
+function decide(){
+  if(!AUTH.me) return showGate('signin');
+  if(!(AUTH.me.roles||[]).some(r=>ALLOWED_ROLES.includes(r))) return showGate('wrongrole');
+  document.body.classList.remove('gated'); $('#gate').hidden=true; $('#gate').innerHTML='';
+  document.querySelectorAll('.mtop .avatar').forEach(a=>a.innerHTML=initials());
+  route();
+}
+function gateShell(inner){return `<div class="gatecard"><div class="gbrand"><div class="mark"><img src="%%LOGO%%" alt=""></div><div><b>BeWise</b><div class="muted" style="font-size:13px">Owner · Holistic Wellness</div></div></div>${inner}</div>`;}
+function showGate(kind,msg){
+  closeMenu(); $('#sheet').hidden=true; document.body.classList.add('gated'); const g=$('#gate'); g.hidden=false; window.scrollTo({top:0});
+  if(kind==='wrongrole'){const roles=AUTH.me.roles||[];const other=roles.map(r=>APP_FOR_ROLE[r]).find(Boolean);
+    g.innerHTML=gateShell(`<img class="owl" src="${IMG.read}" alt=""><h1>This space is for the owner</h1>
+      <p class="muted" style="margin:0">You're signed in as <b>${esc(AUTH.me.name||AUTH.me.email)}</b>${roles.length?' ('+esc(roles.join(', '))+')':''}. The owner's money and team screens aren't part of your access.</p>
+      ${other&&other[1]!=='#'?`<a class="btn primary" href="${other[1]}">Open ${other[0]}</a>`:roles.includes('accountant')?`<p class="hint">The accountant view (reports and exports) is coming next.</p>`:''}
+      <button class="btn ghost" data-logout>${ic('logout')}Log out</button>`); return;}
+  g.innerHTML=gateShell(`<div><h1>Welcome back</h1><p class="muted" style="margin:6px 0 0">Sign in to see your business.</p></div>
+    ${AUTH.mode==='demo'?`<p class="demo">Preview: no real accounts here. Any email and password will sign you in.</p>`:''}
+    <p class="err" id="gErr" role="alert" ${msg?'':'hidden'}>${esc(msg||'')}</p>
+    <form id="pwForm" novalidate>
+      <div><label class="f" for="gEmail">Email</label><input type="email" id="gEmail" autocomplete="username" required placeholder="you@example.com" value="${esc(ss.get('bw_owner_email')||'')}"></div>
+      <div><label class="f" for="gPass">Password</label><div class="pwwrap"><input type="password" id="gPass" autocomplete="current-password" required><button type="button" id="gShow" aria-label="Show password">Show</button></div></div>
+      <button class="btn primary" id="gGo">Sign in</button>
+    </form>
+    <p class="alt"><button class="link" id="gCode" type="button">${ic('mail')}Email me a sign-in code instead</button></p>`);
+  wireSignin();
+  setTimeout(()=>{const e=$('#gEmail'); (e&&e.value? $('#gPass'):e)?.focus();},50);
+}
+function gErr(t){const e=$('#gErr'); if(!e) return; e.textContent=t||''; e.hidden=!t;}
+function busy(btn,on,label){btn.disabled=on; btn.textContent=on?'Please wait…':label;}
+function wireSignin(){
+  $('#gShow').addEventListener('click',e=>{const i=$('#gPass');const show=i.type==='password';i.type=show?'text':'password';e.currentTarget.textContent=show?'Hide':'Show';e.currentTarget.setAttribute('aria-label',show?'Hide password':'Show password');});
+  $('#pwForm').addEventListener('submit',async e=>{e.preventDefault(); gErr('');
+    const email=$('#gEmail').value.trim(), password=$('#gPass').value;
+    if(!/^\S+@\S+\.\S+$/.test(email)) return gErr('Please enter a valid email address.');
+    if(!password) return gErr('Please enter your password.');
+    ss.set('bw_owner_email',email);
+    if(AUTH.mode==='demo'){ AUTH.me={name:'',email,roles:['owner']}; ss.set('bw_owner_demo',JSON.stringify(AUTH.me)); toast('Signed in'); return decide(); }
+    const b=$('#gGo'); busy(b,true,'Sign in'); const r=await BeWise.call('auth.login',{email,password}); busy(b,false,'Sign in');
+    if(!r.ok) return gErr(r.error.message); AUTH.me=r.data; toast('Signed in'); decide();});
+  $('#gCode').addEventListener('click',()=>codeStep());
+}
+function codeStep(){
+  const email=($('#gEmail')?.value||ss.get('bw_owner_email')||'').trim();
+  $('#gate').innerHTML=gateShell(`<div><h1>Sign in with a code</h1><p class="muted" style="margin:6px 0 0">We'll email you a 6-digit code.</p></div>
+    <p class="err" id="gErr" role="alert" hidden></p>
+    <form id="codeForm" novalidate>
+      <div><label class="f" for="gEmail">Email</label><input type="email" id="gEmail" autocomplete="username" required value="${esc(email)}"></div>
+      <div id="codeRow" hidden><label class="f" for="gOtp">Code from the email</label><input type="text" id="gOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6 digits"></div>
+      <button class="btn primary" id="gGo">Send code</button>
+    </form>
+    <p class="alt"><button class="link" id="gBack" type="button">Use my password instead</button></p>`);
+  $('#gBack').addEventListener('click',()=>showGate('signin'));
+  let sent=false;
+  $('#codeForm').addEventListener('submit',async e=>{e.preventDefault(); gErr(''); const em=$('#gEmail').value.trim(); const b=$('#gGo');
+    if(!/^\S+@\S+\.\S+$/.test(em)) return gErr('Please enter a valid email address.');
+    ss.set('bw_owner_email',em);
+    if(!sent){
+      if(AUTH.mode==='live'){busy(b,true,'Send code'); const r=await BeWise.call('auth.requestOtp',{email:em}); busy(b,false,'Send code'); if(!r.ok) return gErr(r.error.message);}
+      sent=true; $('#codeRow').hidden=false; $('#gEmail').readOnly=true; b.textContent='Sign in'; $('#gOtp').focus();
+      toast(AUTH.mode==='demo'?'Preview: type any 6 digits':'Code sent to '+em); return;}
+    const code=$('#gOtp').value.replace(/\D/g,''); if(code.length!==6) return gErr('The code has 6 digits.');
+    if(AUTH.mode==='demo'){ AUTH.me={name:'',email:em,roles:['owner']}; ss.set('bw_owner_demo',JSON.stringify(AUTH.me)); toast('Signed in'); return decide(); }
+    busy(b,true,'Sign in'); const r=await BeWise.call('auth.verifyOtp',{email:em,code}); busy(b,false,'Sign in');
+    if(!r.ok) return gErr(r.error.message); AUTH.me=r.data; toast('Signed in'); decide();});
+}
+async function logout(){
+  closeMenu();
+  if(AUTH.mode==='live'){ const r=await BeWise.call('auth.logout'); if(!r.ok&&r.status!==401){ toast(r.error.message); return; } }
+  else ss.set('bw_owner_demo','out');
+  AUTH.me=null; toast('You are logged out'); showGate('signin');
+}
+/* profile menu */
+function closeMenu(){const m=$('#menu'); if(m&&!m.hidden){m.hidden=true; document.querySelectorAll('[data-menu]').forEach(b=>b.setAttribute('aria-expanded','false'));}}
+function openMenu(btn){
+  const m=$('#menu'), me=AUTH.me||{}; const role=(me.roles||[])[0]||'owner';
+  m.innerHTML=`<div class="who"><span class="avatar" style="flex:none">${initials()}</span><div style="min-width:0"><b>${esc(me.name||'Owner')}</b><small>${esc(me.email||'')}</small><small>${esc(role[0].toUpperCase()+role.slice(1))}${AUTH.mode==='demo'?' · preview':''}</small></div></div>
+    <a href="#business" role="menuitem">${ic('gear')}Business settings</a>
+    <a href="#team" role="menuitem">${ic('users')}Team &amp; roles</a>
+    <a href="#activity" role="menuitem">${ic('activity')}Activity log</a>
+    <button class="mi out" role="menuitem" data-logout>${ic('logout')}Log out</button>`;
+  m.hidden=false; const r=btn.getBoundingClientRect(); const w=m.offsetWidth;
+  m.style.top=(r.bottom+8)+'px'; m.style.left=Math.max(16,Math.min(innerWidth-w-16,r.right-w))+'px';
+  btn.setAttribute('aria-expanded','true'); m.querySelector('a,button').focus();
+}
+document.addEventListener('click',e=>{
+  const lo=e.target.closest('[data-logout]'); if(lo){e.preventDefault(); logout(); return;}
+  const mb=e.target.closest('[data-menu]'); if(mb){e.stopPropagation(); const m=$('#menu'); m.hidden?openMenu(mb):closeMenu(); return;}
+  if(!e.target.closest('#menu')) closeMenu(); else if(e.target.closest('#menu a')) closeMenu();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
+window.addEventListener('resize',closeMenu);
+boot();
 </script>
