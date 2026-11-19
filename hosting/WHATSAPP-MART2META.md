@@ -15,7 +15,7 @@
 | Order paid | Client | `bw_order_confirmed` |
 | Order dispatched (courier and tracking) | Client | `bw_order_dispatched` |
 | New booking · **safety alert from the intake (D-38)** | **Jitu Bhaiya only** | `bw_staff_alert` |
-| Sign-in code (optional, instead of email) | Client | `bw_login_code` |
+| Sign-in code (optional, instead of email) | Client | `bw_auth` |
 
 Clients who turn WhatsApp off in their privacy settings are skipped. Every send is logged; the last 8 show on the tools page.
 
@@ -56,7 +56,7 @@ Copy the texts exactly. `{{1}}`, `{{2}}` and so on are the variables, in this or
 **bw_staff_alert** (Utility)
 > BeWise team update: {{1}} Please open the BeWise app for details.
 
-**bw_login_code** (Authentication)
+**bw_auth** (Authentication — sign-in code)
 - Use Meta's standard authentication text: *"{{1}} is your verification code."*
 - Add a **Copy code** button.
 

@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 /** Defaults — the owner can rename / re-map on tools.php (stored in settings whatsapp.templates). */
 const BW_WA_TEMPLATES = [
-    'login_code'        => ['name' => 'bw_login_code', 'language' => 'en', 'params' => ['field_1' => '{code}', 'copy_code' => '{code}']],
+    'login_code'        => ['name' => 'bw_auth', 'language' => 'en', 'params' => ['field_1' => '{code}', 'copy_code' => '{code}']],
     'booking_confirmed' => ['name' => 'bw_booking_confirmed', 'language' => 'en', 'params' => ['field_1' => '{name}', 'field_2' => '{session}', 'field_3' => '{when}', 'field_4' => '{place}', 'field_5' => '{code}']],
     'session_reminder'  => ['name' => 'bw_session_reminder', 'language' => 'en', 'params' => ['field_1' => '{name}', 'field_2' => '{day}', 'field_3' => '{time}', 'field_4' => '{place}']],
     'payment_due'       => ['name' => 'bw_payment_due', 'language' => 'en', 'params' => ['field_1' => '{name}', 'field_2' => '{what}', 'field_3' => '{amount}', 'field_4' => '{link}']],
@@ -66,6 +66,16 @@ function wa_http(string $path, array $body): array
     return [$ok, $code, is_array($j) ? $j : ($err ?: substr((string)$res, 0, 300))];
 }
 
+/** Request body for a template: provider fields filled from the template's params mapping. */
+function wa_body(string $phone, array $tpl, array $vars): array
+{
+    $body = ['phone_number' => $phone, 'template_name' => $tpl['name'], 'template_language' => $tpl['language'] ?? 'en'];
+    foreach (($tpl['params'] ?? []) as $field => $pattern) {
+        $body[$field] = mb_substr(preg_replace_callback('/\{(\w+)\}/', fn($m) => (string)($vars[$m[1]] ?? ''), (string)$pattern), 0, 900);
+    }
+    return $body;
+}
+
 /**
  * Sends a template to a phone. $vars fill the template's placeholders. $dedupe (optional) makes the send happen once ever.
  * Returns true when accepted by the provider (or logged in 'log' transport).
@@ -78,10 +88,7 @@ function wa_send(?string $phoneRaw, string $key, array $vars, ?string $dedupe = 
         $tpl = wa_templates()[$key] ?? null;
         if (!$tpl || empty($tpl['name']) || !empty($tpl['off'])) return false;
         if ($dedupe && val('SELECT 1 FROM whatsapp_log WHERE dedupe_key = ?', [$dedupe])) return true;
-        $body = ['phone_number' => $phone, 'template_name' => $tpl['name'], 'template_language' => $tpl['language'] ?? 'en'];
-        foreach (($tpl['params'] ?? []) as $field => $pattern) {
-            $body[$field] = mb_substr(preg_replace_callback('/\{(\w+)\}/', fn($m) => (string)($vars[$m[1]] ?? ''), (string)$pattern), 0, 900);
-        }
+        $body = wa_body($phone, $tpl, $vars);
         if (bw_config('whatsapp.transport') === 'log') { $ok = true; $code = 0; $resp = 'logged'; }
         else [$ok, $code, $resp] = wa_http('contact/send-template-message', $body);
         insert('whatsapp_log', ['id' => uuid(), 'to_phone' => $phone, 'template_key' => $key, 'template_name' => $tpl['name'], 'status' => $ok ? 'sent' : 'failed',

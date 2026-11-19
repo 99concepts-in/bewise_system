@@ -131,6 +131,19 @@ if ($post && hash_equals($csrf(), $f('csrf'))) {
                     if (!$ok) bw_fail('wa_failed', "Mart2Meta answered (HTTP $code): " . mb_strimwidth(is_array($resp) ? json_encode($resp, JSON_UNESCAPED_UNICODE) : (string)$resp, 0, 300, '…'));
                     $msg[] = "Test sent to …" . substr($to, -4) . " ✓ — check WhatsApp.";
                     break;
+                case 'watestlogin':
+                    unset($GLOBALS['__bw_cfg']);
+                    if (!bw_config('whatsapp.token')) bw_fail('invalid_input', 'Connect WhatsApp first.');
+                    $to = wa_phone($f('phone'));
+                    if (!$to) bw_fail('invalid_input', 'Enter a valid mobile number.');
+                    $tpl = wa_templates()['login_code'];
+                    $code = (string)random_int(100000, 999999);
+                    $body = wa_body($to, $tpl, ['code' => $code]);
+                    [$ok, $hc, $resp] = wa_http('contact/send-template-message', $body);
+                    insert('whatsapp_log', ['id' => uuid(), 'to_phone' => $to, 'template_key' => 'test_login', 'template_name' => $tpl['name'], 'status' => $ok ? 'sent' : 'failed', 'http_code' => $hc, 'response' => is_array($resp) ? $resp : ['raw' => $resp]]);
+                    if (!$ok) bw_fail('wa_failed', "Template “{$tpl['name']}” — Mart2Meta answered (HTTP $hc): " . mb_strimwidth(is_array($resp) ? json_encode($resp, JSON_UNESCAPED_UNICODE) : (string)$resp, 0, 400, '…') . ' · Sent fields: ' . implode(', ', array_keys($body)));
+                    $msg[] = "Sign-in code template “{$tpl['name']}” sent to …" . substr($to, -4) . " ✓ (test code $code). If it arrived, tick it and turn on WhatsApp sign-in below.";
+                    break;
                 case 'watemplates':
                     $tpls = [];
                     foreach (array_keys(BW_WA_TEMPLATES) as $k) {
@@ -213,7 +226,9 @@ tools_page(<<<HTML
 <button>Save WhatsApp</button></form>
 <form method=post style="margin-top:18px"><input type=hidden name=action value=watest><input type=hidden name=csrf value="$t">
 <div class=row><div><label>Send a test to (your mobile)</label><input name=phone placeholder="98xxxxxxxx" required></div><div class=row><div><label>Template</label><input name=template value="hello_world"></div><div><label>Language</label><input name=language value="en_US"></div></div></div>
-<button>Send test</button></form></section>
+<button>Send test</button></form>
+<form method=post style="margin-top:14px"><input type=hidden name=action value=watestlogin><input type=hidden name=csrf value="$t">
+<div class=row><div><label>Test the sign-in code template <small>(uses the “login code” row below)</small></label><input name=phone placeholder="98xxxxxxxx" required></div><div><label>&nbsp;</label><button style="margin:0;width:100%">Send a test sign-in code</button></div></div></form></section>
 
 <section><h2>WhatsApp messages</h2><p><small>Create these templates in Mart2Meta (Templates → New, category <b>Utility</b>; login code = <b>Authentication</b>) with the texts in the guide, wait for Meta's approval, then tick them here. Unticked messages are not sent. <b>Parameters</b> map Mart2Meta fields to our values.</small></p>
 <form method=post><input type=hidden name=action value=watemplates><input type=hidden name=csrf value="$t">
