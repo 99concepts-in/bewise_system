@@ -47,6 +47,13 @@ function tools_write_config(array $cfg): void
     unset($GLOBALS['__bw_cfg']);
 }
 
+// Any unexpected error shows a readable page instead of a blank HTTP 500 (details go to the PHP error log).
+set_exception_handler(function (Throwable $e) {
+    error_log('BeWise tools error: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+    http_response_code(500);
+    tools_page('<section><h1>Something went wrong</h1><p>Please go back and try again. If it keeps happening, send this to your developer: <code>' . htmlspecialchars(substr(md5($e->getMessage()), 0, 8) . ' · ' . basename($e->getFile()) . ':' . $e->getLine()) . '</code></p><p><a href="tools.php">Back to owner tools</a></p></section>');
+});
+
 if (!bw_config('db')) tools_page('<section><h1>Not set up yet</h1><p>Run <a href="install.php">install.php</a> first.</p></section>');
 bw_auto_migrate();
 
@@ -155,7 +162,7 @@ if ($post && hash_equals($csrf(), $f('csrf'))) {
 
 // ── status ──
 $team = all("SELECT u.name, u.email, u.username, GROUP_CONCAT(r.role) roles, u.last_login_at FROM users u JOIN user_roles r ON r.user_id = u.id
-             GROUP BY u.id HAVING roles REGEXP 'owner|consultant|manager|accountant' OR u.username IS NOT NULL ORDER BY u.created_at");
+             GROUP BY u.id, u.name, u.email, u.username, u.last_login_at, u.created_at HAVING roles REGEXP 'owner|consultant|manager|accountant' OR u.username IS NOT NULL ORDER BY u.created_at");
 $rows = implode('', array_map(fn($t) => '<tr><td>' . $h($t['name']) . '</td><td>' . $h($t['email'] ?: '@' . $t['username']) . '</td><td><span class=pill>' . $h($t['roles']) . '</span></td></tr>', $team));
 $rz = bw_config('razorpay.key_id');
 $rzState = $rz ? (str_starts_with((string)$rz, 'rzp_live') ? 'LIVE keys' : 'Test keys') . ' · webhook ' . (bw_config('razorpay.webhook_secret') ? 'set' : 'not set') : 'Not set up — checkout shows “pay at the studio”';
