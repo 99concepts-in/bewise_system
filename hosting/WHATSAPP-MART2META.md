@@ -60,6 +60,11 @@ Copy the texts exactly. `{{1}}`, `{{2}}` and so on are the variables, in this or
 - Use Meta's standard authentication text: *"{{1}} is your verification code."*
 - Add a **Copy code** button.
 
+## If Mart2Meta says "Template not found in the system"
+- In Mart2Meta → **Templates**, click **Sync** (or *Sync WhatsApp Templates*). Templates approved in Meta only appear after a sync.
+- Check the template's **status is Approved** and its **name matches exactly** (lower case, underscores).
+- BeWise tries the language codes `en`, `en_US` and `en_GB` automatically, and remembers the one that works.
+
 ## Step 3: Turn them on
 1. On the tools page, open **WhatsApp messages** and tick each template once Meta has approved it. Unticked templates are never sent.
 2. Check the **Parameters** column. It maps Mart2Meta's fields to BeWise values, for example `{"field_1":"{name}","field_2":"{session}"}`.

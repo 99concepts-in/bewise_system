@@ -126,7 +126,7 @@ if ($post && hash_equals($csrf(), $f('csrf'))) {
                     $to = wa_phone($f('phone'));
                     if (!$to) bw_fail('invalid_input', 'Enter a valid mobile number.');
                     $body = ['phone_number' => $to, 'template_name' => $f('template') ?: 'hello_world', 'template_language' => $f('language') ?: 'en_US'];
-                    [$ok, $code, $resp] = wa_http('contact/send-template-message', $body);
+                    [$ok, $code, $resp] = wa_send_template('test', $body);
                     insert('whatsapp_log', ['id' => uuid(), 'to_phone' => $to, 'template_key' => 'test', 'template_name' => $body['template_name'], 'status' => $ok ? 'sent' : 'failed', 'http_code' => $code, 'response' => is_array($resp) ? $resp : ['raw' => $resp]]);
                     if (!$ok) bw_fail('wa_failed', "Mart2Meta answered (HTTP $code): " . mb_strimwidth(is_array($resp) ? json_encode($resp, JSON_UNESCAPED_UNICODE) : (string)$resp, 0, 300, '…'));
                     $msg[] = "Test sent to …" . substr($to, -4) . " ✓ — check WhatsApp.";
@@ -139,10 +139,10 @@ if ($post && hash_equals($csrf(), $f('csrf'))) {
                     $tpl = wa_templates()['login_code'];
                     $code = (string)random_int(100000, 999999);
                     $body = wa_body($to, $tpl, ['code' => $code]);
-                    [$ok, $hc, $resp] = wa_http('contact/send-template-message', $body);
+                    [$ok, $hc, $resp, $usedLang] = wa_send_template('login_code', $body);
                     insert('whatsapp_log', ['id' => uuid(), 'to_phone' => $to, 'template_key' => 'test_login', 'template_name' => $tpl['name'], 'status' => $ok ? 'sent' : 'failed', 'http_code' => $hc, 'response' => is_array($resp) ? $resp : ['raw' => $resp]]);
                     if (!$ok) bw_fail('wa_failed', "Template “{$tpl['name']}” — Mart2Meta answered (HTTP $hc): " . mb_strimwidth(is_array($resp) ? json_encode($resp, JSON_UNESCAPED_UNICODE) : (string)$resp, 0, 400, '…') . ' · Sent fields: ' . implode(', ', array_keys($body)));
-                    $msg[] = "Sign-in code template “{$tpl['name']}” sent to …" . substr($to, -4) . " ✓ (test code $code). If it arrived, tick it and turn on WhatsApp sign-in below.";
+                    $msg[] = "Sign-in code template “{$tpl['name']}” ($usedLang) sent to …" . substr($to, -4) . " ✓ (test code $code). If it arrived, tick it and turn on WhatsApp sign-in below.";
                     break;
                 case 'watemplates':
                     $tpls = [];

@@ -77,6 +77,32 @@ function wa_body(string $phone, array $tpl, array $vars): array
 }
 
 /**
+ * Sends a template body; if Mart2Meta says "Template not found", retries the other English codes (en / en_US / en_GB)
+ * and saves the one that works into settings whatsapp.templates so later sends use it straight away.
+ * Returns [ok, httpCode, response, languageUsed].
+ */
+function wa_send_template(string $key, array $body): array
+{
+    $tried = [];
+    $langs = array_values(array_unique([$body['template_language'], 'en', 'en_US', 'en_GB']));
+    foreach ($langs as $lang) {
+        $body['template_language'] = $lang;
+        [$ok, $code, $resp] = wa_http('contact/send-template-message', $body);
+        $tried[] = $lang;
+        $notFound = is_array($resp) && stripos((string)($resp['message'] ?? ''), 'template not found') !== false;
+        if (!$notFound) {
+            if ($ok && $lang !== $langs[0] && isset(BW_WA_TEMPLATES[$key])) {
+                $saved = (array)setting('whatsapp.templates', []);
+                $saved[$key] = array_merge(wa_templates()[$key], ['language' => $lang]);
+                set_setting('whatsapp.templates', $saved);
+            }
+            return [$ok, $code, $resp, $lang];
+        }
+    }
+    return [false, $code ?? 0, ['result' => 'failed', 'message' => "Template \"{$body['template_name']}\" not found in Mart2Meta for languages " . implode(', ', $tried) . ' — open Mart2Meta → Templates, check the exact name and click Sync.'], $lang ?? ''];
+}
+
+/**
  * Sends a template to a phone. $vars fill the template's placeholders. $dedupe (optional) makes the send happen once ever.
  * Returns true when accepted by the provider (or logged in 'log' transport).
  */
@@ -90,7 +116,7 @@ function wa_send(?string $phoneRaw, string $key, array $vars, ?string $dedupe = 
         if ($dedupe && val('SELECT 1 FROM whatsapp_log WHERE dedupe_key = ?', [$dedupe])) return true;
         $body = wa_body($phone, $tpl, $vars);
         if (bw_config('whatsapp.transport') === 'log') { $ok = true; $code = 0; $resp = 'logged'; }
-        else [$ok, $code, $resp] = wa_http('contact/send-template-message', $body);
+        else [$ok, $code, $resp] = wa_send_template($key, $body);
         insert('whatsapp_log', ['id' => uuid(), 'to_phone' => $phone, 'template_key' => $key, 'template_name' => $tpl['name'], 'status' => $ok ? 'sent' : 'failed',
             'http_code' => $code, 'response' => is_array($resp) ? $resp : ['raw' => $resp], 'dedupe_key' => $ok ? $dedupe : null, 'ref' => $ref,
             'vars' => $key === 'login_code' ? ['code' => '••••••'] : $vars]);
