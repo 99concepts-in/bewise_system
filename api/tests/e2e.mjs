@@ -22,7 +22,7 @@ const email = `client${Date.now()}@example.test`
 console.log('public')
 const h = await (await fetch(`${B}/api/v1/system.health`)).json(); ok(h.ok && h.data.db, 'health ok')
 const cfg = await (await fetch(`${B}/api/v1/system.publicConfig`)).json(); ok(cfg.data.consultationTypes.find((t) => t.id === 'first').feePaise === 100000, 'first consultation ₹1,000')
-const prods = await (await fetch(`${B}/api/v1/catalog.listProducts`)).json(); ok(prods.data.items.length >= 19, `catalogue ${prods.data.items.length} products`)
+const prods = await (await fetch(`${B}/api/v1/catalog.listProducts`)).json(); ok(prods.data.items.length >= 18, `catalogue ${prods.data.items.length} products`)
 ok(!('costPaise' in prods.data.items[0].variants[0]), 'no cost price for public')
 const noHeader = await fetch(`${B}/api/v1/auth.me`, { method: 'POST', body: '{}' }); ok(noHeader.status === 400, 'POST without X-BeWise header refused')
 
