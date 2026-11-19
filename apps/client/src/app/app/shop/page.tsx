@@ -8,7 +8,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { ChevronRight, Heart, Search, ShoppingBag, X } from 'lucide-react'
+import { ChevronRight, Search, ShoppingBag, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { ProductCard } from '@/components/product-card'
 import { AppHeader } from '@/components/shell'
@@ -141,10 +141,6 @@ export default function Shop() {
                 <span className="relative">{c.label}</span>
               </button>
             ))}
-            <button role="tab" aria-selected={saved} onClick={() => { setSaved(!saved); setCat('all'); setIntent(null) }} className={cx('relative inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold', saved ? 'text-white' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
-              {saved && <motion.span layoutId="col-pill" transition={spring} className="absolute inset-0 rounded-full bg-navy" />}
-              <Heart className={cx('relative size-4', saved && 'fill-white')} /><span className="relative">Saved{wishlist.length ? ` ${wishlist.length}` : ''}</span>
-            </button>
           </div>
           {list.length === 0 ? (
             <div className="card p-8 text-center">
@@ -162,7 +158,7 @@ export default function Shop() {
   )
 }
 
-/** Category tile art: up to three product photos fanned out, or Jitu Bhaiya for the consultation tile. */
+/** Category tile art: up to three product photos fanned out, or Jitendra Khimlani for the consultation tile. */
 function CatArt({ art, consult }: { art: string[]; consult?: boolean }) {
   if (consult) return <img src={`${BP}/img/jitu-portrait.webp`} alt="" aria-hidden loading="lazy" className="absolute left-1/2 top-1 h-[82px] w-auto -translate-x-1/2 object-contain" />
   const n = art.length
@@ -205,7 +201,7 @@ function HeroSlides({ onPick }: { onPick: (k: Intent | 'bath') => void }) {
             drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.25}
             onDragEnd={(_, info) => { if (info.offset.x < -50) setI((i + 1) % SLIDES.length); else if (info.offset.x > 50) setI((i - 1 + SLIDES.length) % SLIDES.length) }}
             initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -60 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0 block w-full p-6 text-left" style={{ background: s.bg }}>
+            className="absolute inset-0 block w-full touch-pan-y p-6 text-left" style={{ background: s.bg, touchAction: 'pan-y' }}>
             <motion.img src={`${BP}/img/${s.deco}.webp`} alt="" aria-hidden draggable={false} className="pointer-events-none absolute -top-3 right-[150px] h-[64px] opacity-70" animate={{ y: [0, -6, 0] }} transition={{ duration: 6, repeat: Infinity }} />
             {s.art[1] ? <>
               <motion.img src={`${BP}/img/${s.art[0]}.webp`} alt="" aria-hidden draggable={false} className="pointer-events-none absolute bottom-3 right-[70px] h-[150px] drop-shadow-[0_14px_14px_rgba(24,41,87,.2)]" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ ...spring, delay: 0.15 }} />

@@ -26,7 +26,7 @@ export default function About() {
   const next = () => { setTouched(true); if (!ok) return; setProfile({ name: name.trim(), dob, city: city.trim(), gender: gender || undefined }); goSafe(router, '/onboarding/photo') }
 
   return (
-    <OnboardShell step={1} title="A little about" em="you" sub="So Jitu Bhaiya knows who he’s meeting.">
+    <OnboardShell step={1} title="A little about" em="you" sub="So Jitendra Khimlani knows who he’s meeting.">
       <motion.div variants={stagger} initial="hidden" animate="show" className="mt-7 space-y-4">
         <motion.div variants={rise}><Field icon={<User className="size-5" />} label="Your name" err={touched ? errs.name : ''}>
           <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Priya Shah" className="w-full bg-transparent text-[17px] font-semibold text-navy outline-none placeholder:font-medium placeholder:text-[#b6bccb]" />

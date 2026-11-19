@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { AlertTriangle, CalendarHeart, Check, Heart, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
+import { AlertTriangle, CalendarHeart, Check, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
 import { useRef } from 'react'
 import { ProductArt } from './brand'
 import { buzz, toast, useChrome } from './ui'
@@ -16,7 +16,7 @@ export const allergyHit = (p: Product, allergies: string[]) => p.allergens.find(
 
 /**
  * Adding to bag. Personal Bach blends are made after a consultation, so they become a reorder of the client's own blend
- * (or a nudge to book, if Jitu Bhaiya hasn't prepared one yet).
+ * (or a nudge to book, if Jitendra Khimlani hasn't prepared one yet).
  */
 export function useAddProduct() {
   const add = useApp((s) => s.addToCart)
@@ -36,8 +36,6 @@ export function useAddProduct() {
 export function ProductCard({ p, i = 0, wide }: { p: Product; i?: number; wide?: boolean }) {
   const addProduct = useAddProduct()
   const hasBlend = useApp((s) => !!s.blend)
-  const wish = useApp((s) => s.wishlist.includes(p.slug))
-  const toggleWish = useApp((s) => s.toggleWish)
   const allergies = useApp((s) => s.profile?.allergies ?? [])
   const ref = useRef<HTMLDivElement>(null)
   const cartKey = p.personal ? (p.personal === 'spray' ? 'remedy-reorder-spray' : 'remedy-reorder') : p.variants[p.variants.length - 1].id
@@ -84,12 +82,15 @@ export function ProductCard({ p, i = 0, wide }: { p: Product; i?: number; wide?:
           </AnimatePresence>
         </div>
       </div>
-      <motion.button whileTap={{ scale: 0.8 }} aria-label={wish ? 'Remove from saved' : 'Save for later'} aria-pressed={wish} onClick={() => { toggleWish(p.slug); buzz(6) }}
-        className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-white/85 backdrop-blur">
-        <motion.span key={String(wish)} initial={{ scale: 0.4 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500, damping: 15 }}>
-          <Heart className={`size-[18px] ${wish ? 'fill-navy text-navy' : 'text-navy'}`} />
-        </motion.span>
-      </motion.button>
+      {/* owner 2026-11-18: a cart icon instead of the heart */}
+      {!p.soldOut && !bookFirst && (
+        <motion.button whileTap={{ scale: 0.8 }} aria-label={inCart ? `${title}: ${inCart} in cart, add one more` : `Add ${title} to cart`}
+          onClick={() => { if (!(p.personal && inCart)) addProduct(p, v.id, 1, ref.current?.getBoundingClientRect()) }}
+          className={`absolute right-4 top-4 grid size-9 place-items-center rounded-full backdrop-blur ${inCart ? 'bg-navy text-white' : 'bg-white/90 text-navy'}`}>
+          <ShoppingBag className="size-[17px]" />
+          {inCart > 0 && <motion.span key={inCart} initial={{ scale: 0.4 }} animate={{ scale: 1 }} className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-[#f6de8d] text-[11px] font-extrabold text-navy tnum">{inCart}</motion.span>}
+        </motion.button>
+      )}
     </motion.div>
   )
 }

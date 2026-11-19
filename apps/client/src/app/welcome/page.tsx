@@ -14,9 +14,9 @@ import { BP } from '@/lib/asset'
 
 // Copy rule: no cure / medical claims — "gently support emotional balance" (design system §10)
 const SLIDES = [
-  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A calm, private space for your emotional wellbeing, guided by Jitu Bhaiya and the gentle wisdom of Bach flower remedies.' },
-  { lead: 'Book your appointment with', em: 'Jitendra Khimlani', sub: 'Jitu Bhaiya, Bach Remedy Therapist. Online or in person, your personal remedy blend is included.' },
-  { lead: 'Bach flower remedy', em: 'benefits', sub: '38 natural flower essences that gently support emotional balance, chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'A few drops a day'] },
+  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A calm, private space for your emotional wellbeing, guided by Jitendra Khimlani and the gentle wisdom of Bach flower remedies.' },
+  { lead: 'Book your appointment with', em: 'Jitendra Khimlani', sub: 'Jitendra Khimlani is a Bach Flower Remedy therapist. Talk to him about how you feel, and get a remedy blend made just for you.' },
+  { lead: 'Bach flower remedy', em: 'benefits', sub: 'Natural Bach flower remedies that gently support emotional balance, chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'Feel calmer, day by day'] },
 ] as { lead: string; em: string; sub: string; chips?: string[] }[]
 
 // owner 2026-11-18: slide images felt slow; fetch them all up front (during the 1.9 s splash) at high priority
@@ -161,14 +161,11 @@ function ArtBook() {
       {/* owner 2026-11-18: background removed, no circular frame */}
       <div className="absolute inset-x-0 bottom-[6%] top-[10%] flex items-end justify-center">
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="h-full">
-          <FadeImg src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="h-full w-auto object-contain drop-shadow-[0_18px_24px_rgba(24,41,87,.18)] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]" />
+          <FadeImg src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani" className="h-full w-auto object-contain drop-shadow-[0_18px_24px_rgba(24,41,87,.18)] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]" />
         </motion.div>
       </div>
       <Float className="left-[6%] top-[14%]" delay={0.3} dy={6}>
-        <div className="rounded-[18px] rounded-bl-md bg-white px-3.5 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Bach Remedy Therapist</div>
-      </Float>
-      <Float className="right-[6%] top-[30%]" delay={0.45} dy={7}>
-        <div className="rounded-[18px] rounded-br-md bg-navy px-3.5 py-2 text-[13px] font-semibold text-white shadow-[var(--shadow-float)]">Online · In person</div>
+        <div className="rounded-[18px] rounded-bl-md bg-white px-3.5 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Bach Flower Remedy Therapist</div>
       </Float>
       <Float className="bottom-[12%] left-[10%]" delay={0.6} dy={5}>
         <div className="flex items-center gap-1.5 rounded-full bg-sage-100 px-3.5 py-2 text-[13px] font-semibold text-sage-text shadow-[var(--shadow-card)]">✓ Remedy blend included</div>
@@ -220,7 +217,7 @@ function ArtEssence() {
           <path d="M22 16h46c8 0 13 6 13 14v86c0 8-6 14-14 14H23c-8 0-14-6-14-14V30c0-8 5-14 13-14Z" fill="url(#amb)" />
           <rect x="18" y="58" width="54" height="40" rx="6" fill="#f5efe4" />
           <text x="45" y="76" textAnchor="middle" fontSize="9" fontWeight="800" fill="#182957">BeWise</text>
-          <text x="45" y="88" textAnchor="middle" fontSize="6" fontWeight="600" fill="#5f667a">flower essences</text>
+          <text x="45" y="88" textAnchor="middle" fontSize="6" fontWeight="600" fill="#5f667a">flower remedies</text>
           <path d="M16 36c0-5 3-9 7-9" stroke="#fff" strokeOpacity=".5" strokeWidth="4" strokeLinecap="round" fill="none" />
         </svg>
         {/* dropper: bulb + glass pipette, starts inside the neck */}

@@ -18,7 +18,7 @@ export default function Privacy() {
   // ⚠ DPDP Act expects a clear affirmative act for consent — owner to confirm pre-ticked defaults with counsel before launch.
   const [c, setC] = useState(profile?.onboardedAt && profile.consents ? profile.consents : { wellbeing: true, whatsapp: true, offers: true })
   const rows = [
-    { k: 'wellbeing' as const, icon: <Lock className="size-5" />, t: 'Keep my wellbeing data safe', d: 'Needed to use BeWise. Only you and Jitu Bhaiya see your answers and journal.', req: true },
+    { k: 'wellbeing' as const, icon: <Lock className="size-5" />, t: 'Keep my wellbeing data safe', d: 'Needed to use BeWise. Only you and Jitendra Khimlani see your answers and journal.', req: true },
     { k: 'whatsapp' as const, icon: <MessageCircle className="size-5" />, t: 'Updates on WhatsApp', d: 'Session reminders and order updates.' },
     { k: 'offers' as const, icon: <Sparkles className="size-5" />, t: 'Gentle offers', d: 'Now and then, never more than twice a month.' },
   ]

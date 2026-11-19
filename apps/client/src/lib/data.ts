@@ -141,10 +141,10 @@ export const STUDIO = {
 }
 
 export const CONSULTANT = {
-  name: 'Jitu Bhaiya',
+  name: 'Jitendra Khimlani',
   fullName: 'Jitendra Khimlani',
-  title: 'Bach Remedy Therapist',
-  approach: 'Jitu Bhaiya listens first. Then he prepares a blend of Bach flower essences chosen for how you feel.',
+  title: 'Bach Flower Remedy Therapist',
+  approach: 'Jitendra Khimlani listens first. Then he prepares a blend of Bach flower remedies chosen for how you feel.',
   stats: ['12+ years of workshops', '2,00,000+ people guided'],
   website: 'https://www.jitendrakhimlani.com',
 }
@@ -258,15 +258,15 @@ export const PRODUCTS: Product[] = [
   { slug: 'bach-remedy-dropper', name: 'Bach Flower Remedy', tagline: 'Your personal blend, dropper', format: 'Dropper', category: 'remedies', intents: ['calm'],
     art: 'products/bach-remedy-dropper', color: '#5E8F6A', tint: ['#e5efe2', '#f1f6ec'], personal: 'dropper',
     variants: [{ id: 'bach-remedy-dropper-30', label: '30 ml', pricePaise: 80000 }], allergens: [],
-    about: 'A personalised blend of Bach flower essences, chosen by Jitu Bhaiya for how you feel. Your first blend comes with your consultation; reorder the same blend here anytime.',
-    feel: ['Made for you', 'Gentle', 'Natural'], ingredients: 'Bach flower essences chosen for you by Jitu Bhaiya.',
+    about: 'A personalised blend of Bach flower remedies, chosen by Jitendra Khimlani for how you feel. Your first blend comes with your consultation; reorder the same blend here anytime.',
+    feel: ['Made for you', 'Gentle', 'Natural'], ingredients: 'Bach flower remedies chosen for you by Jitendra Khimlani.',
     howTo: 'Take 4 drops, 4 times a day, directly or in any drink you like, or as your Bach expert suggests. A bottle lasts up to 25 days when taken regularly.',
     safety: 'An individual, customised remedy for personal use only. Store at room temperature, away from direct sunlight, and keep away from children. Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor.' },
   { slug: 'bach-remedy-spray', name: 'Bach Remedy Spray', tagline: 'Your personal blend, spray', format: 'Spray', category: 'remedies', intents: ['calm'],
     art: 'products/bach-remedy-spray', color: '#5E8F6A', tint: ['#e5efe2', '#eef1fb'], personal: 'spray',
     variants: [{ id: 'bach-remedy-spray-30', label: '30 ml', pricePaise: 80000 }], allergens: [],
-    about: 'Your personalised Bach flower blend in an easy spray, handy on the go. Available once Jitu Bhaiya has prepared your blend.',
-    feel: ['Made for you', 'On the go', 'Gentle'], ingredients: 'Bach flower essences chosen for you by Jitu Bhaiya.',
+    about: 'Your personalised Bach flower blend in an easy spray, handy on the go. Available once Jitendra Khimlani has prepared your blend.',
+    feel: ['Made for you', 'On the go', 'Gentle'], ingredients: 'Bach flower remedies chosen for you by Jitendra Khimlani.',
     howTo: 'Spray directly into your mouth, 3 sprays per dose, 4 times a day, or as your Bach expert recommends.',
     safety: 'An individual, customised remedy for personal use only. Store at room temperature, away from direct sunlight, and keep away from children. Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor.' },
   { slug: 'rescue-remedy', name: 'Rescue Remedy', tagline: 'For stressful moments', format: 'Spray', category: 'remedies', intents: ['calm'],
@@ -310,7 +310,7 @@ export const CATEGORIES: { key: Category | 'consult'; label: string; sub: string
   { key: 'remedies', label: 'Bach remedies', sub: 'Made for you', tint: '#e5efe2', art: ['products/bach-remedy-dropper', 'products/rescue-remedy-spray'] },
   { key: 'bath', label: 'Bath salts', sub: '3 rituals', tint: '#fbe9ee', art: ['products/aura-bath-salt', 'products/abundance-bath-salt'] },
   { key: 'care', label: 'Hair & beauty', sub: 'Oil & mist', tint: '#fbf0dc', art: ['products/hair-oil', 'products/beauty-spray'] },
-  { key: 'consult', label: 'Consultation', sub: 'With Jitu Bhaiya', tint: '#f1ece4', art: [] },
+  { key: 'consult', label: 'Consultation', sub: 'With Jitendra Khimlani', tint: '#f1ece4', art: [] },
 ]
 export const INTENTS: { key: Intent; label: string; emoji: string; tint: string; line: string }[] = [
   { key: 'sleep', label: 'Sleep', emoji: '🌙', tint: '#e7ecfa', line: 'Wind down gently' },
@@ -345,7 +345,7 @@ export function slotsFor(date: Date): string[] {
 }
 
 /** Session feedback — "How do you feel after the session?" in the client's own words (consultant request §2). Shown to
- * Jitu Bhaiya as "What people said they felt" — never as a BeWise claim. */
+ * Jitendra Khimlani as "What people said they felt" — never as a BeWise claim. */
 export const BENEFITS = ['Calmer', 'Felt heard', 'Sleeping better', 'Lighter', 'Clearer mind', 'More confident', 'Less anxious', 'More hopeful', 'More patient', 'More energy', 'At peace', 'More connected']
 
 export const HELPLINES = [

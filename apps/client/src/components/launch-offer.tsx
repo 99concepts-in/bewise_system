@@ -158,7 +158,7 @@ function OfferBody({ id, onClaim, onSkip, onSmaller }: { id: PlanId; onClaim: ()
         {p.name}
       </motion.h2>
       <motion.p className="mx-auto mt-1 max-w-[300px] text-center text-[14px] leading-5 text-white/75" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
-        {half ? <><b className="font-semibold text-white">Scared of a big commitment? Try 6 months first.</b><br />The minimum we recommend to feel the change: a consultation with Jitu Bhaiya every month, your remedy blend included each time.</> : <>A consultation with Jitu Bhaiya every month for {p.months} months, your remedy blend included each time.</>}
+        {half ? <><b className="font-semibold text-white">Scared of a big commitment? Try 6 months first.</b><br />The minimum we recommend to feel the change: a consultation with Jitendra Khimlani every month, your remedy blend included each time.</> : <>A consultation with Jitendra Khimlani every month for {p.months} months, your remedy blend included each time.</>}
       </motion.p>
 
       <motion.div className="relative mx-auto mt-6 w-full max-w-[340px] rounded-[30px] bg-white/10 p-5 text-center ring-1 ring-white/15 backdrop-blur" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5, type: 'spring', stiffness: 220, damping: 20 }}>

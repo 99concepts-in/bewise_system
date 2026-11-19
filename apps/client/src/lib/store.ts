@@ -35,7 +35,7 @@ export type Appointment = {
   needsNewTime?: boolean; paidAt?: string
   /** owner 2026-11-18: client chose to pay after the consultation (UPI, card or at the studio) */
   payLater?: boolean
-  /** owner 2026-11-18: the client picks a preferred time after paying; Jitu Bhaiya or Haresh bhai confirm it (else the team calls) */
+  /** owner 2026-11-18: the client picks a preferred time after paying; Jitendra Khimlani or Haresh bhai confirm it (else the team calls) */
   timeRequested?: boolean
   /** covered by a consultation plan */
   planId?: PlanId
@@ -111,7 +111,7 @@ type State = {
   payAppointment: (id: string) => void                         // finance checkout for an existing appointment → payment.captured
   pickNewTime: (id: string, startsAt: string) => void          // scheduling.rescheduleAppointment (no cost) → confirmed
   submitCheckin: (appointmentId: string, answers: CheckinAnswers) => void // intake.submitCheckin
-  simulateStaffBooking: (late?: boolean) => Appointment         // preview only: what a booking from Jitu Bhaiya / Haresh looks like
+  simulateStaffBooking: (late?: boolean) => Appointment         // preview only: what a booking from Jitendra Khimlani / Haresh looks like
   setReminderTimes: (t: string[]) => void
   addToCart: (key: string, qty?: number) => void             // commerce.addToCart
   setQty: (key: string, qty: number) => void
@@ -120,7 +120,7 @@ type State = {
   placeOrder: (addressId: string, subscribe?: string[]) => Order // commerce.createOrderFromCart + payment (coupon applied, subscriptions confirmed)
   buyPlan: (id: PlanId, pricePaise: number) => Plan            // finance: plan purchase → unlocks the first-purchase coupon
   setOffer: (o: { skippedAt?: string; downsellAt?: string }) => void
-  confirmTime: (id: string) => void                            // preview only: Jitu Bhaiya / Haresh bhai approve the preferred time
+  confirmTime: (id: string) => void                            // preview only: Jitendra Khimlani / Haresh bhai approve the preferred time
   reviewOrder: (id: string, rating: number, text: string) => void
   subscribeOrder: (id: string, keys: string[]) => void          // commerce.createSubscription (refills confirmed on WhatsApp)
   pushChat: (m: Omit<ChatMsg, 'id' | 'at'>) => void
@@ -189,7 +189,7 @@ export const useApp = create<State>()(
         const seq = get().seq + 1
         const appt: Appointment = { ...a, id: uid(), code: `BW-A-${String(seq).padStart(5, '0')}`, createdAt: new Date().toISOString(), status: 'confirmed' }
         set((s) => ({ appointments: [...s.appointments, appt], seq, ...(a.planId && s.plan ? { plan: { ...s.plan, used: s.plan.used + 1 } } : {}) }))
-        if (!appt.needsNewTime) get().notify(appt.timeRequested ? { title: 'Time requested', body: 'Jitu Bhaiya or Haresh bhai will confirm your time soon. If it doesn’t suit, our team will call you.', href: `/app/sessions/view?id=${appt.id}` } : { title: 'You’re booked', body: 'Jitu Bhaiya will read your answers before you meet.', href: `/app/sessions/view?id=${appt.id}` })
+        if (!appt.needsNewTime) get().notify(appt.timeRequested ? { title: 'Time requested', body: 'Jitendra Khimlani or Haresh bhai will confirm your time soon. If it doesn’t suit, our team will call you.', href: `/app/sessions/view?id=${appt.id}` } : { title: 'You’re booked', body: 'Jitendra Khimlani will read your answers before you meet.', href: `/app/sessions/view?id=${appt.id}` })
         return appt
       },
       reschedule: (id, startsAt) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, startsAt, rescheduled: (a.rescheduled ?? 0) + 1 } : a)) })),
@@ -207,10 +207,10 @@ export const useApp = create<State>()(
         set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString(), ...(late ? { needsNewTime: true } : { status: 'confirmed' as const }) } : x)) }))
         get().notify(late ? { title: 'Payment received', body: 'Please pick a new time for your session, no extra cost.', href: `/app/pay?appointment=${id}` } : { title: 'You’re booked', body: 'Payment received. See you soon.', href: `/app/sessions/view?id=${id}` })
       },
-      // owner 2026-11-18: a chosen time is a request until Jitu Bhaiya or Haresh bhai confirm it
+      // owner 2026-11-18: a chosen time is a request until Jitendra Khimlani or Haresh bhai confirm it
       pickNewTime: (id, startsAt) => {
         set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, startsAt, status: 'confirmed' as const, needsNewTime: false, timeRequested: true } : x)) }))
-        get().notify({ title: 'Time requested', body: 'Jitu Bhaiya or Haresh bhai will confirm your time soon. If it doesn’t suit, our team will call you.', href: `/app/sessions/view?id=${id}` })
+        get().notify({ title: 'Time requested', body: 'Jitendra Khimlani or Haresh bhai will confirm your time soon. If it doesn’t suit, our team will call you.', href: `/app/sessions/view?id=${id}` })
       },
       submitCheckin: (appointmentId, answers) => set((s) => ({ checkins: { ...s.checkins, [appointmentId]: { at: new Date().toISOString(), answers } } })),
       simulateStaffBooking: (late = false) => {
@@ -221,7 +221,7 @@ export const useApp = create<State>()(
           status: late ? 'expired' : 'awaiting_payment', amountPaise: get().appointments.length ? 80000 : 100000, createdAt: new Date().toISOString(), source: 'consultant',
         }
         set((s) => ({ appointments: [...s.appointments, appt], seq }))
-        get().notify({ title: 'Jitu Bhaiya booked a session for you', body: 'Complete the payment to confirm it.', href: `/app/pay?appointment=${appt.id}` })
+        get().notify({ title: 'Jitendra Khimlani booked a session for you', body: 'Complete the payment to confirm it.', href: `/app/pay?appointment=${appt.id}` })
         return appt
       },
       setReminderTimes: (t) => set((s) => (s.blend ? { blend: { ...s.blend, reminderTimes: t } } : {})),
@@ -265,7 +265,7 @@ export const useApp = create<State>()(
       setOffer: (o) => set((s) => ({ offer: { ...s.offer, ...o } })),
       confirmTime: (id) => {
         set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, timeRequested: false } : x)) }))
-        get().notify({ title: 'Your time is confirmed', body: 'Jitu Bhaiya will see you then.', href: `/app/sessions/view?id=${id}` })
+        get().notify({ title: 'Your time is confirmed', body: 'Jitendra Khimlani will see you then.', href: `/app/sessions/view?id=${id}` })
       },
       subscribeOrder: (id, keys) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, subscribed: keys } : o)) })),
       reviewOrder: (id, rating, text) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, review: { rating, text, at: new Date().toISOString() } } : o)) })),

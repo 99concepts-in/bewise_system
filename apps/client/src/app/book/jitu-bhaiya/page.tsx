@@ -3,7 +3,7 @@
  * @module   booking
  * @owner    CLIENT
  * @screens  Public booking link (owner 2026-11-18; consultant request §3) — /book/jitu-bhaiya?type=first|followup
- *           Shared by Jitu Bhaiya and Haresh on WhatsApp and as a QR code. Signed-in clients go straight to booking;
+ *           Shared by Jitendra Khimlani and Haresh on WhatsApp and as a QR code. Signed-in clients go straight to booking;
  *           new visitors see a short welcome, then sign-in → onboarding → booking (type kept).
  */
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -36,10 +36,10 @@ function BookingLink() {
       <header className="flex items-center gap-2.5 pt-3"><LogoMark size={36} /><span className="text-[15px] font-extrabold text-navy">BeWise <span className="font-semibold text-muted">· Holistic Wellness</span></span></header>
       <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }} className="mt-6 flex flex-col items-center text-center">
         <div className="relative">
-          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="relative h-[210px] w-auto object-contain drop-shadow-[0_18px_24px_rgba(24,41,87,.18)] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]" />
+          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani" className="relative h-[210px] w-auto object-contain drop-shadow-[0_18px_24px_rgba(24,41,87,.18)] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]" />
         </div>
-        <h1 className="h-duo mt-6 text-[30px]">Book with <em>Jitu Bhaiya</em></h1>
-        <p className="mt-1 text-[14px] font-semibold text-peri">{CONSULTANT.fullName} · {CONSULTANT.title}</p>
+        <h1 className="h-duo mt-6 text-[30px]">Book with <em>Jitendra Khimlani</em></h1>
+        <p className="mt-1 text-[14px] font-semibold text-peri">{CONSULTANT.title}</p>
         <p className="mt-3 max-w-[330px] text-[15px] leading-6 text-muted">{CONSULTANT.approach}</p>
       </motion.div>
 
@@ -63,7 +63,7 @@ function BookingLink() {
       </div>
 
       <div className="mt-auto space-y-2 pt-8 safe-b">
-        <Btn full variant="gradient" onClick={go}>Book with Jitu Bhaiya</Btn>
+        <Btn full variant="gradient" onClick={go}>Book with Jitendra Khimlani</Btn>
         <p className="text-center text-[12px] text-muted">Takes about 3 minutes · sessions are non-refundable, but you can reschedule</p>
       </div>
     </main>

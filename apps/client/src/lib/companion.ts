@@ -25,19 +25,19 @@ export function respond(raw: string, c: Ctx): Reply {
   const t = raw.toLowerCase().trim()
   if (CRISIS.test(t)) return {
     safety: true,
-    text: `I’m really glad you told me, ${c.name}. You deserve support right now. Please call Tele-MANAS on 14416 (free, any time), or 112 if you’re in danger. Jitu Bhaiya is here for you too.`,
+    text: `I’m really glad you told me, ${c.name}. You deserve support right now. Please call Tele-MANAS on 14416 (free, any time), or 112 if you’re in danger. Jitendra Khimlani is here for you too.`,
     quick: ['Message the team on WhatsApp', 'Book a session'],
   }
   if (BLEND_CHANGE.test(t) && !/when|time|how many|drops/.test(t)) return {
-    text: 'Choosing flowers is Jitu Bhaiya’s call. He knows your story. Would you like to book a follow-up to talk it through?',
+    text: 'Choosing flowers is Jitendra Khimlani’s call. He knows your story. Would you like to book a follow-up to talk it through?',
     actions: [{ id: 'book-followup', label: 'Book a follow-up' }], quick: ['When should I take my drops?'],
   }
   if (MEDICAL.test(t)) return {
-    text: 'I’m not able to advise on medical questions or medicines. Please keep checking with your doctor. For how you’re feeling emotionally, Jitu Bhaiya can help at your next session.',
+    text: 'I’m not able to advise on medical questions or medicines. Please keep checking with your doctor. For how you’re feeling emotionally, Jitendra Khimlani can help at your next session.',
     quick: ['When is my next session?', 'How have I been feeling?'],
   }
   if (/(drop|ritual|when should|take my|dose|blend)/.test(t)) {
-    if (!c.blend) return { text: 'Your personal blend arrives after your first session with Jitu Bhaiya. It’s included in the consultation.', actions: [{ id: 'book-first', label: 'Book a consultation' }] }
+    if (!c.blend) return { text: 'Your personal blend arrives after your first session with Jitendra Khimlani. It’s included in the consultation.', actions: [{ id: 'book-first', label: 'Book a consultation' }] }
     const nextTime = c.blend.reminderTimes.find((t) => { const [h, m] = t.split(':').map(Number); const x = new Date(); x.setHours(h, m, 0, 0); return x.getTime() > Date.now() })
     return {
       text: `Your blend is ${c.blend.drops} drops, ${c.blend.timesPerDay} times a day (${c.blend.reminderTimes.join(', ')}).${c.droppedToday ? ' You’ve ticked today, lovely.' : nextTime ? ` Next one around ${nextTime}. Want a reminder?` : ''}`,
@@ -52,7 +52,7 @@ export function respond(raw: string, c: Ctx): Reply {
     const picks = safe.length ? safe : fallback
     return {
       text: `I’m sorry it’s been restless.${days ? ` Your journal shows tired on ${days} of the last 7 days.` : ''} A slow wind-down can help. Many people enjoy these in their evening routine:`,
-      products: picks.map((p) => p.slug), actions: days >= 3 ? [{ id: 'book-followup', label: 'Book a follow-up with Jitu Bhaiya' }] : undefined,
+      products: picks.map((p) => p.slug), actions: days >= 3 ? [{ id: 'book-followup', label: 'Book a follow-up with Jitendra Khimlani' }] : undefined,
     }
   }
   if (/(feel|mood|journal|week|how have i)/.test(t)) {
@@ -64,7 +64,7 @@ export function respond(raw: string, c: Ctx): Reply {
   }
   if (/(next|session|appointment|book|meet)/.test(t)) {
     const up = c.appointments.filter((a) => a.status === 'confirmed' && +new Date(a.startsAt) > Date.now()).sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))[0]
-    if (up) return { text: `Your next session is ${fmtDay(up.startsAt)} at ${fmtTime(up.startsAt)}, ${CONSULTATIONS.find((x) => x.id === up.type)!.name.toLowerCase()}, ${up.mode === 'online' ? 'online' : 'in person'} with Jitu Bhaiya.`, actions: [{ id: `open-session-${up.id}`, label: 'View session' }] }
+    if (up) return { text: `Your next session is ${fmtDay(up.startsAt)} at ${fmtTime(up.startsAt)}, ${CONSULTATIONS.find((x) => x.id === up.type)!.name.toLowerCase()}, ${up.mode === 'online' ? 'online' : 'in person'} with Jitendra Khimlani.`, actions: [{ id: `open-session-${up.id}`, label: 'View session' }] }
     return { text: 'You don’t have a session booked. A first consultation is ₹1,000 and a follow-up ₹800, both include your remedy blend.', actions: [{ id: c.appointments.length ? 'book-followup' : 'book-first', label: 'Book now' }] }
   }
   if (/(order|deliver|track|ship|parcel)/.test(t)) {
@@ -76,7 +76,7 @@ export function respond(raw: string, c: Ctx): Reply {
   if (/(pay|due|invoice|receipt)/.test(t)) return { text: 'You have nothing due right now. Receipts for your sessions and orders live in Me → Payments.' }
   if (/(price|cost|fee|how much)/.test(t)) return { text: `A first consultation is ${formatINR(100000)} and a follow-up ${formatINR(80000)}, both include your personal remedy blend.` }
   if (/^(hi|hello|hey|namaste|hii+)/.test(t)) return { text: `Hi ${c.name} 🌿 I can help with your ritual, journal, sessions and orders. What’s on your mind?`, quick: ['When should I take my drops?', 'How have I been feeling?', 'Where’s my order?'] }
-  return { text: 'I’m still learning. I can help with your drops and ritual, your mood journal, sessions, orders and our products. For anything about your blend, Jitu Bhaiya is the best person.', quick: ['When should I take my drops?', 'How have I been feeling?', 'I’ve been struggling to sleep'] }
+  return { text: 'I’m still learning. I can help with your drops and ritual, your mood journal, sessions, orders and our products. For anything about your blend, Jitendra Khimlani is the best person.', quick: ['When should I take my drops?', 'How have I been feeling?', 'I’ve been struggling to sleep'] }
 }
 
 export const todayKey = () => dayKey(new Date())

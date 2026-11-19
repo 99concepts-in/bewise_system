@@ -70,8 +70,13 @@ export function IntakeIntro() {
       </div>
       <p className="sr-only" aria-live="polite">{BREATH[phase].t}</p>
 
-      <motion.div className="mt-4 flex flex-wrap justify-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
-        {['Private to Jitu Bhaiya', 'Everything optional', 'About 5 minutes'].map((t) => (
+      {/* owner 2026-11-18: say it before the form starts */}
+      <motion.div className="mt-4 flex w-full max-w-[340px] items-start gap-3 rounded-[20px] bg-white/85 p-3.5 text-left shadow-[var(--shadow-card)]" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
+        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-sage-100 text-sage-text"><Lock className="size-4" /></span>
+        <p className="text-[13px] leading-5 text-ink"><b className="text-navy">Your data is private.</b> It’s only shared with Jitendra Khimlani (Consultant).</p>
+      </motion.div>
+      <motion.div className="mt-3 flex flex-wrap justify-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
+        {['Everything optional', 'About 5 minutes'].map((t) => (
           <span key={t} className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[12px] font-semibold text-navy shadow-[var(--shadow-card)]"><span className="size-1.5 rounded-full bg-sage" />{t}</span>
         ))}
       </motion.div>
@@ -83,7 +88,7 @@ export function IntakeIntro() {
 export function StepWho({ a, set }: P) {
   return (
     <div className="space-y-4">
-      <StepTitle lead="Anything you’d like to" em="share?" sub="In your own words, or record a voice note. Optional. Jitu Bhaiya will read it before you meet." />
+      <StepTitle lead="Anything you’d like to" em="share?" sub="In your own words, or record a voice note. Optional. Jitendra Khimlani will read it before you meet." />
       <Card>
         <Label>In your own words</Label>
         <textarea value={a.onMind} onChange={(e) => set({ onMind: e.target.value.slice(0, 1000) })} rows={4} placeholder="Work has felt heavy lately, and I can’t switch off at night…"
@@ -384,8 +389,8 @@ export function StepGentle({ a, set }: P) {
       <AnimatePresence>
         {a.selfHarm && a.selfHarm !== 'No' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
-            <SafetyCard />
-            <p className="px-2 text-[14px] text-muted">Jitu Bhaiya will be gently informed before your session. You can keep booking whenever you’re ready.</p>
+            {/* owner 2026-11-18: no helpline card inside the booking form (helplines stay on the Help screen) */}
+            <p className="rounded-[20px] bg-peri-50/70 p-4 text-[14px] leading-5 text-ink">Thank you for telling us. Jitendra Khimlani will be gently informed before your session, so he can support you with care.</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -411,10 +416,9 @@ export function StepReview({ a, set, edit }: P & { edit: (step: string) => void 
           <button onClick={() => edit(r.k)} className="text-[14px] font-semibold text-navy underline underline-offset-4">Edit</button>
         </motion.div>
       ))}
-      {/* owner 2026-11-18: sharing + AI summary are part of the service — stated plainly, not toggles */}
+      {/* owner 2026-11-18: privacy stated plainly; no mention of an AI summary */}
       <div className="card space-y-3 p-5">
-        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Lock className="mt-0.5 size-5 shrink-0 text-navy" /><span>Your answers are <b className="text-navy">kept discreet</b> and never shared with anyone except Jitu Bhaiya, your consultant.</span></p>
-        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Sparkles className="mt-0.5 size-5 shrink-0 text-navy" /><span>A secure AI assistant prepares a short summary for him. <b className="text-navy">Only he sees it</b> and it never decides your remedy.</span></p>
+        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Lock className="mt-0.5 size-5 shrink-0 text-navy" /><span>Your answers are <b className="text-navy">kept discreet</b> and never shared with anyone except Jitendra Khimlani, your consultant.</span></p>
       </div>
     </div>
   )
@@ -454,7 +458,7 @@ export function CheckinNews({ c, set }: { c: Checkin; set: (p: Partial<Checkin>)
   return (
     <div className="space-y-4">
       <StepTitle lead="Anything" em="new?" />
-      <textarea value={c.news} onChange={(e) => set({ news: e.target.value.slice(0, 800) })} rows={4} placeholder="Optional. Anything you’d like Jitu Bhaiya to know" aria-label="Anything new"
+      <textarea value={c.news} onChange={(e) => set({ news: e.target.value.slice(0, 800) })} rows={4} placeholder="Optional. Anything you’d like Jitendra Khimlani to know" aria-label="Anything new"
         className="card w-full resize-none p-5 text-[15px] outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
       <div className="card p-5">
         <Label>I took my drops</Label>

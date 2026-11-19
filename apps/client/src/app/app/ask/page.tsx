@@ -3,7 +3,7 @@
  * @module   companion
  * @owner    CLIENT
  * @screens  CL-55 Ask BeWise — mascot, streaming-style replies, product suggestions with Add to bag, confirm-before-action,
- *           crisis card, clear history. Caption: "Not medical advice · for your blend, ask Jitu Bhaiya"
+ *           crisis card, clear history. Caption: "Not medical advice · for your blend, ask Jitendra Khimlani"
  */
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
@@ -148,7 +148,7 @@ export default function Ask() {
             <ArrowUp className="size-5" />
           </motion.button>
         </form>
-        <p className="mt-2 text-center text-[12px] text-muted">Not medical advice · for your blend, ask <b className="text-navy">Jitu Bhaiya</b></p>
+        <p className="mt-2 text-center text-[12px] text-muted">Not medical advice · for your blend, ask <b className="text-navy">Jitendra Khimlani</b></p>
       </div>
 
       <Sheet open={menu} onClose={() => setMenu(false)} title="Ask BeWise">

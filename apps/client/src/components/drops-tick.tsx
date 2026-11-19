@@ -80,7 +80,7 @@ export function DropsTick({ full = false }: { full?: boolean }) {
               return <span key={dayKey(d)} title={d.toDateString()} className={cx('h-6 flex-1 rounded-[6px]', x === true ? 'bg-[linear-gradient(180deg,#e7b768,#c48a3a)]' : x === false ? 'bg-[#e3e6ef]' : 'bg-white ring-1 ring-dashed ring-[#d9dce6]')} />
             })}
           </div>
-          <p className="mt-2 text-[12px] text-muted">{counted.length ? `You took them on ${took} of the last ${counted.length} days you logged. Every day counts.` : 'Tick once a day. It helps Jitu Bhaiya see how your blend is going.'}</p>
+          <p className="mt-2 text-[12px] text-muted">{counted.length ? `You took them on ${took} of the last ${counted.length} days you logged. Every day counts.` : 'Tick once a day. It helps Jitendra Khimlani see how your blend is going.'}</p>
         </div>
       )}
     </div>

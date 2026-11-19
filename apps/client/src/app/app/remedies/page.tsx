@@ -19,7 +19,7 @@ import { DoseTracker } from '@/components/dose-tracker'
 import { blendSupply } from '@/lib/supply'
 import { BP } from '@/lib/asset'
 
-// @decision(D-10) generic Bach descriptions — Jitu Bhaiya approves final wording before launch. Never the reason it was chosen.
+// @decision(D-10) generic Bach descriptions — Jitendra Khimlani approves final wording before launch. Never the reason it was chosen.
 const ABOUT: Record<string, string> = {
   Mimulus: 'Dr Bach described Mimulus for everyday fears of known things, a gentle companion for quiet courage.',
   'White Chestnut': 'Associated with a busy mind and repeating thoughts, for a calmer, clearer head.',
@@ -47,7 +47,7 @@ export default function Remedies() {
       <div className="card mt-4 flex flex-col items-center p-8 text-center">
         <Mascot pose="sleep" height={150} />
         <p className="mt-4 text-[18px] font-extrabold text-navy">Your blend will bloom here</p>
-        <p className="mt-1 max-w-[280px] text-[14px] leading-5 text-muted">After your first session, Jitu Bhaiya prepares a personal blend of flower essences, included in your consultation.</p>
+        <p className="mt-1 max-w-[280px] text-[14px] leading-5 text-muted">After your first session, Jitendra Khimlani prepares a personal blend of flower remedies, included in your consultation.</p>
       </div>
       <div className="mt-4"><PastSessions /></div>
     </main>
@@ -152,7 +152,7 @@ export default function Remedies() {
           <div className="pb-2">
             <motion.img src={`${BP}/img/${FLOWER_IMG[blend.flowers.indexOf(flower) % 2]}.webp`} alt="" className="mx-auto h-[180px]" initial={{ scale: 0.7, rotate: -8, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 16 }} />
             <h2 className="h-duo mt-2 text-[28px]">{flower}</h2>
-            <p className="mt-3 text-[15px] leading-6 text-ink">{ABOUT[flower] ?? 'One of Dr Bach’s 38 flower essences.'}</p>
+            <p className="mt-3 text-[15px] leading-6 text-ink">{ABOUT[flower] ?? 'One of Dr Bach’s flower remedies.'}</p>
             <p className="mt-4 rounded-[18px] bg-[#f6f1e8] p-3 text-[13px] font-semibold text-[#8a6a2c]">In your blend since {fmtDay(blend.startedOn)}</p>
           </div>
         )}
@@ -237,7 +237,7 @@ function Upcoming() {
                 <span className="min-w-0 flex-1">
                   <span className="block text-[12px] font-semibold text-peri">{a.needsNewTime ? 'Booked · choose your time' : a.status === 'awaiting_payment' ? 'Awaiting payment' : a.timeRequested ? 'Time awaiting confirmation' : a.type === 'first' ? 'First consultation' : 'Follow-up'}</span>
                   <span className="block text-[16px] font-bold text-navy">{a.needsNewTime ? 'Pick a preferred time' : `${fmtDay(a.startsAt)} · ${fmtTime(a.startsAt)}`}</span>
-                  <span className="block text-[12px] text-muted">{a.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya</span>
+                  <span className="block text-[12px] text-muted">{a.mode === 'online' ? 'Online' : 'In person'} with Jitendra Khimlani</span>
                 </span>
                 <ChevronRight className="size-5 text-navy" />
               </Link>

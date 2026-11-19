@@ -21,7 +21,7 @@ import { parseIsoDay } from '@/lib/supply'
 import { emptyIntake, planLeft, useApp, type Appointment, type IntakeAnswers, type Plan } from '@/lib/store'
 import { HELPLINE, PLANS, offerLive, planFull, planPrice, planSaving, type PlanId } from '@/lib/offer'
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
-import { downloadIcs, googleCalUrl, sessionIcs } from '@/lib/ics'
+import { addToCalendar, downloadIcs, googleCalUrl, isAndroid, sessionIcs } from '@/lib/ics'
 import * as I from './intake'
 import { BP } from '@/lib/asset'
 
@@ -68,7 +68,7 @@ function Book() {
   // owner 2026-11-18: no follow-up questions for the chosen feelings (or none chosen) → skip "Tell us a little more"
   const skipNuance = !answers.feelings.some((f) => NUANCE[f])
   const flow: Step[] = useMemo(() => {
-    // owner 2026-11-18: payment first, then a preferred time (confirmed by Jitu Bhaiya or Haresh bhai)
+    // owner 2026-11-18: payment first, then a preferred time (confirmed by Jitendra Khimlani or Haresh bhai)
     if (type === 'followup') return ['choose', ...CHECKIN, 'mode', 'pay', 'time', 'done']
     return ['choose', ...(needIntake ? INTAKE.filter((x) => x !== 'nuance' || !skipNuance) : []), 'mode', 'pay', 'time', 'done'] as Step[]
   }, [type, needIntake, skipNuance])
@@ -184,7 +184,7 @@ function Book() {
         ) : step === 'time' ? (
           <>
             <Btn full variant={slot ? 'gradient' : 'primary'} disabled={!slot} onClick={requestTime}>Request this time</Btn>
-            <p className="mt-2 text-center text-[12px] text-muted">Jitu Bhaiya or Haresh bhai will confirm it</p>
+            <p className="mt-2 text-center text-[12px] text-muted">Jitendra Khimlani or Haresh bhai will confirm it</p>
           </>
         ) : (
           <Btn full variant={can[step] === false ? 'primary' : 'gradient'} disabled={can[step] === false} onClick={next}>
@@ -200,7 +200,7 @@ function Book() {
         <div className="text-center">
           <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#fbf3dc] text-[30px]" aria-hidden>🌼</span>
           <h2 className="h-duo mt-3 text-[26px]">We <em>recommend</em> this</h2>
-          <p className="mx-auto mt-2 max-w-[300px] text-[15px] leading-6 text-muted">These few questions help Jitu Bhaiya understand you before you meet, so your first session goes deeper. It takes about 2 minutes.</p>
+          <p className="mx-auto mt-2 max-w-[300px] text-[15px] leading-6 text-muted">These few questions help Jitendra Khimlani understand you before you meet, so your first session goes deeper. It takes about 2 minutes.</p>
         </div>
         <div className="mt-6 flex gap-3 pb-1">
           <Btn full variant="white" size="md" onClick={skipIntake}>Skip anyway</Btn>
@@ -267,7 +267,7 @@ function Stepper({ at }: { at: number }) {
 }
 
 function Choose({ type, setType, canFollow, plan, planPick, setPlanPick, onMeet, onStories }: { type: ConsultationId | null; setType: (t: ConsultationId) => void; canFollow: boolean; plan: Plan | null; planPick: PlanPick; setPlanPick: (p: PlanPick) => void; onMeet: () => void; onStories: () => void }) {
-  // returning clients who met Jitu Bhaiya before the app have no history here — offer follow-up quietly (owner 2026-11-18)
+  // returning clients who met Jitendra Khimlani before the app have no history here — offer follow-up quietly (owner 2026-11-18)
   const [showFollow, setShowFollow] = useState(type === 'followup')
   const follow = canFollow || showFollow
   return (
@@ -305,7 +305,7 @@ function Choose({ type, setType, canFollow, plan, planPick, setPlanPick, onMeet,
       )}
       <motion.button onClick={onMeet} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="card flex w-full items-center gap-4 p-4 text-left">
         <img src={`${BP}/img/jitu.webp`} alt="" className="size-16 shrink-0 rounded-[20px] bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)] object-cover object-top" />
-        <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Meet Jitu Bhaiya</span><span className="text-[13px] text-muted">{CONSULTANT.title} · {CONSULTANT.stats[0]}</span></span>
+        <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Meet Jitendra Khimlani</span><span className="text-[13px] text-muted">{CONSULTANT.title} · {CONSULTANT.stats[0]}</span></span>
         <ChevronRight className="size-5 text-soft" />
       </motion.button>
       <motion.button onClick={onStories} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.36 }} className="card flex w-full items-center gap-4 p-4 text-left">
@@ -357,7 +357,7 @@ function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void })
           <Quote className="mx-auto size-8 text-gold" aria-hidden />
           <p className="mt-3 text-[16px] font-bold text-navy">Stories are on their way</p>
           <p className="mt-1 text-[14px] leading-5 text-muted">We’re gathering words from clients who’ve kindly agreed to share their experience.</p>
-          <a href={TESTIMONIALS_SOURCE} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-navy underline underline-offset-4">Read stories on Jitu Bhaiya’s website <ExternalLink className="size-4" /></a>
+          <a href={TESTIMONIALS_SOURCE} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-navy underline underline-offset-4">Read stories on Jitendra Khimlani’s website <ExternalLink className="size-4" /></a>
         </div>
       )}
     </Sheet>
@@ -368,15 +368,15 @@ function MeetSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Sheet open={open} onClose={onClose} title="Meet your consultant" tall>
       <div className="relative mt-1 flex h-[300px] items-end justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)]">
-        <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitu Bhaiya, smiling" className="h-[96%] w-auto object-contain" />
+        <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani, smiling" className="h-[96%] w-auto object-contain" />
       </div>
-      <h2 className="h-duo mt-4 text-[28px]">Jitu <em>Bhaiya</em></h2>
-      <p className="text-[14px] font-semibold text-peri">{CONSULTANT.fullName} · {CONSULTANT.title}</p>
+      <h2 className="h-duo mt-4 text-[28px]">Jitendra <em>Khimlani</em></h2>
+      <p className="text-[14px] font-semibold text-peri">{CONSULTANT.title}</p>
       <p className="mt-3 text-[15px] leading-6 text-ink">{CONSULTANT.approach}</p>
       <div className="mt-4 grid grid-cols-2 gap-2">{CONSULTANT.stats.map((s) => <div key={s} className="rounded-[18px] bg-peri-50 p-3 text-[13px] font-semibold text-navy">{s}</div>)}</div>
       <div className="mt-4 rounded-[22px] bg-[linear-gradient(135deg,#fbf3dc,#eef1fb)] p-4">
         <p className="text-[15px] font-bold text-navy">How Bach remedies work</p>
-        <p className="mt-1 text-[14px] leading-5 text-muted">Dr Edward Bach described 38 flower essences, each linked to an emotional state. Your blend is chosen for how you feel. A gentle, complementary practice alongside your doctor’s care.</p>
+        <p className="mt-1 text-[14px] leading-5 text-muted">Dr Edward Bach’s flower remedies are each linked to an emotional state. Your blend is chosen for how you feel. A gentle, complementary practice alongside your doctor’s care.</p>
       </div>
       <a href={CONSULTANT.website} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-navy underline underline-offset-4">Visit his website <ExternalLink className="size-4" /></a>
     </Sheet>
@@ -388,7 +388,7 @@ function Saved() {
   return (
     <div className="flex flex-col items-center pt-6 text-center">
       <h1 className="h-duo text-[34px]">Thank you, <em>{name}</em></h1>
-      <p className="mt-3 max-w-[320px] text-[15px] leading-6 text-muted">Jitu Bhaiya will read this before you meet. You can update it until 2 hours before your session.</p>
+      <p className="mt-3 max-w-[320px] text-[15px] leading-6 text-muted">Jitendra Khimlani will read this before you meet. You can update it until 2 hours before your session.</p>
       <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.15 }} className="mt-6"><Mascot pose="bottle" height={240} /></motion.div>
     </div>
   )
@@ -439,7 +439,7 @@ function TimeHead() {
     <div className="mb-4">
       <p className="inline-flex items-center gap-1.5 rounded-full bg-sage-100 px-3 py-1.5 text-[12px] font-bold text-sage-text"><Check className="size-3.5" strokeWidth={3} /> You’re all set</p>
       <h1 className="h-duo mt-3">Your preferred <em>time</em></h1>
-      <p className="mt-1 text-[14px] leading-5 text-muted">Pick what suits you. Jitu Bhaiya or Haresh bhai will confirm it, or our team will call you to find a better time.</p>
+      <p className="mt-1 text-[14px] leading-5 text-muted">Pick what suits you. Jitendra Khimlani or Haresh bhai will confirm it, or our team will call you to find a better time.</p>
     </div>
   )
 }
@@ -451,7 +451,7 @@ function Review({ c, mode, fee, feeLabel, inPlan, canLater, payWhen, setPayWhen 
       <div className="card p-5">
         <div className="-mx-5 -mt-5 mb-1 flex items-end gap-4 overflow-hidden rounded-t-[28px] border-b border-line bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)] px-5 pt-4">
           <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="h-[140px] w-auto shrink-0 object-contain" />
-          <div className="pb-5"><p className="text-[20px] font-extrabold text-navy">Jitu Bhaiya</p><p className="text-[13px] text-muted">{CONSULTANT.title}</p></div>
+          <div className="pb-5"><p className="text-[20px] font-extrabold text-navy">Jitendra Khimlani</p><p className="text-[13px] text-muted">{CONSULTANT.title}</p></div>
         </div>
         {[
           { i: <Sparkles className="size-5" />, t: feeLabel === c.name ? c.name : `${c.name} · ${feeLabel}` },
@@ -471,7 +471,7 @@ function Review({ c, mode, fee, feeLabel, inPlan, canLater, payWhen, setPayWhen 
         <div role="radiogroup" aria-label="When would you like to pay?" className="grid grid-cols-2 gap-2.5">
           {([
             { k: 'now', e: '💳', t: 'Pay now', d: 'UPI, cards, netbanking' },
-            { k: 'later', e: '🤝', t: 'Pay after session', d: 'UPI, card or at the studio' },
+            { k: 'later', e: '🤝', t: 'Pay after session', d: 'UPI, card or at the center' },
           ] as const).map((o) => {
             const on = payWhen === o.k
             return (
@@ -498,7 +498,7 @@ function Booked({ a }: { a: Appointment }) {
   const router = useRouter()
   const [cal, setCal] = useState(false)
   const c = CONSULTATIONS.find((x) => x.id === a.type)!
-  const ev = { id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online (link in the BeWise app)' : `${STUDIO.name}, ${STUDIO.full}`, description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
+  const ev = { id: a.id, title: 'BeWise session with Jitendra Khimlani', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online (link in the BeWise app)' : `${STUDIO.name}, ${STUDIO.full}`, description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
   return (
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       <Petals />
@@ -508,18 +508,18 @@ function Booked({ a }: { a: Appointment }) {
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5, ease }} className="card mt-4 flex items-center gap-4 p-5">
         <span className="grid size-12 place-items-center rounded-full bg-peri-50 text-navy"><CalendarPlus className="size-6" /></span>
-        <div><p className="text-[16px] font-bold text-navy">{fmtLongDay(a.startsAt)}</p><p className="text-[14px] text-muted">{fmtTime(a.startsAt)} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya</p></div>
+        <div><p className="text-[16px] font-bold text-navy">{fmtLongDay(a.startsAt)}</p><p className="text-[14px] text-muted">{fmtTime(a.startsAt)} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitendra Khimlani</p></div>
       </motion.div>
       {a.timeRequested && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }} className="mt-3 rounded-[22px] bg-[#fbf3dc] p-4 text-[14px] leading-5 text-[#6b5320]">
-          <p><b>Waiting for confirmation.</b> Jitu Bhaiya or Haresh bhai will confirm this time. If it doesn’t work, our team will call you.</p>
+          <p><b>Waiting for confirmation.</b> Jitendra Khimlani or Haresh bhai will confirm this time. If it doesn’t work, our team will call you.</p>
           <a href={`tel:${HELPLINE.tel}`} className="mt-2 inline-flex items-center gap-1.5 font-semibold text-navy underline underline-offset-4"><Phone className="size-4" /> Helpline {HELPLINE.label} ({HELPLINE.name})</a>
         </motion.div>
       )}
-      <p className="mt-3 text-center text-[13px] text-muted">{a.payLater ? `Booking ${a.code}. You can pay ${formatINR(a.amountPaise)} after your session.` : `Receipt ${a.code} is in Payments.`} Jitu Bhaiya will read your answers before you meet.</p>
+      <p className="mt-3 text-center text-[13px] text-muted">{a.payLater ? `Booking ${a.code}. You can pay ${formatINR(a.amountPaise)} after your session.` : `Receipt ${a.code} is in Payments.`} Jitendra Khimlani will read your answers before you meet.</p>
       <div className="mt-auto space-y-3 pb-3 pt-6 safe-b">
         <Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View appointment</Btn>
-        <Btn full variant="white" onClick={() => setCal(true)}><CalendarPlus className="size-5" /> Add to calendar</Btn>
+        <Btn full variant="white" onClick={() => (isAndroid() ? addToCalendar(ev) : setCal(true))}><CalendarPlus className="size-5" /> Add to calendar</Btn>
       </div>
       <Sheet open={cal} onClose={() => setCal(false)} title="Add to calendar">
         <h2 className="h-duo text-[24px]">Add to <em>calendar</em></h2>

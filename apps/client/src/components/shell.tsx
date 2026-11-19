@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { Bell, ChevronLeft, Home, Leaf, Search, ShoppingBag, User, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { create } from 'zustand'
-import { Avatar, Logo, MoodButton, MoodImg } from './brand'
+import { Avatar, Logo, MoodButton, MoodImg, LogoMark } from './brand'
 import { Btn, Chrome, IconBtn, Sheet, buzz, spring, toast, useChrome } from './ui'
 import { MOODS, PRIMARY_MOODS, moodOf, searchMoods, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
@@ -91,12 +91,15 @@ export function AppHeader({ back, right, title }: { back?: boolean | string; rig
   const { openNotices } = useChrome()
   const unread = useApp((s) => s.notices.filter((n) => !n.read).length)
   const profile = useApp((s) => s.profile)
+  // owner 2026-11-18: a visible Back button on every screen except Home
+  const path = usePath()
+  const showBack = !!back || path !== '/app'
   return (
     <header className="sticky top-0 z-30 -mx-5 flex items-center justify-between gap-3 bg-[linear-gradient(180deg,#dce2f5_0%,#dfe4f6_72%,rgba(223,228,246,0)_100%)] px-5 pb-4 pt-2 safe-t">
-      {back ? (
-        <div className="flex items-center gap-3">
+      {showBack ? (
+        <div className="flex min-w-0 items-center gap-2.5">
           <IconBtn label="Back" onClick={goBack}><ChevronLeft className="size-5" /></IconBtn>
-          {title ? <span className="text-[16px] font-bold text-navy">{title}</span> : null}
+          {title ? <span className="truncate text-[16px] font-bold text-navy">{title}</span> : <Link href="/app" aria-label="Home" className="shrink-0"><LogoMark size={36} /></Link>}
         </div>
       ) : (
         <Link href="/app" aria-label="Home"><Logo compact /></Link>

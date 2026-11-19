@@ -23,3 +23,11 @@ export function googleCalUrl(o: { title: string; start: string; minutes: number;
   const p = new URLSearchParams({ action: 'TEMPLATE', text: o.title, dates: `${z(s)}/${z(e)}`, location: o.location, details: o.description })
   return `https://calendar.google.com/calendar/render?${p}`
 }
+
+/** owner 2026-11-18: on Android a .ics just downloads as a file, so open Google Calendar there instead. */
+export const isAndroid = () => typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent)
+export const isIOS = () => typeof navigator !== 'undefined' && (/iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
+export function addToCalendar(ev: Parameters<typeof googleCalUrl>[0] & Parameters<typeof sessionIcs>[0]) {
+  if (isIOS()) return downloadIcs('bewise-session.ics', sessionIcs(ev)) // iOS opens .ics straight into Calendar
+  window.open(googleCalUrl(ev), '_blank', 'noopener')
+}

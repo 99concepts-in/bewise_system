@@ -125,22 +125,22 @@ function ContextCard() {
   const appts = useApp.getState().appointments
   const toPay = appts.find((x) => x.needsNewTime || ((x.status === 'awaiting_payment' || x.status === 'expired') && !x.paidAt))
   if (toPay?.needsNewTime)
-    return <Ctx tone="sage" kicker={toPay.payLater ? 'Almost booked' : 'Payment received'} title={toPay.status === 'expired' ? 'Pick a new time' : 'Choose your preferred time'} body={toPay.status === 'expired' ? 'The held time was released before your payment arrived. Choose any time at no extra cost.' : 'Pick a time that suits you. Jitu Bhaiya or Haresh bhai will confirm it.'} cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
+    return <Ctx tone="sage" kicker={toPay.payLater ? 'Almost booked' : 'Payment received'} title={toPay.status === 'expired' ? 'Pick a new time' : 'Choose your preferred time'} body={toPay.status === 'expired' ? 'The held time was released before your payment arrived. Choose any time at no extra cost.' : 'Pick a time that suits you. Jitendra Khimlani or Haresh bhai will confirm it.'} cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
   if (toPay)
-    return <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitu Bhaiya'} title="Complete your booking" body={`${fmtDay(toPay.startsAt)} · ${fmtTime(toPay.startsAt)}, pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
+    return <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitendra Khimlani'} title="Complete your booking" body={`${fmtDay(toPay.startsAt)} · ${fmtTime(toPay.startsAt)}, pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
 
   if (intake && !intake.submittedAt && intake.step > 0)
     return <Ctx tone="peri" kicker="Almost there" title="Your answers are saved" body="Finish in about 3 minutes, then pick a time." cta="Continue" href="/app/book?resume=1" img={`${BP}/img/owl-read.webp`} />
 
   if (upcoming) {
     const mins = Math.round((new Date(upcoming.startsAt).getTime() - now) / 60_000)
-    if (mins <= 60) return <Ctx tone="navy" kicker="Starting soon" title={mins > 0 ? `Your session begins in ${mins} min` : 'Your session is live'} body="Find a quiet spot. Jitu Bhaiya will join you." cta={mins <= 10 ? 'Join now' : 'Open'} href={`/app/sessions/view?id=${upcoming.id}`} icon={<Video className="size-5" />} />
+    if (mins <= 60) return <Ctx tone="navy" kicker="Starting soon" title={mins > 0 ? `Your session begins in ${mins} min` : 'Your session is live'} body="Find a quiet spot. Jitendra Khimlani will join you." cta={mins <= 10 ? 'Join now' : 'Open'} href={`/app/sessions/view?id=${upcoming.id}`} icon={<Video className="size-5" />} />
     return <NextSession a={upcoming} onOpen={() => router.push(`/app/sessions/view?id=${upcoming.id}`)} />
   }
   if (needsFeedback)
-    return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitu Bhaiya." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} art={<div className="absolute bottom-4 right-4"><MoodImg mood="grateful" size={84} /></div>} />
+    return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitendra Khimlani." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} art={<div className="absolute bottom-4 right-4"><MoodImg mood="grateful" size={84} /></div>} />
   if (blend && any) return null // the "Your blend" card carries the follow-up pre-book (owner 2026-11-18)
-  return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm, unhurried conversation with Jitu Bhaiya · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" art={<ConsultInviteArt />} wide />
+  return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm, unhurried conversation with Jitendra Khimlani · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" art={<ConsultInviteArt />} wide />
 }
 
 const TONES = { peri: 'bg-[linear-gradient(135deg,#ffffff_40%,#e9edfa)]', navy: 'bg-[linear-gradient(135deg,#182957,#3c5596)] text-white', rose: 'bg-[linear-gradient(135deg,#fff_40%,#fbe9ee)]', sage: 'bg-[linear-gradient(135deg,#fff_40%,#e5efe2)]' }
@@ -169,7 +169,7 @@ function NextSession({ a, onOpen }: { a: Appointment; onOpen: () => void }) {
         <SessionDateArt startsAt={a.startsAt} mode={a.mode} />
         <div className="flex-1">
           <p className="text-[15px] font-semibold text-navy">{fmtDay(a.startsAt)} · {fmtTime(a.startsAt)}</p>
-          <p className="text-[13px] text-muted">{c.name} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya</p>
+          <p className="text-[13px] text-muted">{c.name} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitendra Khimlani</p>
           <Btn size="sm" className="mt-3 px-6" onClick={onOpen}>View</Btn>
         </div>
       </div>

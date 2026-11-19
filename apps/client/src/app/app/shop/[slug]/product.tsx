@@ -2,12 +2,12 @@
 /** @module commerce-ux @owner CLIENT @screens CL-35 Product — sizes, tabs, allergy / pregnancy warning, add to bag */
 import { useParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { AlertTriangle, Heart, Minus, Plus } from 'lucide-react'
+import { AlertTriangle, Check, Minus, Plus, ShoppingBag } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { ProductArt } from '@/components/brand'
 import { allergyHit, useAddProduct } from '@/components/product-card'
 import { AppHeader } from '@/components/shell'
-import { Btn, IconBtn, Sheet, buzz, cx, ease, spring } from '@/components/ui'
+import { Btn, BtnLink, IconBtn, Sheet, buzz, cx, ease, spring } from '@/components/ui'
 import { productBySlug, productTitle } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { formatINR } from '@/lib/format'
@@ -19,26 +19,28 @@ export default function ProductPage() {
   const p = productBySlug(slug)
   const addProduct = useAddProduct()
   const hasBlend = useApp((s) => !!s.blend)
-  const wish = useApp((s) => s.wishlist.includes(slug))
-  const toggleWish = useApp((s) => s.toggleWish)
+  const cartCount = useApp((s) => s.cart.reduce((n, l) => n + l.qty, 0))
+  const inCartBy = useApp((s) => s.cart)
+  const setCartQty = useApp((s) => s.setQty)
   const allergies = useApp((s) => s.profile?.allergies ?? [])
   const pregnant = useApp((s) => !!s.intake?.answers.safety.pregnant)
   const [vid, setVid] = useState(p?.variants[p.variants.length - 1].id)
   const [tab, setTab] = useState<(typeof TABS)[number]>('About')
-  const [qty, setQty] = useState(1)
   const [confirm, setConfirm] = useState(false)
   const art = useRef<HTMLDivElement>(null)
   if (!p) return <main className="px-5"><AppHeader back /><p className="mt-10 text-center text-muted">This product isn’t available.</p></main>
   const v = p.variants.find((x) => x.id === vid)!
   const hit = allergyHit(p, allergies)
-  const doAdd = () => { addProduct(p, v.id, qty, art.current?.getBoundingClientRect()); setConfirm(false) }
+  const cartKey = p.personal ? (p.personal === 'spray' ? 'remedy-reorder-spray' : 'remedy-reorder') : v.id
+  const inCart = inCartBy.find((l) => l.key === cartKey)?.qty ?? 0
+  const doAdd = () => { addProduct(p, v.id, 1, art.current?.getBoundingClientRect()); setConfirm(false) }
   const title = productTitle(p)
   const bookFirst = p.personal && !hasBlend
   const body = { About: p.about, Ingredients: p.ingredients, 'How to use': p.howTo, Safety: p.safety }[tab]
 
   return (
     <main className="px-5 pb-36">
-      <AppHeader back right={<IconBtn label={wish ? 'Remove from saved' : 'Save for later'} onClick={() => { toggleWish(p.slug); buzz(6) }}><Heart className={cx('size-5', wish && 'fill-navy')} /></IconBtn>} />
+      <AppHeader back right={<IconBtn label={`Cart, ${cartCount} items`} href="/app/bag" badge={cartCount || undefined}><ShoppingBag className="size-5" /></IconBtn>} />
       <motion.section initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, ease }} className="relative mt-1 overflow-hidden rounded-[30px] shadow-[var(--shadow-card)]">
         <div ref={art}><ProductArt product={p} size="lg" className="h-[360px] rounded-[30px]" /></div>
         <div className="absolute left-6 top-6 max-w-[52%]">
@@ -73,7 +75,7 @@ export default function ProductPage() {
       {p.personal && (
         <p className="mt-4 flex items-start gap-2.5 rounded-[22px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
           <span aria-hidden className="text-[18px] leading-5">🌼</span>
-          <span>{hasBlend ? 'We’ll prepare the same blend Jitu Bhaiya chose for you.' : 'Your first blend is made for you after a consultation, and it’s included in the fee.'}</span>
+          <span>{hasBlend ? 'We’ll prepare the same blend Jitendra Khimlani chose for you.' : 'Your first blend is made for you after a consultation, and it’s included in the fee.'}</span>
         </p>
       )}
 
@@ -98,12 +100,19 @@ export default function ProductPage() {
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-[480px] items-center gap-3 bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
-        {!p.personal && !p.soldOut && <div className="flex h-14 items-center gap-1 rounded-full bg-white px-2 shadow-[var(--shadow-card)]">
-          <button aria-label="Fewer" onClick={() => setQty(Math.max(1, qty - 1))} className="grid size-10 place-items-center rounded-full text-navy"><Minus className="size-4" /></button>
-          <AnimatePresence mode="popLayout"><motion.span key={qty} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-6 text-center text-[17px] font-bold text-navy tnum">{qty}</motion.span></AnimatePresence>
-          <button aria-label="More" onClick={() => setQty(Math.min(10, qty + 1))} className="grid size-10 place-items-center rounded-full text-navy"><Plus className="size-4" /></button>
-        </div>}
-        {p.soldOut ? <Btn full variant="primary" disabled>Sold out</Btn> : <Btn full variant="gradient" onClick={() => (hit ? setConfirm(true) : doAdd())}>{bookFirst ? 'Book a consultation' : p.personal ? 'Reorder my blend' : 'Add to cart'}</Btn>}
+        {/* owner 2026-11-18: same UI as the shop cards: Add to cart, then a counter once it's in the cart */}
+        {p.soldOut ? <Btn full variant="primary" disabled>Sold out</Btn>
+          : inCart > 0 && !p.personal ? (
+            <>
+              <div className="flex h-14 items-center gap-1 rounded-full bg-navy px-2 text-white shadow-[var(--shadow-cta)]" role="group" aria-label={`${title} in cart`}>
+                <button aria-label="One less" onClick={() => { buzz(6); setCartQty(cartKey, inCart - 1) }} className="grid size-10 place-items-center rounded-full bg-white/15"><Minus className="size-4" /></button>
+                <AnimatePresence mode="popLayout"><motion.span key={inCart} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-7 text-center text-[17px] font-bold tnum" aria-live="polite">{inCart}</motion.span></AnimatePresence>
+                <button aria-label="One more" onClick={() => { buzz(6); if (inCart < 10) addProduct(p, v.id, 1, art.current?.getBoundingClientRect()) }} className="grid size-10 place-items-center rounded-full bg-white/15"><Plus className="size-4" /></button>
+              </div>
+              <BtnLink full href="/app/bag" variant="gradient"><ShoppingBag className="size-5" /> Go to cart</BtnLink>
+            </>
+          ) : inCart > 0 ? <BtnLink full href="/app/bag" variant="gradient"><Check className="size-5" /> In cart · Go to cart</BtnLink>
+          : <Btn full variant="gradient" onClick={() => (hit ? setConfirm(true) : doAdd())}>{bookFirst ? 'Book a consultation' : p.personal ? 'Reorder my blend' : <><ShoppingBag className="size-5" /> Add to cart</>}</Btn>}
       </div>
 
       <Sheet open={confirm} onClose={() => setConfirm(false)} title="Add anyway?">

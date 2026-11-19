@@ -4,7 +4,7 @@
  * @owner    CLIENT
  * @screens  CL-13 Online or in person — custom art (owner 2026-11-18: replace flat clip-art with something premium)
  * Purpose:  Code-drawn illustrations (crisp at any size, theme-aware on the selected navy card):
- *           OnlineArt = tilted phone with Jitu Bhaiya on a video call · InPersonArt = soft map tile of Alkapuri with a pulsing pin.
+ *           OnlineArt = tilted phone with Jitendra Khimlani on a video call · InPersonArt = soft map tile of Alkapuri with a pulsing pin.
  */
 import { motion } from 'motion/react'
 import { BP } from '@/lib/asset'
