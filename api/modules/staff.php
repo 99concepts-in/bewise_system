@@ -11,6 +11,15 @@ function staff_view(array $u): array
         'roles' => array_column(all('SELECT role FROM user_roles WHERE user_id = ?', [$u['id']]), 'role'), 'lastLoginAt' => iso($u['last_login_at']), 'hasPassword' => (bool)$u['password_hash']];
 }
 
+/** Default hours until the consultant edits them: Mon–Sat 10:00–13:00 and 16:00–19:00 (Asia/Kolkata). */
+function staff_default_hours(string $uid): void
+{
+    if (val('SELECT 1 FROM availability_rules WHERE consultant_id = ?', [$uid])) return;
+    for ($d = 1; $d <= 6; $d++) foreach ([['10:00:00', '13:00:00'], ['16:00:00', '19:00:00']] as [$s, $e]) {
+        insert('availability_rules', ['id' => uuid(), 'consultant_id' => $uid, 'weekday' => $d, 'start_time' => $s, 'end_time' => $e, 'modes' => ['online', 'in_person']]);
+    }
+}
+
 return [
     'listStaff' => function (array $in) {
         Auth::require('owner');
@@ -27,6 +36,7 @@ return [
         if (!$u) { insert('users', ['id' => $uid = uuid(), 'email' => $email, 'name' => req_str($in, 'name', 120), 'phone' => req_str($in, 'phone', 20, false), 'password_hash' => password_hash($pass, PASSWORD_DEFAULT), 'status' => 'invited']); }
         else { $uid = $u['id']; q('UPDATE users SET password_hash = ?, name = COALESCE(NULLIF(?, \'\'), name), status = IF(status = \'disabled\', \'invited\', status) WHERE id = ?', [password_hash($pass, PASSWORD_DEFAULT), (string)($in['name'] ?? ''), $uid]); }
         q('INSERT IGNORE INTO user_roles (user_id, role) VALUES (?, ?)', [$uid, $role]);
+        if ($role === 'consultant') staff_default_hours($uid);
         audit('staff.invite', 'user', $uid, ['role' => $role]);
         bw_send_mail($email, 'You\'ve been added to BeWise', "Hello,\n\nYou've been added to the BeWise team as $role.\nSign in at " . bw_public_url('') . " with this email and the temporary password the owner gave you, then change it.\n\n— BeWise");
         return staff_view(one('SELECT * FROM users WHERE id = ?', [$uid]));

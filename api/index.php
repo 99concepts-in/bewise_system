@@ -48,6 +48,19 @@ function bw_registry(): array
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $path = preg_replace('#^.*?/api/#', '', $path);   // works at the domain root or in a sub-folder
 
+// CORS for BeWise's own websites (bewiseglobal.in calls app.bewiseglobal.in/api). Extra origins: config 'cors_origins'.
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$allowed = array_merge(['https://bewiseglobal.in', 'https://www.bewiseglobal.in'], (array)bw_config('cors_origins', []));
+if ($origin !== '' && in_array($origin, $allowed, true)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Allow-Headers: Content-Type, X-BeWise');
+    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+    header('Access-Control-Max-Age: 86400');
+    header('Vary: Origin');
+}
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') { http_response_code(204); exit; }
+
 try {
     if (!bw_config('db')) bw_fail('not_installed', 'The BeWise server is not set up yet. Open /api/install.php to connect the database.', 503);
     bw_auto_migrate();

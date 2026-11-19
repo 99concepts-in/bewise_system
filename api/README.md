@@ -81,6 +81,9 @@ Input and output shapes are in the module files; each function is documented whe
 | analytics (OWNER) | `today` (counts for the Today screens) |
 | companion (CLIENT) | `sendCompanionMessage`: **@stub**. The safety route works; the CLIENT chat implements the Claude answer (D-29) |
 
+Owner tools page: `/api/tools.php` (owner password) — add team, Razorpay review test login (username login), Razorpay keys → private config.
+CORS: `https://bewiseglobal.in` (+ `www`) may call the API with credentials; more origins via config `cors_origins`.
+
 Webhook: `POST /api/webhooks/razorpay`. Calendar feed: `GET /api/calendar/<token>.ics`.
 
 ## Changing the backend (all chats)

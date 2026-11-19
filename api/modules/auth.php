@@ -48,14 +48,18 @@ return [
         return Auth::startSession($uid);
     },
 
+    /** { login: email or username, password } — `email` still accepted. */
     'login' => function (array $in) {
-        $email = req_email($in);
+        $login = strtolower(trim((string)($in['login'] ?? $in['email'] ?? '')));
+        if ($login === '') bw_fail('invalid_input', 'Enter your email or username.');
         $pass = (string)req_str($in, 'password', 200);
         rate_limit('login:ip:' . client_ip(), 30, 900);
-        rate_limit('login:email:' . $email, 8, 900);
-        $u = one("SELECT * FROM users WHERE email = ? AND status IN ('active','invited')", [$email]);
+        rate_limit('login:id:' . $login, 8, 900);
+        $col = str_contains($login, '@') ? 'email' : 'username';
+        $u = one("SELECT * FROM users WHERE $col = ? AND status IN ('active','invited')", [$login]);
         if (!$u || !$u['password_hash'] || !password_verify($pass, $u['password_hash'])) {
-            bw_fail('bad_login', 'Email or password is not right.', 401);
+            commit_now();   // keep the failed-attempt count
+            bw_fail('bad_login', 'Email/username or password is not right.', 401);
         }
         if ($u['status'] === 'invited') q("UPDATE users SET status = 'active' WHERE id = ?", [$u['id']]);
         if (password_needs_rehash($u['password_hash'], PASSWORD_DEFAULT)) q('UPDATE users SET password_hash = ? WHERE id = ?', [password_hash($pass, PASSWORD_DEFAULT), $u['id']]);
