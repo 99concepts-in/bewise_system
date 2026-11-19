@@ -2,6 +2,18 @@
 
 > Only the OWNER chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-19 — Owner app: sign-in, owner-only access and Log out (owner report: "No option to logout")
+**Status:** Done — goes live on app.bewiseglobal.in with the next Hostinger deploy from main
+**Done:** OW-01 sign-in screen on the HUB backend (D-44): email + password (`auth.login`) or emailed code
+(`auth.requestOtp` → `auth.verifyOtp`); session check on open (`auth.me`); **owner-only** — other roles see "This space is for the
+owner" with a link to their own app and Log out; accountant told the accountant view is next. **Log out** in the profile menu
+(avatar), the sidebar and the phone's More sheet → `auth.logout` ends the server session. Expired sessions (401) return to sign-in.
+Greeting uses the owner's first name from the account (D-42). Previews without a backend (GitHub Pages, Claude) run in demo mode:
+any email/password, remembered per tab. Tested both modes (stubbed live backend: wrong password, manager role, owner, logout,
+expiry) at 1440 and 390 px; layout audit still 0 issues. Before this, `/owner/` on the live site opened for anyone.
+**Contracts changed:** none (uses HUB's `auth.*`) · **Migrations:** none
+**Next:** OW-28 invite accountant + OW-30 accountant view on `staff.invite`; replace sample data with live `analytics`/`finance` calls.
+
 ## 2026-11-18 — Staff bookings: greet then auto payment link; settings keys; requests answered (branch claude/new-session-k130h4)
 **Status:** Specs done — build waits for `FOUNDATION: ✅` (O1 settings, O2 links, O3 templates)
 **Done:** merged origin/main + `claude/new-session-1j1y0u`. New `docs/specs/owner/08-BOOKING-GREETING-AND-AUTOPAY.md`: staff greet
