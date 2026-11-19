@@ -40,7 +40,7 @@ export default function About() {
         </Field></motion.div>
         <motion.div variants={rise}>
           <p className="mb-2 mt-2 text-[13px] font-semibold text-navy">Gender <span className="font-normal text-muted">(optional)</span></p>
-          <div className="flex flex-wrap gap-2">{['Woman', 'Man', 'Non-binary', 'Prefer not to say'].map((g) => <Chip key={g} on={gender === g} onClick={() => setGender(gender === g ? '' : g)}>{g}</Chip>)}</div>
+          <div className="flex flex-wrap gap-2">{['Male', 'Female', 'Prefer not to say'].map((g) => <Chip key={g} on={gender === g} onClick={() => setGender(gender === g ? '' : g)}>{g}</Chip>)}</div>
         </motion.div>
       </motion.div>
       <div className="mt-auto pb-3 pt-8 safe-b"><Btn full variant="gradient" onClick={next}>Continue</Btn></div>
