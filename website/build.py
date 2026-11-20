@@ -51,15 +51,15 @@ def page(fname, title, desc, body, scripts=True):
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>{E(title)} · {B["brand"]}</title><meta name="description" content="{E(desc)}">
 <meta property="og:title" content="{E(title)} · {B["brand"]}"><meta property="og:description" content="{E(desc)}"><meta property="og:image" content="https://{B["domain"]}/assets/img/og.jpg">
-<link rel="icon" href="assets/img/logo-mark.png"><link rel="canonical" href="https://{B["domain"]}/{'' if fname == 'index.html' else fname}">
+<link rel="icon" href="assets/img/brand/bewise-mark.svg" type="image/svg+xml"><link rel="alternate icon" href="assets/img/logo-mark.png"><link rel="canonical" href="https://{B["domain"]}/{'' if fname == 'index.html' else fname}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css"></head><body>
-<header class="top"><div class="wrap"><a class="brand" href="index.html"><img src="assets/img/logo-mark.png" alt=""><span>BeWise<small>Holistic Wellness</small></span></a>
+<header class="top"><div class="wrap"><a class="brand" href="index.html" aria-label="BeWise Holistic Wellness — home"><img src="assets/img/brand/bewise-logo-horizontal.svg" alt="BeWise Holistic Wellness" class="logo"></a>
 <nav class="nav">{nav}</nav><button class="menu" aria-label="Menu">☰</button><a class="bag" href="cart.html" aria-label="Bag">{BAG_SVG}<b></b></a></div></header>
 <main>{body}</main>
 <footer><div class="wrap">
-<div><a class="brand" href="index.html" style="color:#fff"><img src="assets/img/logo-mark-white.png" alt=""><span>BeWise<small style="color:#9aa6cf">Holistic Wellness</small></span></a>
+<div><a class="brand" href="index.html" aria-label="BeWise Holistic Wellness — home"><img src="assets/img/brand/bewise-logo-horizontal-white.svg" alt="BeWise Holistic Wellness" class="logo"></a>
 <p style="margin-top:14px">Bach flower consultations with Jitu Bhaiya and natural aromatherapy blends, made in Vadodara.</p>
 <p>{B["address"]}<br><a href="tel:{B["phone_raw"]}" style="display:inline">{B["phone"]}</a> · <a href="mailto:{B["email"]}" style="display:inline">{B["email"]}</a></p></div>
 <div><h4>Explore</h4><a href="consultations.html">Consultations</a><a href="shop.html">Shop</a><a href="pricing.html">Pricing</a><a href="about.html">About Jitu Bhaiya</a><a href="https://app.bewiseglobal.in/client/">BeWise app</a></div>
