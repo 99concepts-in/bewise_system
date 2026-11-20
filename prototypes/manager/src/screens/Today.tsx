@@ -111,7 +111,7 @@ function DeliveryRow({ o }: { o: Order }) {
     sub = 'Came back to us · send a replacement'; icon = <RotateCcw size={18} />; tone = 'bg-bad-soft text-bad'
     act = <Act kind="bad" onClick={open}>Replace</Act>
   } else if (o.stage === 'ready_to_dispatch') {
-    sub = pickup ? 'Packed · client collects at studio' : `Packed · ${o.pack?.weightG ?? 0} g`; icon = pickup ? <Store size={18} /> : <Truck size={18} />
+    sub = pickup ? 'Packed · client collects at center' : `Packed · ${o.pack?.weightG ?? 0} g`; icon = pickup ? <Store size={18} /> : <Truck size={18} />
     act = <Act onClick={open}>{pickup ? 'Hand over' : 'Ship'}</Act>
   } else {
     sub = o.stage === 'packing' ? 'Packing started' : `${o.items.length} item${o.items.length > 1 ? 's' : ''} to pack`

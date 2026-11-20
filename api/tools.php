@@ -178,7 +178,7 @@ $team = all("SELECT u.name, u.email, u.username, GROUP_CONCAT(r.role) roles, u.l
              GROUP BY u.id, u.name, u.email, u.username, u.last_login_at, u.created_at HAVING roles REGEXP 'owner|consultant|manager|accountant' OR u.username IS NOT NULL ORDER BY u.created_at");
 $rows = implode('', array_map(fn($t) => '<tr><td>' . $h($t['name']) . '</td><td>' . $h($t['email'] ?: '@' . $t['username']) . '</td><td><span class=pill>' . $h($t['roles']) . '</span></td></tr>', $team));
 $rz = bw_config('razorpay.key_id');
-$rzState = $rz ? (str_starts_with((string)$rz, 'rzp_live') ? 'LIVE keys' : 'Test keys') . ' · webhook ' . (bw_config('razorpay.webhook_secret') ? 'set' : 'not set') : 'Not set up — checkout shows “pay at the studio”';
+$rzState = $rz ? (str_starts_with((string)$rz, 'rzp_live') ? 'LIVE keys' : 'Test keys') . ' · webhook ' . (bw_config('razorpay.webhook_secret') ? 'set' : 'not set') : 'Not set up — checkout shows “pay at the center”';
 $wa = bw_config('whatsapp', []);
 $waState = !empty($wa['token']) ? 'Connected · vendor ' . substr((string)$wa['vendor_uid'], 0, 6) . '…' : 'Not connected';
 $waRows = '';

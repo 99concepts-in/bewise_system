@@ -20,7 +20,7 @@ export function Production() {
   const list = s.batches.filter((b) => bucket(b.step) === tab)
   const count = (t: string) => s.batches.filter((b) => bucket(b.step) === t).length
   return (
-    <Screen title="Production" sub="Oils, sprays and salts made at the studio"
+    <Screen title="Production" sub="Oils, sprays and salts made at the center"
       actions={<Button kind="primary" className="h-11" icon={<Plus size={18} />} onClick={() => setOpen(true)}>Batch</Button>}>
       <Segmented id="prod" value={tab} onChange={setTab} options={[
         { value: 'planned', label: `Planned ${count('planned')}` }, { value: 'progress', label: `Making ${count('progress')}` },

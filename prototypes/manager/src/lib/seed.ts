@@ -146,7 +146,7 @@ export function seed() {
     { id: 'b1', party: 'Shiprocket', label: 'Wallet top-up (balance ₹1,240)', amountPaise: 500000, dueOn: dateKey(1), status: 'due', recurring: true },
     { id: 'b2', party: 'Packwell Containers', label: 'Bill PW/1182 · against PO/2026-27/0022', amountPaise: 670000, dueOn: dateKey(-4), status: 'due', poId: 'po2' },
     { id: 'b3', party: 'Kannauj Aroma Co.', label: 'Bill KA/7720 · lavender & rose', amountPaise: 1840000, dueOn: dateKey(9), status: 'due' },
-    { id: 'b4', party: 'Studio rent', label: 'December rent · Karelibaug studio', amountPaise: 2500000, dueOn: dateKey(14), status: 'due', recurring: true },
+    { id: 'b4', party: 'Center rent', label: 'December rent · Karelibaug center', amountPaise: 2500000, dueOn: dateKey(14), status: 'due', recurring: true },
   ]
   const expenses: Expense[] = [
     { id: 'e1', code: 'EXP/2026-27/0061', amountPaise: 38000, category: 'Courier & postage', paidFrom: 'Petty cash', note: 'India Post for Bengaluru remedy', at: t - 30 * H, status: 'approved' },
@@ -176,7 +176,7 @@ function mk(id: string, name: string, collection: string, kind: Product['kind'],
   const code = { oil: 'OL', spray: 'SP', salt: 'SL' }[kind]
   return {
     id, name, collection, kind, short, status, hue, hsn: kind === 'oil' ? '3301' : '3307', gst: 18, sample: true,
-    description: `${name} is made in small batches at the BeWise studio in Vadodara. Sample description — the real copy arrives with the product list.`,
+    description: `${name} is made in small batches at the BeWise center in Vadodara. Sample description — the real copy arrives with the product list.`,
     ingredients: kind === 'salt' ? 'Epsom salt, Himalayan pink salt, lavender essential oil.' : kind === 'spray' ? 'Rose hydrosol, lavender essential oil, plant-derived solubiliser, purified water.' : 'Sweet almond oil, lavender, chamomile and vetiver essential oils.',
     howTo: kind === 'salt' ? 'Dissolve two handfuls in a warm bath. Soak for 20 minutes.' : kind === 'spray' ? 'Mist 3–4 sprays into the air or over your pillow.' : 'Warm 3–4 drops between palms and massage into wrists and temples.',
     safety: 'For external use only. Patch test before use. Keep away from eyes and children. Consult a doctor if pregnant or under medical care.',

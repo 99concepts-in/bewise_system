@@ -20,7 +20,7 @@ export const FAQ: { q: string; a: string }[] = [
   { q: 'Can I take them with my medicines?', a: 'They’re a complementary practice and never replace your doctor. Please tell Jitendra Khimlani about any medicines you take.' },
   { q: 'Is there alcohol in it?', a: 'Traditionally a little brandy keeps the blend fresh. Alcohol-free blends are available, just ask.' },
   { q: 'Are they safe for children and in pregnancy?', a: 'Tell us before your session and Jitendra Khimlani will advise you. Always check with your doctor too.' },
-  { q: 'Online or in person?', a: 'Both. Online by video call, or at our studio in Alkapuri, Vadodara. You choose when you book.' },
+  { q: 'Online or in person?', a: 'Both. Online by video call, or at our center in Alkapuri, Vadodara. You choose when you book.' },
   { q: 'What if I need to reschedule?', a: 'It’s free up to 24 hours before. We don’t offer refunds, but your session is always kept for you.' },
 ]
 

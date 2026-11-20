@@ -185,12 +185,12 @@ function scheduling_confirmed(string $id): void
     Events::emit('appointment.confirmed', ['appointmentId' => $id, 'clientId' => $a['client_id'], 'consultantId' => $a['consultant_id'], 'startsAt' => iso($a['starts_at']), 'mode' => $a['mode']]);
     $when = $a['starts_at'] ? (new DateTimeImmutable($a['starts_at'], new DateTimeZone('UTC')))->setTimezone(new DateTimeZone(BW_TZ))->format('D j M, g:i a') : 'time to be confirmed';
     $c = one('SELECT name FROM clients WHERE id = ?', [$a['client_id']]);
-    notify(['clientId' => $a['client_id']], 'Your consultation is booked', "See you on $when (" . ($a['mode'] === 'online' ? 'online' : 'at the studio') . ').', '/client/app/appointments', 'normal', true);
+    notify(['clientId' => $a['client_id']], 'Your consultation is booked', "See you on $when (" . ($a['mode'] === 'online' ? 'online' : 'at the center') . ').', '/client/app/appointments', 'normal', true);
     notify(['userId' => $a['consultant_id']], 'New booking', ($c['name'] ?: 'A client') . " · $when", '/consultant/', 'normal');
     notify(['role' => 'manager'], 'New booking', ($c['name'] ?: 'A client') . " · $when", '/manager/', 'normal');
     $type = (string)val('SELECT name FROM consultation_types WHERE id = ?', [$a['consultation_type_id']]);
     wa_send(wa_client_phone($a['client_id']), 'booking_confirmed', ['name' => wa_client_name($a['client_id']), 'session' => $type, 'when' => $when,
-        'place' => $a['mode'] === 'online' ? 'online — we’ll share the video link before your session' : 'at the BeWise studio, Alkapuri, Vadodara', 'code' => $a['code']], "booked:{$a['id']}:" . ($a['starts_at'] ?? 'tbc'), $a['id']);
+        'place' => $a['mode'] === 'online' ? 'online — we’ll share the video link before your session' : 'at the BeWise center, Alkapuri, Vadodara', 'code' => $a['code']], "booked:{$a['id']}:" . ($a['starts_at'] ?? 'tbc'), $a['id']);
     wa_staff('consultant', 'New booking — ' . ($c['name'] ?: 'a client') . " · $type · $when", $a['consultant_id']);
 }
 
@@ -234,7 +234,7 @@ function scheduling_ics_feed(string $token): string
         $out[] = 'DTSTART:' . gmdate('Ymd\THis\Z', strtotime($a['starts_at'] . ' UTC'));
         $out[] = 'DTEND:' . gmdate('Ymd\THis\Z', strtotime($a['ends_at'] . ' UTC'));
         $out[] = 'SUMMARY:' . $esc($title);
-        $out[] = 'LOCATION:' . $esc($a['mode'] === 'online' ? ($a['meeting_url'] ?: 'Online') : (string)(setting('business.profile', [])['studio'] ?? 'BeWise studio'));
+        $out[] = 'LOCATION:' . $esc($a['mode'] === 'online' ? ($a['meeting_url'] ?: 'Online') : (string)(setting('business.profile', [])['studio'] ?? 'BeWise center'));
         $out[] = 'END:VEVENT';
     }
     $out[] = 'END:VCALENDAR';
@@ -351,7 +351,7 @@ return [
         else notify(['clientId' => $a['client_id']], 'Your consultation time changed', "New time: $when", '/client/app/appointments', 'normal', true);
         if ($a['status'] === 'confirmed') wa_send(wa_client_phone($a['client_id']), 'booking_confirmed', ['name' => wa_client_name($a['client_id']),
             'session' => (string)val('SELECT name FROM consultation_types WHERE id = ?', [$a['consultation_type_id']]), 'when' => $when,
-            'place' => $a['mode'] === 'online' ? 'online — we’ll share the video link before your session' : 'at the BeWise studio, Alkapuri, Vadodara', 'code' => $a['code']], "booked:{$a['id']}:" . to_db_time($starts), $a['id']);
+            'place' => $a['mode'] === 'online' ? 'online — we’ll share the video link before your session' : 'at the BeWise center, Alkapuri, Vadodara', 'code' => $a['code']], "booked:{$a['id']}:" . to_db_time($starts), $a['id']);
         return scheduling_view(one('SELECT * FROM appointments WHERE id = ?', [$a['id']]));
     },
 

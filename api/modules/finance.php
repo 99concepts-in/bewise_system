@@ -175,7 +175,7 @@ function finance_razorpay_webhook(string $body, string $signature): array
 return [
     /**
      * purpose 'appointment' | 'sales_order', refId. With Razorpay keys → { provider:'razorpay', razorpayOrderId, keyId, amountPaise, prefill }.
-     * Without keys → { provider:'manual' } — the app shows "Pay at the studio / UPI; we'll confirm" and staff use recordPayment.
+     * Without keys → { provider:'manual' } — the app shows "Pay at the center / UPI; we'll confirm" and staff use recordPayment.
      */
     'createCheckout' => function (array $in) {
         $purpose = req_enum($in, 'purpose', ['appointment', 'sales_order']);
@@ -212,7 +212,7 @@ return [
         return ['paymentId' => $p['id'], 'status' => 'captured'];
     },
 
-    /** Staff record money received at the studio / by UPI / bank transfer (MANAGER M-14, OWNER). */
+    /** Staff record money received at the center / by UPI / bank transfer (MANAGER M-14, OWNER). */
     'recordPayment' => function (array $in) {
         $u = Auth::require('manager', 'owner');
         $purpose = req_enum($in, 'purpose', ['appointment', 'sales_order']);

@@ -15,11 +15,12 @@ import { Btn, ease, cx } from '@/components/ui'
 import { BP } from '@/lib/asset'
 
 // Copy rule: no cure / medical claims — "gently support emotional balance" (design system §10)
+// owner copy 2026-11-20 for slides 1 and 2
 const SLIDES = [
-  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A calm, private space for your emotional wellbeing, guided by Jitendra Khimlani and the gentle wisdom of Bach flower remedies.' },
-  { lead: 'Book your appointment with', em: 'Jitendra Khimlani', sub: 'Jitendra Khimlani is a Bach Flower Remedy therapist. Talk to him about how you feel, and get a remedy blend made just for you.' },
+  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A gentle, private space to nurture your emotional wellbeing, find inner balance, and feel your best. Guided by Jitendra Khimlani and the natural wisdom of Bach Flower Remedies.' },
+  { kicker: 'Personal guidance, just for you.', lead: 'Meet', em: 'Jitendra Khimlani', title: 'Your Bach Flower Therapist', sub: 'Get personalised guidance with vibrational remedies for everyday balance and emotional wellbeing. Online or in-person consultation.' },
   { lead: 'Bach flower remedy', em: 'benefits', sub: 'Natural Bach flower remedies that gently support emotional balance, chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'Feel calmer, day by day'] },
-] as { lead: string; em: string; sub: string; chips?: string[] }[]
+] as { kicker?: string; lead: string; em: string; title?: string; sub: string; chips?: string[] }[]
 
 // owner 2026-11-18: slide images felt slow; fetch them all up front (during the 1.9 s splash) at high priority
 const WELCOME_IMAGES = ['img/owl-wave.webp', 'img/jitu-portrait.webp', 'img/brand/bewise-logo-stacked.svg', 'img/flowers/wild-rose.svg', 'img/flowers/mimulus.svg']
@@ -75,9 +76,11 @@ export default function Welcome() {
               <div className="relative z-10 mt-3 px-6">
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div key={i} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35, ease }}>
+                    {SLIDES[i].kicker && <p className="mb-1.5 text-[13px] font-bold uppercase tracking-[0.08em] text-sage-text">{SLIDES[i].kicker}</p>}
                     <h1 className="h-duo">
                       {SLIDES[i].lead} <em>{SLIDES[i].em}</em>
                     </h1>
+                    {SLIDES[i].title && <p className="mt-1.5 text-[16px] font-bold text-navy">{SLIDES[i].title}</p>}
                     <p className="mt-3 text-[16px] leading-6 text-ink-2">{SLIDES[i].sub}</p>
                     {SLIDES[i].chips && (
                       <div className="mt-4 flex flex-wrap gap-2">
@@ -102,8 +105,8 @@ export default function Welcome() {
                   </button>
                 ))}
               </div>
-              <Btn variant="gradient" full onClick={() => (i < 2 ? go(i + 1) : router.push('/sign-in'))}>{i < 2 ? 'Next' : 'Let’s begin'}</Btn>
-              <Btn variant="ghost" full size="md" onClick={() => router.push('/sign-in?returning=1')}>I have an account</Btn>
+              <Btn variant="gradient" full onClick={() => (i < 2 ? go(i + 1) : router.push('/sign-in'))}>{i === 0 ? 'Get Started' : i < 2 ? 'Next' : 'Let’s begin'}</Btn>
+              <Btn variant="ghost" full size="md" onClick={() => router.push('/sign-in?returning=1')}>I already have an account</Btn>
             </footer>
           </motion.div>
         )}
@@ -154,9 +157,6 @@ function ArtBook() {
           <FadeImg src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani" className="h-full w-auto object-contain drop-shadow-[0_18px_24px_rgba(24,41,87,.18)] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]" />
         </motion.div>
       </div>
-      <Float className="left-[6%] top-[14%]" delay={0.3} dy={6}>
-        <div className="rounded-[18px] rounded-bl-md bg-white px-3.5 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Bach Flower Remedy Therapist</div>
-      </Float>
       <Float className="bottom-[12%] left-[10%]" delay={0.6} dy={5}>
         <div className="flex items-center gap-1.5 rounded-full bg-teal-100 px-3.5 py-2 text-[13px] font-semibold text-sage-text shadow-[var(--shadow-card)]">✓ Remedy blend included</div>
       </Float>

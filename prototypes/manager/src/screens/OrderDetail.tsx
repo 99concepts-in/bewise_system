@@ -433,7 +433,7 @@ function ShippingLabel({ o, c, awb, courier }: { o: Order; c: Client; awb: strin
   )
 }
 
-/* ───────── studio pickup ───────── */
+/* ───────── center pickup ───────── */
 function HandOverPanel({ o, c }: { o: Order; c: Client }) {
   const s = useStore()
   const [who, setWho] = useState(c.name)
@@ -441,7 +441,7 @@ function HandOverPanel({ o, c }: { o: Order; c: Client }) {
     <>
       <Surface className="flex items-center gap-4">
         <span className="grid size-12 shrink-0 place-items-center rounded-full bg-sage-soft text-sage"><Store size={22} /></span>
-        <span><span className="block text-[16px] font-bold text-ink">Collect at the studio</span><span className="block text-[13.5px] text-ink-2">{firstName(c.name)} will pick this up in person. No courier needed.</span></span>
+        <span><span className="block text-[16px] font-bold text-ink">Collect at the center</span><span className="block text-[13.5px] text-ink-2">{firstName(c.name)} will pick this up in person. No courier needed.</span></span>
       </Surface>
       <SectionTitle>Handed to</SectionTitle>
       <Surface><Field label="Name of the person collecting"><input id="collector" className={inputCls} value={who} onChange={(e) => setWho(e.target.value)} /></Field></Surface>
@@ -573,8 +573,8 @@ function AddressCard({ c, o }: { c: Client; o: Order }) {
       {['new', 'preparing', 'quality_check', 'packing', 'ready_to_dispatch'].includes(o.stage) && (
         <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-3">
           <span className="text-[14px] font-semibold text-ink">Delivery</span>
-          <Choices id={'dl-' + o.id} value={o.delivery} onChange={(v) => { s.setDelivery(o.id, v); s.toast(v === 'studio_pickup' ? 'Switched to studio pickup' : 'Switched to courier', 'info') }}
-            options={[{ value: 'courier', label: 'Courier' }, { value: 'studio_pickup', label: 'Studio pickup' }]} />
+          <Choices id={'dl-' + o.id} value={o.delivery} onChange={(v) => { s.setDelivery(o.id, v); s.toast(v === 'studio_pickup' ? 'Switched to center pickup' : 'Switched to courier', 'info') }}
+            options={[{ value: 'courier', label: 'Courier' }, { value: 'studio_pickup', label: 'Center pickup' }]} />
         </div>
       )}
     </Surface>

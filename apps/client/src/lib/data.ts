@@ -125,10 +125,10 @@ export const TESTIMONIALS: { name: string; city?: string; quote: string; rating?
 export const CONTACT = { whatsapp: '919054220952', whatsappLabel: '90542 20952', social: '@bewiseglobal' }
 export const TESTIMONIALS_SOURCE = 'https://www.jitendrakhimlani.com'
 
-/** In-person studio (owner 2026-11-18; CONTENT-CHECKLIST #7). */
+/** In-person center (owner 2026-11-18; CONTENT-CHECKLIST #7). */
 const STUDIO_FULL = '102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007'
 export const STUDIO = {
-  name: 'BeWise studio',
+  name: 'BeWise Center',
   line1: '102, Yogikrupa Apartment',
   line2: '19/A, Nutan Bharat Society, Alkapuri',
   city: 'Vadodara, Gujarat 390007',
@@ -332,7 +332,7 @@ export const REORDER_PRICE_PAISE = 80000 // owner sheet 2026-11-18: Bach Flower 
 
 // ---------- Slots (stub for scheduling.getAvailableSlots) ----------
 const BASE_SLOTS = ['10:00', '11:00', '12:00', '14:00', '15:30', '17:00', '18:30']
-/** A wall-clock time at the studio (IST, UTC+5:30) on the given calendar day — independent of the device's timezone. */
+/** A wall-clock time at the center (IST, UTC+5:30) on the given calendar day — independent of the device's timezone. */
 export function istDate(day: Date, hhmm: string) {
   const ymd = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
   return new Date(`${ymd}T${hhmm}:00+05:30`)

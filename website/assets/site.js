@@ -101,7 +101,7 @@
     note(msgEl, 'Opening secure payment…')
     return api.pay(purpose, id).then(function (r) {
       if (r.paid) { note(msgEl, 'Payment received — thank you! A confirmation is on its way to your email.', 'ok'); done && done(true) }
-      else { note(msgEl, 'Saved. Online payment is being set up — please pay at the studio or by UPI and we\'ll confirm (WhatsApp +91 90542 20952).', 'ok'); done && done(false) }
+      else { note(msgEl, 'Saved. Online payment is being set up — please pay at the center or by UPI and we\'ll confirm (WhatsApp +91 90542 20952).', 'ok'); done && done(false) }
     }).catch(function (e) { note(msgEl, e.message || 'Payment did not go through. You can try again from My account.', 'err') })
   }
 
@@ -264,7 +264,7 @@
         $('#acc-appts').innerHTML = items.length ? items.map(function (a) {
           var when = a.startsAt ? new Date(a.startsAt).toLocaleString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kolkata' }) : 'Time to be confirmed'
           var unpaid = a.paymentStatus === 'unpaid' && ['pending_payment', 'confirmed'].indexOf(a.status) >= 0
-          return '<div class="item"><div><b>' + (a.type === 'first' ? 'First consultation' : 'Follow-up') + '</b> <span class="muted small">· ' + (a.mode === 'online' ? 'Online' : 'At the studio') + ' · ' + esc(a.code) + '</span><br><span class="small">' + when + '</span></div>' +
+          return '<div class="item"><div><b>' + (a.type === 'first' ? 'First consultation' : 'Follow-up') + '</b> <span class="muted small">· ' + (a.mode === 'online' ? 'Online' : 'At the center') + ' · ' + esc(a.code) + '</span><br><span class="small">' + when + '</span></div>' +
             '<div style="display:flex;gap:8px;align-items:center"><span class="badge ' + (a.status === 'confirmed' || a.status === 'completed' ? 'ok' : 'warn') + '">' + esc(a.status.replace('_', ' ')) + '</span>' + (unpaid ? '<button class="btn sm" data-pay="appointment" data-id="' + a.id + '">Pay ' + inr(a.amountPaise) + '</button>' : '') + '</div></div>' }).join('') : '<p class="muted">No consultations yet. <a href="consultations.html">Book one</a>.</p>'
       })
       api.call('commerce.listOrders').then(function (j) {

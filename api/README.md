@@ -38,7 +38,7 @@ app (browser) ──POST /api/v1/<module>.<function>  JSON──▶ api/index.ph
 - Posting is double-entry, balanced, idempotent and per source (draft chart of accounts, D-13). There are no refunds (D-16).
 
 **Payments**
-- Without Razorpay keys, `finance.createCheckout` returns `{provider:'manual'}`. The app then shows "Pay at the studio / pay later", and staff use `finance.recordPayment`.
+- Without Razorpay keys, `finance.createCheckout` returns `{provider:'manual'}`. The app then shows "Pay at the center / pay later", and staff use `finance.recordPayment`.
 - With keys it returns Razorpay order data. `BeWise.pay()` opens Checkout. The webhook is the source of truth.
 
 ## Use it from an app
@@ -63,7 +63,7 @@ Input and output shapes are in the module files; each function is documented whe
 
 | Module (owner) | Functions |
 |---|---|
-| system (HUB) | `health` (GET) · `publicConfig` (GET): fees, studio, policies, Razorpay key id, `me` |
+| system (HUB) | `health` (GET) · `publicConfig` (GET): fees, center, policies, Razorpay key id, `me` |
 | auth (HUB) | `requestOtp {email}` · `verifyOtp {email, code}` · `login {email, password}` · `me` · `logout` · `changePassword` |
 | crm (MANAGER) | `getMyProfile` · `updateClientProfile` · `recordConsent` · `listAddresses` · `upsertAddress` · `deleteAddress` · staff: `searchClients {q}` · `getClient {id}` · `createClient` (walk-in) |
 | scheduling (CONSULTANT) | `listConsultationTypes` (GET) · `upsertConsultationType` (owner) · `getAvailability` · `setAvailability {rules}` · `addException` · `removeException` · `getAvailableSlots {consultationTypeId, mode, from?, to?}` · `holdAppointment {consultationTypeId, mode, startsAt, clientNote?, intakeId?, payLater?}` · `bookForClient` (staff) · `rescheduleAppointment` · `cancelAppointment` · `listAppointments {status?, date?, clientId?}` · `getAppointment` · `checkInAppointment` · `startSession` · `completeAppointment` · `markNoShow` · `getAppointmentHistory` · `submitSessionFeedback` · `listSessionFeedback` · `getCalendarFeedUrl` (ICS) |

@@ -129,7 +129,7 @@ const dayLabel = (t: number) => {
 function greetingFor(c: Client, start: number, type: Appointment['type'], mode: Appointment['mode']) {
   return [
     `Namaste ${firstName(c.name)} 🙏`,
-    `This is Haresh from BeWise. Your ${type.toLowerCase()} with Jitendra Khimlani is booked for ${dayLabel(start).toLowerCase()} at ${time(start)}, ${mode === 'online' ? 'online (the video link comes with your reminder)' : 'at the studio in Vadodara'}.`,
+    `This is Haresh from BeWise. Your ${type.toLowerCase()} with Jitendra Khimlani is booked for ${dayLabel(start).toLowerCase()} at ${time(start)}, ${mode === 'online' ? 'online (the video link comes with your reminder)' : 'at the center in Vadodara'}.`,
     type === 'First consultation' ? 'Before you come, please fill the short intake form so Jitendra Khimlani can understand you better.' : 'Jitendra Khimlani is looking forward to hearing how you have been.',
   ].join('\n\n')
 }

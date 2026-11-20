@@ -132,10 +132,10 @@ test('follow-up with a plan: request only (optional preferences, typed date), th
   await page.goto(`/app/sessions/view?id=${a.id}`); await expect(page.getByText('05/12/2026')).toBeVisible()
 })
 
-test('checkout: pick up from studio, pay, then say yes to subscribing', async ({ page }) => {
+test('checkout: pick up from center, pay, then say yes to subscribing', async ({ page }) => {
   await seed(page)
   await page.goto('/app/checkout')
-  await page.getByRole('radio', { name: /Pick up from studio/ }).click()
+  await page.getByRole('radio', { name: /Pick up from the center/ }).click()
   await expect(page.getByText('Ready in 1 to 2 days', { exact: false })).toBeVisible()
   await page.getByRole('button', { name: /^🔒 Pay|Pay ₹/ }).click(); await page.getByRole('button', { name: 'Google Pay' }).click()
   await expect(page.getByRole('heading', { name: /Thank you/ })).toBeVisible({ timeout: 8000 })
@@ -191,7 +191,8 @@ test('home feelings: pick → celebration → collapsed card for that feeling; C
   await page.getByRole('button', { name: 'Anxious', exact: true }).click()
   await expect(page.getByText('Anxious, noted')).toBeVisible()
   await expect(page.getByText('Today you’re feeling')).toBeVisible({ timeout: 4000 })
-  await expect(page.getByRole('link', { name: /Rescue Remedy for stressful moments/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Add a note' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'My journal' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Calm', exact: true })).toHaveCount(0)
   await page.getByRole('button', { name: 'Change' }).click()
   await expect(page.getByRole('button', { name: 'Calm', exact: true })).toBeVisible()

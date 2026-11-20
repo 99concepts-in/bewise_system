@@ -161,7 +161,7 @@ function TodayList({ todays, next, done, now }: { todays: Appt[]; next?: Appt; d
                 </div>
                 <button className="tl-hit" onClick={() => sheets.session(a.id)}>
                   <span className="tl-name">{p.name}</span>
-                  <span className="tl-meta">{a.mode === 'online' ? <Video size={15} aria-hidden /> : <MapPin size={15} aria-hidden />}{a.kind === 'first' ? 'First consultation' : 'Follow-up'}<i aria-hidden>·</i>{a.mode === 'online' ? 'Online' : 'Studio'}</span>
+                  <span className="tl-meta">{a.mode === 'online' ? <Video size={15} aria-hidden /> : <MapPin size={15} aria-hidden />}{a.kind === 'first' ? 'First consultation' : 'Follow-up'}<i aria-hidden>·</i>{a.mode === 'online' ? 'Online' : 'Center'}</span>
                 </button>
                 {feelings.length > 0 && !fin && <FeelingChips items={feelings} size="sm" />}
                 {isNext && a.note && !fin && <p className="tdl-note">“{a.note}”</p>}

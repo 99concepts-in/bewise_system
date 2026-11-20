@@ -72,15 +72,6 @@ export default function Home() {
 
 /* ---------------- feelings ---------------- */
 /** owner 2026-11-20: after picking, a short celebration plays, then the grid collapses into a card made for that feeling. */
-const NEXT_STEP: Record<string, { label: string; href?: string; note?: boolean }> = {
-  happy: { label: 'Note what made today good', note: true },
-  calm: { label: 'Explore the evening ritual', href: '/app/shop' },
-  grateful: { label: 'Add a gratitude note', note: true },
-  anxious: { label: 'Rescue Remedy for stressful moments', href: '/app/shop/rescue-remedy' },
-  sad: { label: 'Talk to Jitendra Khimlani', href: '/app/book' },
-  stressed: { label: 'Find a calming ritual', href: '/app/shop' },
-}
-
 function FeelingCircles() {
   const journal = useApp((s) => s.journal)
   const logMood = useApp((s) => s.logMood)
@@ -130,16 +121,10 @@ function FeelingCircles() {
               <button onClick={() => setPhase('pick')} className="min-h-11 shrink-0 rounded-full bg-white px-3.5 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Change</button>
             </div>
             <p className="mt-3 text-[14px] leading-5 text-ink">{current.tip}</p>
+            {/* owner 2026-11-20: just two options here */}
             <div className="mt-3 flex flex-wrap gap-2">
-              {(() => {
-                const n = NEXT_STEP[current.mood]
-                if (!n) return null
-                return n.note
-                  ? <button onClick={() => openEntry(last.id)} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white">{last.note ? 'Edit your note' : n.label}<ChevronRight className="size-4" /></button>
-                  : <Link href={n.href!} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white">{n.label}<ChevronRight className="size-4" /></Link>
-              })()}
-              {!NEXT_STEP[current.mood]?.note && <button onClick={() => openEntry(last.id)} className="inline-flex min-h-10 items-center rounded-full bg-white px-4 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">{last.note ? 'Edit note' : 'Add a note'}</button>}
-              <Link href="/app/journal" className="inline-flex min-h-10 items-center gap-0.5 rounded-full px-2 text-[13px] font-semibold text-navy">Journal<ChevronRight className="size-4" /></Link>
+              <button onClick={() => openEntry(last.id)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-navy px-4 text-[14px] font-semibold text-white">{last.note ? 'Edit note' : 'Add a note'}</button>
+              <Link href="/app/journal" className="inline-flex min-h-11 items-center gap-1 rounded-full bg-white px-4 text-[14px] font-semibold text-navy shadow-[var(--shadow-card)]">My journal<ChevronRight className="size-4" /></Link>
             </div>
           </motion.div>
         )}

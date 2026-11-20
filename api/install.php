@@ -151,7 +151,7 @@ $err
 <div class="row"><div><label>SMTP host</label><input name="smtp_host" value="{$v('smtp_host', 'smtp.hostinger.com')}"></div><div><label>SMTP port</label><input name="smtp_port" value="{$v('smtp_port', '465')}"></div></div>
 
 <h2>5 · Razorpay (optional — add later)</h2>
-<p><small>Without it, clients can book with "Pay at the studio / pay later" and Haresh records payments.</small></p>
+<p><small>Without it, clients can book with "Pay at the center / pay later" and Haresh records payments.</small></p>
 <label>Key id</label><input name="rzp_key_id" value="{$v('rzp_key_id')}" placeholder="rzp_test_…">
 <div class="row"><div><label>Key secret</label><input type="password" name="rzp_key_secret"></div><div><label>Webhook secret</label><input type="password" name="rzp_webhook_secret"></div></div>
 <button type="submit">Create tables &amp; finish setup</button>

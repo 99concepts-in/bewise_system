@@ -66,11 +66,11 @@ export default function Checkout() {
     <main className="px-5 pb-40">
       <AppHeader back="/app/bag" title="Checkout" />
       <h1 className="h-duo pt-2">How would you like <em>it?</em></h1>
-      {/* owner 2026-11-18: pick up from the studio as well as home delivery */}
+      {/* owner 2026-11-18: pick up from the center as well as home delivery */}
       <div role="radiogroup" aria-label="Delivery or pickup" className="mt-5 grid grid-cols-2 gap-2.5">
         {([
           { k: 'ship', e: '🚚', t: 'Home delivery', d: ship ? `${formatINR(ship)} · 4 to 6 days` : 'Free · 4 to 6 days' },
-          { k: 'pickup', e: '🏡', t: 'Pick up from studio', d: `Free · ${STUDIO.short}` },
+          { k: 'pickup', e: '🏡', t: 'Pick up from the center', d: `Free · ${STUDIO.short}` },
         ] as const).map((o) => {
           const on = how === o.k
           return (

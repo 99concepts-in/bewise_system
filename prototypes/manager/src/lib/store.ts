@@ -99,7 +99,7 @@ export const useStore = create<State>()(persist((set, get) => {
     let from = before.stage
     for (const h of after.history.slice(before.history.length)) {
       ev.push(emit('fulfilment.stage_changed', { taskId: 'FT-' + after.code, salesOrderId: after.id, remedyOrderId: after.remedyOrderId, from, to: h.stage }))
-      if (h.stage === 'dispatched') ev.push(emit('shipment.dispatched', { salesOrderId: after.id, remedyOrderId: after.remedyOrderId, courier: after.shipment?.courier ?? 'Studio pickup', awb: after.shipment?.awb, freightPaise: after.shipment?.freightPaise ?? 0 }))
+      if (h.stage === 'dispatched') ev.push(emit('shipment.dispatched', { salesOrderId: after.id, remedyOrderId: after.remedyOrderId, courier: after.shipment?.courier ?? 'Center pickup', awb: after.shipment?.awb, freightPaise: after.shipment?.freightPaise ?? 0 }))
       if (h.stage === 'delivered') ev.push(emit('shipment.delivered', { salesOrderId: after.id, remedyOrderId: after.remedyOrderId, deliveredAt: new Date(h.at).toISOString() }))
       if (h.stage === 'failed_delivery') ev.push(emit('shipment.failed', { salesOrderId: after.id, reason: after.problem }))
       from = h.stage
@@ -169,7 +169,7 @@ export const useStore = create<State>()(persist((set, get) => {
       let stock = get().stock
       for (const i of o.items) if (i.variantId) stock = move(stock, 'fg-' + i.variantId, mv('sale', -i.qty, o.code), -i.qty)
       set((s) => ({ stock, bloom: s.bloom + 1 }))
-      patchOrder(id, (x) => stamp(stamp(x, 'dispatched', 'Studio pickup'), 'delivered', `Collected by ${collector}`))
+      patchOrder(id, (x) => stamp(stamp(x, 'dispatched', 'Center pickup'), 'delivered', `Collected by ${collector}`))
     },
     delivered: (id) => patchOrder(id, (o) => stamp({ ...o, problem: undefined, shipment: o.shipment && { ...o.shipment, events: [...o.shipment.events, { label: 'Delivered', at: Date.now() }] } }, 'delivered')),
     reportFailed: (id, reason) => patchOrder(id, (o) => stamp({ ...o, problem: reason, shipment: o.shipment && { ...o.shipment, events: [...o.shipment.events, { label: 'Delivery attempt failed · ' + reason, at: Date.now() }] } }, 'failed_delivery', reason)),

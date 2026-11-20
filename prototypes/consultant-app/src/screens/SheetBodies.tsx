@@ -303,7 +303,7 @@ function greetingFor(p: Person, start: number, kind: Kind, mode: Mode, now: numb
   const when = `${dayLabel(start, now) === 'Today' || dayLabel(start, now) === 'Tomorrow' ? dayLabel(start, now).toLowerCase() + ', ' + fmtShort(start) : fmtDay(start)} at ${fmtTime(start)}`
   return [
     `Namaste ${p.first} 🙏`,
-    `This is Jitendra Khimlani from BeWise. Your ${KIND_LABEL[kind].toLowerCase()} is booked for ${when}, ${mode === 'online' ? 'online (the video link comes with your reminder)' : 'at the studio in Vadodara'}.`,
+    `This is Jitendra Khimlani from BeWise. Your ${KIND_LABEL[kind].toLowerCase()} is booked for ${when}, ${mode === 'online' ? 'online (the video link comes with your reminder)' : 'at the center in Vadodara'}.`,
     kind === 'first' ? 'Before we meet, please fill the short intake form so I can understand you better.' : 'Looking forward to hearing how you have been.',
   ].join('\n\n')
 }
@@ -456,7 +456,7 @@ function ShareBody() {
       </div>
       <div className="qr">
         {qr ? <m.img src={qr} width={180} height={180} alt="QR code for your booking link" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={softSpring} /> : <span className="qr-ph" />}
-        <div><b>QR code</b><p className="muted small">Show it at workshops or keep it at the studio desk. People scan and book.</p>
+        <div><b>QR code</b><p className="muted small">Show it at workshops or keep it at the center desk. People scan and book.</p>
           {qr && <a className="link" href={qr} download="jitendra-khimlani-booking-qr.png">Download QR</a>}</div>
       </div>
     </div>

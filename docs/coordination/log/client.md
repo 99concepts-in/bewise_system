@@ -2,6 +2,11 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-20 · Welcome copy, studio renamed to center, Home feeling card
+- Welcome slides 1 and 2 use the owner's new copy: "Get Started" on slide 1, "I already have an account" at the bottom; slide 2 "Meet Jitendra Khimlani · Your Bach Flower Therapist" with a "Personal guidance, just for you." kicker (duplicate title chip on the photo removed). Kept "Jitendra Khimlani" instead of "Jitu Bhaiya", per the earlier rename-everywhere rule.
+- "studio" renamed to "center" in all visible text: client (FAQ, checkout pickup, data), website, consultant and manager apps, and API messages. Identifiers and the `studio` settings key are unchanged.
+- Home feeling card: only "Add a note" and "My journal" (evening ritual button removed).
+
 ## 2026-11-20 — Typed DD/MM/YYYY dates, request-only booking, remedies with emotions · branch claude/new-session-94881h
 **Status:** Pushed; live preview refreshed (preview/client on main)
 **Done:** dates DD/MM/YYYY everywhere, typed number boxes (no date pickers) · clients only request sessions (optional days / time of day / preferred date / note), "Time to be confirmed" until the team sets it, "Can't make it?" asks for a new time · My care lists every remedy in the blend with the feeling it supports (38 mapped) · earlier today: name Jitendra Khimlani, remedies not essences, privacy note before the form, no helplines/AI mention in the form, pay at the center, Android calendar, shop scroll, back buttons, cart icons, dose check-ins + streak + 25-day calendar, My care tab

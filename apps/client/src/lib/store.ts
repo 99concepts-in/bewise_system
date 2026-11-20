@@ -33,7 +33,7 @@ export type Appointment = {
   source?: 'client' | 'consultant' | 'manager'
   /** paid after the hold expired → no time yet; client picks a new one at no cost (consultant K1 §4.3) */
   needsNewTime?: boolean; paidAt?: string
-  /** owner 2026-11-18: client chose to pay after the consultation (UPI, card or at the studio) */
+  /** owner 2026-11-18: client chose to pay after the consultation (UPI, card or at the center) */
   payLater?: boolean
   /** owner 2026-11-18: the client picks a preferred time after paying; Jitendra Khimlani or Haresh bhai confirm it (else the team calls) */
   timeRequested?: boolean
