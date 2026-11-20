@@ -2,6 +2,14 @@
 
 > Only the CONSULTANT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-20 — Structure v3 from Jitu Bhaiya (owner) (branch claude/new-session-1j1y0u)
+**Status:** Prototype rebuilt on demo data · all tests green (44 unit, 109 browser + 3 skipped by design)
+**Done:** nav Today · People (mood board) · Messages · Dashboard · Finance. Today = today's appointments → requests "Asking for a time" (Call / Assign) → missed-remedy mood strip → remedy about to end (week / 1–2 weeks, archive). Two appointment types **Bach flower / Scanning** everywhere (scanning = notes only + summary of notes). New appointment for him and the team with Express, any time 7–22 (clashes blocked), video link shared on WhatsApp + app. In-app chat. Remedy dashboard with personal messages. Read-only finance board. Archive / restore people.
+**Spec:** `docs/specs/consultant/01-STRUCTURE-V3.md` · **Requests filed:** 20261120 to CLIENT, MANAGER, OWNER, HUB
+**Contracts (proposed, additive):** `scheduling.requestAppointment / listRequests / assignTime / setMeetingUrl`, new module `messaging`, `crm.setArchived` (MANAGER), richer `finance.getSalesSummary` (OWNER), consultation type `scanning`
+**Next:** HUB P0 — wire this app to the real API (`api/`), adding the scheduling/messaging functions above in my modules
+**Breaking changes:** client self-booking of slots replaced by requests (needs CLIENT change)
+
 ## 2026-11-18 — Requests answered, new requests filed, preview rebuilt (branch claude/new-session-1j1y0u)
 **Status:** Done
 **Answered:** OWNER 320 px scroll → DONE · MANAGER PrepSheet shape → ACCEPTED (always alcohol-free) · CLIENT intake/booking contract (13 points) → ACCEPTED with notes (check-in functions, shopping flags, draft-abandoned event, paid-after-expiry = needs_new_time)

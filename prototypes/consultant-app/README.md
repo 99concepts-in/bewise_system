@@ -6,24 +6,17 @@
 
 ![Overview](screenshots/overview.jpg)
 
-## What it does
+## What it does (structure v3 — Jitu Bhaiya's own order, 2026-11-20; spec `docs/specs/consultant/01-STRUCTURE-V3.md`)
 | Tab | What Jitu Bhaiya gets |
 |---|---|
-| **Today** (CN-03) | Greeting · **Today's bloom**: one petal per session (done, next, later); tap a petal to open the session · next session with booking note, Prepare / Start · **Needs you**: a swipeable deck of insights computed from data (remedy not given yet, unpaid booking, a check-in where something feels harder, follow-ups overdue, next week almost full → open Saturday morning, quiet clients) with one-tap actions · today's timeline · **Your week**: weekly goal ring, people in care, and **what clients told him**, his kind words |
-| **Sessions** (CN-14/16) | Upcoming and Past in one place (segmented), search, filters (first / follow-up / online / in person / awaiting payment / no-show), grouped by day with sticky headers; tap → session sheet (Start, Reschedule with live slot picker, WhatsApp, Call, Give remedy, Book follow-up) |
-| **People** (CN-12/13) | Everyone registered (128 demo), search by name / city / phone, groups with counts (In care, Follow-up due, New this month, Quiet 4+ months), 3 sorts; profile with progress since last remedy, mood week (mood characters), troubling emotions across sessions, current blend with delivery tracker, all sessions, Book |
-| **Growth** (CN-26) | Month so far vs same days last month, people met, returning visits, rating, remedies; sessions per week; when people book him (heatmap); what people bring (top troubling emotions); next milestone |
-| **Your impact** (top of Today, full on Growth) | Next milestone (sessions and people helped), people helped on BeWise, 2,00,000+ reached, % who said something feels better, hours of listening, five-star sessions, came back %, and **what people said they felt** (from session feedback tags) |
-| **Live session** (CN-05/06/08) | Start opens the session for that person: summary first (booking note, since last remedy, current blend, taking-the-remedy strip), what's troubling them today, private notes 🔒, flowers to consider; **End session** → follow-up + optional client summary → **Give remedy** |
-| **Suggested flowers** (D-37) | Rule-based from today's troubling emotions, last 3 sessions, the check-in and what helped last time; each with its reason; one tap or "Add all"; never auto-applied |
-| **Taking the remedy** | Profile card: % of days taken since the blend, streak, 14-day strip (took / missed / not logged), "Send a gentle nudge"; People group "Missing drops"; insight on Today |
-| **New person / Express booking** | Add someone (validated +91 mobile, duplicate check, city, she/he/they) → Save or Save and book; Express: pick person → next free times → **Greet and confirm** (editable WhatsApp greeting) → payment link goes out automatically afterwards |
-| **Share my link** (top of Today) | His booking link: Copy, WhatsApp with ready messages (new client / follow-up / workshop), phone Share, QR code to show at workshops or the studio (download) |
-| **Today's appointments** (top of Today) | Every session today with one action each: **Check in** (arrived / joined) → **Start** → **Open**, **Give remedy** after; check-in form filled or "Ask" to send it; booking note on the next one |
-| **Calendar** (Today + Sessions) | Month view with sessions per day and unpaid marker; tap a day to see and open its appointments |
-| Bell | Updates feed (bookings, reschedules, ratings, deliveries, check-ins, payments) with unread state |
+| **Today** | 1. **Today's appointments** (Check in → Start → Open / Give remedy, Bach flower vs Scanning badge, video-link and check-in-form state, Calendar, **+ New**) · 2. **Asking for a time** — client requests: Call, **Assign** any time · 3. **Missed their remedy** mood strip · 4. **Remedy about to end** — within a week / 1–2 weeks, Message, Book, **Archive** |
+| **People** | **Mood board**: latest feeling per person; Missed remedy · Ends this week · Ends in 1–2 weeks · On a remedy · Scanning · Everyone · Archived; board or list; tap → full profile (Bach: progress, mood week, troubling, blend, drops · Scanning: notes timeline + summary of all notes) |
+| **Messages** | In-app chat with clients: inbox with unread, conversation, quick replies; side-by-side on wide screens |
+| **Dashboard** | People on a remedy: regular / missing days / not logging, ending soon — **Message personally**; impact, week, what people told him, growth charts |
+| **Finance** | Read-only: today's sales and profit, month revenue and profit vs last month, by source, which products bring the money (revenue / profit), daily bars |
+| Sheets | **New appointment** (Bach flower or Scanning → person → online + video link / in person → any time 7–22 with clashes blocked, Express next free → greet & confirm → payment link automatic) · Session details (video link: add, share on WhatsApp) · Move · Give remedy with suggestions · Share my link + QR · Calendar · Updates |
 
-Slot picking uses the same rules as `docs/specs/consultant/K1-SCHEDULING-AND-CALENDAR-SYNC.md` §3 (10-min gap, 30-min steps, 1 h notice).
+His timings are never fixed: staff pick any time 7 AM–10 PM in 15-minute steps; a 10-minute gap after each session keeps sessions from clashing.
 Changes he makes (give remedy, reschedule, book, dismiss) persist on the device for the day; demo data regenerates daily relative to "now".
 
 ## Run
@@ -49,8 +42,8 @@ Checked automatically at 320, 360, 375, 393, 430 px phones, phone landscape, iPa
 
 ## Tests
 ```bash
-pnpm test        # 30 unit tests: slot engine, data integrity (no double bookings), suggestions, adherence, impact, insights, booking state
-pnpm test:e2e    # 89 browser tests on phone, 320 px phone, tablet, desktop: every flow, 11 screen sizes, axe accessibility, performance budgets, offline
+pnpm test        # 44 unit tests: slot engine, data integrity (no double bookings), suggestions, adherence, impact, insights, booking state
+pnpm test:e2e    # 112 browser tests on phone, 320 px phone, tablet, desktop: every flow, 11 screen sizes, axe accessibility, performance budgets, offline
 ```
 
 ## Not real yet (by design)

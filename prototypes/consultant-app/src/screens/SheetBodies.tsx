@@ -1,30 +1,39 @@
 /**
  * @screens CN-09 CN-10 CN-14 CN-15 CN-19 CN-28 — every bottom-sheet body, loaded lazily (and prefetched on idle).
  */
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat } from 'lucide-react'
-import { useIndex, useStore } from '../state/store'
+import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, MessageSquare, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat, Inbox, NotebookPen, ScanLine, Flower2 } from 'lucide-react'
+import { durationOf, useIndex, useStore } from '../state/store'
 import { Avatar, Chip, Segmented, go, softSpring, spring, useToast } from '../ui/kit'
 import { dayLabel, fmtDay, fmtShort, fmtTime, relative, inr } from '../lib/time'
-import { nextDays, nextFree, slotsForDay } from '../lib/slots'
+import { freeTimes, nextDays, nextFreeAny } from '../lib/slots'
 import { FLOWERS, MIN, startOfDay } from '../data/seed'
 import { suggestFlowers } from '../lib/derive'
 import { Suggestions } from '../ui/care'
-import { pron, type Appt, type Kind, type Mode, type Person } from '../data/types'
+import { TypeBadge } from '../ui/bits'
+import { pron, type Appt, type Kind, type Mode, type Person, type Service } from '../data/types'
 
-import { FEE, KIND_LABEL, STATUS_LABEL, waLink, BOOKING_LINK } from '../lib/labels'
+import { DEFAULT_MEET, FEE, STATUS_LABEL, feeOf, linkMessage, typeLabel, waLink, BOOKING_LINK } from '../lib/labels'
 import type { Api, Open } from './Sheets'
 
 // ---------------------------------------------------------------- session details
 function SessionBody({ id, close, api }: { id: string; close: () => void; api: Api }) {
-  const { s, now } = useStore()
+  const { s, dispatch, now } = useStore()
   const { person } = useIndex()
+  const toast = useToast()
   const a = s.appts.find((x) => x.id === id)
+  const [link, setLink] = useState(a?.meetingUrl ?? '')
+  // save a half-typed link if the sheet is closed without leaving the field
+  const latest = useRef({ link, saved: a?.meetingUrl ?? '' })
+  latest.current.link = link
+  useEffect(() => () => { const { link: l, saved } = latest.current; if (a && l.trim() !== saved) dispatch({ type: 'setLink', apptId: a.id, url: l }) }, []) // eslint-disable-line react-hooks/exhaustive-deps
   if (!a) return null
   const p = person.get(a.personId)!
   const upcoming = a.status === 'confirmed' || a.status === 'awaiting_payment' || a.status === 'checked_in'
   const startsSoon = a.start - now < 30 * MIN
+  const when = `${dayLabel(a.start, now).toLowerCase()} at ${fmtTime(a.start)}`
+  const saveLink = (value = link) => { if (value.trim() !== (a.meetingUrl ?? '')) { dispatch({ type: 'setLink', apptId: a.id, url: value }); latest.current.saved = value.trim(); toast(value.trim() ? 'Link saved. It shows in the client\'s app.' : 'Link removed') } }
   return (
     <div className="sd">
       <button className="sd-head" onClick={() => { close(); go(`/people/${p.id}`) }}>
@@ -36,15 +45,37 @@ function SessionBody({ id, close, api }: { id: string; close: () => void; api: A
         <span className="sd-open">Profile <ChevronRight size={16} /></span>
       </button>
 
+      <TypeBadge service={a.service} kind={a.kind} big />
       <div className="sd-when">
         <div><span className="muted">{dayLabel(a.start, now)}</span><b>{fmtTime(a.start)}</b></div>
-        <div><span className="muted">{KIND_LABEL[a.kind]}</span><b>{a.durationMin} min</b></div>
+        <div><span className="muted">Length</span><b>{a.durationMin} min</b></div>
         <div><span className="muted">{a.mode === 'online' ? 'Online' : 'In person'}</span><b>{a.mode === 'online' ? <Video size={18} /> : <MapPin size={18} />}</b></div>
       </div>
-      <div className={`status status-${a.status}`}><span>{STATUS_LABEL[a.status]}{upcoming ? `, starts ${relative(a.start, now)}` : ""}</span>{a.status !== 'no_show' && <span className="fee"><IndianRupee size={12} />{inr(FEE[a.kind]).slice(1)} incl. remedy</span>}</div>
+      <div className={`status status-${a.status}`}><span>{STATUS_LABEL[a.status]}{upcoming ? `, starts ${relative(a.start, now)}` : ''}</span>{a.status !== 'no_show' && <span className="fee"><IndianRupee size={12} />{inr(feeOf(a.service, a.kind)).slice(1)}{a.service === 'bach' ? ' incl. remedy' : ''}</span>}</div>
+      {a.assignedBy && upcoming && <p className="muted small assigned">Time fixed by {a.assignedBy}</p>}
 
-      {a.note && <blockquote className="quote-note">“{a.note}”<cite>{p.first}'s note when booking</cite></blockquote>}
+      {a.mode === 'online' && upcoming && (
+        <section className="sd-sec link-sec">
+          <h4><Video size={15} /> Video link</h4>
+          <div className="link-edit">
+            <input value={link} onChange={(e) => setLink(e.target.value)} onBlur={() => saveLink()} onKeyDown={(e) => { if (e.key === 'Enter') saveLink() }} placeholder="Paste a Google Meet or Zoom link" aria-label="Video link" inputMode="url" />
+            {!link && <button className="link" onClick={() => { setLink(DEFAULT_MEET); saveLink(DEFAULT_MEET) }}>Use my room</button>}
+          </div>
+          {link && (
+            <div className="btn-row">
+              <a className="btn btn-quiet btn-sm" href={waLink(p.phone, linkMessage(p.first, when, link))} target="_blank" rel="noreferrer" onClick={() => saveLink()}><MessageCircle size={15} /> Share on WhatsApp</a>
+              <a className="btn btn-quiet btn-sm" href={link} target="_blank" rel="noreferrer"><Video size={15} /> Open</a>
+            </div>
+          )}
+          <p className="muted small">{link ? `${p.first} also sees this link in the BeWise app.` : 'Add a link so it reaches ' + p.first + ' on WhatsApp and in the app.'}</p>
+        </section>
+      )}
 
+      {a.note && <blockquote className="quote-note">“{a.note}”<cite>{p.first}'s note when asking</cite></blockquote>}
+
+      {a.service === 'scanning' && a.privateNote && (
+        <section className="sd-sec"><h4><NotebookPen size={15} /> Your notes</h4><p className="scan-note">{a.privateNote}</p></section>
+      )}
       {a.troubling && (
         <section className="sd-sec"><h4>What was troubling {pron(p).obj}</h4>
           <div className="chips-wrap">{a.troubling.map((t) => <span key={t} className="tag">{t}</span>)}</div></section>
@@ -65,58 +96,38 @@ function SessionBody({ id, close, api }: { id: string; close: () => void; api: A
             <Play size={16} /> {startsSoon ? 'Start session' : `Starts ${relative(a.start, now)}`}
           </button>
           <div className="btn-row">
-            <button className="btn btn-quiet" onClick={() => api.reschedule(a.id)}><CalendarClock size={16} /> Reschedule</button>
-            <a className="btn btn-quiet" href={waLink(p.phone, `Namaste ${p.first}, this is Jitu Bhaiya from BeWise. `)} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a>
+            <button className="btn btn-quiet" onClick={() => api.reschedule(a.id)}><CalendarClock size={16} /> Move</button>
+            <button className="btn btn-quiet" onClick={() => { close(); go(`/messages/${p.id}`) }}><MessageSquare size={16} /> Message</button>
             <a className="btn btn-quiet" href={`tel:${p.phone.replace(/\s/g, '')}`}><Phone size={16} /> Call</a>
           </div>
         </>}
-        {a.status === 'completed' && !a.remedy && <button className="btn btn-primary" onClick={() => api.remedy(a.id)}><Leaf size={16} /> Give remedy</button>}
-        {(a.status === 'completed' || a.status === 'no_show') && <button className="btn btn-quiet" onClick={() => api.book(p.id)}><CalendarPlus size={16} /> Book follow-up</button>}
+        {a.status === 'completed' && a.service === 'bach' && !a.remedy && <button className="btn btn-primary" onClick={() => api.remedy(a.id)}><Leaf size={16} /> Give remedy</button>}
+        {(a.status === 'completed' || a.status === 'no_show') && <button className="btn btn-quiet" onClick={() => api.newAppt({ personId: p.id, service: a.service })}><CalendarPlus size={16} /> Book the next one</button>}
       </div>
     </div>
   )
 }
 
-// ---------------------------------------------------------------- slot picker
-function SlotBody({ o, close }: { o: Extract<Open, { k: 'slots' }>; close: () => void }) {
-  const { s, dispatch, now } = useStore()
-  const { person, byPerson } = useIndex()
-  const toast = useToast()
-  const appt = o.mode === 'reschedule' ? s.appts.find((x) => x.id === o.apptId) : undefined
-  const personId = appt?.personId ?? (o.mode === 'book' ? o.personId : '')
-  const p = person.get(personId)!
-  const hasHistory = (byPerson.get(personId) ?? []).some((a) => a.status === 'completed')
-  const [kind, setKind] = useState<Kind>(appt?.kind ?? (hasHistory ? 'followup' : 'first'))
-  const [mode, setMode] = useState<Mode>(appt?.mode ?? 'online')
-  const duration = kind === 'first' ? 60 : 30
+
+// ---------------------------------------------------------------- time picker (his timings are never fixed: any time 7 AM–10 PM, clashes blocked)
+function TimePicker({ duration, value, onChange, ignoreId }: { duration: number; value: number | null; onChange: (t: number) => void; ignoreId?: string }) {
+  const { s, now } = useStore()
   const days = useMemo(() => nextDays(now, 15), [now])
-  const counts = useMemo(() => days.map((d) => slotsForDay(d, duration, s.appts, s, now, appt?.id).length), [days, duration, s, now, appt?.id])
-  const firstOpen = counts.findIndex((c) => c > 0)
-  const [day, setDay] = useState(days[Math.max(0, firstOpen)])
-  const slots = useMemo(() => slotsForDay(day, duration, s.appts, s, now, appt?.id), [day, duration, s, now, appt?.id])
-  const [pick, setPick] = useState<number | null>(null)
-  const [review, setReview] = useState(false)
-
-  const confirm = () => {
-    if (pick === null) return
-    if (appt) { dispatch({ type: 'reschedule', apptId: appt.id, start: pick }); toast(`Moved to ${dayLabel(pick, now)}, ${fmtTime(pick)}. ${p.first} will be told.`); close() }
-    else setReview(true)
-  }
-  if (review && pick !== null && !appt) return <ConfirmBooking p={p} start={pick} kind={kind} mode={mode} onBack={() => setReview(false)} close={close} />
-
+  const counts = useMemo(() => days.map((d) => freeTimes(d, duration, s.appts, now, ignoreId).filter((x) => x.free).length), [days, duration, s.appts, now, ignoreId])
+  const [day, setDay] = useState(() => value ? startOfDay(value) : days[Math.max(0, counts.findIndex((c) => c > 0))])
+  const times = useMemo(() => freeTimes(day, duration, s.appts, now, ignoreId), [day, duration, s.appts, now, ignoreId])
+  const quick = useMemo(() => nextFreeAny(duration, s.appts.filter((a) => a.id !== ignoreId), now, 3), [duration, s.appts, now, ignoreId])
+  const groups: [string, number, number][] = [['Morning', 7, 12], ['Afternoon', 12, 17], ['Evening', 17, 22]]
   return (
-    <div className="slots">
-      <h3 className="sheet-title">{appt ? `Move ${p.first}'s session` : `Book ${p.first}`}</h3>
-      {appt && <p className="muted small">Currently {dayLabel(appt.start, now).toLowerCase()} at {fmtTime(appt.start)}. Moving it doesn't use up {pron(p).poss} free reschedules.</p>}
-      {!appt && (
-        <div className="slots-opts">
-          <Segmented id="kind" value={kind} onChange={(v) => { setKind(v); setPick(null) }} options={[{ value: 'followup', label: 'Follow-up ₹800' }, { value: 'first', label: 'First ₹1,000' }]} />
-          <Segmented id="mode" value={mode} onChange={setMode} options={[{ value: 'online', label: 'Online' }, { value: 'in_person', label: 'In person' }]} />
+    <div className="tp">
+      {quick.length > 0 && (
+        <div className="tp-quick"><span className="muted small"><Zap size={13} /> Express</span>
+          {quick.map((t) => <button key={t} className={'chip' + (value === t ? ' is-on' : '')} onClick={() => { setDay(startOfDay(t)); onChange(t) }}>{dayLabel(t, now)}, {fmtTime(t)}</button>)}
         </div>
       )}
       <div className="daystrip" role="listbox" aria-label="Day">
         {days.map((d, i) => (
-          <button key={d} role="option" aria-selected={d === day} disabled={counts[i] === 0} className={'day' + (d === day ? ' is-on' : '')} onClick={() => { setDay(d); setPick(null) }}>
+          <button key={d} role="option" aria-selected={d === day} disabled={counts[i] === 0} className={'day' + (d === day ? ' is-on' : '')} onClick={() => setDay(d)}>
             {d === day && <m.span layoutId="day-pill" className="day-pill" transition={spring} />}
             <span className="day-wd">{i === 0 ? 'Today' : new Intl.DateTimeFormat('en-IN', { weekday: 'short' }).format(d)}</span>
             <span className="day-n">{new Date(d).getDate()}</span>
@@ -125,15 +136,42 @@ function SlotBody({ o, close }: { o: Extract<Open, { k: 'slots' }>; close: () =>
         ))}
       </div>
       <AnimatePresence mode="wait" initial={false}>
-        <m.div key={day + kind} className="slot-grid" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.12 }}>
-          {slots.length === 0 && <p className="muted small">No free times on {fmtDay(day)}. Try another day.</p>}
-          {slots.map((t) => (
-            <button key={t} className={'slot' + (pick === t ? ' is-on' : '')} onClick={() => setPick(t)} aria-pressed={pick === t}>{fmtTime(t)}</button>
-          ))}
+        <m.div key={day + '-' + duration} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
+          {groups.map(([label, h0, h1]) => {
+            const list = times.filter(({ t }) => { const h = new Date(t).getHours(); return h >= h0 && h < h1 })
+            if (!list.length) return null
+            return (
+              <div key={label} className="tp-group">
+                <h5>{label}</h5>
+                <div className="slot-grid tp-grid">
+                  {list.map(({ t, free }) => (
+                    <button key={t} className={'slot' + (value === t ? ' is-on' : '') + (free ? '' : ' is-taken')} disabled={!free} onClick={() => onChange(t)} aria-pressed={value === t} aria-label={`${fmtTime(t)}${free ? '' : ', taken'}`}>{fmtTime(t).replace(' AM', '').replace(' PM', '')}</button>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+          {times.length === 0 && <p className="muted small">No times left today. Pick another day.</p>}
         </m.div>
       </AnimatePresence>
-      <button className="btn btn-primary btn-block" disabled={pick === null} onClick={confirm}>
-        {pick === null ? 'Pick a time' : appt ? `Move to ${fmtTime(pick)}` : `Continue with ${fmtTime(pick)}`}
+    </div>
+  )
+}
+
+function SlotBody({ o, close }: { o: Extract<Open, { k: 'slots' }>; close: () => void }) {
+  const { s, dispatch, now } = useStore()
+  const { person } = useIndex()
+  const toast = useToast()
+  const appt = s.appts.find((x) => x.id === o.apptId)!
+  const p = person.get(appt.personId)!
+  const [pick, setPick] = useState<number | null>(null)
+  return (
+    <div className="slots">
+      <h3 className="sheet-title">Move {p.first}'s session</h3>
+      <p className="muted small">Currently {dayLabel(appt.start, now).toLowerCase()} at {fmtTime(appt.start)}. {p.first} gets the new time on WhatsApp and in the app.</p>
+      <TimePicker duration={appt.durationMin} value={pick} onChange={setPick} ignoreId={appt.id} />
+      <button className="btn btn-primary btn-block" disabled={pick === null} onClick={() => { if (pick === null) return; dispatch({ type: 'reschedule', apptId: appt.id, start: pick }); toast(`Moved to ${dayLabel(pick, now)}, ${fmtTime(pick)}. ${p.first} will be told.`); close() }}>
+        {pick === null ? 'Pick a time' : `Move to ${dayLabel(pick, now).toLowerCase()}, ${fmtTime(pick)}`}
       </button>
     </div>
   )
@@ -180,7 +218,7 @@ function RemedyBody({ apptId, close }: { apptId: string; close: () => void }) {
 }
 
 // ---------------------------------------------------------------- notices
-const NOTICE_ICON = { booked: CalendarPlus, rescheduled: Repeat, feedback: Star, delivered: PackageCheck, payment: IndianRupee, checkin: ClipboardCheck }
+const NOTICE_ICON = { booked: CalendarPlus, rescheduled: Repeat, feedback: Star, delivered: PackageCheck, payment: IndianRupee, checkin: ClipboardCheck, request: Inbox, message: MessageSquare }
 function NoticesBody({ close }: { close: () => void }) {
   const { s, dispatch, now } = useStore()
   const unread = s.notices.filter((n) => n.at > s.readUpTo && !n.seen).length
@@ -262,27 +300,31 @@ function AddPersonBody({ then, close, api }: { then: 'profile' | 'express'; clos
 }
 
 // ---------------------------------------------------------------- greet & confirm (payment link follows automatically)
-function greetingFor(p: Person, start: number, kind: Kind, mode: Mode, now: number) {
+function greetingFor(p: Person, start: number, service: Service, kind: Kind, mode: Mode, url: string | undefined, now: number) {
   const when = `${dayLabel(start, now) === 'Today' || dayLabel(start, now) === 'Tomorrow' ? dayLabel(start, now).toLowerCase() + ', ' + fmtShort(start) : fmtDay(start)} at ${fmtTime(start)}`
+  const what = service === 'scanning' ? 'Scanning session' : kind === 'first' ? 'first Bach flower consultation' : 'Bach flower follow-up'
   return [
     `Namaste ${p.first} 🙏`,
-    `This is Jitu Bhaiya from BeWise. Your ${KIND_LABEL[kind].toLowerCase()} is booked for ${when}, ${mode === 'online' ? 'online (the video link comes with your reminder)' : 'at the studio in Vadodara'}.`,
-    kind === 'first' ? 'Before we meet, please fill the short intake form so I can understand you better.' : 'Looking forward to hearing how you have been.',
-  ].join('\n\n')
+    `This is Jitu Bhaiya from BeWise. Your ${what} is fixed for ${when}, ${mode === 'online' ? 'online' : 'at the studio in Alkapuri, Vadodara'}.`,
+    mode === 'online' ? (url ? `Join here: ${url}` : 'The video link comes with your reminder.') : '',
+    service === 'bach' && kind === 'first' ? 'Before we meet, please fill the short intake form in the BeWise app.' : 'Looking forward to seeing you.',
+  ].filter(Boolean).join('\n\n')
 }
 
-function ConfirmBooking({ p, start, kind, mode, onBack, close }: { p: Person; start: number; kind: Kind; mode: Mode; onBack: () => void; close: () => void }) {
+interface Draft { p: Person; start: number; service: Service; kind: Kind; mode: Mode; url?: string; requestId?: string }
+function ConfirmBooking({ d, onBack, close }: { d: Draft; onBack: () => void; close: () => void }) {
   const { dispatch, now } = useStore()
-  const [msg, setMsg] = useState(() => greetingFor(p, start, kind, mode, now))
+  const { p, start, service, kind, mode, url, requestId } = d
+  const [msg, setMsg] = useState(() => greetingFor(p, start, service, kind, mode, url, now))
   const [stage, setStage] = useState<'review' | 'sending' | 'done'>('review')
   const send = () => {
-    dispatch({ type: 'book', personId: p.id, start, kind, mode, id: `b${Date.now()}`, now: Date.now(), greeting: msg })
+    dispatch({ type: 'book', personId: p.id, start, service, kind, mode, meetingUrl: url, id: `b${Date.now()}`, now: Date.now(), greeting: msg, by: 'Jitu Bhaiya', requestId })
     setStage('sending')
     setTimeout(() => setStage('done'), 1500)
   }
   const steps = [
-    { label: `Greeting sent to ${p.first} on WhatsApp`, on: stage !== 'review' },
-    { label: `Booking confirmed for ${dayLabel(start, now).toLowerCase()}, ${fmtTime(start)}`, on: stage !== 'review' },
+    { label: `${p.first} got the time on WhatsApp and in the app`, on: stage !== 'review' },
+    ...(mode === 'online' ? [{ label: url ? 'Video link shared with the time' : 'Video link to add before the session', on: stage !== 'review' && !!url }] : []),
     { label: stage === 'done' ? 'Payment link sent automatically' : 'Sending the payment link automatically', on: stage === 'done' },
   ]
   if (stage !== 'review') return (
@@ -296,54 +338,76 @@ function ConfirmBooking({ p, start, kind, mode, onBack, close }: { p: Person; st
           </m.li>
         ))}
       </ol>
-      <p className="muted small">You don't need to send anything else. BeWise sends the payment link and the reminders.</p>
+      <p className="muted small">Nothing else to send. BeWise sends the payment link and the reminders.</p>
       <button className="btn btn-primary btn-block" onClick={close}>Done</button>
     </div>
   )
   return (
     <div className="confirm">
-      <button className="link back-link" onClick={onBack}><ArrowLeft size={15} /> Change time</button>
+      <button className="link back-link" onClick={onBack}><ArrowLeft size={15} /> Change</button>
       <h3 className="sheet-title">Greet and confirm</h3>
       <div className="confirm-summary">
         <Avatar name={p.name} size={44} />
-        <span><b>{p.name}</b><small>{KIND_LABEL[kind]}, {dayLabel(start, now)} at {fmtTime(start)}, {mode === 'online' ? 'online' : 'in person'}</small></span>
-        <span className="confirm-fee">{inr(FEE[kind])}</span>
+        <span><b>{p.name}</b><TypeBadge service={service} kind={kind} /><small>{dayLabel(start, now)} at {fmtTime(start)}, {mode === 'online' ? 'online' : 'in person'}</small></span>
+        <span className="confirm-fee">{inr(feeOf(service, kind))}</span>
       </div>
       <label className="field"><span>Your greeting on WhatsApp</span>
         <textarea className="wa-bubble" value={msg} onChange={(e) => setMsg(e.target.value)} rows={7} />
       </label>
-      <p className="auto-note"><IndianRupee size={14} /> After you confirm, BeWise sends {p.first} the payment link automatically. Nothing to send yourself.</p>
-      <button className="btn btn-primary btn-block" disabled={msg.trim().length < 5} onClick={send}><MessageCircle size={16} /> Confirm booking and greet {p.first}</button>
+      <p className="auto-note"><IndianRupee size={14} /> After you confirm, {p.first} sees the time in the BeWise app too, and BeWise sends the payment link automatically.</p>
+      <button className="btn btn-primary btn-block" disabled={msg.trim().length < 5} onClick={send}><MessageCircle size={16} /> Confirm and greet {p.first}</button>
     </div>
   )
 }
 
-// ---------------------------------------------------------------- express booking: person → next free time → done
-function ExpressBody({ personId, close, api }: { personId?: string; close: () => void; api: Api }) {
+// ---------------------------------------------------------------- new appointment (Jitu Bhaiya or the team): type → person → online/link → any time → greet
+function NewApptBody({ o, close, api }: { o: Extract<Open, { k: 'new' }>; close: () => void; api: Api }) {
   const { s, now } = useStore()
   const { person, byPerson } = useIndex()
-  const [pid, setPid] = useState(personId)
+  const req = o.requestId ? s.requests.find((r) => r.id === o.requestId) : undefined
+  const [service, setService] = useState<Service | undefined>(req?.service ?? o.service)
+  const [pid, setPid] = useState<string | undefined>(req?.personId ?? o.personId)
   const [q, setQ] = useState('')
   const p = pid ? person.get(pid) : undefined
-  const returning = p ? (byPerson.get(p.id) ?? []).some((a) => a.status === 'completed') : false
-  const [kind, setKind] = useState<Kind>(returning ? 'followup' : 'first')
-  const [mode, setMode] = useState<Mode>('online')
-  const effKind: Kind = p && !returning ? 'first' : kind
-  const free = useMemo(() => nextFree(effKind === 'first' ? 60 : 30, s.appts, s, now, 6), [effKind, s, now])
-  const [picked, setPicked] = useState<number | null>(null)
+  const returning = p ? (byPerson.get(p.id) ?? []).some((a) => a.status === 'completed' && a.service === (service ?? 'bach')) : false
+  const kind: Kind = req?.kind ?? (returning ? 'followup' : 'first')
+  const [mode, setMode] = useState<Mode>(req?.mode ?? 'online')
+  const [url, setUrl] = useState(DEFAULT_MEET)
+  const [start, setStart] = useState<number | null>(null)
+  const [confirm, setConfirm] = useState(false)
+  const duration = durationOf(service ?? 'bach', kind)
+
+  if (confirm && p && service && start !== null) return <ConfirmBooking d={{ p, start, service, kind, mode, url: mode === 'online' ? url.trim() || undefined : undefined, requestId: req?.id }} onBack={() => setConfirm(false)} close={close} />
+
+  const head = req && p && (
+    <div className="req-head">
+      <span><b>{p.first} asked {relative(req.at, now)}</b><small>Prefers: {req.preferred}</small>{req.note && <em>“{req.note}”</em>}</span>
+      <a className="btn btn-quiet btn-sm" href={`tel:${p.phone.replace(/\s/g, '')}`}><Phone size={15} /> Call</a>
+    </div>
+  )
+
+  if (!service) return (
+    <div className="na">
+      <h3 className="sheet-title">New appointment</h3>
+      <p className="muted small">What is it for?</p>
+      <div className="svc-pick">
+        <button className="svc svc-bach" onClick={() => setService('bach')}><Flower2 size={26} /><b>Bach flower remedy</b><small>Consultation, then a remedy</small></button>
+        <button className="svc svc-scanning" onClick={() => setService('scanning')}><ScanLine size={26} /><b>Scanning</b><small>Session with your notes only</small></button>
+      </div>
+    </div>
+  )
 
   if (!p) {
     const ql = q.trim().toLowerCase()
-    const matches = (ql ? s.people.filter((x) => x.name.toLowerCase().includes(ql) || x.phone.replace(/\s/g, '').includes(ql.replace(/\s/g, ''))) : s.people.slice(0, 0)).slice(0, 6)
+    const matches = ql ? s.people.filter((x) => x.name.toLowerCase().includes(ql) || x.phone.replace(/\s/g, '').includes(ql.replace(/\s/g, ''))).slice(0, 6) : []
     return (
-      <div className="express">
-        <h3 className="sheet-title"><Zap size={20} /> Express booking</h3>
-        <p className="muted small">Pick who it's for. The next free times come up straight away.</p>
-        <div className="search-wrap"><Search size={18} aria-hidden /><input className="search" placeholder="Search name or phone" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search people" /></div>
+      <div className="na">
+        <button className="link back-link" onClick={() => setService(undefined)}><ArrowLeft size={15} /> <TypeBadge service={service} /></button>
+        <h3 className="sheet-title">Who is it for?</h3>
+        <div className="search-wrap"><Search size={18} aria-hidden /><input className="search" autoFocus placeholder="Search name or phone" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search people" /></div>
         <ul className="pick-list">
           {matches.map((x) => (
-            <li key={x.id}><button className="row" onClick={() => { setPid(x.id); setKind((byPerson.get(x.id) ?? []).some((a) => a.status === 'completed') ? 'followup' : 'first') }}>
-              <Avatar name={x.name} size={38} /><span className="row-main"><b>{x.name}</b><small>{x.city}, {x.phone}</small></span><ChevronRight size={16} /></button></li>
+            <li key={x.id}><button className="row" onClick={() => setPid(x.id)}><Avatar name={x.name} size={38} /><span className="row-main"><b>{x.name}</b><small>{x.city}, {x.phone}</small></span><ChevronRight size={16} /></button></li>
           ))}
           {ql && matches.length === 0 && <li className="muted small pad">No one matches “{q}”.</li>}
         </ul>
@@ -352,30 +416,22 @@ function ExpressBody({ personId, close, api }: { personId?: string; close: () =>
     )
   }
 
-  if (picked !== null) return <ConfirmBooking p={p} start={picked} kind={effKind} mode={mode} onBack={() => setPicked(null)} close={close} />
   return (
-    <div className="express">
-      <h3 className="sheet-title"><Zap size={20} /> Book {p.first}</h3>
-      {!personId && <button className="link" onClick={() => setPid(undefined)}>Change person</button>}
-      <div className="slots-opts">
-        {returning
-          ? <Segmented id="x-kind" value={kind} onChange={setKind} options={[{ value: 'followup', label: 'Follow-up ₹800' }, { value: 'first', label: 'First ₹1,000' }]} />
-          : <p className="pill-note">First consultation, 60 min, ₹1,000 incl. remedy</p>}
-        <Segmented id="x-mode" value={mode} onChange={setMode} options={[{ value: 'online', label: 'Online' }, { value: 'in_person', label: 'In person' }]} />
-      </div>
-      <h4 className="x-head">Next free times</h4>
-      {free.length === 0 && <p className="muted small">No free times in the next 3 weeks. Open more hours in availability.</p>}
-      <ul className="x-list">
-        {free.map((t, i) => (
-          <m.li key={t} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: i * 0.04 }}>
-            <button className={'x-slot' + (i === 0 ? ' is-first' : '')} onClick={() => setPicked(t)}>
-              <span><b>{dayLabel(t, now)}</b><small>{fmtTime(t)}</small></span>
-              <span className="x-cta">{i === 0 ? 'Book earliest' : 'Book'}</span>
-            </button>
-          </m.li>
-        ))}
-      </ul>
-      <button className="btn btn-quiet btn-block" onClick={() => api.book(p.id)}><CalendarClock size={16} /> Pick another day</button>
+    <div className="na">
+      {!req && <button className="link back-link" onClick={() => (o.personId ? setService(undefined) : setPid(undefined))}><ArrowLeft size={15} /> Change</button>}
+      <h3 className="sheet-title">{req ? `Assign a time for ${p.first}` : `Book ${p.first}`}</h3>
+      {head}
+      <div className="na-type"><TypeBadge service={service} kind={kind} big /><span className="muted small">{duration} min, {inr(feeOf(service, kind))}</span></div>
+      <Segmented id="na-mode" value={mode} onChange={setMode} options={[{ value: 'online', label: 'Online' }, { value: 'in_person', label: 'In person' }]} />
+      {mode === 'online' && (
+        <label className="field"><span>Video link (sent to {p.first} on WhatsApp and in the app)</span>
+          <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a Google Meet or Zoom link" inputMode="url" />
+        </label>
+      )}
+      <TimePicker duration={duration} value={start} onChange={setStart} />
+      <button className="btn btn-primary btn-block" disabled={start === null} onClick={() => setConfirm(true)}>
+        {start === null ? 'Pick a time' : `Continue with ${dayLabel(start, now).toLowerCase()}, ${fmtTime(start)}`}
+      </button>
     </div>
   )
 }
@@ -480,7 +536,7 @@ function CalendarBody({ api }: { api: Api }) {
             return (
               <li key={a.id}><button className="row" onClick={() => api.session(a.id)}>
                 <span className="row-time">{fmtTime(a.start)}<small>{a.durationMin} min</small></span>
-                <span className="row-main"><b>{p.name}</b><small>{KIND_LABEL[a.kind]}{a.status !== 'confirmed' ? `, ${STATUS_LABEL[a.status].toLowerCase()}` : ''}</small></span>
+                <span className="row-main"><b>{p.name}</b><small>{typeLabel(a)}{a.status !== 'confirmed' ? `, ${STATUS_LABEL[a.status].toLowerCase()}` : ''}</small></span>
                 <span className="mode-ic">{a.mode === 'online' ? <Video size={15} /> : <MapPin size={15} />}</span>
               </button></li>
             )
@@ -500,7 +556,7 @@ export default function SheetBody({ open, close, api }: { open: NonNullable<Open
     case 'remedy': return <RemedyBody apptId={open.apptId} close={close} />
     case 'notices': return <NoticesBody close={close} />
     case 'add': return <AddPersonBody then={open.then} close={close} api={api} />
-    case 'express': return <ExpressBody key={open.personId ?? 'pick'} personId={open.personId} close={close} api={api} />
+    case 'new': return <NewApptBody key={(open.requestId ?? '') + (open.personId ?? '') + (open.service ?? '')} o={open} close={close} api={api} />
     case 'share': return <ShareBody />
     case 'calendar': return <CalendarBody api={api} />
   }

@@ -4,13 +4,15 @@
  */
 import { createContext, useContext, useEffect, useMemo, useReducer, useState, type ReactNode } from 'react'
 import { makeSeed, startOfDay, MIN } from '../data/seed'
-import type { Appt, Kind, Mode, Notice, Person } from '../data/types'
+import type { Appt, ApptRequest, Kind, Mode, Notice, Person, Service, Staff, Thread } from '../data/types'
 
 export interface State {
   day: number
   people: Person[]
   appts: Appt[]
   notices: Notice[]
+  requests: ApptRequest[]
+  threads: Thread[]
   readUpTo: number
   dismissed: string[]
   saturdayMorning: boolean
@@ -19,7 +21,11 @@ export interface State {
 export type Action =
   | { type: 'giveRemedy'; apptId: string; flowers: string[]; now: number }
   | { type: 'reschedule'; apptId: string; start: number }
-  | { type: 'book'; personId: string; start: number; kind: Kind; mode: Mode; id: string; now: number; greeting: string }
+  | { type: 'book'; personId: string; start: number; service: Service; kind: Kind; mode: Mode; id: string; now: number; greeting: string; meetingUrl?: string; by: Staff; requestId?: string }
+  | { type: 'setLink'; apptId: string; url: string }
+  | { type: 'archive'; personId: string; on: boolean }
+  | { type: 'send'; personId: string; text: string; now: number }
+  | { type: 'readThread'; personId: string; now: number }
   | { type: 'start'; apptId: string }
   | { type: 'checkIn'; apptId: string }
   | { type: 'dismiss'; key: string }
@@ -31,7 +37,7 @@ export type Action =
   | { type: 'endSession'; apptId: string; outcome: 'completed' | 'no_show'; followUpWeeks?: number; shareSummary?: string }
   | { type: 'reset'; now: number }
 
-const KEY = 'bewise.consult.v1'
+const KEY = 'bewise.consult.v2' // v2: services, requests, chat (2026-11-20)
 
 export function fresh(now: number): State {
   const s = makeSeed(now)
@@ -59,15 +65,36 @@ export function reducer(s: State, a: Action): State {
       return { ...s, appts, notices: p ? [{ id: `n${Date.now()}`, at: Date.now(), kind: 'rescheduled', text: `You moved ${s.people.find((q) => q.id === p.personId)?.first}'s session`, personId: p.personId, seen: true }, ...s.notices] : s.notices }
     }
     case 'book': {
-      // Flow (owner 2026-11-18): greet + confirm first; the payment link then goes out automatically from BeWise.
-      const appt: Appt = { id: a.id, personId: a.personId, start: a.start, durationMin: a.kind === 'first' ? 60 : 30, kind: a.kind, mode: a.mode, status: 'awaiting_payment', greeting: a.greeting }
+      // Flow (owner 2026-11-18/20): the team assigns the time, greets + confirms; the client gets it on WhatsApp and in the app,
+      // then BeWise sends the payment link automatically. A request (if any) is closed by the booking.
+      const appt: Appt = {
+        id: a.id, personId: a.personId, start: a.start, durationMin: durationOf(a.service, a.kind), service: a.service, kind: a.kind, mode: a.mode,
+        status: 'awaiting_payment', greeting: a.greeting, meetingUrl: a.mode === 'online' ? a.meetingUrl : undefined, assignedBy: a.by,
+      }
       const first = s.people.find((q) => q.id === a.personId)?.first ?? 'Client'
       const n = (k: 'booked' | 'payment', text: string, d: number) => ({ id: `n${a.id}${k}`, at: a.now + d, kind: k, text, personId: a.personId, seen: true })
       return {
         ...s, appts: [...s.appts, appt].sort((x, y) => x.start - y.start),
-        notices: [n('payment', `Payment link sent automatically to ${first}`, 2000), n('booked', `You booked ${first} and sent your greeting`, 0), ...s.notices],
+        requests: a.requestId ? s.requests.filter((r) => r.id !== a.requestId) : s.requests,
+        notices: [n('payment', `Payment link sent automatically to ${first}`, 2000), n('booked', `${first} got the time on WhatsApp and in the app`, 0), ...s.notices],
       }
     }
+    case 'setLink':
+      return { ...s, appts: s.appts.map((x) => x.id === a.apptId ? { ...x, meetingUrl: a.url.trim() || undefined } : x) }
+    case 'archive':
+      return { ...s, people: s.people.map((p) => p.id === a.personId ? { ...p, archived: a.on } : p) }
+    case 'send': {
+      const text = a.text.trim()
+      if (!text) return s
+      const msg = { id: `m${a.now}`, from: 'jb' as const, text, at: a.now }
+      const has = s.threads.some((t) => t.personId === a.personId)
+      const threads = has
+        ? s.threads.map((t) => t.personId === a.personId ? { ...t, messages: [...t.messages, msg], readAt: a.now } : t)
+        : [{ personId: a.personId, messages: [msg], readAt: a.now }, ...s.threads]
+      return { ...s, threads }
+    }
+    case 'readThread':
+      return { ...s, threads: s.threads.map((t) => t.personId === a.personId ? { ...t, readAt: Math.max(t.readAt, a.now) } : t) }
     case 'start':
       return { ...s, appts: s.appts.map((x) => x.id === a.apptId ? { ...x, status: 'in_session' } : x) }
     case 'checkIn':
@@ -128,5 +155,8 @@ export function useIndex() {
     return { person, byPerson, now }
   }, [s.people, s.appts, now])
 }
+
+/** Scanning sessions are 45 min; Bach flower first consultation 60, follow-up 30 (owner to confirm durations, D-09). */
+export function durationOf(service: Service, kind: Kind) { return service === 'scanning' ? 45 : kind === 'first' ? 60 : 30 }
 
 export const minutes = (n: number) => n * MIN

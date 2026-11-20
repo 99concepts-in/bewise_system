@@ -23,18 +23,20 @@ async function routes(page: Page) {
   await page.evaluate(() => localStorage.clear())
   await page.reload()
   await page.waitForSelector('.tdl-row')
-  await page.waitForFunction(() => localStorage.getItem('bewise.consult.v1'))
-  const s = await page.evaluate(() => JSON.parse(localStorage.getItem('bewise.consult.v1') || '{}'))
+  await page.waitForFunction(() => localStorage.getItem('bewise.consult.v2'))
+  const s = await page.evaluate(() => JSON.parse(localStorage.getItem('bewise.consult.v2') || '{}'))
   const pid = s.people.find((p: { drops?: unknown[] }) => p.drops)?.id ?? s.people[0].id
+  const scan = s.appts.find((a: { service: string; status: string }) => a.service === 'scanning' && a.status === 'completed')
   const aid = s.appts.find((a: { status: string; start: number }) => a.status === 'confirmed' && a.start > Date.now()).id
-  return ['/', '/sessions', '/people', `/people/${pid}`, `/session/${aid}`, '/growth']
+  const tid = s.threads[0].personId
+  return ['/', '/people', `/people/${pid}`, `/people/${scan.personId}`, '/messages', `/messages/${tid}`, '/dashboard', '/finance', '/sessions', `/session/${aid}`, '/growth']
 }
 
 /** Anything sticking out sideways, except deliberate horizontal scrollers. */
 async function overflow(page: Page) {
   return page.evaluate(() => {
     const W = document.documentElement.clientWidth
-    const scrollers = '.chips-scroll, .daystrip, .felt-chips'
+    const scrollers = '.chips-scroll, .daystrip, .felt-chips, .mood-strip, .quick-replies'
     const bad: string[] = []
     if (document.documentElement.scrollWidth > W + 1) bad.push(`page scrolls sideways: ${document.documentElement.scrollWidth} > ${W}`)
     for (const el of document.querySelectorAll<HTMLElement>('main *, nav *')) {
@@ -136,10 +138,12 @@ test.describe('performance budgets', () => {
       return (await page.evaluate(() => performance.now())) - t0
     }
     const results = {
-      sessions: await timeIt(() => page.getByRole('button', { name: 'Sessions' }).first().click(), '.sum'),
-      people: await timeIt(() => page.getByRole('button', { name: 'People' }).first().click(), '.people .row'),
-      growth: await timeIt(() => page.getByRole('button', { name: 'Growth' }).first().click(), '.impact-panel'),
-      calendar: await timeIt(async () => { await page.getByRole('button', { name: 'Today' }).first().click(); await page.getByRole('button', { name: 'Calendar' }).click() }, '.cal-grid'),
+      people: await timeIt(() => page.getByRole('button', { name: 'People' }).first().click(), '.board-card'),
+      messages: await timeIt(() => page.getByRole('button', { name: /^Messages/ }).first().click(), '.inbox-list .row'),
+      dashboard: await timeIt(() => page.getByRole('button', { name: 'Dashboard' }).first().click(), '.remedy-hero'),
+      finance: await timeIt(() => page.getByRole('button', { name: 'Finance' }).first().click(), '.fin-today'),
+      today: await timeIt(() => page.getByRole('button', { name: 'Today' }).first().click(), '.tdl-row'),
+      calendar: await timeIt(() => page.getByRole('button', { name: 'Calendar' }).first().click(), '.cal-grid'),
     }
     console.log('interaction ms', Object.fromEntries(Object.entries(results).map(([k, v]) => [k, Math.round(v)])))
     for (const [k, v] of Object.entries(results)) expect(v, k).toBeLessThan(400)
@@ -159,7 +163,7 @@ test.describe('offline & repeat visits', () => {
     await page.reload()
     await expect(page.locator('.tdl-row').first()).toBeVisible()
     await page.getByRole('button', { name: 'People' }).first().click()
-    await expect(page.locator('.people .row').first()).toBeVisible()
+    await expect(page.locator('.board-card').first()).toBeVisible()
     await context.setOffline(false)
   })
 })

@@ -4,7 +4,7 @@
  * Purpose:  Deterministic demo data generated relative to "now", so every state (done / now / next / quiet) is real.
  *           Names, quotes and numbers are illustrative only.
  */
-import type { Appt, Kind, Mode, Mood, Notice, Person } from './types'
+import type { Appt, ApptRequest, Kind, Mode, Mood, Notice, Person, Service, Staff, Thread } from './types'
 
 export const FLOWERS = [
   'Agrimony', 'Aspen', 'Beech', 'Centaury', 'Cerato', 'Cherry Plum', 'Chestnut Bud', 'Chicory', 'Clematis',
@@ -98,7 +98,24 @@ function mulberry32(seed: number) {
 
 export function startOfDay(t: number) { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime() }
 
-export interface Seed { people: Person[]; appts: Appt[]; notices: Notice[] }
+export interface Seed { people: Person[]; appts: Appt[]; notices: Notice[]; requests: ApptRequest[]; threads: Thread[] }
+type Draft = Omit<Appt, 'service'> & { service?: Service }
+
+/** Notes Jitu Bhaiya writes after a Scanning session (demo, illustrative wording — no diagnosis). */
+const SCAN_NOTES = [
+  'Energy low and scattered today. Shoulders and jaw holding stress. Suggested 10 minutes of slow breathing before sleep.',
+  'Much steadier than last time. Sleep pattern improving. Continue the evening walk and less screen time after 10 PM.',
+  'Restless mind, overthinking about work. Asked to write three worries down each night and close the notebook.',
+  'Grief still close to the surface. Gentle session. Suggested a weekly call with her sister and sunlight in the morning.',
+  'Feels drained after long workdays. Advised short breaks every 90 minutes and an early dinner.',
+  'Calmer overall. Wants to work on confidence before the interview next month. Practise the morning affirmation.',
+  'Tension around the stomach when anxious. Breath into the belly, 4 counts in and 6 out, three times a day.',
+  'Better focus this week. Family support has helped. Keep the gratitude note going.',
+]
+const meetLink = (rnd: () => number) => {
+  const c = () => 'abcdefghijkmnopqrstuvwxyz'[Math.floor(rnd() * 25)]
+  return `https://meet.google.com/${c()}${c()}${c()}-${c()}${c()}${c()}${c()}-${c()}${c()}${c()}`
+}
 
 export function makeSeed(now: number): Seed {
   const r = mulberry32(20261117)
@@ -106,7 +123,7 @@ export function makeSeed(now: number): Seed {
   const pickN = <T,>(xs: T[], n: number) => { const c = [...xs]; const o: T[] = []; while (o.length < n && c.length) o.push(c.splice(Math.floor(r() * c.length), 1)[0]); return o }
   const today = startOfDay(now)
   const people: Person[] = []
-  const appts: Appt[] = []
+  const appts: Draft[] = []
   const used = new Set<string>()
   const N = 128
   let aid = 1
@@ -236,11 +253,28 @@ export function makeSeed(now: number): Seed {
 
   appts.sort((a, b) => a.start - b.start)
 
+  // ---- two kinds of appointment (owner 2026-11-20): about a fifth of people come for Scanning, the rest for Bach flower remedies
+  const rs = mulberry32(2020)
+  const track = new Map<string, Service>()
+  for (const p of people) track.set(p.id, rs() < 0.22 ? 'scanning' : 'bach')
+  ;[0, 1, 2].forEach((i) => track.set(todayPeople[i].id, 'bach'))
+  ;[3, 4].forEach((i) => track.set(todayPeople[i].id, 'scanning'))
+  const STAFF: Staff[] = ['Haresh bhai', 'Shivani di', 'Haresh bhai', 'Jitu Bhaiya']
+  for (const a of appts) {
+    a.service = track.get(a.personId) ?? 'bach'
+    if (a.service === 'scanning') {
+      a.remedy = undefined; a.troubling = undefined
+      if (a.status === 'completed') a.privateNote = SCAN_NOTES[Math.floor(rs() * SCAN_NOTES.length)]
+    } else if (a.remedy) a.remedy.weeks = rs() < 0.5 ? 3 : 4
+    if (a.mode === 'online' && a.start > now - DAY && rs() < 0.8) a.meetingUrl = meetLink(rs)
+    if (a.start > now - HOUR && a.status !== 'completed') a.assignedBy = STAFF[Math.floor(rs() * STAFF.length)]
+  }
+
   // ---- benefits clients reported in their feedback (separate RNG so the rest of the demo stays stable)
   const rb = mulberry32(777)
   for (const a of appts) {
     if (a.status !== 'completed' || !a.rating || a.rating < 4) continue
-    const pool = [...new Set([...(a.troubling ?? []).flatMap((t) => CONCERN_BENEFITS[t] ?? []), 'Felt heard'])]
+    const pool = a.service === 'scanning' ? ['Felt heard', 'Calmer', 'Lighter', 'More energy', 'Clearer mind'] : [...new Set([...(a.troubling ?? []).flatMap((t) => CONCERN_BENEFITS[t] ?? []), 'Felt heard'])]
     const n = 1 + Math.floor(rb() * Math.min(3, pool.length))
     const chosen: string[] = []
     while (chosen.length < n) { const b = pool[Math.floor(rb() * pool.length)]; if (!chosen.includes(b)) chosen.push(b) }
@@ -264,6 +298,39 @@ export function makeSeed(now: number): Seed {
     }
   }
 
+  // ---- appointment requests: clients only ask; the team calls and assigns a time
+  const PREFS = ['Weekday evenings after 6 PM', 'Saturday morning', 'Any time this week', 'Tomorrow if possible', 'Lunch time, 1 to 2 PM', 'Online, any evening']
+  const hasUpcoming = (id: string) => appts.some((a) => a.personId === id && a.start > now)
+  const candidates = [...fresh.slice(14), ...inCare.slice(25)].filter((x) => !hasUpcoming(x.id) && !todayPeople.includes(x))
+  const reqPeople = [candidates[0], candidates[1], candidates[candidates.length - 1], candidates[candidates.length - 3], candidates[2]].filter(Boolean).filter((x, i, a) => a.indexOf(x) === i)
+  const requests: ApptRequest[] = reqPeople.map((pp, i) => ({
+    id: `r${i + 1}`, personId: pp.id, service: i === 1 || i === 4 ? 'scanning' : track.get(pp.id) ?? 'bach',
+    kind: appts.some((a) => a.personId === pp.id && a.status === 'completed') ? 'followup' : 'first',
+    mode: i % 3 === 0 ? 'in_person' : 'online', preferred: PREFS[i], note: i % 2 === 0 ? NOTES[(i + 3) % NOTES.length] : undefined,
+    at: now - (35 + i * 170) * MIN,
+  }))
+
+  // ---- in-app chat with Jitu Bhaiya (demo conversations; his replies never change medicines — he points to the doctor)
+  const CONVOS: [('c' | 'j'), string][][] = [
+    [['c', 'Namaste Bhaiya 🙏 I have been taking the drops 4 times a day. Sleep is a little better.'], ['j', 'So happy to hear that. Keep going, and note how you feel each evening.'], ['c', 'Thank you Bhaiya, will do.']],
+    [['c', 'Can I take the drops with my thyroid tablet?'], ['j', 'Please keep taking your medicine exactly as your doctor advised. Take the drops at a different time, 15 minutes apart. We can talk more in your session.']],
+    [['c', 'Bhaiya, my bottle will finish on Sunday. Should I book a follow-up?']],
+    [['c', 'Had a hard day at work, felt that old panic again.'], ['j', 'Thank you for telling me. Sit for a minute and breathe slowly, 4 counts in and 6 out. Let us speak tomorrow.'], ['c', 'Feeling calmer now 🙏']],
+    [['c', 'Can we do the scanning online this time? I am travelling next week.']],
+    [['j', 'Hope the week is going gently. Remember your drops tonight 🌿'], ['c', 'Missed two days, sorry Bhaiya. Starting again today.']],
+    [['c', 'My daughter is asking when her next session is.']],
+    [['c', 'Thank you for yesterday. I felt so light walking out.'], ['j', 'That makes my day. Keep the gratitude note going 🙏']],
+    [['c', 'Is the remedy alcohol-free? I do not take alcohol at all.'], ['j', 'Yes, every BeWise blend is alcohol-free.'], ['c', 'Perfect, thank you!']],
+    [['c', 'Bhaiya, the payment link is not opening on my phone.']],
+  ]
+  const chatPeople = inCare.slice(3, 3 + CONVOS.length)
+  const threads: Thread[] = chatPeople.map((pp, i) => {
+    let t = now - (i * 13 + 7) * HOUR
+    const messages = CONVOS[i].map(([from, text], k) => { t += (k ? 25 + k * 40 : 0) * MIN; return { id: `m${i}-${k}`, from: from === 'c' ? 'client' as const : 'jb' as const, text, at: t } })
+    const last = messages.at(-1)!
+    return { personId: pp.id, messages, readAt: last.from === 'client' ? last.at - MIN : last.at }
+  })
+
   // ---- notices
   const notices: Notice[] = []
   const nx = (minsAgo: number, kind: Notice['kind'], text: string, personId?: string) =>
@@ -277,5 +344,9 @@ export function makeSeed(now: number): Seed {
   const ck = people.find((p) => p.checkin?.harder.length)
   if (ck) nx(260, 'checkin', `${ck.first} filled the check-in before their follow-up`, ck.id)
   nx(26 * 60, 'payment', `${holdP.first} started booking a first consultation`, holdP.id)
-  return { people, appts, notices }
+  if (requests[0]) nx(35, 'request', `${nameOf(requests[0].personId)} asked for an appointment (${requests[0].preferred.toLowerCase()})`, requests[0].personId)
+  const assigned = appts.find((a) => a.start > now && a.assignedBy === 'Shivani di')
+  if (assigned) nx(70, 'booked', `Shivani di assigned ${nameOf(assigned.personId)} a time: ${new Date(assigned.start).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}`, assigned.personId)
+  notices.sort((a, b) => b.at - a.at)
+  return { people, appts: appts as Appt[], notices, requests, threads }
 }

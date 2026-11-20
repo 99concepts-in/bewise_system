@@ -56,3 +56,34 @@ export function nextFree(durationMin: number, appts: Appt[], av: Availability, n
   }
   return out
 }
+
+/**
+ * His timings are never fixed (owner 2026-11-20): staff may put a session at any time between 7 AM and 10 PM,
+ * as long as it doesn't clash with another session (10-minute gap). 15-minute steps.
+ */
+export function freeTimes(day: number, durationMin: number, appts: Appt[], now: number, ignoreId?: string, fromH = 7, toH = 22) {
+  const busy = appts
+    .filter((a) => a.id !== ignoreId && a.status !== 'no_show' && startOfDay(a.start) === day)
+    .map((a) => [a.start, a.start + a.durationMin * MIN + GAP] as const)
+  const out: { t: number; free: boolean }[] = []
+  for (let s = day + fromH * HOUR; s + durationMin * MIN <= day + toH * HOUR; s += 15 * MIN) {
+    if (s < now + 15 * MIN) continue
+    const e = s + durationMin * MIN + GAP
+    out.push({ t: s, free: !busy.some(([b0, b1]) => s < b1 && b0 < e) })
+  }
+  return out
+}
+
+/** Express: the next free times inside his usual working hours (10–1, 4–8), from now. */
+export function nextFreeAny(durationMin: number, appts: Appt[], now: number, count = 4, days = 14) {
+  const out: number[] = []
+  for (const day of nextDays(now, days)) {
+    if (new Date(day).getDay() === 0) continue
+    for (const { t, free } of freeTimes(day, durationMin, appts, now)) {
+      const h = new Date(t).getHours() + new Date(t).getMinutes() / 60
+      const usual = (h >= 10 && h + durationMin / 60 <= 13) || (h >= 16 && h + durationMin / 60 <= 20)
+      if (free && usual && new Date(t).getMinutes() % 30 === 0) { out.push(t); if (out.length >= count) return out }
+    }
+  }
+  return out
+}

@@ -2,12 +2,12 @@
  * Derived views: per-person summary, people filters, weekly stats and the "Needs you" insights.
  * Everything is computed from data — no hard-coded insight text.
  */
-import { pron, type Appt, type Mood, type Person } from '../data/types'
+import { pron, type Appt, type Mood, type Person, type Service } from '../data/types'
 import { CONCERN_FLOWERS, DAY, FLOWER_NOTE, HOUR, MIN, startOfDay } from '../data/seed'
 import { weekLoad, type Availability } from './slots'
 import { fmtTime, relative } from './time'
 
-export type Bucket = 'all' | 'care' | 'due' | 'new' | 'quiet' | 'missing'
+export type Bucket = 'all' | 'care' | 'due' | 'new' | 'quiet' | 'missing' | 'ending7' | 'ending14' | 'remedy' | 'scanning' | 'archived'
 
 export interface PersonView {
   p: Person
@@ -20,6 +20,9 @@ export interface PersonView {
   buckets: Bucket[]
   latestMood?: Mood
   avgRating?: number
+  service: Service // what they come for (latest appointment)
+  endsOn?: number // the current blend runs out on this day
+  daysLeft?: number // days until it runs out (negative = finished)
 }
 
 export function personView(p: Person, list: Appt[] = [], now: number): PersonView {
@@ -35,11 +38,20 @@ export function personView(p: Person, list: Appt[] = [], now: number): PersonVie
   if (dueOn && dueOn <= now && sinceLast < 120 * DAY) buckets.push('due')
   if (now - p.joinedAt < 30 * DAY) buckets.push('new')
   if (!next && sinceLast >= 120 * DAY) buckets.push('quiet')
+  const service: Service = (next ?? list.at(-1))?.service ?? 'bach'
+  const endsOn = blend?.remedy ? startOfDay(blend.remedy.givenAt) + (blend.remedy.weeks ?? 3) * 7 * DAY : undefined
+  const daysLeft = endsOn !== undefined ? Math.round((endsOn - startOfDay(now)) / DAY) : undefined
+  if (p.archived) return { p, sessions: list, past, last, next, blend, dueOn, buckets: ['all', 'archived'], latestMood: p.moods.at(-1)?.mood, service, endsOn, daysLeft }
   const ad = adherence(p, now)
-  if (ad && ad.last7Missed >= 3) buckets.push('missing')
+  const onRemedy = daysLeft !== undefined && daysLeft >= 0
+  if (onRemedy) buckets.push('remedy')
+  if (onRemedy && ad && ad.last7Missed >= 3) buckets.push('missing')
+  if (onRemedy && daysLeft! <= 7) buckets.push('ending7')
+  else if (onRemedy && daysLeft! <= 14) buckets.push('ending14')
+  if (service === 'scanning') buckets.push('scanning')
   const rated = done.filter((a) => a.rating)
   return {
-    p, sessions: list, past, last, next, blend, dueOn, buckets,
+    p, sessions: list, past, last, next, blend, dueOn, buckets, service, endsOn, daysLeft,
     latestMood: p.moods.at(-1)?.mood,
     avgRating: rated.length ? rated.reduce((s, a) => s + (a.rating ?? 0), 0) / rated.length : undefined,
   }
@@ -279,4 +291,43 @@ export function adherence(p: Person, now: number, span = 14): Adherence | null {
   for (let d = today; d >= since; d -= DAY) { if (byDay.get(d)) streak++; else if (d === today && !byDay.has(d)) continue; else break }
   const last7Missed = Array.from({ length: 7 }, (_, i) => today - i * DAY).filter((d) => d >= since && byDay.get(d) !== true).length
   return { days, pct: taken / total, streak, last7Missed, since, logged: p.drops.length }
+}
+
+// ---------------------------------------------------------------- remedy dashboard (who is taking it, who needs a word)
+export function remedyBoard(views: PersonView[], now: number) {
+  const on = views.filter((v) => v.buckets.includes('remedy'))
+  const missing: PersonView[] = [], regular: PersonView[] = [], silent: PersonView[] = []
+  for (const v of on) {
+    const a = adherence(v.p, now)
+    const recent = a?.days.slice(-3).some((d) => d.state !== 'none')
+    if (!a || !recent) silent.push(v)
+    else if (v.buckets.includes('missing')) missing.push(v)
+    else regular.push(v)
+  }
+  const byEnd = (a: PersonView, b: PersonView) => (a.daysLeft ?? 99) - (b.daysLeft ?? 99)
+  return {
+    on, regular, missing, silent,
+    ending7: on.filter((v) => v.buckets.includes('ending7')).sort(byEnd),
+    ending14: on.filter((v) => v.buckets.includes('ending14')).sort(byEnd),
+  }
+}
+
+// ---------------------------------------------------------------- scanning: summary of all his notes (rule-based stand-in for the AI summary, K6)
+const THEMES: [string, RegExp][] = [
+  ['Sleep', /sleep/i], ['Stress', /stress|tension|panic|anxious/i], ['Energy', /energy|drained|tired/i], ['Overthinking', /overthink|restless mind|worr/i],
+  ['Grief', /grief|loss/i], ['Confidence', /confiden/i], ['Breathing', /breath/i], ['Work', /work/i], ['Family', /family|sister|daughter|son/i], ['Focus', /focus/i],
+]
+export function scanSummary(sessions: Appt[]) {
+  const notes = sessions.filter((a) => a.service === 'scanning' && a.status === 'completed' && a.privateNote).sort((a, b) => a.start - b.start)
+  if (!notes.length) return null
+  const themes = THEMES.map(([name, re]) => [name, notes.filter((a) => re.test(a.privateNote!)).length] as [string, number]).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).slice(0, 4)
+  const last = notes.at(-1)!
+  const sentences = (t: string) => t.split(/(?<=\.)\s+/)
+  const advice = [...notes].reverse().flatMap((a) => sentences(a.privateNote!)).find((x) => /suggest|advis|continue|practi|keep|asked to/i.test(x))
+  return {
+    count: notes.length, since: notes[0].start, last,
+    themes,
+    lastLine: sentences(last.privateNote!)[0],
+    advice,
+  }
 }

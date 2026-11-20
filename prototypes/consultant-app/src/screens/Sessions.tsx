@@ -8,6 +8,7 @@ import { CalendarDays, CalendarPlus, ChevronDown, Leaf, MapPin, MessageCircle, S
 import { useIndex, useStore } from '../state/store'
 import { Avatar, Empty, Segmented, softSpring, spring } from '../ui/kit'
 import { useSheets, reminderText, waLink } from './Sheets'
+import { TypeBadge } from '../ui/bits'
 import { personView } from '../lib/derive'
 import { nextFree } from '../lib/slots'
 import { dayLabel, fmtMonth, fmtTime, relative } from '../lib/time'
@@ -43,7 +44,7 @@ export default function Sessions() {
   const actionFor = (a: Appt): Act | null => {
     const p = person.get(a.personId)!
     if (a.status === 'awaiting_payment') return { label: 'Remind', icon: 'remind', run: () => window.open(waLink(p.phone, reminderText(p.first, a.start, now)), '_blank', 'noopener') }
-    if (a.status === 'completed' && !a.remedy) return { label: 'Give remedy', icon: 'remedy', run: () => sheets.remedy(a.id) }
+    if (a.status === 'completed' && a.service === 'bach' && !a.remedy) return { label: 'Give remedy', icon: 'remedy', run: () => sheets.remedy(a.id) }
     if (latestDone.has(a.id)) return { label: 'Book', icon: 'book', run: () => sheets.express(a.personId) }
     return null
   }
@@ -55,7 +56,7 @@ export default function Sessions() {
   const unpaid = upcoming.filter((a) => a.status === 'awaiting_payment')
   const firsts = week.filter((a) => a.kind === 'first')
   const open = useMemo(() => nextFree(30, s.appts, s, now, 40, 7).length, [s, now])
-  const remedyDue = past.filter((a) => a.status === 'completed' && !a.remedy)
+  const remedyDue = past.filter((a) => a.status === 'completed' && a.service === 'bach' && !a.remedy)
   const followDue = past.filter((a) => latestDone.has(a.id))
   const noShows = past.filter((a) => a.status === 'no_show' && a.start > now - 30 * DAY)
   const month0 = new Date(now); month0.setDate(1); month0.setHours(0, 0, 0, 0)
@@ -70,7 +71,7 @@ export default function Sessions() {
   const list = useMemo(() => base.filter((a) => {
     if (focus === 'action' && a.status !== 'awaiting_payment') return false
     if (focus === 'first' && a.kind !== 'first') return false
-    if (focus === 'remedy' && !(a.status === 'completed' && !a.remedy)) return false
+    if (focus === 'remedy' && !(a.status === 'completed' && a.service === 'bach' && !a.remedy)) return false
     if (focus === 'followup' && !latestDone.has(a.id)) return false
     if (focus === 'noshow' && a.status !== 'no_show') return false
     if (dq) { const p = person.get(a.personId)!; if (!p.name.toLowerCase().includes(dq) && !p.city.toLowerCase().includes(dq)) return false }
@@ -104,7 +105,7 @@ export default function Sessions() {
         <div className="title-actions">
           <button className="icon-btn" aria-label={searching ? 'Close search' : 'Search'} aria-expanded={searching} onClick={() => { setSearching((x) => !x); setQ('') }}>{searching ? <X size={19} /> : <Search size={19} />}</button>
           <button className="icon-btn" aria-label="Calendar" onClick={sheets.calendar}><CalendarDays size={19} /></button>
-          <button className="sort-btn" onClick={() => sheets.express()}><Zap size={16} /><span className="hide-xs">Express</span></button>
+          <button className="sort-btn" onClick={() => sheets.newAppt()}><Zap size={16} /><span className="hide-xs">New</span></button>
         </div>
       </div>
       <AnimatePresence initial={false}>
@@ -126,7 +127,7 @@ export default function Sessions() {
           <div className="sum-stats">
             <button onClick={() => setFocus('all')}><b>{week.length}</b><span>sessions in the next 7 days</span></button>
             <button onClick={() => setFocus('first')}><b>{firsts.length}</b><span>first visits</span></button>
-            <button onClick={() => sheets.express()}><b>{open}</b><span>open slots left</span></button>
+            <button onClick={() => sheets.newAppt()}><b>{open}</b><span>free hours in usual times</span></button>
           </div>
         </> : <>
           <p className="sum-line">{remedyDue.length ? <><b>{remedyDue.length} {remedyDue.length === 1 ? 'remedy' : 'remedies'} still to give.</b> The office is waiting.</> : followDue.length ? <><b>{followDue.length} people are due a follow-up</b> and haven't booked yet.</> : <><b>All caught up.</b> Every session has its remedy.</>}</p>
@@ -175,7 +176,7 @@ function Row({ a, act, n, past }: { a: Appt; act: Act | null; n: number; past: b
   const soon = !past && a.start - now < 2 * 60 * MIN && a.start > now - 30 * MIN
   let sub: string
   if (past) sub = a.status === 'no_show' ? 'Did not come' : a.benefits?.length ? `Felt ${a.benefits.slice(0, 2).join(', ').toLowerCase()}` : a.rating ? 'Left a rating' : 'No feedback yet'
-  else sub = a.kind === 'first' ? 'First visit' : `Follow-up, session ${n}`
+  else sub = a.service === 'scanning' ? `session ${n}` : a.kind === 'first' ? 'first visit' : `session ${n}`
   const Icon = act?.icon === 'remind' ? MessageCircle : act?.icon === 'remedy' ? Leaf : CalendarPlus
   return (
     <li>
@@ -183,7 +184,7 @@ function Row({ a, act, n, past }: { a: Appt; act: Act | null; n: number; past: b
         <button className="row-hit" onClick={() => sheets.session(a.id)}>
           <span className="row-time">{fmtTime(a.start)}<small>{soon ? relative(a.start, now) : `${a.durationMin} min`}</small></span>
           <Avatar name={p.name} size={40} />
-          <span className="row-main"><b>{p.name}</b><small className={past && a.benefits?.length ? 'felt' : a.status === 'no_show' ? 'warn' : ''}>{sub}</small></span>
+          <span className="row-main"><b>{p.name}</b><small className={'with-badge ' + (past && a.benefits?.length ? 'felt' : a.status === 'no_show' ? 'warn' : '')}><TypeBadge service={a.service} />{sub}</small></span>
           {past && a.rating ? <span className="mini-rating"><Star size={12} />{a.rating}</span> : null}
         </button>
         <span className="row-end">

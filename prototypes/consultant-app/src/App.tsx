@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useLayoutEffect, useRef } from 'react'
 import { LazyMotion, MotionConfig, m } from 'motion/react'
-import { CalendarDays, Home, Sprout, Users } from 'lucide-react'
-import { StoreProvider } from './state/store'
+import { Home, IndianRupee, LayoutDashboard, MessageSquare, Users } from 'lucide-react'
+import { StoreProvider, useStore } from './state/store'
 import { ToastProvider, go, spring, useRoute } from './ui/kit'
 import { SheetsProvider } from './screens/Sheets'
 import Today from './screens/Today'
@@ -15,20 +15,31 @@ const People = lazyWithPreload(() => import('./screens/People'))
 const Profile = lazyWithPreload(() => import('./screens/Profile'))
 const Live = lazyWithPreload(() => import('./screens/Live'))
 const Growth = lazyWithPreload(() => import('./screens/Growth'))
+const Messages = lazyWithPreload(() => import('./screens/Messages'))
+const Dashboard = lazyWithPreload(() => import('./screens/Dashboard'))
+const Finance = lazyWithPreload(() => import('./screens/Finance'))
 const loadFeatures = () => import('./motionFeatures').then((r) => r.default)
 
 function prefetchAll() {
-  const run = () => { loadFeatures(); SheetBody.preload(); [Sessions, People, Profile, Live, Growth].forEach((c) => c.preload()) }
+  const run = () => { loadFeatures(); SheetBody.preload(); [People, Messages, Dashboard, Finance, Profile, Live, Sessions, Growth].forEach((c) => c.preload()) }
   const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => void }).requestIdleCallback
   if (ric) ric(run, { timeout: 1500 }); else setTimeout(run, 300)
 }
 
+// Owner 2026-11-20: Today · People (mood board) · Messages · Dashboard · Finance
 const TABS = [
   { path: '/', key: '', label: 'Today', Icon: Home },
-  { path: '/sessions', key: 'sessions', label: 'Sessions', Icon: CalendarDays },
   { path: '/people', key: 'people', label: 'People', Icon: Users },
-  { path: '/growth', key: 'growth', label: 'Growth', Icon: Sprout },
+  { path: '/messages', key: 'messages', label: 'Messages', Icon: MessageSquare },
+  { path: '/dashboard', key: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+  { path: '/finance', key: 'finance', label: 'Finance', Icon: IndianRupee },
 ]
+const TAB_OF: Record<string, string> = { sessions: '', session: '', growth: 'dashboard' }
+
+function useUnread() {
+  const { s } = useStore()
+  return s.threads.reduce((n, t) => n + t.messages.filter((x) => x.from === 'client' && x.at > t.readAt).length, 0)
+}
 
 function Shell() {
   const { parts, q } = useRoute()
@@ -55,7 +66,12 @@ function Shell() {
   else if (top === 'people' && parts[1]) screen = <Profile id={parts[1]} />
   else if (top === 'people') screen = <People initialBucket={(q || undefined) as Bucket | undefined} />
   else if (top === 'growth') screen = <Growth />
+  else if (top === 'messages') screen = <Messages pid={parts[1]} />
+  else if (top === 'dashboard') screen = <Dashboard />
+  else if (top === 'finance') screen = <Finance />
   else screen = <Today />
+  const activeTab = TAB_OF[top] ?? top
+  const unread = useUnread()
 
   return (
     <div className={'app' + (top === 'session' ? ' is-focus' : '')}>
@@ -63,17 +79,19 @@ function Shell() {
       <nav className="nav" aria-label="Main">
         <img className="nav-logo" src="./img/owl-drops-160.webp" width={40} height={40} alt="BeWise" decoding="async" />
         {TABS.map(({ path, key: k, label, Icon }) => {
-          const on = top === k
+          const on = activeTab === k
+          const n = k === 'messages' ? unread : 0
           return (
-            <button key={path} className={'nav-btn' + (on ? ' is-on' : '')} onClick={() => go(path)} aria-current={on ? 'page' : undefined} aria-label={label}>
+            <button key={path} className={'nav-btn' + (on ? ' is-on' : '')} onClick={() => go(path)} aria-current={on ? 'page' : undefined} aria-label={n ? `${label}, ${n} unread` : label}>
               {on && <m.span layoutId="nav-pill" className="nav-pill" transition={spring} />}
               <Icon size={21} strokeWidth={on ? 2.3 : 1.9} />
               <span className="nav-label">{label}</span>
+              {n > 0 && <span className="nav-badge" aria-hidden>{n}</span>}
             </button>
           )
         })}
       </nav>
-      <main id="main" className={'main' + (top === '' ? ' main-wide' : '')}>
+      <main id="main" className={'main' + (top === '' || top === 'messages' ? ' main-wide' : '')}>
         {/* Enter-only transition: the new screen never waits for the old one to leave (instant, and nothing can stall it). */}
         <m.div key={key} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}>
           <Suspense fallback={<ScreenSkeleton />}>{screen}</Suspense>
