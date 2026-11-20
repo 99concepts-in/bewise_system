@@ -301,9 +301,9 @@ function TodaysBlend() {
   return (
     <section className="card overflow-hidden p-5" aria-labelledby="blend-h">
       <div className="flex items-center gap-4">
-        <div className="relative grid h-[124px] w-[86px] shrink-0 place-items-center">
-          <span className="absolute inset-x-1 bottom-0 h-4 rounded-[50%] bg-navy/10 blur-[6px]" aria-hidden />
-          <RemedyBottle level={level} pulse={pulse} className="relative h-full w-full" />
+        <div className="relative flex w-[78px] shrink-0 justify-center">
+          <span className="absolute bottom-0 h-3 w-14 rounded-[50%] bg-navy/15 blur-[5px]" aria-hidden />
+          <RemedyBottle level={level} pulse={pulse} height={150} />
         </div>
         <div className="min-w-0 flex-1">
           <p className="eyebrow text-sage-text">Your remedy</p>

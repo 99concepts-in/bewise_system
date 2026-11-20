@@ -3,73 +3,48 @@
  * @module   remedies-ux
  * @owner    CLIENT
  * @screens  CL-08 Home blend card
- * Purpose:  Owner 2026-11-20: a remedy bottle that empties little by little as doses are checked in.
- *           `level` is 0..1 (what is left). The surface eases down on each dose and gently sways.
+ * Purpose:  Owner 2026-11-20: a realistic slim glass dropper bottle that empties little by little.
+ *           Layers: amber liquid (clipped to the inside of the glass by bottle-slim-mask.png) under the
+ *           photo-real bottle, which is multiplied on top so the glass, pipette and reflections show through.
+ *           `level` is 0..1 (what is left).
  */
 import { motion, useReducedMotion } from 'motion/react'
-import { useId } from 'react'
 import { BP } from '@/lib/asset'
 
-// body interior in viewBox units: liquid can sit between TOP (full) and BOTTOM (empty)
-const TOP = 58, BOTTOM = 141
+// inside of the glass, as % of the image height (measured from bottle-slim.webp, 113×440)
+const FULL = 37, EMPTY = 91.3
+const RATIO = 113 / 440
 
-export function RemedyBottle({ level, className, pulse = 0 }: { level: number; className?: string; pulse?: number }) {
-  const id = useId().replace(/:/g, '')
+export function RemedyBottle({ level, height = 168, pulse = 0 }: { level: number; height?: number; pulse?: number }) {
   const still = useReducedMotion()
   const l = Math.max(0, Math.min(1, level))
-  // keep a sliver visible until the bottle is truly empty
-  const y = l <= 0 ? BOTTOM + 2 : BOTTOM - Math.max(0.05, l) * (BOTTOM - TOP)
+  const top = l <= 0 ? 100 : EMPTY - Math.max(0.04, l) * (EMPTY - FULL)
+  const mask = `url(${BP}/img/bottle-slim-mask.png)`
   return (
-    <svg viewBox="0 0 100 150" className={className} role="img" aria-label={`Remedy bottle, about ${Math.round(l * 100)}% left`}>
-      <defs>
-        <clipPath id={`b${id}`}>
-          <path d="M28 47h44c8 0 13 6 13 13v73c0 7-6 12-13 12H28c-7 0-13-5-13-12V60c0-7 5-13 13-13Z" />
-        </clipPath>
-        <linearGradient id={`l${id}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f6d27c" />
-          <stop offset="1" stopColor="#d4923a" />
-        </linearGradient>
-        <linearGradient id={`g${id}`} x1="0" x2="1">
-          <stop offset="0" stopColor="#ffffff" stopOpacity=".75" />
-          <stop offset=".5" stopColor="#eef2fb" stopOpacity=".55" />
-          <stop offset="1" stopColor="#dfe5f4" stopOpacity=".8" />
-        </linearGradient>
-      </defs>
-
-      {/* dropper: bulb + collar */}
-      <rect x="39" y="2" width="22" height="24" rx="11" fill="#243D91" />
-      <rect x="34" y="23" width="32" height="13" rx="3.5" fill="#1b2c6b" />
-      {/* neck */}
-      <rect x="40" y="35" width="20" height="13" rx="2" fill={`url(#g${id})`} stroke="#c6d0e8" strokeWidth="1.5" />
-
-      {/* glass body */}
-      <path d="M28 47h44c8 0 13 6 13 13v73c0 7-6 12-13 12H28c-7 0-13-5-13-12V60c0-7 5-13 13-13Z" fill={`url(#g${id})`} />
-      <g clipPath={`url(#b${id})`}>
-        <motion.g initial={false} animate={{ y }} transition={still ? { duration: 0 } : { type: 'spring', stiffness: 60, damping: 14 }}>
-          {/* wide wavy surface that sways sideways; liquid fills down to the base */}
-          <motion.path
-            d="M-60 0 q 12.5 -5 25 0 t 25 0 t 25 0 t 25 0 t 25 0 t 25 0 t 25 0 t 25 0 V 120 H -60 Z"
-            fill={`url(#l${id})`}
-            animate={still ? undefined : { x: [0, 50] }}
-            transition={{ duration: 3.2, ease: 'linear', repeat: Infinity }}
-          />
-          {/* a ripple each time a dose is taken */}
+    <div className="relative" style={{ height, width: height * RATIO }} role="img" aria-label={`Remedy bottle, about ${Math.round(l * 100)}% left`}>
+      {/* liquid, clipped to the inside of the glass */}
+      <div className="absolute inset-0" style={{ WebkitMaskImage: mask, maskImage: mask, WebkitMaskSize: '100% 100%', maskSize: '100% 100%' }} aria-hidden>
+        <motion.div className="absolute inset-x-0 bottom-0" initial={false} animate={{ top: `${top}%` }}
+          transition={still ? { duration: 0 } : { type: 'spring', stiffness: 50, damping: 14 }}>
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,#f6d184_0%,#eab45c_50%,#d9963f_100%)] opacity-90" />
+          {/* glass light through the liquid */}
+          <div className="absolute inset-y-0 left-[30%] w-[12%] bg-white/35 blur-[1.5px]" />
+          <div className="absolute inset-y-0 right-[24%] w-[5%] bg-white/25" />
+          {/* surface, seen slightly from above */}
+          <div className="absolute inset-x-0 -top-[3px] h-[6px] rounded-[50%] bg-[#f8dc97]" />
           {pulse > 0 && !still && (
-            <motion.ellipse key={pulse} cx="50" cy="0" rx="10" ry="2.4" fill="none" stroke="#fff" strokeWidth="1.4"
-              initial={{ scale: 0.4, opacity: 0.9 }} animate={{ scale: 3, opacity: 0 }} transition={{ duration: 0.9, ease: 'easeOut' }} />
+            <motion.span key={pulse} className="absolute left-1/2 -top-[3px] h-[6px] w-full -translate-x-1/2 rounded-[50%] border border-white/90"
+              initial={{ scaleX: 0.2, opacity: 1 }} animate={{ scaleX: 1, opacity: 0 }} transition={{ duration: 0.8, ease: 'easeOut' }} />
           )}
-        </motion.g>
-      </g>
-      <path d="M28 47h44c8 0 13 6 13 13v73c0 7-6 12-13 12H28c-7 0-13-5-13-12V60c0-7 5-13 13-13Z" fill="none" stroke="#c6d0e8" strokeWidth="2" />
-      {/* glass shine */}
-      <path d="M22 64c0-5 2-8 6-9" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity=".9" />
-      <path d="M22 72v40" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" opacity=".55" />
-
-      {/* label sits on the shoulder so the liquid level stays visible below it */}
-      <rect x="25" y="58" width="50" height="19" rx="5" fill="#fff" opacity=".96" />
-      <image href={`${BP}/img/brand/bewise-mark.svg`} x="28.5" y="61.5" width="12" height="12" />
-      <text x="42" y="67" fontSize="5.6" fontWeight="800" fill="#243D91" fontFamily="inherit">Flower</text>
-      <text x="42" y="73.5" fontSize="5.6" fontWeight="800" fill="#243D91" fontFamily="inherit">Remedy</text>
-    </svg>
+        </motion.div>
+      </div>
+      {/* the bottle photo, multiplied so its white background disappears and the glass sits over the liquid */}
+      <img src={`${BP}/img/bottle-slim.webp`} alt="" className="absolute inset-0 h-full w-full mix-blend-multiply" draggable={false} />
+      {/* label on the upper body, so the level stays visible below it */}
+      <div className="absolute inset-x-[15%] top-[43%] flex flex-col items-center rounded-[2px] bg-[linear-gradient(90deg,#e9ecf3_0%,#fff_28%,#fff_70%,#e4e7ef_100%)] py-[6%]" aria-hidden>
+        <img src={`${BP}/img/brand/bewise-mark.svg`} alt="" className="w-[36%]" />
+        <span className="mt-[2px] text-center text-[5.5px] font-bold uppercase leading-[1.25] tracking-[0.06em] text-navy">Flower<br />Remedy</span>
+      </div>
+    </div>
   )
 }

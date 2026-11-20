@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-20 · Realistic remedy bottle on Home
+- Replaced the drawn bottle with a photo-real slim clear-glass dropper bottle (Higgsfield render, public/img/bottle-slim.webp). Amber liquid is a CSS layer clipped to the inside of the glass by public/img/bottle-slim-mask.png, with the bottle multiplied on top, so the level still drops day by day and dips on each dose (surface ripple). Small BeWise "Flower Remedy" label on the upper body keeps the level visible.
+
 ## 2026-11-20 · My care tidy-up
 - Removed the "Running low? Reorder" card from My care (owner). Reordering a blend is still possible from the shop's personal blend card.
 - Past blends row redesigned: the version badge no longer squeezes, "Blend 1 · Current" with "Since DD/MM/YYYY", and every remedy shown as a wrapping chip instead of a clipped line.
