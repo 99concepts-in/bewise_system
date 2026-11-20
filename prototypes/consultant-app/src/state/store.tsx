@@ -24,6 +24,7 @@ export type Action =
   | { type: 'book'; personId: string; start: number; service: Service; kind: Kind; mode: Mode; id: string; now: number; greeting: string; meetingUrl?: string; by: Staff; requestId?: string }
   | { type: 'setLink'; apptId: string; url: string }
   | { type: 'archive'; personId: string; on: boolean }
+  | { type: 'addNote'; personId: string; id: string; at: number; text: string }
   | { type: 'send'; personId: string; text: string; now: number }
   | { type: 'readThread'; personId: string; now: number }
   | { type: 'start'; apptId: string }
@@ -83,6 +84,11 @@ export function reducer(s: State, a: Action): State {
       return { ...s, appts: s.appts.map((x) => x.id === a.apptId ? { ...x, meetingUrl: a.url.trim() || undefined } : x) }
     case 'archive':
       return { ...s, people: s.people.map((p) => p.id === a.personId ? { ...p, archived: a.on } : p) }
+    case 'addNote': {
+      const text = a.text.trim()
+      if (!text) return s
+      return { ...s, people: s.people.map((p) => p.id === a.personId ? { ...p, notes: [...(p.notes ?? []), { id: a.id, at: a.at, text }] } : p) }
+    }
     case 'send': {
       const text = a.text.trim()
       if (!text) return s

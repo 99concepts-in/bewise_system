@@ -298,6 +298,15 @@ describe('two kinds of appointment', () => {
     expect(s.advice).toBe('Continue the evening walk.')
     expect(scanSummary([appt({ service: 'bach', status: 'completed' })])).toBeNull()
   })
+  it('notes added from the profile join the summary and the timeline', () => {
+    const sessions = [appt({ service: 'scanning', status: 'completed', start: NOW - 20 * DAY, privateNote: 'Grief close to the surface.' })]
+    const s = scanSummary(sessions, [{ id: 'n1', at: NOW - DAY, text: 'Called after the session. Sleep better. Keep the morning sunlight.' }])!
+    expect(s.count).toBe(1)
+    expect(s.notes).toBe(2)
+    expect(s.lastLine).toBe('Called after the session.')
+    expect(s.advice).toBe('Keep the morning sunlight.')
+    expect(scanSummary([], [{ id: 'n2', at: NOW, text: 'First impressions.' }])!.count).toBe(0)
+  })
 })
 
 describe('requests, remedy ending, archive, messages', () => {

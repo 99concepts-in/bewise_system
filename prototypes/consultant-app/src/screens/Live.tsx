@@ -42,7 +42,7 @@ export default function Live({ id }: { id: string }) {
   const ended = a.status === 'completed' || a.status === 'no_show'
   const { obj, poss } = pron(p)
   const scanning = a.service === 'scanning'
-  const scan = scanning ? scanSummary(history) : null
+  const scan = scanning ? scanSummary(history, p?.notes) : null
 
   return (
     <div className="screen live">

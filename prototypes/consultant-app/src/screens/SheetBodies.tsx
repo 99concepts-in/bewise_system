@@ -3,7 +3,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, MessageSquare, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat, Inbox, NotebookPen, ScanLine, Flower2 } from 'lucide-react'
+import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, MessageSquare, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat, Inbox, NotebookPen, Brain, Flower2 } from 'lucide-react'
 import { durationOf, useIndex, useStore } from '../state/store'
 import { Avatar, Chip, Segmented, go, softSpring, spring, useToast } from '../ui/kit'
 import { dayLabel, fmtDay, fmtShort, fmtTime, relative, inr } from '../lib/time'
@@ -392,7 +392,7 @@ function NewApptBody({ o, close, api }: { o: Extract<Open, { k: 'new' }>; close:
       <p className="muted small">What is it for?</p>
       <div className="svc-pick">
         <button className="svc svc-bach" onClick={() => setService('bach')}><Flower2 size={26} /><b>Bach flower remedy</b><small>Consultation, then a remedy</small></button>
-        <button className="svc svc-scanning" onClick={() => setService('scanning')}><ScanLine size={26} /><b>Scanning</b><small>Session with your notes only</small></button>
+        <button className="svc svc-scanning" onClick={() => setService('scanning')}><Brain size={26} /><b>Scanning</b><small>Intuitive session, your notes only</small></button>
       </div>
     </div>
   )

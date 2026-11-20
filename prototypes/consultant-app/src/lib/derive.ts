@@ -317,17 +317,27 @@ const THEMES: [string, RegExp][] = [
   ['Sleep', /sleep/i], ['Stress', /stress|tension|panic|anxious/i], ['Energy', /energy|drained|tired/i], ['Overthinking', /overthink|restless mind|worr/i],
   ['Grief', /grief|loss/i], ['Confidence', /confiden/i], ['Breathing', /breath/i], ['Work', /work/i], ['Family', /family|sister|daughter|son/i], ['Focus', /focus/i],
 ]
-export function scanSummary(sessions: Appt[]) {
-  const notes = sessions.filter((a) => a.service === 'scanning' && a.status === 'completed' && a.privateNote).sort((a, b) => a.start - b.start)
+export type ScanNote = { id: string; start: number; text: string; extra?: boolean }
+/** Every scanning note, oldest first: notes saved at the end of a session + notes added from the profile. */
+export function scanNotes(sessions: Appt[], extra: { id: string; at: number; text: string }[] = []): ScanNote[] {
+  return [
+    ...sessions.filter((a) => a.service === 'scanning' && a.status === 'completed' && a.privateNote).map((a) => ({ id: a.id, start: a.start, text: a.privateNote! })),
+    ...extra.map((n) => ({ id: n.id, start: n.at, text: n.text, extra: true })),
+  ].sort((a, b) => a.start - b.start)
+}
+
+export function scanSummary(sessions: Appt[], extra: { id: string; at: number; text: string }[] = []) {
+  const notes = scanNotes(sessions, extra)
   if (!notes.length) return null
-  const themes = THEMES.map(([name, re]) => [name, notes.filter((a) => re.test(a.privateNote!)).length] as [string, number]).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).slice(0, 4)
+  const sessionCount = notes.filter((n) => !n.extra).length
+  const themes = THEMES.map(([name, re]) => [name, notes.filter((n) => re.test(n.text)).length] as [string, number]).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).slice(0, 4)
   const last = notes.at(-1)!
   const sentences = (t: string) => t.split(/(?<=\.)\s+/)
-  const advice = [...notes].reverse().flatMap((a) => sentences(a.privateNote!)).find((x) => /suggest|advis|continue|practi|keep|asked to/i.test(x))
+  const advice = [...notes].reverse().flatMap((n) => sentences(n.text)).find((x) => /suggest|advis|continue|practi|keep|asked to/i.test(x))
   return {
-    count: notes.length, since: notes[0].start, last,
+    count: sessionCount, notes: notes.length, since: notes[0].start, last,
     themes,
-    lastLine: sentences(last.privateNote!)[0],
+    lastLine: sentences(last.text)[0],
     advice,
   }
 }

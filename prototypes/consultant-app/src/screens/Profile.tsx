@@ -1,14 +1,14 @@
 /**
  * @screens CN-13 Client profile — Bach flower: progress, feelings week, troubling over time, blend, drops. Scanning: notes history + summary. Archive.
  */
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { m } from 'motion/react'
-import { Archive, ArchiveRestore, ArrowLeft, CalendarPlus, Leaf, Lock, MapPin, MessageCircle, MessageSquare, Phone, Sparkles, Star, Video } from 'lucide-react'
+import { Archive, ArchiveRestore, ArrowLeft, CalendarPlus, Leaf, MapPin, NotebookPen, Plus, MessageCircle, MessageSquare, Phone, Sparkles, Star, Video } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
 import { Avatar, MoodFace, Empty, go, softSpring, useToast } from '../ui/kit'
 import { TypeBadge } from '../ui/bits'
 import { useSheets, STATUS_LABEL, typeLabel, waLink } from './Sheets'
-import { personView, scanSummary, sinceLastRemedy } from '../lib/derive'
+import { personView, scanNotes, scanSummary, sinceLastRemedy } from '../lib/derive'
 import { AdherenceCard } from '../ui/care'
 import { dayLabel, fmtLong, fmtShort, fmtTime, fmtWeekday, relative } from '../lib/time'
 import { DAY, MIN, startOfDay } from '../data/seed'
@@ -68,7 +68,7 @@ export default function Profile({ id }: { id: string }) {
         <div>{v.next ? <b>{dayLabel(v.next.start, now)}</b> : v.dueOn ? <b>{v.dueOn < now ? 'Due now' : fmtShort(v.dueOn)}</b> : <b className="dim">Not set</b>}<span>{v.next ? 'next session' : 'follow-up'}</span></div>
       </div>
 
-      {v.service === 'scanning' && <ScanNotes sessions={v.sessions} first={p.first} now={now} />}
+      {v.service === 'scanning' && <ScanNotes sessions={v.sessions} personId={p.id} extra={p.notes} first={p.first} now={now} />}
 
       {v.service === 'bach' && <>
       <section className="card pf-card">
@@ -153,29 +153,53 @@ export default function Profile({ id }: { id: string }) {
 }
 
 /** Scanning clients: his notes after every session + a summary of all of them (AI in the live app, K6). */
-function ScanNotes({ sessions, first, now }: { sessions: Appt[]; first: string; now: number }) {
-  const sum = scanSummary(sessions)
-  const notes = sessions.filter((a) => a.service === 'scanning' && a.status === 'completed' && a.privateNote).reverse()
+function ScanNotes({ sessions, personId, extra, first, now }: { sessions: Appt[]; personId: string; extra?: { id: string; at: number; text: string }[]; first: string; now: number }) {
+  const { dispatch } = useStore()
+  const toast = useToast()
+  const [adding, setAdding] = useState(false)
+  const [text, setText] = useState('')
+  const sum = scanSummary(sessions, extra)
+  const notes = scanNotes(sessions, extra).reverse()
+  const save = () => {
+    if (!text.trim()) return
+    const at = Date.now()
+    dispatch({ type: 'addNote', personId, id: `note-${at}`, at, text })
+    setText(''); setAdding(false)
+    toast('Note saved')
+  }
   return (
     <>
       <section className="card pf-card scan-sum">
         <h2><Sparkles size={16} /> Summary of all notes</h2>
         {sum ? (
           <ul className="three">
-            <li>{sum.count} scanning {sum.count === 1 ? 'session' : 'sessions'} since {fmtLong(sum.since)}.</li>
+            <li>{sum.count} scanning {sum.count === 1 ? 'session' : 'sessions'}{sum.notes > sum.count ? ` and ${sum.notes - sum.count} added ${sum.notes - sum.count === 1 ? 'note' : 'notes'}` : ''} since {fmtLong(sum.since)}.</li>
             {sum.themes.length > 0 && <li>Comes up most: {sum.themes.map(([t, n]) => `${t.toLowerCase()} (${n})`).join(', ')}.</li>}
-            <li>Last time ({fmtShort(sum.last.start)}): {sum.lastLine}</li>
+            <li>Last note ({fmtShort(sum.last.start)}): {sum.lastLine}</li>
             {sum.advice && <li>To follow up: {sum.advice}</li>}
           </ul>
-        ) : <p className="muted small">After the first scanning session, add notes and the summary appears here.</p>}
+        ) : <p className="muted small">Add a note after each scanning session and the summary appears here.</p>}
         <p className="tagline">Auto summary of your notes. Only you can see them.</p>
       </section>
       <section className="card pf-card">
-        <h2><Lock size={16} /> Notes after each scanning</h2>
-        {notes.length === 0 && <p className="muted small">No notes yet for {first}.</p>}
+        <div className="notes-head">
+          <h2><NotebookPen size={16} /> Notes after each scanning</h2>
+          {!adding && <button type="button" className="cal-btn" onClick={() => setAdding(true)}><Plus size={15} /> Add a note</button>}
+        </div>
+        {adding && (
+          <form className="note-add" onSubmit={(e) => { e.preventDefault(); save() }}>
+            <label className="sr-only" htmlFor="note-add">New note for {first}</label>
+            <textarea id="note-add" className="notes" rows={3} autoFocus value={text} onChange={(e) => setText(e.target.value)} placeholder={`What you felt in ${first}'s scanning today, what you suggested…`} onKeyDown={(e) => { if (e.key === 'Escape') { setAdding(false); setText('') } }} />
+            <div className="note-add-actions">
+              <button type="button" className="btn btn-quiet" onClick={() => { setAdding(false); setText('') }}>Cancel</button>
+              <button type="submit" className="btn btn-primary" disabled={!text.trim()}>Save note</button>
+            </div>
+          </form>
+        )}
+        {notes.length === 0 && !adding && <p className="muted small">No notes yet for {first}.</p>}
         <ol className="note-tl">
-          {notes.map((a) => (
-            <li key={a.id}><span className="nt-date">{fmtShort(a.start)}<small>{relative(a.start, now)}</small></span><p>{a.privateNote}</p></li>
+          {notes.map((n) => (
+            <li key={n.id}><span className="nt-date">{fmtShort(n.start)}<small>{relative(n.start, now)}</small></span><p>{n.text}</p></li>
           ))}
         </ol>
       </section>

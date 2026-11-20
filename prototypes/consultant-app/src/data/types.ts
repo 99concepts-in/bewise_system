@@ -24,6 +24,7 @@ export interface Person {
   moods: { day: number; mood: Mood }[] // journal entries (shared with him), newest last
   checkin?: { at: number; better: string[]; same: string[]; harder: string[] }
   drops?: { day: number; taken: boolean }[] // client ticks "took my drops" in their app (CL-26); missing day = not logged
+  notes?: { id: string; at: number; text: string }[] // scanning notes added from the profile (not tied to a session)
   archived?: boolean // hidden from the mood board and remedy lists; restorable
 }
 

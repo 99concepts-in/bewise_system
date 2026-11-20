@@ -3,14 +3,14 @@
  */
 import { useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { Flower2, ScanLine } from 'lucide-react'
+import { Brain, Flower2 } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
 import { relative } from '../lib/time'
 import type { Appt, Kind, Service } from '../data/types'
 
 /** Bach flower vs Scanning — always the same colour + icon + word, so they are told apart at a glance. */
 export function TypeBadge({ service, kind, big }: { service: Service; kind?: Kind; big?: boolean }) {
-  const Icon = service === 'scanning' ? ScanLine : Flower2
+  const Icon = service === 'scanning' ? Brain : Flower2
   return <span className={`type-badge type-${service}${big ? ' big' : ''}`}><Icon size={big ? 15 : 12} aria-hidden />{service === 'scanning' ? 'Scanning' : kind === 'first' ? 'Bach flower, first visit' : 'Bach flower'}</span>
 }
 

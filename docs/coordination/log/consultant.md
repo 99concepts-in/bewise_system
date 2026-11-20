@@ -54,3 +54,12 @@
 **Breaking changes:** none
 **Next:** K1 code as soon as FOUNDATION ✅
 
+
+## 2026-11-20 — Owner feedback round (nav, scanning icon, notes)
+**Status:** Done
+- Nav: focus ring now sits inside the pill (no double ring); on desktop the unread count sits in line at the end of the row.
+- Scanning badge uses a mind icon (it is an intuitive session); Bach flower keeps the flower.
+- Scanning profile: notes card uses a notes icon and has **Add a note** (saved on the person, `people[].notes`); the summary counts sessions and added notes together.
+- Today: Calendar / New buttons aligned to the end of the header.
+- Tests: 45 unit, 109 browser passed (3 skipped).
+- Backend note: profile notes need `scheduling`/CRM storage when wiring (HUB P0) — e.g. `client_notes (id, client_id, body, created_at)` consultant-only.
