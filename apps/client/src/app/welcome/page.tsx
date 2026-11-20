@@ -215,9 +215,6 @@ function ArtEssence() {
           <defs><linearGradient id="amb" x1="0" x2="1"><stop offset="0" stopColor="#7a4312" /><stop offset=".45" stopColor="#c7832f" /><stop offset="1" stopColor="#6c3a10" /></linearGradient></defs>
           <rect x="31" y="0" width="28" height="16" rx="4" fill="#5b3412" />
           <path d="M22 16h46c8 0 13 6 13 14v86c0 8-6 14-14 14H23c-8 0-14-6-14-14V30c0-8 5-14 13-14Z" fill="url(#amb)" />
-          <rect x="18" y="58" width="54" height="40" rx="6" fill="#f5efe4" />
-          <text x="45" y="76" textAnchor="middle" fontSize="9" fontWeight="800" fill="#182957">BeWise</text>
-          <text x="45" y="88" textAnchor="middle" fontSize="6" fontWeight="600" fill="#5f667a">flower remedies</text>
           <path d="M16 36c0-5 3-9 7-9" stroke="#fff" strokeOpacity=".5" strokeWidth="4" strokeLinecap="round" fill="none" />
         </svg>
         {/* dropper: bulb + glass pipette, starts inside the neck */}
@@ -230,6 +227,12 @@ function ArtEssence() {
             <path d="M9.5 70h5v30l-1.6 10h-1.8L9.5 100Z" fill="#e2a24c" />
           </svg>
         </motion.div>
+        {/* label drawn above the pipette so the text is never covered (owner 2026-11-20: "Flower Remedy") */}
+        <svg viewBox="0 0 90 130" className="pointer-events-none absolute" style={{ left: 46, top: 128, width: 82, height: 118 }}>
+          <rect x="18" y="58" width="54" height="40" rx="6" fill="#f5efe4" />
+          <text x="45" y="76" textAnchor="middle" fontSize="9" fontWeight="800" fill="#182957">BeWise</text>
+          <text x="45" y="88" textAnchor="middle" fontSize="6.4" fontWeight="600" fill="#5f667a">Flower Remedy</text>
+        </svg>
         {/* drops: fall from the pipette tip (stage ≈ x 199, y 108) onto the mood character */}
         <AnimatePresence>
           {phase === 'drop' && drops > 0 && drops <= 4 && (
