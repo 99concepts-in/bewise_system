@@ -1,0 +1,35 @@
+# BeWise client app — Hostinger (Apache / LiteSpeed) config for the static export.  @owner CLIENT
+#  is replaced by the build script ("" for a domain/subdomain root, "/folder" for a sub-folder).
+Options -Indexes
+DirectoryIndex index.html
+DirectorySlash On
+AddType application/manifest+json .webmanifest
+AddType image/webp .webp
+
+RewriteEngine On
+# HTTPS everywhere — the onboarding camera only works on a secure origin
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+ErrorDocument 404 /404.html
+
+<IfModule mod_headers.c>
+  Header always set Permissions-Policy "camera=(self), microphone=(self), geolocation=()"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Strict-Transport-Security "max-age=31536000"
+  # Preview build: keep it out of search engines
+  Header always set X-Robots-Tag "noindex, nofollow"
+  <FilesMatch "\.(html|txt|webmanifest|json)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(webp|png|jpg|jpeg|svg|ico|woff2?)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript application/json application/manifest+json image/svg+xml
+</IfModule>
