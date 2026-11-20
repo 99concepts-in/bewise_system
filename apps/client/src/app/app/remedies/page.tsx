@@ -8,20 +8,20 @@
  *   Flower art now uses the real Bach vectors (FlowerArt), with a soft fallback while a file is missing.
  */
 import { motion } from 'motion/react'
-import { Bell, CalendarHeart, ChevronRight, Lightbulb, ShoppingBag } from 'lucide-react'
+import { Bell, CalendarHeart, ChevronRight, Lightbulb } from 'lucide-react'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Mascot, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
 import { FaqCard } from '@/components/faq'
 import { FlowerArt, FlowerTile } from '@/components/flower'
 import { SessionDateArt } from '@/components/session-art'
-import { Btn, BtnLink, Item, Reveal, Sheet, buzz, ease, toast, useChrome } from '@/components/ui'
-import { BACH_REMEDIES, CONSULTATIONS, moodOf, REORDER_PRICE_PAISE, type ConsultationId } from '@/lib/data'
+import { Btn, BtnLink, Item, Reveal, Sheet, ease, toast } from '@/components/ui'
+import { BACH_REMEDIES, CONSULTATIONS, moodOf, type ConsultationId } from '@/lib/data'
 import type { Appointment } from '@/lib/store'
 import { useApp } from '@/lib/store'
 import { isUpcoming, tbc, whenShort } from '@/lib/appt'
-import { dayKey, fmtDay, fmtTime, formatINR } from '@/lib/format'
+import { dayKey, fmtDay, fmtTime } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
 import { DoseTracker } from '@/components/dose-tracker'
 import { blendSupply } from '@/lib/supply'
@@ -40,11 +40,8 @@ export default function Remedies() {
   const blend = useApp((s) => s.blend)
   const appointments = useApp((s) => s.appointments)
   const journal = useApp((s) => s.journal)
-  const addToCart = useApp((s) => s.addToCart)
-  const { flyToBag } = useChrome()
   const [flower, setFlower] = useState<string | null>(null)
   const [times, setTimes] = useState(false)
-  const reorderRef = useRef<HTMLButtonElement>(null)
 
   if (!blend) return (
     <main className="px-5 pb-32">
@@ -71,11 +68,6 @@ export default function Remedies() {
   const left = sup.daysLeft
   const lines = progressLines(journal, blend.startedOn)
   const mix = moodMix(journal)
-  const reorder = () => {
-    addToCart('remedy-reorder'); buzz(12)
-    const r = reorderRef.current?.getBoundingClientRect(); if (r) flyToBag(r, `${BP}/img/products/bach-remedy-dropper.webp`)
-    toast(`Blend added to cart · ${formatINR(REORDER_PRICE_PAISE)}`)
-  }
 
   return (
     <main className="px-5 pb-32">
@@ -161,20 +153,22 @@ export default function Remedies() {
           </Item>
         )}
 
-        <Item>
-          <section className="card flex items-center gap-4 p-5">
-            <div className="flex-1"><h2 className="h-section">Running low?</h2><p className="text-[13px] text-muted">Reorder the same blend · {formatINR(REORDER_PRICE_PAISE)}</p></div>
-            <Btn ref={reorderRef} size="md" onClick={reorder}><ShoppingBag className="size-4" /> Reorder</Btn>
-          </section>
-        </Item>
-
         <Item><PastSessions /></Item>
         <Item>
           <section className="card p-5">
             <h2 className="h-section">Past blends</h2>
-            <div className="mt-3 flex items-center gap-3 rounded-[20px] bg-sky-50 p-3">
-              <span className="grid size-11 place-items-center rounded-full bg-white text-[13px] font-extrabold text-navy">v{blend.version}</span>
-              <div className="flex-1"><p className="text-[14px] font-bold text-navy">Current · since {fmtDay(blend.startedOn)}</p><p className="truncate text-[12px] text-muted">{blend.flowers.join(', ')}</p></div>
+            {/* owner 2026-11-20: tidy row; badge never squeezes, every remedy is shown (wraps, no clipping) */}
+            <div className="mt-3 rounded-[20px] bg-sky-50 p-4">
+              <div className="flex items-center gap-3">
+                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-[14px] font-extrabold text-navy shadow-[var(--shadow-card)]">v{blend.version}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="flex flex-wrap items-center gap-2 text-[15px] font-bold text-navy">Blend {blend.version}<span className="rounded-full bg-teal-100 px-2 py-0.5 text-[11px] font-bold text-sage-text">Current</span></p>
+                  <p className="text-[13px] text-muted">Since {fmtDay(blend.startedOn)}</p>
+                </div>
+              </div>
+              <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Remedies in this blend">
+                {blend.flowers.map((f) => <li key={f} className="rounded-full bg-white px-3 py-1 text-[12px] font-semibold text-navy">{f}</li>)}
+              </ul>
             </div>
             <p className="mt-3 text-[12px] text-muted">Earlier blends appear here after each follow-up.</p>
           </section>

@@ -2,6 +2,10 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-20 · My care tidy-up
+- Removed the "Running low? Reorder" card from My care (owner). Reordering a blend is still possible from the shop's personal blend card.
+- Past blends row redesigned: the version badge no longer squeezes, "Blend 1 · Current" with "Since DD/MM/YYYY", and every remedy shown as a wrapping chip instead of a clipped line.
+
 ## 2026-11-20 · Check-in order
 - "Since we last met" (check-in and follow-up intake): options now read Harder · Same · Better, so Better sits on the right (owner).
 
