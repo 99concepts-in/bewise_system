@@ -1,6 +1,6 @@
 /* BeWise consultant prototype — static asset cache for instant repeat loads.
  * Caches only the app shell and static files (no API data exists in this prototype; the real app never caches /consult API responses). */
-const VERSION = 'bw-consult-v3'
+const VERSION = 'bw-consult-v4' // v5 Blue Bloom (HUB 2026-11-20): new fonts, logo kit, flower and feeling art
 self.addEventListener('install', (e) => { self.skipWaiting() })
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim()))
@@ -11,7 +11,7 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url)
   if (url.origin !== location.origin) return
   // hashed assets, fonts, images: cache first (immutable)
-  if (/\/(assets|fonts|img)\//.test(url.pathname) || /\.(png|ico|webmanifest)$/.test(url.pathname)) {
+  if (/\/(assets|fonts|img|brand)\//.test(url.pathname) || /\.(png|ico|webmanifest)$/.test(url.pathname)) {
     e.respondWith(caches.open(VERSION).then(async (c) => {
       const hit = await c.match(req)
       if (hit) return hit
