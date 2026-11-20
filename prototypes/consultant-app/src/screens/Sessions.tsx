@@ -1,12 +1,14 @@
 /**
  * @screens CN-16 / CN-14 — Sessions, calm by default: a short summary, what needs you (with inline actions),
  *          the next 7 days, everything else folded away. Past shows what people said they felt.
+ * v5 (HUB 2026-11-20): Blue Bloom header with the official logo; past sessions show their blend as flower thumbnails.
  */
 import { useDeferredValue, useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { CalendarDays, CalendarPlus, ChevronDown, Leaf, MapPin, MessageCircle, Search, Star, Video, X, Zap } from 'lucide-react'
+import { CalendarDays, CalendarPlus, ChevronDown, Droplet, MapPin, MessageCircle, Search, Star, Video, X, Zap } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { Avatar, Empty, Segmented, softSpring, spring } from '../ui/kit'
+import { AppHeader, Avatar, Empty, Segmented, softSpring, spring } from '../ui/kit'
+import { FlowerStack } from '../ui/art'
 import { useSheets, reminderText, waLink } from './Sheets'
 import { personView } from '../lib/derive'
 import { nextFree } from '../lib/slots'
@@ -99,13 +101,13 @@ export default function Sessions() {
 
   return (
     <div className="screen sessions">
+      <AppHeader>
+        <button className="icon-btn" aria-label={searching ? 'Close search' : 'Search'} aria-expanded={searching} onClick={() => { setSearching((x) => !x); setQ('') }}>{searching ? <X size={20} /> : <Search size={20} />}</button>
+        <button className="icon-btn" aria-label="Calendar" onClick={sheets.calendar}><CalendarDays size={20} /></button>
+      </AppHeader>
       <div className="title-row">
         <h1 className="page-title">Sessions</h1>
-        <div className="title-actions">
-          <button className="icon-btn" aria-label={searching ? 'Close search' : 'Search'} aria-expanded={searching} onClick={() => { setSearching((x) => !x); setQ('') }}>{searching ? <X size={19} /> : <Search size={19} />}</button>
-          <button className="icon-btn" aria-label="Calendar" onClick={sheets.calendar}><CalendarDays size={19} /></button>
-          <button className="sort-btn" onClick={() => sheets.express()}><Zap size={16} /><span className="hide-xs">Express</span></button>
-        </div>
+        <button className="sort-btn" onClick={() => sheets.express()}><Zap size={16} aria-hidden />Express booking</button>
       </div>
       <AnimatePresence initial={false}>
         {searching && (
@@ -176,7 +178,7 @@ function Row({ a, act, n, past }: { a: Appt; act: Act | null; n: number; past: b
   let sub: string
   if (past) sub = a.status === 'no_show' ? 'Did not come' : a.benefits?.length ? `Felt ${a.benefits.slice(0, 2).join(', ').toLowerCase()}` : a.rating ? 'Left a rating' : 'No feedback yet'
   else sub = a.kind === 'first' ? 'First visit' : `Follow-up, session ${n}`
-  const Icon = act?.icon === 'remind' ? MessageCircle : act?.icon === 'remedy' ? Leaf : CalendarPlus
+  const Icon = act?.icon === 'remind' ? MessageCircle : act?.icon === 'remedy' ? Droplet : CalendarPlus
   return (
     <li>
       <div className={'row row-split' + (soon ? ' is-soon' : '')}>
@@ -184,14 +186,14 @@ function Row({ a, act, n, past }: { a: Appt; act: Act | null; n: number; past: b
           <span className="row-time">{fmtTime(a.start)}<small>{soon ? relative(a.start, now) : `${a.durationMin} min`}</small></span>
           <Avatar name={p.name} size={40} />
           <span className="row-main"><b>{p.name}</b><small className={past && a.benefits?.length ? 'felt' : a.status === 'no_show' ? 'warn' : ''}>{sub}</small></span>
-          {past && a.rating ? <span className="mini-rating"><Star size={12} />{a.rating}</span> : null}
+          {past && a.rating ? <span className="mini-rating"><Star size={13} aria-hidden />{a.rating}</span> : null}
         </button>
         <span className="row-end">
           {act ? (
             <m.button className={`act act-${act.icon}`} whileTap={{ scale: 0.94 }} onClick={act.run}>
-              <Icon size={14} />{act.label}
+              <Icon size={15} aria-hidden />{act.label}
             </m.button>
-          ) : !past && <span className="mode-ic" role="img" aria-label={a.mode === 'online' ? 'Online' : 'In person'}>{a.mode === 'online' ? <Video size={15} /> : <MapPin size={15} />}</span>}
+          ) : past && a.remedy ? <FlowerStack flowers={a.remedy.flowers} size={24} max={3} /> : !past && <span className="mode-ic" role="img" aria-label={a.mode === 'online' ? 'Online' : 'In person'}>{a.mode === 'online' ? <Video size={15} /> : <MapPin size={15} />}</span>}
         </span>
       </div>
     </li>

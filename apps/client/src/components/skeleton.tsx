@@ -14,7 +14,7 @@ export function AppSkeleton() {
       </div>
       <div className="mt-7 space-y-2.5"><Bar w="46%" h={30} r={10} /><Bar w="78%" h={22} r={8} /></div>
       {[132, 210, 150].map((h, i) => (
-        <div key={i} className="mt-4 rounded-[28px] bg-white/80 p-5 shadow-[var(--shadow-card)]" style={{ height: h }}>
+        <div key={i} className="mt-4 rounded-[24px] bg-white/80 p-5 shadow-[var(--shadow-card)]" style={{ height: h }}>
           <Bar w="42%" h={18} r={8} /><div className="mt-3"><Bar w="68%" h={12} r={6} /></div>
         </div>
       ))}

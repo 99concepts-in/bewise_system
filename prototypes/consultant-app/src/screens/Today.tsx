@@ -1,15 +1,19 @@
 /**
  * @screens CN-03 Today — share link, today's appointments with check-in (+ calendar), impact, "Needs you" insights, motivation.
+ * v5 (HUB 2026-11-20, D-45 "Blue Bloom"): serif greeting, navy summary card (sessions · blends to give · today's sales),
+ *          a calm session timeline with each client's chosen feelings as coloured chips, a safety dot, check-in state,
+ *          and one floating primary action (build the pending remedy, or start the session that's ready).
  */
 import { useMemo, useState } from 'react'
 import { AnimatePresence, m, useMotionValue, useTransform } from 'motion/react'
-import { Bell, MapPin, Video, Play, Sparkles, ChevronRight, MessageCircle, Link2, CalendarDays, UserCheck, Leaf, Check, ClipboardCheck, ClipboardList } from 'lucide-react'
+import { Bell, MapPin, Video, Play, Sparkles, ChevronRight, MessageCircle, Link2, CalendarDays, UserCheck, Check, ClipboardCheck, ClipboardList, Droplet, Users, CalendarPlus, Quote } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { CountUp, Empty, go, softSpring, spring, useMedia, useToast } from '../ui/kit'
-import { useSheets, waLink, reminderText } from './Sheets'
+import { AppHeader, CountUp, Empty, go, spring, useMedia, useToast } from '../ui/kit'
+import { FeelingChips, FlowerStack } from '../ui/art'
+import { useSheets, waLink, reminderText, FEE } from './Sheets'
 import { ImpactCard } from './Impact'
 import { insights, personView, growth, WEEK_GOAL, LIFETIME_REACH, type Insight, type PersonView } from '../lib/derive'
-import { fmtTime, greeting, relative } from '../lib/time'
+import { fmtDay, fmtTime, greeting, relative, inr } from '../lib/time'
 import { MIN, startOfDay, DAY } from '../data/seed'
 import type { Appt } from '../data/types'
 
@@ -30,24 +34,43 @@ export default function Today() {
   const wide = useMedia('(min-width: 1180px)')
   const inCare = useMemo(() => [...views.values()].filter((v) => v.buckets.includes('care')).length, [views])
 
+  // v5 summary: everything from existing data (fees per session kind; a blend is due from every session that happens)
+  const attended = todays.filter((a) => a.status !== 'no_show')
+  const blendsToGive = attended.filter((a) => !a.remedy).length
+  const sales = attended.reduce((sum, a) => sum + FEE[a.kind], 0)
+
   const sub = todays.length === 0 ? 'No sessions today. A good day for follow-ups.'
     : !next ? `All ${todays.length} sessions done. Thank you for today.`
     : live ? `You're with ${person.get(live.personId)?.first} now.`
     : `${done} of ${todays.length} done. Next at ${fmtTime(next.start)}.`
 
+  // one primary action on this screen (spec §4): the remedy that's waiting, else the session that's ready to start
+  const pendingRemedy = todays.find((a) => a.status === 'completed' && !a.remedy)
+  const ready = todays.find((a) => a.status === 'in_session') ?? todays.find((a) => a.status === 'checked_in')
+  const pill = pendingRemedy
+    ? { label: `Build ${person.get(pendingRemedy.personId)?.first}'s remedy`, Icon: Droplet, run: () => sheets.remedy(pendingRemedy.id) }
+    : ready ? { label: `${ready.status === 'in_session' ? 'Open' : 'Start'} ${person.get(ready.personId)?.first}'s session`, Icon: Play, run: () => go(`/session/${ready.id}`) }
+    : null
+
   return (
     <div className="screen today">
-      <header className="topbar">
-        <img className="me" src="./img/jitu.webp" width={44} height={44} alt="Jitu Bhaiya" />
-        <div className="brand"><b>BeWise</b><span>Consultant</span></div>
-        <m.button className="share-btn" onClick={sheets.share} whileTap={{ scale: 0.95 }}><Link2 size={16} /> Share my link</m.button>
+      <AppHeader>
+        <m.button className="icon-btn" onClick={sheets.share} whileTap={{ scale: 0.94 }} aria-label="Share my link"><Link2 size={20} /></m.button>
         <button className="icon-btn" aria-label={`Updates${unread ? `, ${unread} new` : ''}`} onClick={sheets.notices}>
           <Bell size={20} />
           <AnimatePresence>{unread > 0 && <m.span className="badge" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring}>{unread}</m.span>}</AnimatePresence>
         </button>
-      </header>
+      </AppHeader>
 
-      <h1 className="hello"><span>{greeting(now)}, Jitu Bhaiya.</span><span className="hello-sub">{sub}</span></h1>
+      <p className="eyebrow">{fmtDay(now)}</p>
+      <h1 className="hello">{greeting(now)}, Jitu Bhaiya</h1>
+      <p className="hello-sub">{sub}</p>
+
+      <m.section className="summary" aria-label="Today at a glance" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+        <p><b><CountUp to={todays.length} /></b><span>{todays.length === 1 ? 'session' : 'sessions'}</span></p>
+        <p><b><CountUp to={blendsToGive} /></b><span>{blendsToGive === 1 ? 'blend to give' : 'blends to give'}</span></p>
+        <p><b><CountUp to={sales} format={(n) => inr(Math.round(n))} /></b><span>today's sales</span></p>
+      </m.section>
 
       {(() => {
         const list = <TodayList todays={todays} next={next} done={done} now={now} />
@@ -66,7 +89,7 @@ export default function Today() {
               <div className="week-stats">
                 <p><b><CountUp to={g.thisWeek} /></b> of {WEEK_GOAL} sessions done this week</p>
                 <p className="muted small">{g.thisWeek >= WEEK_GOAL ? 'Weekly goal reached. Remember to rest too.' : g.thisWeek + g.bookedRest >= WEEK_GOAL ? `${g.bookedRest} more booked. You're on track for your goal.` : `${g.bookedRest} more booked, ${WEEK_GOAL - g.thisWeek - g.bookedRest} open ${WEEK_GOAL - g.thisWeek - g.bookedRest === 1 ? 'spot' : 'spots'} to your goal.`}</p>
-                <p className="reach"><Sparkles size={14} /> <span><b><CountUp to={inCare} /></b> people in your care right now, part of the {(LIFETIME_REACH).toLocaleString('en-IN')}+ lives you've reached</span></p>
+                <p className="reach"><Sparkles size={15} aria-hidden /> <span><b><CountUp to={inCare} /></b> people in your care right now, part of the {(LIFETIME_REACH).toLocaleString('en-IN')}+ lives you've reached</span></p>
               </div>
             </div>
             <KindWords appts={g.kind} />
@@ -79,115 +102,90 @@ export default function Today() {
       })()}
 
       {todays.length === 0 && <Empty img="owl-read" title="A quiet day" body="No sessions booked today. Follow-ups that are due are a gentle place to start." action={<button className="btn btn-quiet" onClick={() => go('/people?due')}>See follow-ups due</button>} />}
+
+      <AnimatePresence>
+        {pill && (
+          <m.button key={pill.label} className="fab" onClick={pill.run} initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 24, opacity: 0 }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }} whileTap={{ scale: 0.97 }}>
+            <pill.Icon size={20} aria-hidden /> {pill.label}
+          </m.button>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
 
-// ---------------------------------------------------------------- the bloom
-function Bloom({ appts, now, onPetal }: { appts: Appt[]; now: number; onPetal: (a: Appt) => void }) {
-  const n = Math.max(appts.length, 1)
-  const nextIdx = appts.findIndex((a) => a.status === 'in_session' || a.status === 'checked_in' || (a.start > now - 15 * MIN && a.status === 'confirmed'))
-  const w = Math.min(1, 6 / n)
-  return (
-    <svg className="bloom" viewBox="0 0 200 200" role="group" aria-label={`${appts.length} sessions today`}>
-      <defs>
-        <linearGradient id="petal-done" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stopColor="#182957" /><stop offset="1" stopColor="#5E7FB8" /></linearGradient>
-        <radialGradient id="core" cx="0.5" cy="0.45" r="0.6"><stop offset="0" stopColor="#FFF8E8" /><stop offset="1" stopColor="#E9D9B4" /></radialGradient>
-      </defs>
-      {appts.length === 0 && <circle cx="100" cy="100" r="62" fill="none" stroke="#C9D2EC" strokeDasharray="4 6" strokeWidth="2" />}
-      {appts.map((a, i) => {
-        const st = a.status === 'completed' || a.status === 'no_show' ? 'done' : i === nextIdx ? 'next' : 'later'
-        const angle = (360 / n) * i - 90 + (n === 1 ? 90 : 0)
-        return (
-          <g key={a.id} transform={`translate(100 100) rotate(${angle + 90})`}>
-            <m.g
-              initial={{ scale: 0, rotate: -24, opacity: 0 }}
-              animate={{ scale: 1, rotate: 0, opacity: 1 }}
-              transition={{ ...softSpring, delay: 0.12 + i * 0.09 }}
-              style={{ originX: '0px', originY: '0px' }}
-            >
-              <m.path
-                className={`petal petal-${st}`}
-                d="M0,-14 C-27,-32 -31,-74 0,-90 C31,-74 27,-32 0,-14Z"
-                transform={`scale(${w} 1)`}
-                animate={st === 'next' ? { scale: [1, 1.05, 1] } : undefined}
-                transition={st === 'next' ? { duration: 2.6, repeat: Infinity, ease: 'easeInOut' } : undefined}
-                style={{ originX: '0px', originY: '-14px' }}
-                tabIndex={0}
-                role="button"
-                aria-label={`${fmtTime(a.start)}, ${st === 'done' ? 'done' : st === 'next' ? 'next' : 'later'}`}
-                onClick={() => onPetal(a)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onPetal(a) }}
-              />
-            </m.g>
-          </g>
-        )
-      })}
-      <m.circle cx="100" cy="100" r="17" fill="url(#core)" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ ...softSpring, delay: 0.05 }} style={{ originX: '100px', originY: '100px' }} />
-    </svg>
-  )
-}
-
-// ---------------------------------------------------------------- today's appointments with check-in
+// ---------------------------------------------------------------- today's sessions: a calm timeline
 function TodayList({ todays, next, done, now }: { todays: Appt[]; next?: Appt; done: number; now: number }) {
-  const { person } = useIndex()
+  const { person, byPerson } = useIndex()
   const { s, dispatch } = useStore()
   const sheets = useSheets()
   const toast = useToast()
-  if (todays.length === 0) return (
-    <section className="card today-list" aria-label="Today's appointments">
-      <div className="tdl-head"><div><h2>Today's appointments</h2><small>None booked</small></div><button className="cal-btn" onClick={sheets.calendar}><CalendarDays size={16} /> Calendar</button></div>
-    </section>
-  )
+  const checkedIn = todays.filter((a) => a.status === 'checked_in').length
   return (
-    <section className="card today-list" aria-label="Today's appointments">
-      <div className="tdl-head">
-        <div className="mini-bloom"><Bloom appts={todays} now={now} onPetal={(a) => sheets.session(a.id)} /></div>
-        <div><h2>Today's appointments</h2><small>{done} of {todays.length} done{todays.filter((a) => a.status === 'checked_in').length ? `, ${todays.filter((a) => a.status === 'checked_in').length} checked in` : ''}</small></div>
-        <button className="cal-btn" onClick={sheets.calendar}><CalendarDays size={16} /> Calendar</button>
+    <section className="block today-list" aria-label="Today's appointments">
+      <div className="block-head">
+        <h2>Today's sessions</h2>
+        <button className="link link-ic" onClick={sheets.calendar}><CalendarDays size={16} aria-hidden /> Calendar</button>
       </div>
-      <ul className="tdl">
+      {todays.length === 0
+        ? <p className="muted small">None booked.</p>
+        : <p className="muted small tl-sum">{done} of {todays.length} done{checkedIn ? `, ${checkedIn} checked in` : ''}</p>}
+      <ol className="tl">
         {todays.map((a, i) => {
           const p = person.get(a.personId)!
           const isNext = a === next
           const fin = a.status === 'completed' || a.status === 'no_show'
           const soon = a.start - now < 2 * 60 * MIN
           const form = a.kind === 'followup' ? (p.checkin && now - p.checkin.at < 10 * DAY ? 'filled' : 'missing') : null
+          // what the client chose when booking; for sessions already held, what was troubling them
+          const lastTroubling = [...(byPerson.get(p.id) ?? [])].reverse().find((x) => x.start < a.start && x.troubling)?.troubling
+          const feelings = a.feelings ?? a.troubling ?? lastTroubling ?? []
           let action: JSX.Element | null = null
-          if (a.status === 'confirmed' && soon) action = <m.button className="tdl-act act-in" whileTap={{ scale: 0.94 }} onClick={() => { dispatch({ type: 'checkIn', apptId: a.id }); toast(`${p.first} ${a.mode === 'online' ? 'has joined' : 'has arrived'}. Start when you're ready.`) }}><UserCheck size={14} /> Check in</m.button>
-          else if (a.status === 'checked_in') action = <m.button className="tdl-act act-start" whileTap={{ scale: 0.94 }} onClick={() => go(`/session/${a.id}`)}><Play size={14} /> Start</m.button>
-          else if (a.status === 'in_session') action = <m.button className="tdl-act act-start" whileTap={{ scale: 0.94 }} onClick={() => go(`/session/${a.id}`)}><Play size={14} /> Open</m.button>
-          else if (a.status === 'completed' && !a.remedy) action = <m.button className="tdl-act act-remedy" whileTap={{ scale: 0.94 }} onClick={() => sheets.remedy(a.id)}><Leaf size={14} /> Give remedy</m.button>
-          else if (fin) action = <span className="tdl-done">{a.status === 'no_show' ? "Didn't come" : <><Check size={14} /> Done</>}</span>
+          if (a.status === 'confirmed' && soon) action = <m.button className="btn btn-quiet btn-sm" whileTap={{ scale: 0.95 }} onClick={() => { dispatch({ type: 'checkIn', apptId: a.id }); toast(`${p.first} ${a.mode === 'online' ? 'has joined' : 'has arrived'}. Start when you're ready.`) }}><UserCheck size={16} aria-hidden /> Check in</m.button>
+          else if (a.status === 'checked_in') action = <m.button className="btn btn-quiet btn-sm" whileTap={{ scale: 0.95 }} onClick={() => go(`/session/${a.id}`)}><Play size={16} aria-hidden /> Start</m.button>
+          else if (a.status === 'in_session') action = <m.button className="btn btn-quiet btn-sm" whileTap={{ scale: 0.95 }} onClick={() => go(`/session/${a.id}`)}><Play size={16} aria-hidden /> Open</m.button>
+          else if (a.status === 'completed' && !a.remedy) action = <m.button className="btn btn-quiet btn-sm" whileTap={{ scale: 0.95 }} onClick={() => sheets.remedy(a.id)}><Droplet size={16} aria-hidden /> Give remedy</m.button>
+          const state = a.status === 'checked_in' ? { cls: 'teal', text: a.mode === 'online' ? 'Joined' : 'Checked in', tick: true }
+            : a.status === 'in_session' ? { cls: 'blue', text: 'In session', tick: false }
+            : a.status === 'completed' ? { cls: 'done', text: 'Done', tick: true }
+            : a.status === 'no_show' ? { cls: 'coral', text: "Didn't come", tick: false }
+            : isNext ? { cls: 'sky', text: relative(a.start, now), tick: false } : null
           return (
-            <m.li key={a.id} className={'tdl-row' + (fin ? ' is-fin' : '') + (isNext ? ' is-next' : '') + (a.status === 'in_session' ? ' is-live' : '')} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.05, duration: 0.24 }}>
-              <div className="tdl-line">
-                <button className="tdl-who" onClick={() => sheets.session(a.id)}>
-                  <span className="tdl-time">{fmtTime(a.start)}<small>{isNext && !fin ? (a.status === 'in_session' ? 'now' : relative(a.start, now)) : `${a.durationMin} min`}</small></span>
-                  <span className="tdl-main"><b>{p.name}</b>
-                    <small>{a.mode === 'online' ? <Video size={12} /> : <MapPin size={12} />} {a.kind === 'first' ? 'First visit' : 'Follow-up'}{a.status === 'checked_in' ? (a.mode === 'online' ? ', joined' : ', arrived') : ''}</small></span>
-                </button>
-                {action}
-              </div>
-              {!fin && form && (
-                <div className="tdl-form">
-                  {form === 'filled'
-                    ? <button className="form-ok" onClick={() => go(`/people/${p.id}`)}><ClipboardCheck size={13} /> Check-in form filled {relative(p.checkin!.at, now)}</button>
-                    : <a className="form-miss" href={waLink(p.phone, `Namaste ${p.first} 🙏 Before our follow-up at ${fmtTime(a.start)}, please fill the 2-minute check-in in the BeWise app so I can see how you've been. Jitu Bhaiya`)} target="_blank" rel="noreferrer"><ClipboardList size={13} /> No check-in form yet. Ask {p.first}</a>}
+            <m.li key={a.id} className={'tdl-row' + (fin ? ' is-fin' : '') + (isNext ? ' is-next' : '') + (a.status === 'in_session' ? ' is-live' : '')} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05, duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
+              <span className="tl-rail" aria-hidden><i className="tl-dot">{fin && a.status === 'completed' ? <Check size={10} strokeWidth={3.4} /> : null}</i></span>
+              <div className="tl-card">
+                <div className="tl-top">
+                  <span className="tl-time">{fmtTime(a.start)}<span className="muted"> · {a.durationMin} min</span></span>
+                  {a.safety && !fin && <span className="safety" role="img" aria-label="Safety answer in the intake. Read it before the session." title="Safety answer in the intake. Read it before the session." />}
+                  {state && <span className={`state state-${state.cls}`}>{state.tick && <Check size={13} strokeWidth={3} aria-hidden />}{state.text}</span>}
                 </div>
-              )}
-              {isNext && a.note && !fin && <p className="tdl-note">“{a.note}”</p>}
+                <button className="tl-hit" onClick={() => sheets.session(a.id)}>
+                  <span className="tl-name">{p.name}</span>
+                  <span className="tl-meta">{a.mode === 'online' ? <Video size={15} aria-hidden /> : <MapPin size={15} aria-hidden />}{a.kind === 'first' ? 'First consultation' : 'Follow-up'}<i aria-hidden>·</i>{a.mode === 'online' ? 'Online' : 'Studio'}</span>
+                </button>
+                {feelings.length > 0 && !fin && <FeelingChips items={feelings} size="sm" />}
+                {isNext && a.note && !fin && <p className="tdl-note">“{a.note}”</p>}
+                {(action || (!fin && form) || (fin && a.remedy)) && (
+                  <div className="tl-foot">
+                    {!fin && form === 'filled' && <button className="form-ok" onClick={() => go(`/people/${p.id}`)}><ClipboardCheck size={15} aria-hidden /> Check-in filled {relative(p.checkin!.at, now)}</button>}
+                    {!fin && form === 'missing' && <a className="form-miss" href={waLink(p.phone, `Namaste ${p.first} 🙏 Before our follow-up at ${fmtTime(a.start)}, please fill the 2-minute check-in in the BeWise app so I can see how you've been. Jitu Bhaiya`)} target="_blank" rel="noreferrer"><ClipboardList size={15} aria-hidden /> Ask for check-in</a>}
+                    {fin && a.remedy && <span className="tl-blend"><FlowerStack flowers={a.remedy.flowers} size={26} /><span className="muted small">Blend given</span></span>}
+                    {action}
+                  </div>
+                )}
+              </div>
             </m.li>
           )
         })}
-      </ul>
+      </ol>
       {todays.length > 0 && !next && <p className="muted small tdl-end">That's everyone for today. Tomorrow: {s.appts.filter((x) => startOfDay(x.start) === startOfDay(now) + DAY).length} sessions booked.</p>}
     </section>
   )
 }
 
 // ---------------------------------------------------------------- insight deck (swipe to dismiss)
-const TONE_IMG: Record<Insight['tone'], string> = { rose: 'owl-drops', mist: 'owl-read', sage: 'owl-wave', gold: 'owl-wave' }
+const TONE_ACCENT: Record<Insight['tone'], string> = { rose: 'coral', mist: 'sky', sage: 'teal', gold: 'marigold' }
+const ACTION_ICON: Record<Insight['action']['kind'], typeof Droplet> = { 'give-remedy': Droplet, whatsapp: MessageCircle, person: ClipboardList, people: Users, saturday: CalendarPlus, session: Play }
 function InsightDeck({ items, views }: { items: Insight[]; views: Map<string, PersonView> }) {
   const { s, dispatch, now } = useStore()
   const sheets = useSheets()
@@ -212,7 +210,7 @@ function InsightDeck({ items, views }: { items: Insight[]; views: Map<string, Pe
   }
   const visible = items.slice(0, 3)
   return (
-    <div className="deck" style={{ height: 196 }}>
+    <div className="deck" style={{ height: 206 }}>
       <AnimatePresence initial={false}>
         {visible.map((it, i) => (
           <DeckCard key={it.key} it={it} depth={i} total={items.length} onAct={() => act(it)} onDismiss={() => dispatch({ type: 'dismiss', key: it.key })} />
@@ -224,13 +222,14 @@ function InsightDeck({ items, views }: { items: Insight[]; views: Map<string, Pe
 
 function DeckCard({ it, depth, total, onAct, onDismiss }: { it: Insight; depth: number; total: number; onAct: () => void; onDismiss: () => void }) {
   const x = useMotionValue(0)
-  const rotate = useTransform(x, [-220, 0, 220], [-8, 0, 8])
+  const rotate = useTransform(x, [-220, 0, 220], [-6, 0, 6])
   const top = depth === 0
+  const Icon = ACTION_ICON[it.action.kind]
   return (
     <m.article
-      className={`insight tone-${it.tone}`}
+      className="insight"
       style={{ x: top ? x : 0, rotate: top ? rotate : 0, zIndex: 10 - depth }}
-      initial={{ scale: 0.9, y: 22, opacity: 0 }}
+      initial={{ scale: 0.92, y: 22, opacity: 0 }}
       animate={{ scale: 1 - depth * 0.05, y: depth * 12, opacity: depth > 1 ? 0.6 : 1 }}
       exit={{ x: x.get() < 0 ? -420 : 420, opacity: 0, transition: { duration: 0.25 } }}
       transition={spring}
@@ -242,15 +241,15 @@ function DeckCard({ it, depth, total, onAct, onDismiss }: { it: Insight; depth: 
       }}
       aria-hidden={!top}
     >
-      <img className="insight-owl" src={`./img/${TONE_IMG[it.tone]}-160.webp`} width={72} height={72} alt="" decoding="async" />
+      <span className={`insight-ic tone-${TONE_ACCENT[it.tone]}`} aria-hidden><Icon size={20} /></span>
       <h3>{it.title}</h3>
       <p>{it.why}</p>
       <div className="insight-foot">
         <button className="btn btn-primary btn-sm" onClick={onAct} tabIndex={top ? 0 : -1}>
-          {it.action.kind === 'whatsapp' && <MessageCircle size={15} />}{it.action.label}{it.action.kind === 'people' || it.action.kind === 'person' ? <ChevronRight size={15} /> : null}
+          {it.action.kind === 'whatsapp' && <MessageCircle size={16} aria-hidden />}{it.action.label}{it.action.kind === 'people' || it.action.kind === 'person' ? <ChevronRight size={16} aria-hidden /> : null}
         </button>
         <button className="link" onClick={onDismiss} tabIndex={top ? 0 : -1}>Later</button>
-        {depth === 0 && total > 1 && <span className="muted small deck-hint">{total - 1} more, swipe for next</span>}
+        {depth === 0 && total > 1 && <span className="muted small deck-hint">{total - 1} more</span>}
       </div>
     </m.article>
   )
@@ -262,10 +261,9 @@ function Ring({ value, goal }: { value: number; goal: number }) {
   const pct = Math.min(1, value / goal)
   return (
     <svg className="ring" viewBox="0 0 84 84" width={84} height={84} aria-label={`${value} of ${goal} sessions this week`} role="img">
-      <circle cx="42" cy="42" r={r} fill="none" stroke="#E6EAF6" strokeWidth="8" />
-      <m.circle cx="42" cy="42" r={r} fill="none" stroke="url(#ring-g)" strokeWidth="8" strokeLinecap="round" transform="rotate(-90 42 42)"
+      <circle cx="42" cy="42" r={r} fill="none" stroke="#E6EDFF" strokeWidth="8" />
+      <m.circle cx="42" cy="42" r={r} fill="none" stroke="#4C6FD6" strokeWidth="8" strokeLinecap="round" transform="rotate(-90 42 42)"
         strokeDasharray={c} initial={{ strokeDashoffset: c }} animate={{ strokeDashoffset: c * (1 - pct) }} transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.3 }} />
-      <defs><linearGradient id="ring-g" x1="0" x2="1"><stop offset="0" stopColor="#82977E" /><stop offset="1" stopColor="#5E7FB8" /></linearGradient></defs>
       <text x="42" y="47" textAnchor="middle" className="ring-text">{Math.round(pct * 100)}%</text>
     </svg>
   )
@@ -283,7 +281,7 @@ function KindWords({ appts }: { appts: Appt[] }) {
   const step = (d: number) => setI((x) => (x + d + recent.length) % recent.length)
   return (
     <figure className="kind card">
-      <figcaption className="muted small">What people told you</figcaption>
+      <figcaption className="kind-cap"><Quote size={16} aria-hidden /> What people told you</figcaption>
       <AnimatePresence mode="wait" initial={false}>
         <m.blockquote key={a.id} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.22 }}
           drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.4} onDragEnd={(_, inf) => { if (inf.offset.x < -50) step(1); if (inf.offset.x > 50) step(-1) }}>
@@ -297,3 +295,4 @@ function KindWords({ appts }: { appts: Appt[] }) {
     </figure>
   )
 }
+

@@ -3,15 +3,22 @@
  * @module   remedies-ux
  * @owner    CLIENT (views) · CONSULTANT owns remedies data (getCurrentRemedyForClient — names, ritual; never reasons)
  * @screens  CL-26 My Remedies · CL-27 Flower detail · CL-28 Ritual & reminders · CL-29 Past blends · CL-56 Progress
+ * v5 (HUB 2026-11-20): this is the "Care" tab (route unchanged). Order per DESIGN-SYSTEM §7: next appointment → your blend
+ *   (flower tiles, day x of 25, drops tick) → FAQ accordion → existing content (progress, reorder, past blends).
+ *   Flower art now uses the real Bach vectors (FlowerArt), with a soft fallback while a file is missing.
  */
 import { motion } from 'motion/react'
-import { Bell, CalendarHeart, ChevronRight, Lightbulb, RotateCcw, ShoppingBag } from 'lucide-react'
+import { Bell, CalendarHeart, ChevronRight, Lightbulb, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { Mascot, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
-import { Btn, BtnLink, Item, Reveal, Ring, Sheet, buzz, ease, toast, useChrome } from '@/components/ui'
-import { moodOf, REORDER_PRICE_PAISE } from '@/lib/data'
+import { FaqCard } from '@/components/faq'
+import { FlowerArt, FlowerTile } from '@/components/flower'
+import { SessionDateArt } from '@/components/session-art'
+import { Btn, BtnLink, Item, Reveal, Sheet, buzz, ease, toast, useChrome } from '@/components/ui'
+import { CONSULTATIONS, moodOf, REORDER_PRICE_PAISE, type ConsultationId } from '@/lib/data'
+import type { Appointment } from '@/lib/store'
 import { useApp } from '@/lib/store'
 import { dayKey, fmtDay, fmtTime, formatINR } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
@@ -27,7 +34,6 @@ const ABOUT: Record<string, string> = {
   Impatiens: 'Associated with impatience and irritation, for an easier, unhurried pace.',
   Walnut: 'Known as the remedy for times of change, for steadiness while life shifts.',
 }
-const FLOWER_IMG = ['f-rose', 'f-mimulus']
 
 export default function Remedies() {
   const blend = useApp((s) => s.blend)
@@ -44,26 +50,20 @@ export default function Remedies() {
   if (!blend) return (
     <main className="px-5 pb-32">
       <AppHeader />
-      <h1 className="h-duo pt-2">My <em>remedies</em></h1>
-      <div className="card mt-6 flex flex-col items-center p-8 text-center">
-        <Mascot pose="sleep" height={150} />
-        <p className="mt-4 text-[18px] font-extrabold text-navy">Your blend will bloom here</p>
-        <p className="mt-1 max-w-[280px] text-[14px] leading-5 text-muted">After your first session, Jitu Bhaiya prepares a personal blend of flower essences, included in your consultation.</p>
+      <Reveal className="space-y-6">
+        <Item><h1 className="h-duo pt-1">Your <em>care</em></h1></Item>
         {/* owner 2026-11-18: if a session is already booked, show it instead of asking to book */}
-        {next ? (
-          <Link href={next.needsNewTime ? `/app/pay?appointment=${next.id}` : `/app/sessions/view?id=${next.id}`} className="mt-5 flex w-full items-center gap-3 rounded-[22px] bg-peri-50 p-4 text-left">
-            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-navy text-white"><CalendarHeart className="size-6" /></span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[12px] font-semibold text-peri">{next.needsNewTime ? 'Booked · choose your time' : next.timeRequested ? 'Booked · time awaiting confirmation' : 'Your session is booked'}</span>
-              <span className="block text-[16px] font-bold text-navy">{next.needsNewTime ? 'Pick a preferred time' : `${fmtDay(next.startsAt)} · ${fmtTime(next.startsAt)}`}</span>
-              <span className="block text-[12px] text-muted">{next.mode === 'online' ? 'Online' : 'In person'} with Jitu Bhaiya · your blend comes after</span>
-            </span>
-            <ChevronRight className="size-5 text-navy" />
-          </Link>
-        ) : (
-          <BtnLink href="/app/book" size="md" className="mt-5">Book a consultation</BtnLink>
-        )}
-      </div>
+        {next ? <Item><NextAppointment a={next} /></Item> : null}
+        <Item>
+          <div className="card flex flex-col items-center p-7 text-center">
+            <Mascot pose="sleep" height={132} />
+            <p className="mt-4 font-display text-[20px] font-semibold text-ink">Your blend will bloom here</p>
+            <p className="mt-1 max-w-[290px] text-[14px] leading-5 text-ink-2">After your first session, Jitu Bhaiya prepares a personal blend of flower essences, included in your consultation.</p>
+            {!next && <BtnLink href="/app/book" size="md" className="mt-5">Book a consultation</BtnLink>}
+          </div>
+        </Item>
+        <Item><FaqCard /></Item>
+      </Reveal>
     </main>
   )
 
@@ -83,36 +83,47 @@ export default function Remedies() {
     <main className="px-5 pb-32">
       <AppHeader />
       <Reveal className="space-y-4">
-        <Item><h1 className="h-duo pt-2">My <em>remedies</em></h1></Item>
+        <Item><h1 className="h-duo pt-1">Your <em>care</em></h1></Item>
+        {next && <Item><NextAppointment a={next} /></Item>}
         <Item>
-          <section className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(150deg,#fbf3dc_0%,#f6efe4_45%,#eef1fb_100%)] p-6 shadow-[var(--shadow-card)]">
-            <motion.img src={`${BP}/img/f-mimulus.webp`} alt="" aria-hidden className="absolute -right-10 top-2 h-[150px] opacity-80" animate={{ rotate: [0, 4, 0] }} transition={{ duration: 6, repeat: Infinity }} />
-            <motion.img src={`${BP}/img/products/bach-remedy-dropper.webp`} alt="" aria-hidden className="absolute bottom-3 right-6 h-[170px] drop-shadow-[0_18px_18px_rgba(24,41,87,.22)]" initial={{ y: 30, opacity: 0 }} animate={{ y: [0, -8, 0], opacity: 1 }} transition={{ y: { duration: 5, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.6 } }} />
-            <p className="text-[13px] font-semibold text-[#8a6a2c]">Since {fmtDay(blend.startedOn)}</p>
-            <h2 className="relative mt-1 max-w-[62%] text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">{blend.name} <span className="text-soft">v{blend.version}</span></h2>
-            <p className="relative mt-1 max-w-[62%] text-[14px] text-muted">{blend.drops} drops · {blend.timesPerDay}× a day</p>
-            <div className="relative mt-5 flex max-w-[62%] items-center gap-3">
-              <Ring value={sup.level} size={74} stroke={8} color="#c48a3a" track="#ffffffaa"><span className="text-center leading-none"><b className="text-[18px] text-navy tnum">{left}</b><br /><span className="text-[11px] text-muted">days left</span></span></Ring>
-              <p className="text-[13px] leading-4 text-muted">{sup.next ? 'Lasts until your next session.' : 'A follow-up refreshes your blend.'}</p>
+          <section className="card p-5" aria-labelledby="blend-h">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="eyebrow text-navy">Since {fmtDay(blend.startedOn)}</p>
+                <h2 id="blend-h" className="h-section mt-1">{blend.name} <span className="text-soft">v{blend.version}</span></h2>
+                <p className="mt-0.5 text-[14px] text-ink-2">{blend.drops} drops, {blend.timesPerDay}× a day</p>
+              </div>
+              <img src={`${BP}/img/products/bach-remedy-dropper.webp`} alt="" aria-hidden className="-my-2 h-[84px] w-auto drop-shadow-[0_10px_12px_rgba(23,33,74,.18)]" />
             </div>
-          </section>
-        </Item>
+            <div className="mt-4 flex items-center justify-between text-[14px]">
+              <span className="font-semibold text-ink tnum">Day {Math.min(dayN, blend.days)} of {blend.days}</span>
+              <span className="text-ink-2 tnum">{left} {left === 1 ? 'day' : 'days'} left</span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-sky-100" role="progressbar" aria-label="Blend progress" aria-valuemin={1} aria-valuemax={blend.days} aria-valuenow={Math.min(dayN, blend.days)}>
+              <motion.div className="h-full rounded-full bg-blue" initial={{ width: 0 }} animate={{ width: `${(Math.min(dayN, blend.days) / blend.days) * 100}%` }} transition={{ duration: 0.9, ease }} />
+            </div>
+            <p className="mt-2 text-[12px] text-muted">{sup.next ? 'Lasts until your next session.' : 'A follow-up refreshes your blend.'}</p>
 
-        <Item>
-          <section className="card p-5">
-            <h2 className="h-section">Flowers in your blend</h2>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <h3 className="mt-5 font-sans text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-2">Flowers in your blend</h3>
+            <div className="mt-3 grid grid-cols-3 gap-3">
               {blend.flowers.map((f, i) => (
-                <motion.button key={f} onClick={() => setFlower(f)} whileTap={{ scale: 0.95 }} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 + i * 0.05 }}
-                  className="inline-flex h-11 items-center gap-2 rounded-full bg-[#f6f1e8] pl-1.5 pr-4 text-[14px] font-semibold text-navy">
-                  <img src={`${BP}/img/${FLOWER_IMG[i % 2]}.webp`} alt="" className="size-8 rounded-full bg-white object-contain p-0.5" />{f}
-                </motion.button>
+                <motion.div key={f} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 + i * 0.05, ease, duration: 0.4 }}>
+                  <FlowerTile name={f} onClick={() => setFlower(f)} />
+                </motion.div>
               ))}
             </div>
+
+            <div className="mt-5 border-t border-line pt-5">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 id="drops-h" className="font-display text-[18px] font-semibold text-ink">Your daily drops</h3>
+                <button onClick={() => setTimes(true)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-sky-50 px-3.5 text-[13px] font-semibold text-navy ring-1 ring-sky-200"><Bell className="size-4" /> {blend.reminderTimes.length} times</button>
+              </div>
+              <DropsTick full />
+            </div>
           </section>
         </Item>
 
-        <Item><RitualToday onTimes={() => setTimes(true)} /></Item>
+        <Item><FaqCard /></Item>
 
         {lines.length > 0 && (
           <Item>
@@ -127,7 +138,7 @@ export default function Remedies() {
                 ))}
               </div>
               {mix.length > 0 && (
-                <div className="mt-2 flex items-center gap-5 rounded-[22px] bg-peri-50/60 p-4">
+                <div className="mt-2 flex items-center gap-5 rounded-[20px] bg-sky-50 p-4">
                   <Donut mix={mix} />
                   <ul className="flex-1 space-y-1.5">
                     {mix.slice(0, 4).map((m) => <li key={m.mood} className="flex items-center gap-2 text-[13px]"><span className="size-3 rounded-full" style={{ background: moodOf(m.mood).color }} /><span className="flex-1 text-ink">{moodOf(m.mood).label}</span><b className="tnum text-navy">{m.pct}%</b></li>)}
@@ -150,7 +161,7 @@ export default function Remedies() {
         <Item>
           <section className="card p-5">
             <h2 className="h-section">Past blends</h2>
-            <div className="mt-3 flex items-center gap-3 rounded-[20px] bg-peri-50/60 p-3">
+            <div className="mt-3 flex items-center gap-3 rounded-[20px] bg-sky-50 p-3">
               <span className="grid size-11 place-items-center rounded-full bg-white text-[13px] font-extrabold text-navy">v{blend.version}</span>
               <div className="flex-1"><p className="text-[14px] font-bold text-navy">Current · since {fmtDay(blend.startedOn)}</p><p className="truncate text-[12px] text-muted">{blend.flowers.join(', ')}</p></div>
             </div>
@@ -162,10 +173,12 @@ export default function Remedies() {
       <Sheet open={!!flower} onClose={() => setFlower(null)} title={flower ?? 'Flower'}>
         {flower && (
           <div className="pb-2">
-            <motion.img src={`${BP}/img/${FLOWER_IMG[blend.flowers.indexOf(flower) % 2]}.webp`} alt="" className="mx-auto h-[180px]" initial={{ scale: 0.7, rotate: -8, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 16 }} />
+            <motion.div className="mx-auto grid size-[200px] place-items-center rounded-full bg-sky-50" initial={{ scale: 0.7, rotate: -8, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 16 }}>
+              <FlowerArt name={flower} className="h-[170px] w-[170px] text-[48px]" />
+            </motion.div>
             <h2 className="h-duo mt-2 text-[28px]">{flower}</h2>
             <p className="mt-3 text-[15px] leading-6 text-ink">{ABOUT[flower] ?? 'One of Dr Bach’s 38 flower essences.'}</p>
-            <p className="mt-4 rounded-[18px] bg-[#f6f1e8] p-3 text-[13px] font-semibold text-[#8a6a2c]">In your blend since {fmtDay(blend.startedOn)}</p>
+            <p className="mt-4 rounded-[18px] bg-marigold-100 p-3 text-[13px] font-semibold text-ink">In your blend since {fmtDay(blend.startedOn)}</p>
           </div>
         )}
       </Sheet>
@@ -190,19 +203,6 @@ function Donut({ mix }: { mix: { mood: Parameters<typeof moodOf>[0]; pct: number
   )
 }
 
-function RitualToday({ onTimes }: { onTimes: () => void }) {
-  const blend = useApp((s) => s.blend)!
-  return (
-    <section className="card p-5" aria-labelledby="drops-h">
-      <div className="flex items-start justify-between">
-        <div><h2 id="drops-h" className="h-section">Your daily drops</h2><p className="text-[13px] text-muted">{blend.drops} drops, {blend.timesPerDay}× a day · {blend.reminderTimes.join(', ')}</p></div>
-        <button onClick={onTimes} className="inline-flex items-center gap-1.5 rounded-full bg-peri-50 px-3 py-2 text-[13px] font-semibold text-navy"><Bell className="size-4" /> Times</button>
-      </div>
-      <div className="mt-4"><DropsTick full /></div>
-    </section>
-  )
-}
-
 function ReminderSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const blend = useApp((s) => s.blend)
   const set = useApp((s) => s.setReminderTimes)
@@ -223,5 +223,22 @@ function ReminderSheet({ open, onClose }: { open: boolean; onClose: () => void }
       <Btn full className="mt-5" onClick={() => { set([...t].sort()); toast('Reminders updated'); onClose() }}>Save times</Btn>
       <p className="mt-3 flex items-center justify-center gap-1 text-[12px] text-muted">Notifications arrive once the app is installed <ChevronRight className="size-3" /></p>
     </Sheet>
+  )
+}
+
+/** v5 Care: the next appointment, first on the tab. */
+function NextAppointment({ a }: { a: Appointment }) {
+  const c = CONSULTATIONS.find((x) => x.id === (a.type as ConsultationId))
+  const href = a.needsNewTime ? `/app/pay?appointment=${a.id}` : `/app/sessions/view?id=${a.id}`
+  return (
+    <section className="card flex items-center gap-4 p-4" aria-label="Next appointment">
+      {a.needsNewTime ? <span className="grid size-[72px] shrink-0 place-items-center rounded-[20px] bg-sky-100 text-navy"><CalendarHeart className="size-8" strokeWidth={1.75} /></span> : <SessionDateArt startsAt={a.startsAt} mode={a.mode} />}
+      <div className="min-w-0 flex-1">
+        <p className="eyebrow text-navy">{a.needsNewTime ? 'Booked · choose your time' : a.timeRequested ? 'Awaiting confirmation' : a.status === 'awaiting_payment' ? 'Payment due' : 'Next session'}</p>
+        <p className="mt-0.5 font-display text-[18px] font-semibold leading-6 text-ink">{a.needsNewTime ? 'Pick a preferred time' : `${fmtDay(a.startsAt)} · ${fmtTime(a.startsAt)}`}</p>
+        <p className="text-[13px] text-ink-2">{c?.name ?? 'Session'} · {a.mode === 'online' ? 'Online' : 'In person'}</p>
+        <BtnLink href={href} size="sm" className="mt-3">{a.needsNewTime ? 'Choose a time' : a.status === 'awaiting_payment' ? 'Pay to confirm' : 'View'}<ChevronRight className="size-4" /></BtnLink>
+      </div>
+    </section>
   )
 }

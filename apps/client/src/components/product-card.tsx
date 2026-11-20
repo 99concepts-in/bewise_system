@@ -54,30 +54,30 @@ export function ProductCard({ p, i = 0, wide }: { p: Product; i?: number; wide?:
         <div ref={ref} className="relative"><ProductArt product={p} className={p.soldOut ? 'opacity-70 grayscale-[35%]' : undefined} />
           {p.soldOut && <span className="absolute left-2.5 top-2.5 rounded-full bg-navy px-2.5 py-1 text-[11px] font-bold text-white">Sold out</span>}</div>
         <div className="px-1.5 pt-2.5">
-          <p className="text-[15px] font-bold leading-tight text-navy">{title}</p>
-          <p className="mt-0.5 text-[12px] text-muted">{p.personal ? `Made for you · ${v.label}` : `${v.label} · ${p.format}`}</p>
+          <p className="font-display text-[16px] font-semibold leading-5 text-ink">{title}</p>
+          <p className="mt-0.5 text-[12px] text-ink-2">{p.personal ? `Made for you · ${v.label}` : `${v.label} · ${p.format}`}</p>
           {hit && <p className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-rose"><AlertTriangle className="size-3" /> Contains {hit}</p>}
         </div>
       </Link>
       <div className="mt-auto px-1.5 pb-0.5 pt-2">
-        <span className="text-[16px] font-extrabold text-navy tnum">{formatINR(v.pricePaise)}</span>
+        <span className="text-[16px] font-semibold text-ink tnum">{formatINR(v.pricePaise)}</span>
         {/* owner 2026-11-18: a plain "Add to cart", then a counter once it's in the cart */}
-        <div className="mt-2 h-10">
+        <div className="mt-2 h-11">
           <AnimatePresence mode="wait" initial={false}>
             {p.soldOut ? (
-              <span key="sold" className="flex h-10 w-full items-center justify-center rounded-full bg-[#eceef4] text-[13px] font-bold text-muted" aria-label={`${title} is sold out`}>Sold out</span>
+              <span key="sold" className="flex h-11 w-full items-center justify-center rounded-[14px] bg-sky-100 text-[13px] font-bold text-ink-2" aria-label={`${title} is sold out`}>Sold out</span>
             ) : inCart > 0 && !p.personal ? (
               <motion.div key="qty" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.18 }}
-                className="flex h-10 items-center justify-between rounded-full bg-navy px-1 text-white" role="group" aria-label={`${title} in cart`}>
-                <button aria-label={`One less ${title}`} onClick={() => { buzz(6); setQty(cartKey, inCart - 1) }} className="grid size-8 place-items-center rounded-full bg-white/15">{inCart === 1 ? <Trash2 className="size-3.5" /> : <Minus className="size-3.5" />}</button>
+                className="flex h-11 items-center justify-between rounded-[14px] bg-navy px-1 text-white" role="group" aria-label={`${title} in cart`}>
+                <button aria-label={`One less ${title}`} onClick={() => { buzz(6); setQty(cartKey, inCart - 1) }} className="grid size-9 place-items-center rounded-[10px] bg-white/15">{inCart === 1 ? <Trash2 className="size-3.5" /> : <Minus className="size-3.5" />}</button>
                 <AnimatePresence mode="popLayout" initial={false}><motion.span key={inCart} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }} className="text-[15px] font-bold tnum" aria-live="polite">{inCart}</motion.span></AnimatePresence>
-                <button aria-label={`One more ${title}`} onClick={() => { buzz(6); if (inCart < 10) addProduct(p, v.id, 1, ref.current?.getBoundingClientRect()) }} className="grid size-8 place-items-center rounded-full bg-white/15"><Plus className="size-3.5" /></button>
+                <button aria-label={`One more ${title}`} onClick={() => { buzz(6); if (inCart < 10) addProduct(p, v.id, 1, ref.current?.getBoundingClientRect()) }} className="grid size-9 place-items-center rounded-[10px] bg-white/15"><Plus className="size-3.5" /></button>
               </motion.div>
             ) : (
               <motion.button key="add" whileTap={{ scale: 0.95 }} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.18 }}
                 aria-label={bookFirst ? `Book a consultation for ${title}` : inCart ? `${title} is in your cart` : `Add ${title} to cart`}
                 onClick={() => (inCart ? undefined : addProduct(p, v.id, 1, ref.current?.getBoundingClientRect()))}
-                className={`flex h-10 w-full items-center justify-center gap-1.5 rounded-full text-[13px] font-bold ${inCart ? 'bg-sage-100 text-sage-text' : 'bg-navy text-white shadow-[var(--shadow-cta)]'}`}>
+                className={`flex h-11 w-full items-center justify-center gap-1.5 rounded-[14px] font-display text-[15px] font-semibold ${inCart ? 'bg-teal-100 text-sage-text' : 'bg-navy text-white'}`}>
                 {bookFirst ? <><CalendarHeart className="size-4" /> Book first</> : inCart ? <><Check className="size-4" strokeWidth={3} /> In cart</> : <><ShoppingBag className="size-4" /> Add to cart</>}
               </motion.button>
             )}
@@ -85,7 +85,7 @@ export function ProductCard({ p, i = 0, wide }: { p: Product; i?: number; wide?:
         </div>
       </div>
       <motion.button whileTap={{ scale: 0.8 }} aria-label={wish ? 'Remove from saved' : 'Save for later'} aria-pressed={wish} onClick={() => { toggleWish(p.slug); buzz(6) }}
-        className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-white/85 backdrop-blur">
+        className="absolute right-3.5 top-3.5 grid size-10 place-items-center rounded-full bg-white/90 shadow-[var(--shadow-card)] backdrop-blur">
         <motion.span key={String(wish)} initial={{ scale: 0.4 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500, damping: 15 }}>
           <Heart className={`size-[18px] ${wish ? 'fill-navy text-navy' : 'text-navy'}`} />
         </motion.span>

@@ -39,8 +39,8 @@ export default function ProductPage() {
   return (
     <main className="px-5 pb-36">
       <AppHeader back right={<IconBtn label={wish ? 'Remove from saved' : 'Save for later'} onClick={() => { toggleWish(p.slug); buzz(6) }}><Heart className={cx('size-5', wish && 'fill-navy')} /></IconBtn>} />
-      <motion.section initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, ease }} className="relative mt-1 overflow-hidden rounded-[30px] shadow-[var(--shadow-card)]">
-        <div ref={art}><ProductArt product={p} size="lg" className="h-[360px] rounded-[30px]" /></div>
+      <motion.section initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, ease }} className="relative mt-1 overflow-hidden rounded-[32px] shadow-[var(--shadow-card)]">
+        <div ref={art}><ProductArt product={p} size="lg" className="h-[360px] rounded-[32px]" /></div>
         <div className="absolute left-6 top-6 max-w-[52%]">
           <h1 className="text-[32px] font-extrabold leading-[1.05] tracking-[-0.03em] text-navy">{title.split(' ')[0]} <span className="text-soft">{title.split(' ').slice(1).join(' ')}</span></h1>
           <p className="mt-2 text-[14px] leading-5 text-muted">{p.tagline}.</p>
@@ -71,14 +71,14 @@ export default function ProductPage() {
       </div>
 
       {p.personal && (
-        <p className="mt-4 flex items-start gap-2.5 rounded-[22px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
+        <p className="mt-4 flex items-start gap-2.5 rounded-[20px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
           <span aria-hidden className="text-[18px] leading-5">🌼</span>
           <span>{hasBlend ? 'We’ll prepare the same blend Jitu Bhaiya chose for you.' : 'Your first blend is made for you after a consultation, and it’s included in the fee.'}</span>
         </p>
       )}
 
       {(hit || (pregnant && /pregnan/i.test(p.safety))) && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mt-4 flex items-center gap-3 rounded-[22px] bg-rose-50 p-4" role="alert">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mt-4 flex items-center gap-3 rounded-[20px] bg-rose-50 p-4" role="alert">
           <AlertTriangle className="size-6 shrink-0 text-rose" />
           <p className="text-[14px] font-semibold leading-5 text-rose">{hit ? `Contains ${hit}. You noted an allergy.` : 'Not recommended during pregnancy. Please check with your doctor.'}</p>
         </motion.div>
@@ -97,7 +97,7 @@ export default function ProductPage() {
         </AnimatePresence>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-[480px] items-center gap-3 bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-[480px] items-center gap-3 bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
         {!p.personal && !p.soldOut && <div className="flex h-14 items-center gap-1 rounded-full bg-white px-2 shadow-[var(--shadow-card)]">
           <button aria-label="Fewer" onClick={() => setQty(Math.max(1, qty - 1))} className="grid size-10 place-items-center rounded-full text-navy"><Minus className="size-4" /></button>
           <AnimatePresence mode="popLayout"><motion.span key={qty} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-6 text-center text-[17px] font-bold text-navy tnum">{qty}</motion.span></AnimatePresence>

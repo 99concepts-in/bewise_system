@@ -1,12 +1,13 @@
 /**
  * @screens CN-12 Clients — everyone registered, with care buckets, search and sort.
+ * v5 (HUB 2026-11-20): Blue Bloom header with the official logo; one primary action (New person).
  */
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { m } from 'motion/react'
 import { ArrowDownAZ, CalendarClock, History, Search, UserPlus, X, Zap } from 'lucide-react'
 import { useSheets } from './Sheets'
 import { useIndex, useStore } from '../state/store'
-import { Avatar, Chip, Empty, go } from '../ui/kit'
+import { AppHeader, Avatar, Chip, Empty, go } from '../ui/kit'
 import { personView, type Bucket } from '../lib/derive'
 import { dayLabel, fmtShort, relative } from '../lib/time'
 
@@ -52,13 +53,14 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
 
   return (
     <div className="screen">
+      <AppHeader />
       <div className="title-row">
         <h1 className="page-title">People<span className="title-count">{s.people.length} registered</span></h1>
         <button className="sort-btn" onClick={() => setSort(nextSort[sort])} aria-label={`Sorted by ${sortLabel}. Change sort`}><SortIcon size={16} />{sortLabel}</button>
       </div>
       <div className="quick-actions">
-        <button className="btn btn-primary" onClick={() => sheets.addPerson('profile')}><UserPlus size={17} /> New person</button>
-        <button className="btn btn-quiet" onClick={() => sheets.express()}><Zap size={17} /> Express booking</button>
+        <button className="btn btn-primary" onClick={() => sheets.addPerson('profile')}><UserPlus size={18} aria-hidden /> New person</button>
+        <button className="btn btn-quiet" onClick={() => sheets.express()}><Zap size={18} aria-hidden /> Express booking</button>
       </div>
       <div className="search-wrap">
         <Search size={18} aria-hidden />

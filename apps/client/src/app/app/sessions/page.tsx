@@ -43,7 +43,7 @@ export default function Sessions() {
                   <span className="block text-[16px] font-bold text-navy">{CONSULTATIONS.find((c) => c.id === a.type)!.name}</span>
                   <span className="flex items-center gap-1.5 text-[13px] text-muted">{a.mode === 'online' ? <Laptop className="size-3.5" /> : <MapPin className="size-3.5" />}{fmtTime(d)} · {a.mode === 'online' ? 'Online' : 'In person'}</span>
                   {(a.status === 'awaiting_payment' || a.needsNewTime) && <span className="mt-1 inline-block rounded-full bg-[#fbe3c0] px-2 py-0.5 text-[11px] font-bold text-[#7a4a10]">{a.needsNewTime ? 'Pick a time' : 'Awaiting payment'}</span>}
-                  {a.timeRequested && <span className="mt-1 inline-block rounded-full bg-[#fbf3dc] px-2 py-0.5 text-[11px] font-bold text-[#7a5a1c]">Awaiting confirmation</span>}
+                  {a.timeRequested && <span className="mt-1 inline-block rounded-full bg-marigold-100 px-2 py-0.5 text-[11px] font-bold text-[#7a5a1c]">Awaiting confirmation</span>}
                   {tab === 'past' && !a.feedback && <span className="mt-1 inline-block rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose">Add feedback</span>}
                 </span>
                 <ChevronRight className="size-5 text-soft" />

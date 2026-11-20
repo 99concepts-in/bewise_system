@@ -306,21 +306,22 @@ export const PRODUCTS: Product[] = [
 ]
 /** Product line name as shown on cards: "Abundance" + "Roll-on" etc. */
 export const productTitle = (p: Product) => (p.category === 'remedies' || p.category === 'care' && p.format === 'Dropper' ? p.name : `${p.name} ${p.format === 'Bath salt' ? 'Bath Salt' : p.format === 'Roll-on' ? 'Roll-on' : p.slug === 'beauty-spray' ? 'Mist' : 'Spray'}`)
+// v5 (HUB 2026-11-20): category / intent tints moved to the Blue Bloom accent-100 family (presentation only)
 export const CATEGORIES: { key: Category | 'consult'; label: string; sub: string; tint: string; art: string[] }[] = [
-  { key: 'rollons', label: 'Roll-on oils', sub: '8 blends', tint: '#e7ecfa', art: ['products/sleep-rollon', 'products/abundance-rollon', 'products/immutime-rollon'] },
-  { key: 'sprays', label: 'Aura sprays', sub: '4 mists', tint: '#efe9fb', art: ['products/protection-spray', 'products/aura-spray'] },
-  { key: 'remedies', label: 'Bach remedies', sub: 'Made for you', tint: '#e5efe2', art: ['products/bach-remedy-dropper', 'products/rescue-remedy-spray'] },
-  { key: 'bath', label: 'Bath salts', sub: '3 rituals', tint: '#fbe9ee', art: ['products/aura-bath-salt', 'products/abundance-bath-salt'] },
-  { key: 'care', label: 'Hair & beauty', sub: 'Oil & mist', tint: '#fbf0dc', art: ['products/hair-oil', 'products/beauty-spray'] },
-  { key: 'consult', label: 'Consultation', sub: 'With Jitu Bhaiya', tint: '#f1ece4', art: [] },
+  { key: 'rollons', label: 'Roll-on oils', sub: '8 blends', tint: '#E6EDFF', art: ['products/sleep-rollon', 'products/abundance-rollon', 'products/immutime-rollon'] },
+  { key: 'sprays', label: 'Aura sprays', sub: '4 mists', tint: '#EEE8FF', art: ['products/protection-spray', 'products/aura-spray'] },
+  { key: 'remedies', label: 'Bach remedies', sub: 'Made for you', tint: '#DDF4F1', art: ['products/bach-remedy-dropper', 'products/rescue-remedy-spray'] },
+  { key: 'bath', label: 'Bath salts', sub: '3 rituals', tint: '#FDE3EB', art: ['products/aura-bath-salt', 'products/abundance-bath-salt'] },
+  { key: 'care', label: 'Hair & beauty', sub: 'Oil & mist', tint: '#FFF1D9', art: ['products/hair-oil', 'products/beauty-spray'] },
+  { key: 'consult', label: 'Consultation', sub: 'With Jitu Bhaiya', tint: '#DFF0FF', art: [] },
 ]
 export const INTENTS: { key: Intent; label: string; emoji: string; tint: string; line: string }[] = [
-  { key: 'sleep', label: 'Sleep', emoji: '🌙', tint: '#e7ecfa', line: 'Wind down gently' },
-  { key: 'calm', label: 'Calm', emoji: '🍃', tint: '#e5efe2', line: 'Ease everyday stress' },
-  { key: 'abundance', label: 'Abundance', emoji: '✨', tint: '#fbf3dc', line: 'Positive and confident' },
-  { key: 'protection', label: 'Protection', emoji: '🛡️', tint: '#efe9fb', line: 'Grounded and shielded' },
-  { key: 'wellness', label: 'Wellness', emoji: '🌿', tint: '#dff0ee', line: 'Fresh and balanced' },
-  { key: 'beauty', label: 'Beauty', emoji: '🌸', tint: '#fbe9ee', line: 'Hair and skin care' },
+  { key: 'sleep', label: 'Sleep', emoji: '🌙', tint: '#EEE8FF', line: 'Wind down gently' },
+  { key: 'calm', label: 'Calm', emoji: '🍃', tint: '#DDF4F1', line: 'Ease everyday stress' },
+  { key: 'abundance', label: 'Abundance', emoji: '✨', tint: '#FFF1D9', line: 'Positive and confident' },
+  { key: 'protection', label: 'Protection', emoji: '🛡️', tint: '#E6EDFF', line: 'Grounded and shielded' },
+  { key: 'wellness', label: 'Wellness', emoji: '🌿', tint: '#DFF0FF', line: 'Fresh and balanced' },
+  { key: 'beauty', label: 'Beauty', emoji: '🌸', tint: '#FDE3EB', line: 'Hair and skin care' },
 ]
 export const productBySlug = (s: string) => PRODUCTS.find((p) => p.slug === s)
 export const variantById = (id: string) => {

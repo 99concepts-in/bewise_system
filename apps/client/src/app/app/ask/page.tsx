@@ -62,7 +62,7 @@ export default function Ask() {
 
   return (
     <main className="flex min-h-dvh flex-col px-5">
-      <header className="sticky top-0 z-20 -mx-5 flex items-center gap-3 bg-gradient-to-b from-[#dce2f5] via-[#dce2f5]/90 to-transparent px-5 pb-4 pt-2 safe-t">
+      <header className="sticky top-0 z-20 -mx-5 flex items-center gap-3 bg-sky-50/95 backdrop-blur-xl px-5 pb-4 pt-2 safe-t">
         <IconBtn label="Back" onClick={() => router.back()}><ChevronLeft className="size-5" /></IconBtn>
         <div className="flex-1">
           <p className="text-[20px] font-extrabold leading-tight tracking-[-0.02em] text-navy">Ask <span className="text-soft">BeWise</span></p>
@@ -141,10 +141,10 @@ export default function Ask() {
         </div>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-2 pt-8 safe-b">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-2 pt-8 safe-b">
         <form onSubmit={(e) => { e.preventDefault(); send(text) }} className="flex h-16 items-center gap-2 rounded-full bg-white pl-5 pr-2 shadow-[var(--shadow-float)]">
           <input value={text} onChange={(e) => setText(e.target.value.slice(0, 1000))} placeholder="Ask anything…" aria-label="Message Ask BeWise" className="flex-1 bg-transparent text-[16px] outline-none placeholder:text-soft" />
-          <motion.button type="submit" aria-label="Send" whileTap={{ scale: 0.85 }} disabled={!text.trim() || typing} animate={{ scale: text.trim() ? 1 : 0.85, opacity: text.trim() ? 1 : 0.5 }} className="grid size-12 place-items-center rounded-full bg-[linear-gradient(135deg,#182957,#5e7fb8)] text-white">
+          <motion.button type="submit" aria-label="Send" whileTap={{ scale: 0.85 }} disabled={!text.trim() || typing} animate={{ scale: text.trim() ? 1 : 0.85, opacity: text.trim() ? 1 : 0.5 }} className="grid size-12 place-items-center rounded-full bg-navy text-white">
             <ArrowUp className="size-5" />
           </motion.button>
         </form>

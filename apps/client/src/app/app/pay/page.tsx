@@ -48,7 +48,7 @@ function Pay() {
         <div><p className="text-[16px] font-extrabold text-navy">{a.status === 'expired' ? 'Payment received. Pick a new time' : 'Choose your preferred time'}</p><p className="text-[13px] leading-5 text-sage-text">{a.status === 'expired' ? 'The time we were holding was released before the payment arrived. Choose any time below at no extra cost.' : 'Jitu Bhaiya or Haresh bhai will confirm it. If it doesn’t suit, our team will call you.'}</p></div>
       </motion.div>
       <div className="mt-5"><TimePicker slot={slot} setSlot={setSlot} /></div>
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
         <Btn full variant="gradient" disabled={!slot} onClick={() => { if (!slot) return; pickNewTime(a.id, slot.toISOString()); toast('Time requested. We’ll confirm soon'); router.replace(`/app/sessions/view?id=${a.id}`) }}>
           {slot ? `Request ${fmtLongDay(slot).split(',')[0]} · ${fmtTime(slot)}` : 'Choose a time'}
         </Btn>
@@ -93,7 +93,7 @@ function Pay() {
           </div>
         ))}
       </section>
-      <div className="mt-4 flex items-start gap-3 rounded-[22px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
+      <div className="mt-4 flex items-start gap-3 rounded-[20px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
         <Info className="mt-0.5 size-5 shrink-0" /><p>Sessions are non-refundable, but you can reschedule free up to 24 h before.</p>
       </div>
       <AnimatePresence>
@@ -102,7 +102,7 @@ function Pay() {
         )}
       </AnimatePresence>
       <div className="card mt-4 flex items-center justify-between p-5"><span className="text-[20px] font-extrabold text-navy">Total</span><span className="text-[30px] font-extrabold text-navy tnum">{formatINR(a.amountPaise)}</span></div>
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
         <Btn full variant="gradient" onClick={() => setPaying(true)}><span aria-hidden>🔒</span> Pay {formatINR(a.amountPaise)}</Btn>
         <p className="mt-2 text-center text-[12px] text-muted">Secured by Razorpay · UPI, cards, netbanking</p>
       </div>

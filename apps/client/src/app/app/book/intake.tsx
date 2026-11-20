@@ -4,24 +4,29 @@
  * @owner    CLIENT builds UI · CONSULTANT owns data, mapping, AI (D-35/D-36/D-37)
  * @screens  IN-01…IN-11 (spec docs/specs/client/C3-intake-IN-01-IN-12.md), IN-12 check-in, safety card (D-38)
  * @sensitive intake answers
+ * v5 (HUB 2026-11-20): Blue Bloom look — Fraunces titles, name step, feelings as 104 px icon circles (accent colours),
+ *   nuance statements as tappable list cards (selected = sky-100 + navy check). Answer shapes and NUANCE strings unchanged.
  */
 import { AnimatePresence, motion } from 'motion/react'
 import { Check, Heart, Lock, Mic, Phone, Plus, Sparkles, Square, Trash2 } from 'lucide-react'
+import { FeelingIcon } from '@/components/flower'
+import { ACCENTS, intakeFeeling } from '@/lib/feelings'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { MoodImg } from '@/components/brand'
 import { MoodFace, type FaceSpec } from '@/components/mood-face'
 import { Chip, Segmented, buzz, cx, spring } from '@/components/ui'
-import { BODY_AREAS, FEELINGS, FEELINGS_COMMON, HELPLINES, LIFE_CHANGES, NUANCE, feelingIcon, type Emotion } from '@/lib/data'
+import { BODY_AREAS, FEELINGS, FEELINGS_COMMON, HELPLINES, LIFE_CHANGES, NUANCE, type Emotion } from '@/lib/data'
 import type { IntakeAnswers } from '@/lib/store'
 
 type P = { a: IntakeAnswers; set: (p: Partial<IntakeAnswers>) => void }
 const toggle = (arr: string[], v: string) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v])
 
-export function StepTitle({ lead, em, sub }: { lead: string; em: string; sub?: string }) {
+export function StepTitle({ lead, em, sub, hello }: { lead: string; em: string; sub?: string; hello?: string }) {
   return (
-    <div className="mb-5">
-      <h1 className="h-duo">{lead} <em>{em}</em></h1>
-      {sub && <p className="mt-2 text-[15px] leading-6 text-muted">{sub}</p>}
+    <div className="mb-6">
+      {hello && <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mb-1.5 font-display text-[20px] font-medium italic text-navy">{hello}</motion.p>}
+      <h1 className="h-duo">{lead} {em}</h1>
+      {sub && <p className="mt-2 text-[16px] leading-6 text-ink-2">{sub}</p>}
     </div>
   )
 }
@@ -52,18 +57,18 @@ export function IntakeIntro() {
         {/* soft outer petals rotate slowly */}
         <motion.div className="absolute inset-0" animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}>
           {Array.from({ length: 6 }).map((_, k) => (
-            <motion.span key={k} className="absolute left-1/2 top-1/2 block h-[46%] w-[30%] origin-[50%_100%] rounded-[50%] bg-[linear-gradient(180deg,rgba(185,203,242,.55),rgba(220,231,217,.25))] mix-blend-multiply"
+            <motion.span key={k} className="absolute left-1/2 top-1/2 block h-[46%] w-[30%] origin-[50%_100%] rounded-[50%] bg-sky-200/70 mix-blend-multiply"
               style={{ translateX: '-50%', translateY: '-100%', rotate: k * 60 }}
               animate={{ scaleY: phase === 2 ? 0.55 : 1, opacity: phase === 2 ? 0.45 : 0.9 }} transition={{ duration: dur, ease: [0.45, 0, 0.55, 1] }} />
           ))}
         </motion.div>
         {/* breathing orb */}
-        <motion.div className="absolute size-[62%] rounded-full bg-[radial-gradient(circle_at_35%_30%,#ffffff,#dce2f5_55%,#c9d6f2)] shadow-[0_20px_60px_rgba(94,127,184,.35)]"
+        <motion.div className="absolute size-[62%] rounded-full bg-sky-100 shadow-[0_20px_60px_rgba(76,111,214,.28)] ring-8 ring-white/70"
           initial={{ scale: 0.62 }} animate={{ scale }} transition={{ duration: dur, ease: [0.45, 0, 0.55, 1] }} />
         <motion.div className="absolute size-[62%] rounded-full border-2 border-white/80" initial={{ scale: 0.62, opacity: 0.6 }}
           animate={{ scale: phase === 2 ? 0.7 : 1.18, opacity: phase === 1 ? 0.9 : 0.35 }} transition={{ duration: dur, ease: [0.45, 0, 0.55, 1] }} />
         <AnimatePresence mode="wait">
-          <motion.p key={phase} className="relative text-[20px] font-bold text-navy" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.6 }}>
+          <motion.p key={phase} className="relative font-display text-[22px] font-semibold text-navy" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.6 }}>
             {BREATH[phase].t}
           </motion.p>
         </AnimatePresence>
@@ -72,10 +77,22 @@ export function IntakeIntro() {
 
       <motion.div className="mt-4 flex flex-wrap justify-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
         {['Private to Jitu Bhaiya', 'Everything optional', 'About 5 minutes'].map((t) => (
-          <span key={t} className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[12px] font-semibold text-navy shadow-[var(--shadow-card)]"><span className="size-1.5 rounded-full bg-sage" />{t}</span>
+          <span key={t} className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold text-ink shadow-[var(--shadow-card)]"><span className="size-1.5 rounded-full bg-teal" />{t}</span>
         ))}
       </motion.div>
       <AnimatePresence>{cycles >= 1 && <motion.p className="mt-4 text-[13px] text-muted" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Ready when you are.</motion.p>}</AnimatePresence>
+    </div>
+  )
+}
+
+/** v5 — "What should we call you?" (only shown when the profile has no name; saved to the profile, not the answers). */
+export function StepName({ value, onChange, onEnter }: { value: string; onChange: (v: string) => void; onEnter: () => void }) {
+  return (
+    <div>
+      <StepTitle lead="What should we" em="call you?" sub="Just your first name is lovely. Jitu Bhaiya will greet you by it." />
+      <input autoFocus value={value} onChange={(e) => onChange(e.target.value.slice(0, 60))} onKeyDown={(e) => { if (e.key === 'Enter') onEnter() }}
+        placeholder="Your name" aria-label="Your name" autoComplete="given-name" enterKeyHint="next"
+        className="h-[60px] w-full rounded-[18px] bg-white px-5 font-display text-[22px] font-medium text-ink shadow-[var(--shadow-card)] outline-none ring-1 ring-sky-200 placeholder:text-muted focus:ring-2 focus:ring-blue" />
     </div>
   )
 }
@@ -87,7 +104,7 @@ export function StepWho({ a, set }: P) {
       <Card>
         <Label>In your own words</Label>
         <textarea value={a.onMind} onChange={(e) => set({ onMind: e.target.value.slice(0, 1000) })} rows={4} placeholder="Work has felt heavy lately, and I can’t switch off at night…"
-          className="w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] leading-6 outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" aria-label="What’s been on your mind" />
+          className="w-full resize-none rounded-[20px] bg-sky-50 p-4 text-[16px] leading-6 outline-none ring-1 ring-sky-200 placeholder:text-muted focus:ring-2 focus:ring-blue" aria-label="What’s been on your mind" />
         <VoiceNote />
       </Card>
     </div>
@@ -141,34 +158,49 @@ const SLEEP_FACES: { color: string; face: FaceSpec }[] = [
   { color: '#B9CBF2', face: { eyes: 'closed', mouth: 'smile', extras: ['blush', 'zzz'] } },
 ]
 
-export function StepFeelings({ a, set }: P) {
+export function StepFeelings({ a, set, name }: P & { name?: string }) {
   const rest = FEELINGS.filter((f) => !(FEELINGS_COMMON as readonly string[]).includes(f))
   const [more, setMore] = useState(() => a.feelings.some((f) => rest.includes(f as never)))
   const shown = more ? [...FEELINGS_COMMON, ...rest] : [...FEELINGS_COMMON]
+  const first = (name ?? '').trim().split(/\s+/)[0]
   return (
     <div>
-      <StepTitle lead="How have you been" em="feeling?" sub="Pick all that fit. You can explain more next." />
-      <div className="grid grid-cols-3 gap-2.5">
+      <StepTitle hello={first ? `Nice to meet you, ${first}!` : undefined} lead="How have you been" em="feeling?" sub="Choose the ones that feel closest. Up to 3 is plenty." />
+      <div className="grid grid-cols-3 gap-x-2 gap-y-5" role="group" aria-label="Feelings">
         {shown.map((f, i) => {
-          const on = a.feelings.includes(f); const ic = feelingIcon(f)
+          const on = a.feelings.includes(f)
+          const fi = intakeFeeling(f), ac = ACCENTS[fi.accent]
           return (
             <motion.button key={f} type="button" role="checkbox" aria-checked={on} onClick={() => { buzz(6); set({ feelings: toggle(a.feelings, f) }) }}
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: (i % 9) * 0.03 }} whileTap={{ scale: 0.94 }}
-              className={cx('relative flex min-h-[96px] flex-col items-center justify-center gap-1.5 rounded-[22px] px-1.5 py-2.5 text-center transition-colors duration-200',
-                on ? 'bg-navy text-white shadow-[0_8px_18px_rgba(24,41,87,.22)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
-              <MoodFace color={ic.color} face={ic.face} size={40} />
-              <span className="text-[13px] font-semibold leading-tight">{f}</span>
-              <AnimatePresence>{on && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring} className="absolute right-2 top-2 grid size-5 place-items-center rounded-full bg-white text-navy"><Check className="size-3" strokeWidth={3.5} aria-hidden /></motion.span>}</AnimatePresence>
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: (i % 9) * 0.03 }}
+              className="flex flex-col items-center gap-2 rounded-[20px] pb-1 text-center">
+              <motion.span whileTap={{ scale: 0.94 }} animate={on ? { scale: [0.94, 1.04, 1] } : { scale: 1 }} transition={{ duration: 0.35 }}
+                className="relative grid aspect-square w-full max-w-[104px] place-items-center rounded-full transition-colors duration-200"
+                style={on ? { background: ac.c500, color: ac.onInk ? '#17214A' : '#FFFFFF' } : { background: '#FFFFFF', color: '#17214A', boxShadow: 'inset 0 0 0 1.5px #CFDBFF' }}>
+                <FeelingIcon icon={fi.icon} size={62} />
+                <AnimatePresence>{on && (
+                  <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring}
+                    className="absolute right-0.5 top-0.5 grid size-7 place-items-center rounded-full bg-white text-navy shadow-[var(--shadow-card)]">
+                    <Check className="size-4" strokeWidth={3} aria-hidden />
+                  </motion.span>
+                )}</AnimatePresence>
+              </motion.span>
+              <span className="text-[13px] font-semibold leading-tight text-ink">{f}</span>
             </motion.button>
           )
         })}
       </div>
       {!more && (
-        <button type="button" onClick={() => setMore(true)} className="mx-auto mt-4 flex h-11 items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold text-navy">
+        <button type="button" onClick={() => setMore(true)} className="mx-auto mt-5 flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[15px] font-semibold text-navy ring-1 ring-sky-200">
           <Plus className="size-4" /> More feelings
         </button>
       )}
-      {a.feelings.length > 6 && <p className="mt-4 text-[13px] text-muted">That’s a lot to carry. Pick the ones that feel strongest if you like.</p>}
+      {/* rule kept from v4: any number can be chosen; past 3 we gently suggest focusing */}
+      <AnimatePresence>{a.feelings.length > 3 && (
+        <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-5 rounded-[16px] bg-marigold-100 p-3.5 text-[14px] leading-5 text-ink">
+          That’s a lot to carry. The 3 that feel strongest help Jitu Bhaiya most, but keep any that matter.
+        </motion.p>
+      )}</AnimatePresence>
     </div>
   )
 }
@@ -176,33 +208,41 @@ export function StepFeelings({ a, set }: P) {
 export function StepNuance({ a, set }: P) {
   const list = a.feelings.filter((f) => NUANCE[f])
   return (
-    <div className="space-y-4">
-      <StepTitle lead="Tell us a little" em="more" />
+    <div className="space-y-8">
+      <StepTitle lead="Tell us a little" em="more" sub="Tap every line that sounds like you." />
       {list.map((f, idx) => {
         const v = a.nuance[f] ?? { statements: [] }
         const upd = (p: Partial<typeof v>) => set({ nuance: { ...a.nuance, [f]: { ...v, ...p } } })
+        const fi = intakeFeeling(f), ac = ACCENTS[fi.accent]
         return (
-          <motion.div key={f} className="card p-5" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.06 }}>
-            <p className="text-[18px] font-extrabold text-navy">{f} <span className="font-bold text-soft">,  which feels closest?</span></p>
-            <div className="mt-3 space-y-2" role="group" aria-label={`${f} statements`}>
-              {NUANCE[f].map((s) => {
-                const on = v.statements.includes(s)
+          <motion.section key={f} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.06 }} aria-label={f}>
+            <div className="flex items-center gap-3">
+              <span className="grid size-11 shrink-0 place-items-center rounded-full" style={{ background: ac.c500, color: ac.onInk ? '#17214A' : '#FFFFFF' }} aria-hidden>
+                <FeelingIcon icon={fi.icon} size={30} />
+              </span>
+              <h2 className="font-display text-[20px] font-semibold leading-6 text-ink">{f} <span className="font-medium italic text-ink-2">· which feels closest?</span></h2>
+            </div>
+            <div className="mt-3 space-y-2.5" role="group" aria-label={`${f} statements`}>
+              {NUANCE[f].map((st) => {
+                const on = v.statements.includes(st)
                 return (
-                  <button key={s} role="checkbox" aria-checked={on} onClick={() => { buzz(5); upd({ statements: toggle(v.statements, s) }) }}
-                    className={cx('flex w-full items-center gap-3 rounded-[18px] px-3 py-3 text-left text-[14px] transition-colors', on ? 'bg-peri-100 font-semibold text-navy' : 'bg-[#f7f8fb] text-ink')}>
-                    <span className={cx('grid size-6 shrink-0 place-items-center rounded-full border-2 transition', on ? 'border-navy bg-navy' : 'border-[#c6cbd9]')}>
-                      {on && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="size-2.5 rounded-full bg-white" />}
-                    </span>{s}
-                  </button>
+                  <motion.button key={st} type="button" role="checkbox" aria-checked={on} whileTap={{ scale: 0.985 }} onClick={() => { buzz(5); upd({ statements: toggle(v.statements, st) }) }}
+                    className={cx('flex min-h-[60px] w-full items-center gap-3 rounded-[20px] px-4 py-3.5 text-left text-[16px] leading-[22px] transition-colors duration-200',
+                      on ? 'bg-sky-100 font-medium text-ink ring-1 ring-sky-200' : 'bg-white text-ink shadow-[var(--shadow-card)]')}>
+                    <span className="flex-1">{st}</span>
+                    <span className={cx('grid size-7 shrink-0 place-items-center rounded-full transition-colors', on ? 'bg-navy text-white' : 'ring-[1.5px] ring-inset ring-sky-200')} aria-hidden>
+                      <AnimatePresence>{on && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring}><Check className="size-4" strokeWidth={3} /></motion.span>}</AnimatePresence>
+                    </span>
+                  </motion.button>
                 )
               })}
             </div>
-            <p className="mb-2 mt-4 text-[14px] font-bold text-navy">Intensity</p>
+            <p className="mb-2 mt-4 text-[14px] font-semibold text-ink-2">How strong is it?</p>
             <Segmented value={v.intensity} onChange={(intensity) => upd({ intensity })} options={(['Mild', 'Moderate', 'Strong'] as const).map((x) => ({ value: x, label: x }))} />
-          </motion.div>
+          </motion.section>
         )
       })}
-      {list.length === 0 && <p className="text-[15px] text-muted">Nothing more needed here. Tap Continue.</p>}
+      {list.length === 0 && <p className="text-[15px] text-ink-2">Nothing more needed here. Tap Next.</p>}
     </div>
   )
 }
@@ -212,7 +252,7 @@ const BACK: Record<string, [number, number, number, number]> = { 'Upper back': [
 function Figure({ regions, on, toggleArea, label }: { regions: Record<string, [number, number, number, number]>; on: string[]; toggleArea: (s: string) => void; label: string }) {
   return (
     <svg viewBox="0 0 120 220" className="h-[210px] w-auto" role="group" aria-label={label}>
-      <defs><linearGradient id={`body-${label}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#dbe1f6" /><stop offset="1" stopColor="#c9d2ef" /></linearGradient></defs>
+      <defs><linearGradient id={`body-${label}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#E6EDFF" /><stop offset="1" stopColor="#CFDBFF" /></linearGradient></defs>
       <g fill={`url(#body-${label})`}>
         <circle cx="60" cy="24" r="17" /><rect x="53" y="38" width="14" height="12" rx="6" />
         <path d="M30 56c0-6 6-10 14-10h32c8 0 14 4 14 10l6 62c1 6-8 8-9 2l-6-46-2 40H41l-2-40-6 46c-1 6-10 4-9-2Z" />
@@ -222,7 +262,7 @@ function Figure({ regions, on, toggleArea, label }: { regions: Record<string, [n
         const sel = on.includes(k)
         return (
           <g key={k} role="checkbox" aria-checked={sel} aria-label={k} tabIndex={0} onClick={() => toggleArea(k)} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleArea(k)} className="cursor-pointer outline-none">
-            <motion.ellipse cx={cx_} cy={cy} rx={rx} ry={ry} fill="#f08a7e" initial={false} animate={{ opacity: sel ? 0.75 : 0, scale: sel ? 1 : 0.6 }} style={{ filter: 'blur(3px)', transformOrigin: `${cx_}px ${cy}px` }} />
+            <motion.ellipse cx={cx_} cy={cy} rx={rx} ry={ry} fill="#EE7F5F" initial={false} animate={{ opacity: sel ? 0.75 : 0, scale: sel ? 1 : 0.6 }} style={{ filter: 'blur(3px)', transformOrigin: `${cx_}px ${cy}px` }} />
             <ellipse cx={cx_} cy={cy} rx={rx} ry={ry} fill="transparent" />
           </g>
         )
@@ -262,7 +302,7 @@ function Slider({ label, value, onChange }: { label: string; value: number; onCh
       <div className="flex items-baseline justify-between"><p className="text-[18px] font-extrabold text-navy">{label} <span className="text-soft">{value}/5</span></p></div>
       <input type="range" min={1} max={5} step={1} value={value} onChange={(e) => { buzz(4); onChange(Number(e.target.value)) }} aria-label={label}
         className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full bg-peri-100 accent-navy [&::-webkit-slider-thumb]:size-7 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-navy [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md"
-        style={{ background: `linear-gradient(90deg,#182957 ${(value - 1) * 25}%,#dce2f5 ${(value - 1) * 25}%)` }} />
+        style={{ background: `linear-gradient(90deg,#4C6FD6 ${(value - 1) * 25}%,#E6EDFF ${(value - 1) * 25}%)` }} />
     </div>
   )
 }
@@ -280,7 +320,7 @@ export function StepSleep({ a, set }: P) {
             const on = a.sleepQuality === v
             return (
               <motion.button key={label} type="button" role="radio" aria-checked={on} whileTap={{ scale: 0.92 }} onClick={() => { buzz(6); set({ sleepQuality: v }) }}
-                className={cx('flex flex-col items-center gap-1.5 rounded-[18px] px-1 pb-2.5 pt-2.5 transition-colors', on ? 'bg-navy text-white shadow-[0_6px_16px_rgba(24,41,87,.25)]' : 'bg-peri-50/80 text-navy')}>
+                className={cx('flex flex-col items-center gap-1.5 rounded-[18px] px-1 pb-2.5 pt-2.5 transition-colors', on ? 'bg-navy text-white shadow-[var(--shadow-cta)]' : 'bg-sky-50 text-ink ring-1 ring-sky-200')}>
                 <motion.span animate={on ? { scale: [1, 1.15, 1] } : { scale: 1 }} transition={{ duration: 0.35 }} className="block" aria-hidden>
                   <MoodFace color={SLEEP_FACES[i].color} face={SLEEP_FACES[i].face} size={36} />
                 </motion.span>
@@ -313,14 +353,14 @@ export function StepLife({ a, set }: P) {
           const pick = () => { buzz(5); set({ life: l.label === 'Nothing major' ? (on ? [] : ['Nothing major']) : toggle(a.life.filter((x) => x !== 'Nothing major'), l.label) }) }
           return (
             <motion.button key={l.label} role="checkbox" aria-checked={on} onClick={pick} whileTap={{ scale: 0.96 }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-              className={cx('flex min-h-[64px] items-center gap-2.5 rounded-[22px] p-3 text-left text-[14px] font-semibold transition-colors', on ? 'bg-navy text-white' : 'bg-white text-navy shadow-[var(--shadow-card)]', l.label === 'Nothing major' && 'col-span-2')}>
+              className={cx('flex min-h-[64px] items-center gap-2.5 rounded-[20px] p-3 text-left text-[14px] font-semibold transition-colors', on ? 'bg-navy text-white' : 'bg-white text-navy shadow-[var(--shadow-card)]', l.label === 'Nothing major' && 'col-span-2')}>
               <MoodImg mood={l.mood} size={36} />{l.label}
             </motion.button>
           )
         })}
       </div>
       <input value={a.lifeOther} onChange={(e) => set({ lifeOther: e.target.value.slice(0, 300) })} placeholder="Anything else you’d like to share" aria-label="Anything else you’d like to share"
-        className="h-14 w-full rounded-[22px] bg-white px-5 text-[15px] shadow-[var(--shadow-card)] outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
+        className="h-14 w-full rounded-[20px] bg-white px-5 text-[15px] shadow-[var(--shadow-card)] outline-none placeholder:text-muted focus:ring-2 focus:ring-blue" />
     </div>
   )
 }
@@ -336,7 +376,7 @@ function YesNo({ label, hint, value, onChange, children }: { label: string; hint
     </div>
   )
 }
-const small = 'mt-2 h-11 w-full rounded-full bg-peri-50 px-4 text-[14px] outline-none focus:ring-2 focus:ring-navy'
+const small = 'mt-2 h-11 w-full rounded-full bg-peri-50 px-4 text-[14px] outline-none focus:ring-2 focus:ring-blue'
 export function StepSafety({ a, set }: P) {
   const s = a.safety, up = (p: Partial<typeof s>) => set({ safety: { ...s, ...p } })
   return (
@@ -359,7 +399,7 @@ export function StepSafety({ a, set }: P) {
 export function SafetyCard() {
   return (
     <motion.div initial={{ opacity: 0, y: 16, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={spring}
-      className="rounded-[28px] bg-[linear-gradient(135deg,#e9edfa,#dce2f5)] p-5" role="region" aria-label="Support">
+      className="rounded-[24px] bg-sky-100 p-5" role="region" aria-label="Support">
       <div className="flex items-start gap-3">
         <motion.span animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 1.6, repeat: Infinity }} className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-navy"><Heart className="size-5" /></motion.span>
         <div><p className="text-[18px] font-extrabold text-navy">You’re not alone.</p><p className="text-[14px] leading-5 text-muted">Talk to someone now. It’s free and confidential.</p></div>
@@ -455,7 +495,7 @@ export function CheckinNews({ c, set }: { c: Checkin; set: (p: Partial<Checkin>)
     <div className="space-y-4">
       <StepTitle lead="Anything" em="new?" />
       <textarea value={c.news} onChange={(e) => set({ news: e.target.value.slice(0, 800) })} rows={4} placeholder="Optional. Anything you’d like Jitu Bhaiya to know" aria-label="Anything new"
-        className="card w-full resize-none p-5 text-[15px] outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
+        className="card w-full resize-none p-5 text-[15px] outline-none placeholder:text-muted focus:ring-2 focus:ring-blue" />
       <div className="card p-5">
         <Label>I took my drops</Label>
         <div className="grid grid-cols-2 gap-2">{['Every day', 'Most days', 'Sometimes', 'Rarely'].map((d) => <Chip key={d} on={c.drops === d} onClick={() => set({ drops: d })} className="justify-center">{d}</Chip>)}</div>

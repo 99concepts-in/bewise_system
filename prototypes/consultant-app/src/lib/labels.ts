@@ -3,6 +3,8 @@ import { dayLabel, fmtTime } from './time'
 import type { Appt, Kind } from '../data/types'
 
 export const FEE: Record<Kind, number> = { first: 1000, followup: 800 }
+/** v5 (HUB 2026-11-20): a blend holds at most 7 flowers (spec §5 "Build remedy · 3/7 flowers"). */
+export const MAX_FLOWERS = 7
 export const KIND_LABEL: Record<Kind, string> = { first: 'First consultation', followup: 'Follow-up' }
 export const STATUS_LABEL: Record<Appt['status'], string> = {
   awaiting_payment: 'Awaiting payment', confirmed: 'Confirmed', checked_in: 'Checked in', in_session: 'In session', completed: 'Completed', no_show: 'No-show',

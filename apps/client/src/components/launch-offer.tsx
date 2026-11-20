@@ -3,6 +3,7 @@
  * @module   commerce-ux
  * @owner    CLIENT
  * @screens  Launch offer banner + full-screen offer (owner 2026-11-18)
+ * v5 (HUB 2026-11-20): solid navy + marigold (no gradients); the celebratory glow on the gift stays as illustration.
  * Flow:     banner → animated yearly offer (₹9,600 cut to ₹8,000, 2 months free, save ₹1,600) → pay or WhatsApp
  *           ✕ → "Are you sure?" → 6-month offer (1 month free) → claim or skip
  *           paid → congratulations + 15% first-purchase coupon (7 days)
@@ -47,13 +48,13 @@ export function LaunchBanner() {
   return (
     <>
       {show && <motion.button onClick={() => { buzz(10); setOpen(true) }} whileTap={{ scale: 0.98 }} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-        className="relative flex w-full items-center gap-3 overflow-hidden rounded-[24px] bg-[linear-gradient(120deg,#182957,#2c4384_55%,#b58a3c)] p-3.5 pr-4 text-left text-white shadow-[var(--shadow-float)]"
+        className="relative flex w-full items-center gap-3 overflow-hidden rounded-[24px] bg-navy p-3.5 pr-4 text-left text-white shadow-[var(--shadow-float)]"
         aria-label="Reveal your introductory offer">
         <motion.span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-white/20 blur-md"
           animate={{ x: ['0%', '480%'] }} transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' }} />
         <motion.span className="grid size-11 shrink-0 place-items-center rounded-full bg-white/15 text-[22px]" animate={{ rotate: [0, -10, 10, -6, 0] }} transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2.5 }} aria-hidden>🎁</motion.span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#f6de8d]">Just for you</span>
+          <span className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#F2A93B]">Just for you</span>
           <span className="block text-[15px] font-bold leading-tight">A new introductory offer for you</span>
           <span className="block text-[12px] text-white/75">Valid till 1 December · <Countdown compact /> left</span>
         </span>
@@ -90,7 +91,7 @@ export function LaunchOffer({ open, onClose, start = 'yearly' }: { open: boolean
     <>
       <AnimatePresence>
         {open && (
-          <motion.div role="dialog" aria-modal="true" aria-label="Launch offer" className="fixed inset-0 z-[44] mx-auto flex max-w-[480px] flex-col overflow-y-auto bg-[radial-gradient(120%_80%_at_50%_0%,#2c4384_0%,#182957_55%,#0f1b3d_100%)] text-white"
+          <motion.div role="dialog" aria-modal="true" aria-label="Launch offer" className="fixed inset-0 z-[44] mx-auto flex max-w-[480px] flex-col overflow-y-auto bg-navy text-white"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
             <Sparkle />
             {stage !== 'congrats' && (
@@ -109,9 +110,9 @@ export function LaunchOffer({ open, onClose, start = 'yearly' }: { open: boolean
       <AnimatePresence>
         {open && stage === 'sure' && (
           <motion.div className="fixed inset-0 z-[46] mx-auto flex max-w-[480px] items-center justify-center bg-[#0f1b3d]/70 px-6 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <motion.div role="alertdialog" aria-modal="true" aria-labelledby="sure-h" className="w-full rounded-[28px] bg-white p-6 text-center shadow-[var(--shadow-float)]"
+            <motion.div role="alertdialog" aria-modal="true" aria-labelledby="sure-h" className="w-full rounded-[24px] bg-white p-6 text-center shadow-[var(--shadow-float)]"
               initial={{ scale: 0.85, y: 20 }} animate={{ scale: 1, y: 0 }} transition={{ type: 'spring', stiffness: 320, damping: 24 }}>
-              <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#fbf3dc] text-[30px]" aria-hidden>🥺</span>
+              <span className="mx-auto grid size-16 place-items-center rounded-full bg-marigold-100 text-[30px]" aria-hidden>🥺</span>
               <h2 id="sure-h" className="mt-3 text-[22px] font-extrabold tracking-[-0.02em] text-navy">Are you sure?</h2>
               <p className="mt-1.5 text-[15px] leading-6 text-muted">You’ll miss <b className="text-navy">2 months free</b> and a saving of {formatINR(planSaving('yearly'))}. This price won’t come back after 1 December.</p>
               <div className="mt-5 space-y-2">
@@ -143,15 +144,15 @@ function OfferBody({ id, onClaim, onSkip, onSmaller }: { id: PlanId; onClaim: ()
   return (
     <motion.div className="relative flex min-h-full flex-1 flex-col px-6 pb-6 pt-14 safe-t" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -24 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
       <div className="relative mx-auto grid size-[112px] place-items-center">
-        <motion.span aria-hidden className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,#f6de8d55,transparent_25%,#f6de8d55_50%,transparent_75%,#f6de8d55)]"
+        <motion.span aria-hidden className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,#F2A93B55,transparent_25%,#F2A93B55_50%,transparent_75%,#F2A93B55)]"
           animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: 'linear' }} />
-        <motion.span aria-hidden className="absolute inset-3 rounded-full bg-[#f6de8d]/25 blur-xl" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2.4, repeat: Infinity }} />
+        <motion.span aria-hidden className="absolute inset-3 rounded-full bg-[#F2A93B]/25 blur-xl" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2.4, repeat: Infinity }} />
         <motion.span className="relative text-[58px]" aria-hidden initial={{ scale: 0, rotate: -30 }} animate={{ scale: [0, 1.25, 1], rotate: [-30, 8, 0] }} transition={{ duration: 0.8, ease: 'easeOut' }}>
           {half ? '🌱' : '🎁'}
         </motion.span>
       </div>
 
-      <motion.p className="mt-4 text-center text-[12px] font-bold uppercase tracking-[0.3em] text-[#f6de8d]" initial={{ opacity: 0, letterSpacing: '0.6em' }} animate={{ opacity: 1, letterSpacing: '0.3em' }} transition={{ delay: 0.2, duration: 0.7 }}>
+      <motion.p className="mt-4 text-center text-[12px] font-bold uppercase tracking-[0.3em] text-[#F2A93B]" initial={{ opacity: 0, letterSpacing: '0.6em' }} animate={{ opacity: 1, letterSpacing: '0.3em' }} transition={{ delay: 0.2, duration: 0.7 }}>
         {half ? 'Recommended minimum' : 'Launch offer'}
       </motion.p>
       <motion.h2 className="mt-2 text-center text-[30px] font-extrabold leading-tight tracking-[-0.03em]" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
@@ -161,21 +162,21 @@ function OfferBody({ id, onClaim, onSkip, onSmaller }: { id: PlanId; onClaim: ()
         {half ? <><b className="font-semibold text-white">Scared of a big commitment? Try 6 months first.</b><br />The minimum we recommend to feel the change: a consultation with Jitu Bhaiya every month, your remedy blend included each time.</> : <>A consultation with Jitu Bhaiya every month for {p.months} months, your remedy blend included each time.</>}
       </motion.p>
 
-      <motion.div className="relative mx-auto mt-6 w-full max-w-[340px] rounded-[30px] bg-white/10 p-5 text-center ring-1 ring-white/15 backdrop-blur" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5, type: 'spring', stiffness: 220, damping: 20 }}>
+      <motion.div className="relative mx-auto mt-6 w-full max-w-[340px] rounded-[32px] bg-white/10 p-5 text-center ring-1 ring-white/15 backdrop-blur" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5, type: 'spring', stiffness: 220, damping: 20 }}>
         <div className="relative mx-auto h-8 w-fit">
           <motion.span className="text-[22px] font-bold text-white/70 tnum" animate={{ opacity: phase >= 1 ? 1 : 0, scale: phase >= 3 ? 0.9 : 1 }}>{formatINR(full)}</motion.span>
           <motion.span aria-hidden className="absolute left-[-6%] top-1/2 h-[3px] w-[112%] origin-left -rotate-6 rounded-full bg-[#f08fa0]" initial={{ scaleX: 0 }} animate={{ scaleX: phase >= 2 ? 1 : 0 }} transition={{ duration: 0.4, ease: 'easeOut' }} />
         </div>
-        <motion.p className="mt-1 text-[52px] font-extrabold leading-none tracking-[-0.03em] text-[#f6de8d] tnum" animate={phase >= 3 ? { scale: [1, 1.12, 1] } : {}} transition={{ duration: 0.5 }}>
+        <motion.p className="mt-1 text-[52px] font-extrabold leading-none tracking-[-0.03em] text-[#F2A93B] tnum" animate={phase >= 3 ? { scale: [1, 1.12, 1] } : {}} transition={{ duration: 0.5 }}>
           {formatINR(shown)}
         </motion.p>
         <p className="mt-1 text-[13px] text-white/70">for {p.months} months · {formatINR(Math.round(price / p.months))} a month</p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           <AnimatePresence>
             {phase >= 3 && <motion.span key="free" initial={{ scale: 0, rotate: -12 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 14 }}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#f6de8d] px-3.5 py-1.5 text-[13px] font-extrabold text-navy"><Gift className="size-4" /> {p.free} month{p.free > 1 ? 's' : ''} FREE</motion.span>}
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#F2A93B] px-3.5 py-1.5 text-[13px] font-extrabold text-navy"><Gift className="size-4" /> {p.free} month{p.free > 1 ? 's' : ''} FREE</motion.span>}
             {phase >= 3 && <motion.span key="save" initial={{ scale: 0, rotate: 12 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 14, delay: 0.15 }}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#bfd8c2] px-3.5 py-1.5 text-[13px] font-extrabold text-[#1f4a2c]"><Sparkles className="size-4" /> You save {formatINR(save)}</motion.span>}
+              className="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-3.5 py-1.5 text-[13px] font-extrabold text-sage-text"><Sparkles className="size-4" /> You save {formatINR(save)}</motion.span>}
           </AnimatePresence>
         </div>
       </motion.div>
@@ -187,7 +188,7 @@ function OfferBody({ id, onClaim, onSkip, onSmaller }: { id: PlanId; onClaim: ()
 
       <div className="mt-auto space-y-2.5 pt-6 safe-b">
         <motion.div className="rounded-full" animate={{ boxShadow: ['0 0 0 0 rgba(246,222,141,.55)', '0 0 0 14px rgba(246,222,141,0)'] }} transition={{ duration: 1.8, repeat: Infinity, delay: 2.2 }}>
-          <button onClick={() => { buzz(14); onClaim() }} className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(90deg,#f6de8d,#e9c46a)] text-[16px] font-extrabold text-navy shadow-[0_12px_30px_rgba(246,222,141,.35)]">
+          <button onClick={() => { buzz(14); onClaim() }} className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-marigold text-[16px] font-extrabold text-navy shadow-[0_12px_30px_rgba(246,222,141,.35)]">
             <span aria-hidden>🔒</span> Claim offer · Pay {formatINR(price)}
           </button>
         </motion.div>
@@ -195,7 +196,7 @@ function OfferBody({ id, onClaim, onSkip, onSmaller }: { id: PlanId; onClaim: ()
           className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white/12 text-[15px] font-semibold text-white ring-1 ring-white/20">
           <MessageCircle className="size-5" /> Ask on WhatsApp
         </a>
-        {onSmaller && <button onClick={onSmaller} className="block w-full py-2 text-center text-[14px] font-semibold text-white/80">Not ready for a whole year? <span className="text-[#f6de8d] underline underline-offset-4">Try 6 months</span></button>}
+        {onSmaller && <button onClick={onSmaller} className="block w-full py-2 text-center text-[14px] font-semibold text-white/80">Not ready for a whole year? <span className="text-[#F2A93B] underline underline-offset-4">Try 6 months</span></button>}
         {onSkip && <button onClick={onSkip} className="block w-full py-2 text-center text-[14px] font-semibold text-white/70 underline underline-offset-4">Skip offer</button>}
       </div>
     </motion.div>
@@ -210,21 +211,21 @@ function Congrats({ onDone }: { onDone: () => void }) {
       <Confetti />
       <div className="relative grid size-[150px] place-items-center">
         {[0, 1, 2].map((i) => (
-          <motion.span key={i} aria-hidden className="absolute inset-0 rounded-full border-2 border-[#f6de8d]/60" initial={{ scale: 0.4, opacity: 0.9 }} animate={{ scale: 1.6, opacity: 0 }} transition={{ duration: 2.2, repeat: Infinity, delay: i * 0.7 }} />
+          <motion.span key={i} aria-hidden className="absolute inset-0 rounded-full border-2 border-[#F2A93B]/60" initial={{ scale: 0.4, opacity: 0.9 }} animate={{ scale: 1.6, opacity: 0 }} transition={{ duration: 2.2, repeat: Infinity, delay: i * 0.7 }} />
         ))}
-        <motion.span className="relative grid size-[110px] place-items-center rounded-full bg-[radial-gradient(circle_at_35%_30%,#fff6d6,#f6de8d_60%,#d9b35a)] text-[54px] shadow-[0_0_60px_rgba(246,222,141,.55)]"
+        <motion.span className="relative grid size-[110px] place-items-center rounded-full bg-marigold text-[54px] shadow-[0_0_60px_rgba(246,222,141,.55)]"
           initial={{ scale: 0, rotate: -40 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 12 }} aria-hidden>🌸</motion.span>
       </div>
-      <motion.p className="mt-6 text-[12px] font-bold uppercase tracking-[0.3em] text-[#f6de8d]" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>Congratulations</motion.p>
+      <motion.p className="mt-6 text-[12px] font-bold uppercase tracking-[0.3em] text-[#F2A93B]" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>Congratulations</motion.p>
       <motion.h2 className="mt-2 text-[26px] font-extrabold leading-tight tracking-[-0.02em]" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
         You’ve just taken the first step towards your mental and emotional wellbeing
       </motion.h2>
 
       <motion.div className="relative mt-7 w-full max-w-[340px] overflow-hidden rounded-[26px] bg-white p-5 text-left text-navy shadow-[0_20px_50px_rgba(0,0,0,.25)]"
         initial={{ opacity: 0, y: 40, rotate: -4 }} animate={{ opacity: 1, y: 0, rotate: 0 }} transition={{ delay: 1, type: 'spring', stiffness: 160, damping: 16 }}>
-        <span aria-hidden className="absolute -left-3 top-1/2 size-6 -translate-y-1/2 rounded-full bg-[#182957]" />
-        <span aria-hidden className="absolute -right-3 top-1/2 size-6 -translate-y-1/2 rounded-full bg-[#182957]" />
-        <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-[#8a6a2c]">🎁 A gift from the BeWise app</p>
+        <span aria-hidden className="absolute -left-3 top-1/2 size-6 -translate-y-1/2 rounded-full bg-[#243D91]" />
+        <span aria-hidden className="absolute -right-3 top-1/2 size-6 -translate-y-1/2 rounded-full bg-[#243D91]" />
+        <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink-2">🎁 A gift from the BeWise app</p>
         <p className="mt-1 text-[34px] font-extrabold leading-none tracking-[-0.03em]">{coupon?.pct ?? COUPON_PCT}% off</p>
         <p className="mt-1 text-[14px] text-muted">on all products, on your first purchase</p>
         <div className="mt-3 flex items-center justify-between border-t border-dashed border-line pt-3">
@@ -234,7 +235,7 @@ function Congrats({ onDone }: { onDone: () => void }) {
       </motion.div>
 
       <div className="mt-auto w-full space-y-2.5 pt-7 safe-b">
-        <Link href="/app/shop" onClick={onDone} className="flex h-14 w-full items-center justify-center rounded-full bg-[linear-gradient(90deg,#f6de8d,#e9c46a)] text-[16px] font-extrabold text-navy">Shop with {coupon?.pct ?? COUPON_PCT}% off</Link>
+        <Link href="/app/shop" onClick={onDone} className="flex h-14 w-full items-center justify-center rounded-full bg-marigold text-[16px] font-extrabold text-navy">Shop with {coupon?.pct ?? COUPON_PCT}% off</Link>
         <Link href="/app/book?type=followup" onClick={onDone} className="flex h-12 w-full items-center justify-center rounded-full bg-white/12 text-[15px] font-semibold text-white ring-1 ring-white/20">Book my session</Link>
       </div>
     </motion.div>
@@ -258,7 +259,7 @@ function Sparkle() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
       {dots.map((p, i) => (
-        <motion.span key={i} className="absolute rounded-full bg-[#f6de8d]" style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.s, height: p.s }}
+        <motion.span key={i} className="absolute rounded-full bg-[#F2A93B]" style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.s, height: p.s }}
           animate={{ opacity: [0, 1, 0], scale: [0.6, 1.4, 0.6] }} transition={{ duration: p.d, repeat: Infinity, delay: p.delay }} />
       ))}
     </div>

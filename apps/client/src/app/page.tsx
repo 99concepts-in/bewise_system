@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { motion } from 'motion/react'
 import { useApp } from '@/lib/store'
-import { LogoMark } from '@/components/brand'
+import { LogoStacked } from '@/components/brand'
 
 export default function Entry() {
   const router = useRouter()
@@ -24,7 +24,7 @@ export default function Entry() {
   return (
     <main className="grid min-h-dvh place-items-center">
       <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5 }}>
-        <LogoMark size={88} />
+        <LogoStacked height={140} />
       </motion.div>
     </main>
   )

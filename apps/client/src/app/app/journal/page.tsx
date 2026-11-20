@@ -38,7 +38,7 @@ export default function Journal() {
       <Reveal className="space-y-4">
         <Item><h1 className="h-duo pt-2 text-[32px]">Your mood <em>journal</em></h1></Item>
         <Item>
-          <label className="flex h-14 items-center gap-3 rounded-full bg-white px-5 shadow-[var(--shadow-card)] focus-within:ring-2 focus-within:ring-navy">
+          <label className="flex h-14 items-center gap-3 rounded-full bg-white px-5 shadow-[var(--shadow-card)] focus-within:ring-2 focus-within:ring-blue">
             <Search className="size-5 text-navy" aria-hidden />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings, notes or dates" aria-label="Search feelings, notes or dates" className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted" />
             {q && <button aria-label="Clear search" onClick={() => setQ('')}><X className="size-4 text-muted" /></button>}
@@ -74,7 +74,7 @@ export default function Journal() {
                     const on = tip === i
                     return (
                       <button key={i} aria-label={`${fmtDay(d.date)}: ${d.mood ? moodOf(d.mood).label : 'nothing logged'}`} onClick={() => setTip(on ? null : i)} className="relative flex h-full flex-1 items-end">
-                        <motion.span className="block w-full rounded-full" style={{ background: d.mood ? (on ? '#182957' : moodOf(d.mood).color) : '#eef0f6' }}
+                        <motion.span className="block w-full rounded-full" style={{ background: d.mood ? (on ? '#243D91' : moodOf(d.mood).color) : '#eef0f6' }}
                           initial={{ height: 0 }} animate={{ height: h }} transition={{ duration: 0.8, ease, delay: 0.25 + i * 0.035 }} />
                         <AnimatePresence>
                           {on && d.mood && (
@@ -140,7 +140,7 @@ export default function Journal() {
       </Reveal>
 
       <motion.button aria-label="Log a feeling" onClick={openLog} whileTap={{ scale: 0.9 }} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ ...spring, delay: 0.4 }}
-        className="fixed bottom-28 right-[max(20px,calc(50vw-220px))] z-30 grid size-14 place-items-center rounded-full bg-[linear-gradient(135deg,#182957,#5e7fb8)] text-white shadow-[var(--shadow-float)]">
+        className="fixed bottom-28 right-[max(20px,calc(50vw-220px))] z-30 grid size-14 place-items-center rounded-full bg-navy text-white shadow-[var(--shadow-float)]">
         <Plus className="size-6" />
       </motion.button>
 

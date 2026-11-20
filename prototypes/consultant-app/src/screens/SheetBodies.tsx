@@ -1,19 +1,22 @@
 /**
  * @screens CN-09 CN-10 CN-14 CN-15 CN-19 CN-28 — every bottom-sheet body, loaded lazily (and prefetched on idle).
+ * v5 (HUB 2026-11-20, D-45): remedy builder is a flower-tile grid ("Flowers to consider" first), max 7 flowers,
+ *          with a floating "Build remedy · n/7 flowers" pill; feelings and blends shown as colour chips and flower thumbnails.
  */
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat } from 'lucide-react'
+import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Droplet, MapPin, MessageCircle, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat, ShieldAlert, X } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
 import { Avatar, Chip, Segmented, go, softSpring, spring, useToast } from '../ui/kit'
 import { dayLabel, fmtDay, fmtShort, fmtTime, relative, inr } from '../lib/time'
 import { nextDays, nextFree, slotsForDay } from '../lib/slots'
 import { FLOWERS, MIN, startOfDay } from '../data/seed'
 import { suggestFlowers } from '../lib/derive'
-import { Suggestions } from '../ui/care'
+import { FlowerTile, Suggestions } from '../ui/care'
+import { FeelingChips, FlowerArt, FlowerChip } from '../ui/art'
 import { pron, type Appt, type Kind, type Mode, type Person } from '../data/types'
 
-import { FEE, KIND_LABEL, STATUS_LABEL, waLink, BOOKING_LINK } from '../lib/labels'
+import { FEE, KIND_LABEL, MAX_FLOWERS, STATUS_LABEL, waLink, BOOKING_LINK } from '../lib/labels'
 import type { Api, Open } from './Sheets'
 
 // ---------------------------------------------------------------- session details
@@ -43,15 +46,20 @@ function SessionBody({ id, close, api }: { id: string; close: () => void; api: A
       </div>
       <div className={`status status-${a.status}`}><span>{STATUS_LABEL[a.status]}{upcoming ? `, starts ${relative(a.start, now)}` : ""}</span>{a.status !== 'no_show' && <span className="fee"><IndianRupee size={12} />{inr(FEE[a.kind]).slice(1)} incl. remedy</span>}</div>
 
+      {a.safety && upcoming && <p className="safety-note"><ShieldAlert size={18} aria-hidden /><span><b>Safety answer in the intake.</b> Read it before you begin.</span></p>}
       {a.note && <blockquote className="quote-note">“{a.note}”<cite>{p.first}'s note when booking</cite></blockquote>}
 
+      {a.feelings && (
+        <section className="sd-sec"><h4>How {p.first} is feeling</h4>
+          <FeelingChips items={a.feelings} max={6} /></section>
+      )}
       {a.troubling && (
         <section className="sd-sec"><h4>What was troubling {pron(p).obj}</h4>
-          <div className="chips-wrap">{a.troubling.map((t) => <span key={t} className="tag">{t}</span>)}</div></section>
+          <FeelingChips items={a.troubling} max={12} /></section>
       )}
       {a.remedy && (
-        <section className="sd-sec"><h4><Leaf size={15} /> Remedy given {fmtShort(a.remedy.givenAt)}</h4>
-          <div className="chips-wrap">{a.remedy.flowers.map((f) => <span key={f} className="tag tag-sage">{f}</span>)}</div></section>
+        <section className="sd-sec"><h4><Droplet size={16} aria-hidden /> Remedy given {fmtShort(a.remedy.givenAt)}</h4>
+          <div className="fchips">{a.remedy.flowers.map((f) => <FlowerChip key={f} name={f} />)}</div></section>
       )}
       {a.rating && (
         <section className="sd-sec"><h4>{p.first}'s feedback</h4>
@@ -62,7 +70,7 @@ function SessionBody({ id, close, api }: { id: string; close: () => void; api: A
       <div className="sd-actions">
         {upcoming && <>
           <button className="btn btn-primary" disabled={!startsSoon} onClick={() => { close(); go(`/session/${a.id}`) }}>
-            <Play size={16} /> {startsSoon ? 'Start session' : `Starts ${relative(a.start, now)}`}
+            <Play size={18} aria-hidden /> {startsSoon ? 'Start session' : `Starts ${relative(a.start, now)}`}
           </button>
           <div className="btn-row">
             <button className="btn btn-quiet" onClick={() => api.reschedule(a.id)}><CalendarClock size={16} /> Reschedule</button>
@@ -70,7 +78,7 @@ function SessionBody({ id, close, api }: { id: string; close: () => void; api: A
             <a className="btn btn-quiet" href={`tel:${p.phone.replace(/\s/g, '')}`}><Phone size={16} /> Call</a>
           </div>
         </>}
-        {a.status === 'completed' && !a.remedy && <button className="btn btn-primary" onClick={() => api.remedy(a.id)}><Leaf size={16} /> Give remedy</button>}
+        {a.status === 'completed' && !a.remedy && <button className="btn btn-primary" onClick={() => api.remedy(a.id)}><Droplet size={18} aria-hidden /> Give remedy</button>}
         {(a.status === 'completed' || a.status === 'no_show') && <button className="btn btn-quiet" onClick={() => api.book(p.id)}><CalendarPlus size={16} /> Book follow-up</button>}
       </div>
     </div>
@@ -139,7 +147,7 @@ function SlotBody({ o, close }: { o: Extract<Open, { k: 'slots' }>; close: () =>
   )
 }
 
-// ---------------------------------------------------------------- give remedy
+// ---------------------------------------------------------------- give remedy: the remedy builder
 function RemedyBody({ apptId, close }: { apptId: string; close: () => void }) {
   const { s, dispatch, now } = useStore()
   const { person, byPerson } = useIndex()
@@ -147,34 +155,63 @@ function RemedyBody({ apptId, close }: { apptId: string; close: () => void }) {
   const a = s.appts.find((x) => x.id === apptId)!
   const p = person.get(a.personId)!
   const last = [...(byPerson.get(p.id) ?? [])].reverse().find((x) => x.remedy && x.id !== a.id)
-  const [picked, setPicked] = useState<string[]>(last?.remedy?.flowers ?? [])
+  const [picked, setPicked] = useState<string[]>((last?.remedy?.flowers ?? []).slice(0, MAX_FLOWERS))
   const [q, setQ] = useState('')
   const history = (byPerson.get(p.id) ?? []).filter((x) => x.id !== a.id && x.start < a.start)
   const suggestions = useMemo(() => suggestFlowers(p, history, a.troubling ?? []), [p, history.length, a.troubling]) // eslint-disable-line react-hooks/exhaustive-deps
-  const list = FLOWERS.filter((f) => f.toLowerCase().includes(q.toLowerCase()))
-  const toggle = (f: string) => setPicked((x) => x.includes(f) ? x.filter((y) => y !== f) : [...x, f])
+  const suggested = new Set(suggestions.map((x) => x.flower))
+  const ql = q.trim().toLowerCase()
+  // all 38 + Rescue: while searching show every match; otherwise the ones not already offered above
+  const list = FLOWERS.filter((f) => (ql ? f.toLowerCase().includes(ql) : !suggested.has(f)))
+  const full = picked.length >= MAX_FLOWERS
+  const toggle = (f: string) => {
+    if (picked.includes(f)) { setPicked((x) => x.filter((y) => y !== f)); return }
+    if (full) { toast(`A blend holds up to ${MAX_FLOWERS} flowers. Remove one to add ${f}.`); return }
+    setPicked((x) => [...x, f])
+  }
+  const give = () => { dispatch({ type: 'giveRemedy', apptId, flowers: picked, now: Date.now() }); toast(`Remedy given. The office is preparing ${p.first}'s bottle.`); close() }
   return (
     <div className="remedy">
       <h3 className="sheet-title">Give {p.first}'s remedy</h3>
       <p className="muted small">Session {dayLabel(a.start, now).toLowerCase()} at {fmtTime(a.start)}. Included in the {inr(FEE[a.kind])} fee.{last ? ' Started from the last blend.' : ''}</p>
-      <Suggestions first={p.first} items={suggestions} picked={picked} onToggle={toggle} onAddAll={() => setPicked((x) => [...new Set([...x, ...suggestions.slice(0, 5).map((s) => s.flower)])])} />
-      <h4 className="blend-head">{p.first}'s blend{picked.length ? `, ${picked.length} ${picked.length === 1 ? 'flower' : 'flowers'}` : ''}</h4>
-      <div className="blend">
-        <AnimatePresence initial={false}>
-          {picked.map((f) => (
-            <m.button layout key={f} className="tag tag-sage tag-x" onClick={() => toggle(f)} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.6, opacity: 0 }} transition={spring} aria-label={`Remove ${f}`}>{f} ×</m.button>
-          ))}
-        </AnimatePresence>
-        {picked.length === 0 && <span className="muted small">Tap flowers below to add them.</span>}
+      {(a.troubling ?? a.feelings) && <div className="remedy-feel"><FeelingChips items={a.troubling ?? a.feelings ?? []} max={6} size="sm" /></div>}
+
+      <section className="blend-box" aria-label={`${p.first}'s blend`}>
+        <div className="blend-head"><h4>{p.first}'s blend</h4><span className="blend-count" aria-live="polite">{picked.length}/{MAX_FLOWERS} flowers</span></div>
+        <div className="blend">
+          <AnimatePresence initial={false}>
+            {picked.map((f) => (
+              <m.button layout key={f} type="button" className="blend-chip" onClick={() => toggle(f)} initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.7, opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} aria-label={`Remove ${f}`}>
+                <FlowerArt name={f} decorative /><span>{f}</span><X size={14} aria-hidden />
+              </m.button>
+            ))}
+          </AnimatePresence>
+          {picked.length === 0 && <span className="muted small">Tap flowers below to add them.</span>}
+        </div>
+        <p className="dosage"><b>4 drops, 4 times a day</b> for 3 weeks, 30 ml bottle</p>
+      </section>
+
+      {!ql && <Suggestions first={p.first} items={suggestions} picked={picked} onToggle={toggle} full={full} limit={7}
+        onAddAll={() => setPicked((x) => [...new Set([...x, ...suggestions.map((sg) => sg.flower)])].slice(0, MAX_FLOWERS))} />}
+
+      <section className="all-flowers">
+        <h4 className="sugg-title">{ql ? `Flowers matching “${q.trim()}”` : suggestions.length ? 'All other flowers' : 'All flowers'}</h4>
+        <div className="search-wrap search-in-sheet">
+          <Search size={18} aria-hidden />
+          <input className="search" placeholder="Search by flower name" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search flowers" />
+          {q && <button type="button" className="icon-btn sm" onClick={() => setQ('')} aria-label="Clear search"><X size={16} /></button>}
+        </div>
+        {list.length === 0 && <p className="muted small">No flower matches “{q.trim()}”.</p>}
+        <ul className="ftile-grid">
+          {list.map((f) => <li key={f}><FlowerTile name={f} on={picked.includes(f)} onToggle={toggle} full={full} /></li>)}
+        </ul>
+      </section>
+
+      <div className="sheet-fab">
+        <m.button type="button" className="fab" disabled={!picked.length} onClick={give} whileTap={{ scale: 0.97 }}>
+          <Droplet size={20} aria-hidden /> Build remedy · {picked.length}/{MAX_FLOWERS} flowers
+        </m.button>
       </div>
-      <p className="dosage"><b>4 drops, 4 times a day</b> for 3 weeks, 30 ml bottle</p>
-      <input className="search" placeholder="Add any other flower: search 38 and Rescue Remedy" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search flowers" />
-      <div className="flower-list">
-        {list.map((f) => <Chip key={f} active={picked.includes(f)} onClick={() => toggle(f)}>{f}</Chip>)}
-      </div>
-      <button className="btn btn-primary btn-block" disabled={!picked.length} onClick={() => { dispatch({ type: 'giveRemedy', apptId, flowers: picked, now: Date.now() }); toast(`Remedy given. The office is preparing ${p.first}'s bottle.`); close() }}>
-        <Leaf size={16} /> Give remedy with {picked.length} {picked.length === 1 ? 'flower' : 'flowers'}
-      </button>
     </div>
   )
 }
@@ -287,7 +324,7 @@ function ConfirmBooking({ p, start, kind, mode, onBack, close }: { p: Person; st
   ]
   if (stage !== 'review') return (
     <div className="confirm-done">
-      <m.div className="done-badge" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={softSpring}><img src="./img/owl-wave.webp" width={96} height={96} alt="" /></m.div>
+      <m.div className="done-badge" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={softSpring}><Check size={40} strokeWidth={2.6} aria-hidden /></m.div>
       <h3 className="sheet-title">{p.first} is booked</h3>
       <ol className="done-steps">
         {steps.map((st, i) => (
@@ -394,7 +431,7 @@ function ShareBody() {
   const msg = `${SHARE_MSGS[kind].text}\n${BOOKING_LINK}`
   useEffect(() => {
     let live = true
-    import('qrcode').then((Q) => Q.toDataURL(BOOKING_LINK, { margin: 1, width: 360, color: { dark: '#182957', light: '#FFFFFF' } })).then((u) => { if (live) setQr(u) }).catch(() => {})
+    import('qrcode').then((Q) => Q.toDataURL(BOOKING_LINK, { margin: 1, width: 360, color: { dark: '#17214A', light: '#FFFFFF' } })).then((u) => { if (live) setQr(u) }).catch(() => {})
     return () => { live = false }
   }, [])
   const m0 = new Date(now); m0.setDate(1); m0.setHours(0, 0, 0, 0)

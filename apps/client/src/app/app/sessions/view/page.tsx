@@ -42,7 +42,7 @@ function Detail() {
     <main className="px-5 pb-36">
       <AppHeader back="/app/sessions" title={a.code} />
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }}
-        className={cx('relative mt-2 overflow-hidden rounded-[30px] p-6', past ? 'bg-white shadow-[var(--shadow-card)]' : 'bg-[linear-gradient(140deg,#182957,#3c5596_60%,#5e7fb8)] text-white shadow-[var(--shadow-float)]')}>
+        className={cx('relative mt-2 overflow-hidden rounded-[32px] p-6', past ? 'bg-white shadow-[var(--shadow-card)]' : 'bg-navy text-white shadow-[var(--shadow-float)]')}>
         {!past && <motion.span className="absolute -right-10 -top-10 size-48 rounded-full bg-white/10" animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 5, repeat: Infinity }} />}
         <p className={cx('text-[13px] font-semibold', past ? 'text-peri' : 'text-white/70')}>{past ? 'Completed' : a.timeRequested ? 'Preferred time · awaiting confirmation' : soon ? 'Starting soon' : 'Upcoming'}</p>
         <p className="mt-1 text-[30px] font-extrabold leading-tight tracking-[-0.02em]">{fmtTime(a.startsAt)}</p>
@@ -57,7 +57,7 @@ function Detail() {
 
       <div className="mt-4 space-y-3">
         {a.timeRequested && !past && (
-          <div className="rounded-[22px] bg-[#fbf3dc] p-4 text-[14px] leading-5 text-[#6b5320]">
+          <div className="rounded-[20px] bg-marigold-100 p-4 text-[14px] leading-5 text-[#6b5320]">
             <p><b>Waiting for confirmation.</b> Jitu Bhaiya or Haresh bhai will confirm this time. If it doesn’t work, our team will call you.</p>
             <a href={`tel:${HELPLINE.tel}`} className="mt-2 inline-flex items-center gap-1.5 font-semibold text-navy underline underline-offset-4"><Phone className="size-4" /> Helpline {HELPLINE.label} ({HELPLINE.name})</a>
           </div>
@@ -71,7 +71,7 @@ function Detail() {
 
         {!past && (
           checkin ? (
-            <div className="flex items-center gap-3 rounded-[22px] bg-sage-100/80 p-4 text-[14px] text-sage-text"><Check className="size-5" strokeWidth={3} /><span className="flex-1"><b>Check-in shared</b> · Jitu Bhaiya will read it before you meet</span><button onClick={() => router.push(`/app/checkin?appointment=${a.id}`)} className="font-semibold underline underline-offset-2">Edit</button></div>
+            <div className="flex items-center gap-3 rounded-[20px] bg-sage-100/80 p-4 text-[14px] text-sage-text"><Check className="size-5" strokeWidth={3} /><span className="flex-1"><b>Check-in shared</b> · Jitu Bhaiya will read it before you meet</span><button onClick={() => router.push(`/app/checkin?appointment=${a.id}`)} className="font-semibold underline underline-offset-2">Edit</button></div>
           ) : (
             <button onClick={() => router.push(`/app/checkin?appointment=${a.id}`)} className="card flex w-full items-center gap-3 p-4 text-left">
               <span className="grid size-11 shrink-0 place-items-center rounded-full bg-peri-50 text-[18px]" aria-hidden>📝</span>
@@ -106,7 +106,7 @@ function Detail() {
       </div>
 
       {!past && (
-        <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] space-y-2.5 bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
+        <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] space-y-2.5 bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
           {a.mode === 'online'
             ? <Btn full variant={joinable ? 'gradient' : 'primary'} disabled={!joinable} onClick={() => toast('The video link opens here at session time')}><Video className="size-5" /> {joinable ? 'Join session' : 'Join opens 10 min before'}</Btn>
             : <Btn full variant="gradient" onClick={() => window.open(STUDIO.directionsUrl, '_blank', 'noopener')}><MapPin className="size-5" /> Directions</Btn>}
@@ -199,7 +199,7 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
             <p className="text-[13px] text-muted">Pick any that fit, in your own words.</p>
             <div className="mt-3 flex flex-wrap gap-2">{BENEFITS.map((b) => <Chip key={b} on={benefits.includes(b)} onClick={() => setBenefits(benefits.includes(b) ? benefits.filter((x) => x !== b) : [...benefits, b])}>{b}</Chip>)}</div>
             <label className="mt-6 block text-[15px] font-bold text-navy" htmlFor="fbnotes">Notes for Jitu Bhaiya</label>
-            <textarea id="fbnotes" rows={3} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder="Anything you’d like him to know…" className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
+            <textarea id="fbnotes" rows={3} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder="Anything you’d like him to know…" className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] outline-none focus:ring-2 focus:ring-blue" />
             <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-muted"><Check className="size-3.5" /> Visible only to your consultant</p>
             <Btn full className="mt-5" disabled={!rating} onClick={() => { give(id, { rating, tags, notes, benefits }); setSent(true); buzz(20) }}>Send to Jitu Bhaiya</Btn>
           </motion.div>

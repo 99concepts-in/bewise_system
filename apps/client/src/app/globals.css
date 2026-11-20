@@ -1,32 +1,55 @@
 /**
  * @module   client-shell
  * @owner    CLIENT
- * Purpose:  v4 "Soft Bloom" tokens (design/tokens.json → v4) as Tailwind v4 theme + base styles.
+ * Purpose:  v5 "Blue Bloom" tokens (design/v5-blue/DESIGN-SYSTEM.md, D-45) as Tailwind v4 theme + base styles.
+ *           v5 (HUB 2026-11-20): replaces v4 Soft Bloom. Blue base, colourful accents, Fraunces display + Inter body.
+ *           Legacy v4 token names (peri, sage, gold, soft…) are kept and re-pointed at v5 values so every screen inherits.
  */
 @import 'tailwindcss';
-@import '@fontsource-variable/plus-jakarta-sans';
+@import '@fontsource-variable/fraunces/full.css';
+@import '@fontsource-variable/fraunces/full-italic.css';
+@import '@fontsource-variable/inter';
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  /* one place to swap the display face (Fraunces stands in for Roca until licensed) */
+  --font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 
-  --color-navy: #182957;
-  --color-navy-2: #243d91;
-  --color-peri: #4d6ba6;   /* text-safe periwinkle (5.2:1); gradients keep #5e7fb8 literals */
-  --color-peri-50: #eef1fb;
-  --color-peri-100: #dce2f5;
-  --color-ivory: #faf9f5;
-  --color-sage: #82977e;
-  --color-sage-text: #4f6249;
-  --color-sage-100: #dce7d9;
-  --color-beige: #ede5d9;
-  --color-gold: #b89b64;
-  --color-ink: #1b2238;
-  --color-muted: #5f667a;   /* 5.7:1 on white — AA (consultant app token) */
-  --color-soft: #8a90a0;
-  --color-line: #e9ebf2;
-  --color-rose: #a83a4d;   /* AA on rose-50 */
-  --color-rose-50: #fdeef0;
+  /* v5 base */
+  --color-navy: #243d91;
+  --color-navy-2: #1d3279;   /* pressed / hover */
+  --color-ink: #17214a;      /* 13.9:1 on paper */
+  --color-ink-2: #4a5478;    /* 7.4:1 */
+  --color-muted: #6b7391;    /* 4.8:1 on white */
+  --color-blue: #4c6fd6;     /* highlights, progress, focus ring — not body text */
+  --color-sky-50: #f3f6ff;   /* app background */
+  --color-sky-100: #e6edff;  /* soft cards, selected fill */
+  --color-sky-200: #cfdbff;  /* dividers on blue, chips */
+  --color-line: #e3e8f5;
 
+  /* v5 accents (500 strong · 100 tint) — feelings, categories, illustration only, never body text */
+  --color-marigold: #f2a93b;  --color-marigold-100: #fff1d9;
+  --color-coral: #ee7f5f;     --color-coral-100: #ffe6de;
+  --color-rose-500: #e06a8e;  --color-rose-100: #fde3eb;
+  --color-lilac: #8e74db;     --color-lilac-100: #eee8ff;
+  --color-teal: #2fa39a;      --color-teal-100: #ddf4f1;
+  --color-azure: #3e9be6;     --color-azure-100: #dff0ff;
+
+  /* legacy v4 names → v5 values (screens not yet hand-tuned inherit the new palette) */
+  --color-peri: #3d5ab8;     /* text-safe blue (6:1) */
+  --color-peri-50: #e6edff;
+  --color-peri-100: #cfdbff;
+  --color-ivory: #f3f6ff;
+  --color-sage: #2fa39a;
+  --color-sage-text: #1d756e; /* 4.8:1 on teal-100 */
+  --color-sage-100: #ddf4f1;
+  --color-beige: #e6edff;
+  --color-gold: #c77d12;
+  --color-soft: #6b7391;
+  --color-rose: #b23a5e;     /* alerts / errors (AA on rose-50) */
+  --color-rose-50: #fde3eb;
+
+  /* journal mood characters keep their own pastel family */
   --color-mood-calm: #bfd8c2;
   --color-mood-joyful: #f6de8d;
   --color-mood-grateful: #f4c2c8;
@@ -36,11 +59,12 @@
   --color-mood-sad: #c3ccd8;
   --color-mood-irritated: #f3b1a4;
 
-  --radius-card: 28px;
-  --radius-xl2: 22px;
-  --shadow-card: 0 8px 24px rgba(24, 41, 87, 0.06);
-  --shadow-float: 0 18px 40px rgba(24, 41, 87, 0.18);
-  --shadow-cta: 0 10px 24px rgba(24, 41, 87, 0.28);
+  --radius-card: 24px;
+  --radius-hero: 32px;
+  --radius-btn: 16px;
+  --shadow-card: 0 6px 20px rgba(23, 33, 74, 0.06);
+  --shadow-float: 0 14px 32px rgba(23, 33, 74, 0.18);
+  --shadow-cta: 0 8px 20px rgba(36, 61, 145, 0.22);
 
   --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -49,56 +73,105 @@
   html {
     -webkit-tap-highlight-color: transparent;
     text-size-adjust: 100%;
+    background: var(--color-sky-50);
   }
   body {
     @apply font-sans text-ink antialiased;
-    background: #faf9f5;
+    background: var(--color-sky-50);
+    font-feature-settings: 'cv11', 'ss01';
     overscroll-behavior-y: none;
   }
-  /* the fixed gradient wash lives behind every screen (cards stay pure white) */
-  .bw-wash {
-    background: linear-gradient(180deg, #dce2f5 0%, #eef0fa 22%, #faf9f5 52%, #e6eee3 100%);
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 0;
+    font-optical-sizing: auto;
   }
-  /* keyboard focus only; follows each element's own radius (no shape change, no ring after taps) */
+  /* keyboard focus only: 2 px blue, 3 px offset (spec §9) */
   :focus { outline: none; }
   :focus-visible {
-    outline: 2px solid rgba(94, 127, 184, 0.55);
+    outline: 2px solid var(--color-blue);
     outline-offset: 3px;
   }
   button { cursor: pointer; }
   input, textarea { font: inherit; }
+  ::selection { background: var(--color-sky-200); }
+}
+
+/*
+ * Migration bridge: v4 screens set titles in Inter ExtraBold. Unlayered + :where() so it wins over the utility weight
+ * but stays overridable — any extrabold text that isn't a number (.tnum) or explicitly .font-sans renders in the display
+ * face at 650, which is how v5 sets card titles.
+ */
+:where(.font-extrabold:not(.tnum):not(.font-sans)) {
+  font-family: var(--font-display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 0;
+  font-weight: 650;
 }
 
 @layer components {
-  .card { @apply rounded-[28px] bg-white shadow-[var(--shadow-card)]; }
-  .h-duo { @apply text-[30px] font-extrabold leading-[1.08] tracking-[-0.02em] text-navy; }
-  .h-duo em { @apply not-italic text-soft; }
-  .h-section { @apply text-[19px] font-bold tracking-[-0.01em] text-navy; }
+  .card { @apply rounded-[24px] bg-white shadow-[var(--shadow-card)]; }
+  /* H1 — Fraunces 650 28/32; the <em> half is a soft italic in navy */
+  .h-duo {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 0;
+    @apply text-[28px] font-[650] leading-[1.14] tracking-[-0.01em] text-ink;
+  }
+  .h-duo em { @apply font-[560] italic text-navy; }
+  .h-display {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 0;
+    @apply text-[36px] font-bold leading-[40px] tracking-[-0.01em] text-ink;
+  }
+  /* H2 / card title */
+  .h-section {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 0;
+    @apply text-[20px] font-semibold leading-[26px] text-ink;
+  }
+  .h-section .text-soft, .h-section em { @apply font-medium italic text-navy; }
+  .eyebrow { @apply text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-2; }
   .tnum { font-variant-numeric: tabular-nums; }
   .no-scrollbar { scrollbar-width: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .safe-b { padding-bottom: max(env(safe-area-inset-bottom), 12px); }
   .safe-t { padding-top: max(env(safe-area-inset-top), 10px); }
   .cta-sheen { position: relative; overflow: hidden; isolation: isolate; }
-  .cta-sheen::after {
-    content: ''; position: absolute; inset: 0; z-index: -1;
-    background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.22) 50%, transparent 70%);
-    transform: translateX(-120%);
-    animation: sheen 3.6s var(--ease-soft) infinite 1.2s;
-  }
   .multiply { mix-blend-mode: multiply; }
+  /* single soft wash, Home only (spec §2) */
+  .home-wash { background: linear-gradient(180deg, #e6edff 0, #f3f6ff 280px); }
+  /* single-colour line icons tinted with currentColor (feelings set) */
+  .mask-icon {
+    display: inline-block;
+    background-color: currentColor;
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+  }
 }
 
 /* instant skeleton shimmer (CSS only so it paints before any JS) */
-.bw-shimmer { background: linear-gradient(90deg, #e6e9f3 0%, #f3f5fa 40%, #e6e9f3 80%); background-size: 240% 100%; animation: bwshimmer 1.3s ease-in-out infinite; }
+.bw-shimmer { background: linear-gradient(90deg, #e3e9fa 0%, #f3f6ff 40%, #e3e9fa 80%); background-size: 240% 100%; animation: bwshimmer 1.3s ease-in-out infinite; }
 @keyframes bwshimmer { 0% { background-position: 100% 0 } 100% { background-position: -100% 0 } }
 
-@keyframes sheen { 0% { transform: translateX(-120%) } 45%, 100% { transform: translateX(120%) } }
 @keyframes floaty { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
 @keyframes breathe { 0%, 100% { transform: scale(1); opacity: .55 } 50% { transform: scale(1.06); opacity: .9 } }
+/* Jitu story: line-flower petals drifting slowly (18–30 s loops) */
+@keyframes drift {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  25% { transform: translate3d(14px, -18px, 0) rotate(8deg); }
+  50% { transform: translate3d(-6px, -34px, 0) rotate(-4deg); }
+  75% { transform: translate3d(-16px, -14px, 0) rotate(6deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+@keyframes twinkle { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1 } 50% { transform: scale(.8) rotate(20deg); opacity: .7 } }
 .animate-floaty { animation: floaty 5s ease-in-out infinite; }
 .animate-breathe { animation: breathe 4s ease-in-out infinite; }
+.animate-drift { animation: drift var(--dur, 24s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+.animate-twinkle { animation: twinkle 3.2s ease-in-out infinite; }
+/* lucide icons "draw in" once visible (Jitu story · His approach) */
+.draw-icon svg :is(path, circle, line, rect, polyline) { stroke-dasharray: 90; stroke-dashoffset: 90; transition: stroke-dashoffset 1.4s cubic-bezier(.22,1,.36,1) .15s; }
+.draw-icon.is-drawn svg :is(path, circle, line, rect, polyline) { stroke-dashoffset: 0; }
 
 @media (prefers-reduced-motion: reduce) {
+  .draw-icon svg :is(path, circle, line, rect, polyline) { stroke-dashoffset: 0; }
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }

@@ -2,7 +2,9 @@
 /**
  * @module   client-ui
  * @owner    CLIENT
- * Purpose:  v4 Soft Bloom primitives — pill buttons, icon buttons, chips, toggles, segmented, sheets, toasts, reveals.
+ * Purpose:  v5 Blue Bloom primitives (DESIGN-SYSTEM §5) — buttons, icon buttons, chips, toggles, segmented, sheets, toasts, reveals.
+ *           v5 (HUB 2026-11-20): Fraunces buttons (radius 16, 54 px), solid navy (the v4 gradient variant now renders solid),
+ *           thin blue progress, white sheets on a navy scrim.
  *           Small additive kit until HUB's src/components/ui exists; then these become variants there.
  */
 import Link from 'next/link'
@@ -21,16 +23,16 @@ const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).jo
 export { cx }
 
 type BtnVariant = 'primary' | 'gradient' | 'white' | 'outline' | 'ghost' | 'sage'
-const btnBase = 'relative inline-flex select-none items-center justify-center gap-2 rounded-full font-semibold tracking-[-0.005em] transition-colors disabled:cursor-not-allowed disabled:opacity-45'
+const btnBase = 'relative inline-flex select-none items-center justify-center gap-2 font-display font-semibold tracking-[-0.005em] transition-colors disabled:cursor-not-allowed disabled:opacity-45'
 const btnVar: Record<BtnVariant, string> = {
-  primary: 'bg-navy text-white shadow-[var(--shadow-cta)] hover:bg-[#1f3470]',
-  gradient: 'cta-sheen bg-[linear-gradient(90deg,#182957_0%,#3c5596_55%,#5e7fb8_100%)] text-white shadow-[var(--shadow-cta)]',
-  white: 'bg-white text-navy shadow-[var(--shadow-card)]',
-  outline: 'border border-[#d5d9e6] bg-white/70 text-navy backdrop-blur',
-  ghost: 'text-navy hover:bg-white/60',
-  sage: 'bg-sage-100 text-sage-text',
+  primary: 'bg-navy text-white shadow-[var(--shadow-cta)] hover:bg-navy-2 disabled:shadow-none',
+  gradient: 'bg-navy text-white shadow-[var(--shadow-cta)] hover:bg-navy-2 disabled:shadow-none', // v5: no gradients on buttons
+  white: 'border border-sky-200 bg-white text-navy hover:bg-sky-50', // spec "Secondary"
+  outline: 'border border-sky-200 bg-white text-navy hover:bg-sky-50',
+  ghost: 'text-navy underline-offset-4 hover:underline',
+  sage: 'bg-teal-100 text-sage-text',
 }
-const btnSize = { sm: 'h-10 px-4 text-[14px]', md: 'h-12 px-6 text-[15px]', lg: 'h-14 px-7 text-[16px]' }
+const btnSize = { sm: 'h-11 rounded-[14px] px-4 text-[15px]', md: 'h-12 rounded-[16px] px-6 text-[16px]', lg: 'h-[54px] rounded-[16px] px-7 text-[17px]' }
 
 type BtnProps = Omit<HTMLMotionProps<'button'>, 'children'> & {
   variant?: BtnVariant; size?: keyof typeof btnSize; full?: boolean; loading?: boolean; children?: ReactNode
@@ -61,10 +63,10 @@ export function BtnLink({ href, variant = 'primary', size = 'lg', full, classNam
 }
 
 export function IconBtn({ label, children, onClick, href, className, badge }: { label: string; children: ReactNode; onClick?: () => void; href?: string; className?: string; badge?: number | boolean }) {
-  const cls = cx('relative grid size-11 shrink-0 place-items-center rounded-full bg-white text-navy shadow-[var(--shadow-card)]', className)
+  const cls = cx('relative grid size-11 shrink-0 place-items-center rounded-full bg-white text-navy shadow-[var(--shadow-card)] transition-colors hover:bg-sky-50', className)
   const dot = badge ? (
     <motion.span key={String(badge)} initial={{ scale: 0.4 }} animate={{ scale: 1 }} transition={spring}
-      className="absolute -right-0.5 -top-0.5 grid min-w-[18px] place-items-center rounded-full bg-rose px-1 text-[10px] font-bold leading-[18px] text-white">
+      className="absolute -right-0.5 -top-0.5 grid min-w-[18px] place-items-center rounded-full bg-coral px-1 text-[10px] font-bold leading-[18px] text-white ring-2 ring-white">
       {typeof badge === 'number' ? badge : ''}
     </motion.span>
   ) : null
@@ -78,7 +80,7 @@ export function Chip({ on, onClick, children, className, icon }: { on: boolean; 
       type="button" role="checkbox" aria-checked={on} whileTap={{ scale: 0.95 }} layout transition={spring}
       onClick={() => { buzz(6); onClick() }}
       className={cx('inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-[14px] font-semibold transition-colors duration-200',
-        on ? 'bg-navy text-white shadow-[0_6px_16px_rgba(24,41,87,.22)]' : 'bg-white text-navy shadow-[var(--shadow-card)] ring-1 ring-[#e7e9f1]', className)}
+        on ? 'bg-navy text-white shadow-[var(--shadow-cta)]' : 'bg-white text-ink ring-1 ring-sky-200', className)}
     >
       {icon}
       <AnimatePresence initial={false}>
@@ -96,7 +98,7 @@ export function Chip({ on, onClick, children, className, icon }: { on: boolean; 
 export function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <button type="button" role="switch" aria-checked={on} aria-label={label} onClick={() => { buzz(6); onChange(!on) }}
-      className={cx('relative h-8 w-[52px] shrink-0 rounded-full transition-colors duration-300', on ? 'bg-navy' : 'bg-[#d9dcE6]')}>
+      className={cx('relative h-8 w-[52px] shrink-0 rounded-full transition-colors duration-300', on ? 'bg-navy' : 'bg-sky-200')}>
       <motion.span layout transition={spring} className="absolute top-1 size-6 rounded-full bg-white shadow" style={{ left: on ? 24 : 4 }} />
     </button>
   )
@@ -110,8 +112,8 @@ export function Segmented<T extends string>({ value, options, onChange, classNam
         const on = o.value === value
         return (
           <button key={o.value} type="button" role="radio" aria-checked={on} onClick={() => { buzz(6); onChange(o.value) }}
-            className={cx('relative h-12 flex-1 rounded-full text-[15px] font-semibold transition-colors', on ? 'text-white' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
-            {on && <motion.span layoutId={`seg-${id}`} transition={spring} className="absolute inset-0 rounded-full bg-navy shadow-[0_6px_16px_rgba(24,41,87,.25)]" />}
+            className={cx('relative h-12 flex-1 rounded-full text-[15px] font-semibold transition-colors', on ? 'text-white' : 'bg-white text-ink ring-1 ring-sky-200')}>
+            {on && <motion.span layoutId={`seg-${id}`} transition={spring} className="absolute inset-0 rounded-full bg-navy shadow-[var(--shadow-cta)]" />}
             <span className="relative">{o.label}</span>
           </button>
         )
@@ -137,15 +139,15 @@ export function Sheet({ open, onClose, children, title, tall }: { open: boolean;
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
-          <motion.div className="absolute inset-0 bg-[#182957]/30 backdrop-blur-[3px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
+          <motion.div className="absolute inset-0 bg-ink/35 backdrop-blur-[2px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
           <motion.div
             ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title}
-            initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', stiffness: 380, damping: 38 }}
+            initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ duration: 0.28, ease }}
             drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0.05, bottom: 0.6 }} onDragEnd={onDragEnd}
-            className={cx('relative w-full max-w-[480px] rounded-t-[32px] bg-white px-5 pt-3 shadow-[0_-12px_40px_rgba(24,41,87,.18)] outline-none safe-b', tall ? 'max-h-[92dvh]' : 'max-h-[86dvh]')}
+            className={cx('relative w-full max-w-[480px] rounded-t-[32px] bg-white px-5 pt-3 shadow-[0_-12px_40px_rgba(23,33,74,.16)] outline-none safe-b', tall ? 'max-h-[92dvh]' : 'max-h-[86dvh]')}
           >
-            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-[#dfe2ec]" />
-            <button onClick={onClose} aria-label="Close" className="absolute right-4 top-4 z-20 grid size-9 place-items-center rounded-full bg-white/90 text-navy shadow-[var(--shadow-card)] backdrop-blur"><X className="size-4" /></button>
+            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-sky-200" />
+            <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 z-20 grid size-11 place-items-center rounded-full bg-sky-50 text-navy hover:bg-sky-100"><X className="size-[18px]" /></button>
             <div className="no-scrollbar max-h-[calc(86dvh-40px)] overflow-y-auto overscroll-contain pb-2">{children}</div>
           </motion.div>
         </div>
@@ -156,13 +158,13 @@ export function Sheet({ open, onClose, children, title, tall }: { open: boolean;
 
 export function ProgressBar({ value, className, label = 'Progress' }: { value: number; className?: string; label?: string }) {
   return (
-    <div className={cx('h-2 overflow-hidden rounded-full bg-white/80', className)} role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(value * 100)}>
-      <motion.div className="h-full rounded-full bg-navy" initial={false} animate={{ width: `${Math.max(4, value * 100)}%` }} transition={soft} />
+    <div className={cx('h-1 overflow-hidden rounded-full bg-sky-200', className)} role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(value * 100)}>
+      <motion.div className="h-full rounded-full bg-blue" initial={false} animate={{ width: `${Math.max(4, value * 100)}%` }} transition={soft} />
     </div>
   )
 }
 
-export function Ring({ value, size = 64, stroke = 7, color = '#182957', track = '#e8ebf5', children }: { value: number; size?: number; stroke?: number; color?: string; track?: string; children?: ReactNode }) {
+export function Ring({ value, size = 64, stroke = 7, color = '#243D91', track = '#E6EDFF', children }: { value: number; size?: number; stroke?: number; color?: string; track?: string; children?: ReactNode }) {
   const r = (size - stroke) / 2, c = 2 * Math.PI * r
   return (
     <div className="relative grid place-items-center" style={{ width: size, height: size }}>
@@ -201,10 +203,10 @@ export function Toaster() {
       <AnimatePresence>
         {list.map((t) => (
           <motion.div key={t.id} layout initial={{ y: -40, opacity: 0, scale: 0.96 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: -30, opacity: 0 }} transition={spring}
-            className="pointer-events-auto mt-2 flex max-w-[440px] items-center gap-3 rounded-full bg-navy py-2.5 pl-5 pr-2.5 text-[14px] font-medium text-white shadow-[var(--shadow-float)]">
-            <span className="grid size-5 place-items-center rounded-full bg-white/15"><Check className="size-3.5" strokeWidth={3} /></span>
+            className="pointer-events-auto mt-2 flex max-w-[440px] items-center gap-3 rounded-[18px] bg-ink py-2.5 pl-3 pr-2.5 text-[14px] font-medium text-white shadow-[var(--shadow-float)]">
+            <span className="grid size-6 place-items-center rounded-full bg-teal text-white"><Check className="size-3.5" strokeWidth={3} /></span>
             <span className="pr-2">{t.text}</span>
-            {t.action ? <button onClick={() => { t.action!.onClick(); drop(t.id) }} className="rounded-full bg-white/15 px-3 py-1 text-[13px] font-semibold">{t.action.label}</button> : null}
+            {t.action ? <button onClick={() => { t.action!.onClick(); drop(t.id) }} className="min-h-8 rounded-full bg-white/15 px-3 py-1 text-[13px] font-semibold">{t.action.label}</button> : null}
           </motion.div>
         ))}
       </AnimatePresence>
