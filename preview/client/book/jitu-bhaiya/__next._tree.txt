@@ -1,6 +1,6 @@
-:HL["/bewise_system/preview/client/_next/static/chunks/03jw5dl9tgi3u.css","style"]
+:HL["/bewise_system/preview/client/_next/static/chunks/43bn7oi3zenxs.css","style"]
 :HC["/",""]
 3:[["children",{"s":"__PAGE__","h":160}]]
 2:[["children",{"s":"jitu-bhaiya","h":96,"c":"$Q3"}]]
 1:[["children",{"s":"book","h":96,"c":"$Q2"}]]
-0:{"b":"G-B-F9NzZ9kkpjKEhaApU","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"RliFp2MZGAknOFVMykFAh","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
