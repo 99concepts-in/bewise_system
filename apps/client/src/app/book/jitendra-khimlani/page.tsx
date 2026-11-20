@@ -10,7 +10,7 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'motion/react'
 import { Check, MapPin, Sparkles, Video } from 'lucide-react'
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Logo, LogoMark } from '@/components/brand'
 import { Sparkle } from '@/components/jitu-story'
 import { Btn, cx, ease } from '@/components/ui'
@@ -25,7 +25,8 @@ export default function Page() { return <Suspense><BookingLink /></Suspense> }
 function BookingLink() {
   const router = useRouter()
   const params = useSearchParams()
-  const type = params.get('type') === 'followup' ? 'followup' : 'first'
+  // owner 2026-11-20: both options are selectable here (the link's ?type= only sets the starting choice)
+  const [type, setType] = useState<'first' | 'followup'>(params.get('type') === 'followup' ? 'followup' : 'first')
   const hydrated = useApp((s) => s.hydrated)
   const onboarded = useApp((s) => !!s.profile?.onboardedAt)
   const dest = `/app/book?type=${type}`
@@ -42,20 +43,21 @@ function BookingLink() {
           <Sparkle size={26} className="absolute -right-4 top-6" />
         </div>
         <h1 className="h-duo mt-6 text-[30px]">Book with <em>Jitendra Khimlani</em></h1>
-        <p className="mt-1 text-[14px] font-semibold text-navy">{CONSULTANT.fullName} · {CONSULTANT.title}</p>
-        <p className="mt-3 max-w-[330px] text-[16px] leading-6 text-ink-2">{CONSULTANT.approach}</p>
+        <p className="mt-1 text-[14px] font-semibold text-navy">{CONSULTANT.title} · {CONSULTANT.stats[0]}</p>
+        <p className="mt-3 max-w-[330px] text-[16px] leading-6 text-ink-2">{CONSULTANT.approach.replace(/^Jitendra Khimlani listens first\./, 'He listens first.')}</p>
       </motion.div>
 
-      <div className="mt-6 space-y-3">
+      <div className="mt-6 space-y-3" role="radiogroup" aria-label="Choose your session">
         {CONSULTATIONS.map((c, i) => {
           const on = c.id === type
           return (
-            <motion.div key={c.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.08 }}
-              className={cx('flex items-center gap-3 rounded-[24px] p-4', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
+            <motion.button key={c.id} type="button" role="radio" aria-checked={on} onClick={() => setType(c.id)} whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.08 }}
+              className={cx('flex w-full items-center gap-3 rounded-[24px] p-4 text-left transition-colors duration-200', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
               <span className={cx('grid size-10 shrink-0 place-items-center rounded-full', on ? 'bg-white/15' : 'bg-sky-100')}>{on ? <Check className="size-5" strokeWidth={3} /> : <Sparkles className="size-5" />}</span>
               <span className="flex-1"><span className="block text-[16px] font-bold">{c.name}</span><span className={cx('text-[13px]', on ? 'text-white/75' : 'text-muted')}>Remedy blend included</span></span>
               <span className="text-[20px] font-extrabold tnum">{formatINR(c.feePaise)}</span>
-            </motion.div>
+            </motion.button>
           )
         })}
       </div>
@@ -66,7 +68,7 @@ function BookingLink() {
       </div>
 
       <div className="mt-auto space-y-2 pt-8 safe-b">
-        <Btn full variant="gradient" onClick={go}>Book with Jitendra Khimlani</Btn>
+        <Btn full variant="gradient" onClick={go}>Book an appointment</Btn>
         <p className="text-center text-[12px] text-muted">Takes about 3 minutes · sessions are non-refundable, but you can reschedule</p>
       </div>
     </main>
