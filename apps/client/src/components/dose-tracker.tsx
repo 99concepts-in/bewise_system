@@ -14,10 +14,10 @@ import { useApp } from '@/lib/store'
 import { dayKey, fmtDay } from '@/lib/format'
 import { blendDays, doseStats, dosesOn, perDay } from '@/lib/doses'
 
-function Dots({ n, of, size = 'lg', onTap, label }: { n: number; of: number; size?: 'lg' | 'sm' | 'xs'; onTap?: (i: number) => void; label?: string }) {
+function Dots({ n, of, size = 'lg', onTap, label, fluid }: { n: number; of: number; size?: 'lg' | 'sm' | 'xs'; onTap?: (i: number) => void; label?: string; fluid?: boolean }) {
   const px = size === 'lg' ? 'size-12' : size === 'sm' ? 'size-9' : 'size-[7px]'
   return (
-    <div className={cx('flex', size === 'xs' ? 'gap-[3px]' : size === 'lg' ? 'gap-3.5' : 'gap-2')} role={onTap ? 'group' : 'img'} aria-label={label ?? `${n} of ${of} doses`}>
+    <div className={cx('flex', fluid ? 'w-full justify-between' : size === 'xs' ? 'gap-[3px]' : size === 'lg' ? 'gap-3.5' : 'gap-2')} role={onTap ? 'group' : 'img'} aria-label={label ?? `${n} of ${of} doses`}>
       {Array.from({ length: of }, (_, i) => {
         const on = i < n
         if (size === 'xs') return <span key={i} className={cx('rounded-full', px, on ? 'bg-navy' : 'bg-[#d8dcea]')} />

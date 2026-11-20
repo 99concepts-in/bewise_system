@@ -17,7 +17,7 @@ import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
 import { AppHeader, useNavShown } from '@/components/shell'
 import { SessionDateArt } from '@/components/session-art'
-import { FeelingIcon, FlowerTile } from '@/components/flower'
+import { FeelingIcon } from '@/components/flower'
 import { JituPortrait, JituStory, Sparkle } from '@/components/jitu-story'
 import { ProductCard } from '@/components/product-card'
 import { BtnLink, Item, Reveal, buzz, cx, ease, toast, useChrome, useNow } from '@/components/ui'
@@ -26,7 +26,9 @@ import { ACCENTS, HOME_FEELINGS, type HomeFeeling } from '@/lib/feelings'
 import { isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { GoalCheck } from '@/components/goal-check'
 import { doneToday, kindOf, streak } from '@/lib/goals'
-import { DoseTracker } from '@/components/dose-tracker'
+import { DoseDots } from '@/components/dose-tracker'
+import { RemedyBottle } from '@/components/remedy-bottle'
+import { doseStats, dosesOn, perDay } from '@/lib/doses'
 import { useApp, type Appointment } from '@/lib/store'
 import { dayKey, firstName, fmtDay, fmtTime, formatINR } from '@/lib/format'
 import { blendSupply } from '@/lib/supply'
@@ -277,27 +279,54 @@ function NextSession({ a }: { a: Appointment }) {
 }
 
 /* ---------------- today's blend ---------------- */
+/**
+ * owner 2026-11-20: Home shows only the essentials of the blend: a bottle that empties as doses are checked in,
+ * today's 4 drops, and a way into the full details (remedies, emotions, calendar) in My care.
+ */
 function TodaysBlend() {
-  const blend = useApp((s) => s.blend)!
-  const appts = useApp((s) => s.appointments)
-  const now = useNow(60_000)
-  const day = Math.min(blend.days, Math.max(1, Math.floor((now - +new Date(blend.startedOn)) / 86_400_000) + 1))
+  const s = useApp()
+  const blend = s.blend!
+  const [pulse, setPulse] = useState(0)
+  const of = perDay(s), today = dayKey(new Date()), n = dosesOn(s, today)
+  const st = doseStats(s)
+  const left = Math.max(0, st.of - st.day)
+  // the bottle lasts its 25 days: it reflects the days gone by, and lowers a notch with each dose taken today
+  const level = 1 - (st.day - 1 + n / of) / st.of
+  const tap = (i: number) => {
+    const next = i < n ? i : i + 1
+    s.logDoses(today, next); buzz(next > n ? 14 : 8)
+    if (next > n) { setPulse(Date.now()); if (next === of) toast(`All ${of} done today 🔥 Your streak grows`) }
+  }
+  const caption = n >= of ? 'All done for today 🌿' : n === 0 ? 'Tap a drop each time you take your dose' : `${of - n} more to go today`
   return (
-    <section className="card p-5" aria-labelledby="blend-h">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h2 id="blend-h" className="h-section">Today’s blend</h2>
-          <p className="mt-0.5 text-[14px] text-ink-2"><span className="tnum">Day {day} of {blend.days}</span> · {blend.drops} drops, {blend.timesPerDay}× a day</p>
+    <section className="card overflow-hidden p-5" aria-labelledby="blend-h">
+      <div className="flex items-center gap-4">
+        <div className="relative grid h-[124px] w-[86px] shrink-0 place-items-center">
+          <span className="absolute inset-x-1 bottom-0 h-4 rounded-[50%] bg-navy/10 blur-[6px]" aria-hidden />
+          <RemedyBottle level={level} pulse={pulse} className="relative h-full w-full" />
         </div>
-        <Link href="/app/remedies" className="-mr-2 inline-flex min-h-11 items-center gap-0.5 rounded-full px-2 text-[14px] font-semibold text-navy">Care<ChevronRight className="size-4" /></Link>
+        <div className="min-w-0 flex-1">
+          <p className="eyebrow text-sage-text">Your remedy</p>
+          <h2 id="blend-h" className="h-section mt-0.5 tnum">Day {st.day} <span className="text-muted">of {st.of}</span></h2>
+          <p className="mt-0.5 text-[13px] text-ink-2">{left ? `${left} day${left > 1 ? 's' : ''} left` : 'Last day of this bottle'}</p>
+          <span className={cx('mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold', st.streak ? 'bg-[#fbe9d6] text-[#9a4f12]' : 'bg-peri-50 text-muted')}>
+            🔥 {st.streak}-day streak
+          </span>
+        </div>
       </div>
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-sky-100" role="progressbar" aria-label="Blend progress" aria-valuemin={1} aria-valuemax={blend.days} aria-valuenow={day}>
-        <motion.div className="h-full rounded-full bg-blue" initial={{ width: 0 }} animate={{ width: `${(day / blend.days) * 100}%` }} transition={{ duration: 0.9, ease }} />
+
+      <div className="mt-4 rounded-[22px] bg-peri-50/70 px-4 pb-3 pt-3.5">
+        <div className="flex items-baseline justify-between">
+          <p className="text-[14px] font-bold text-navy">Today’s doses</p>
+          <p className="text-[12px] font-semibold text-muted">{blend.drops} drops, {of}× a day</p>
+        </div>
+        <div className="mt-3"><DoseDots n={n} of={of} fluid onTap={tap} label={`Today: ${n} of ${of} doses`} /></div>
+        <p className="mt-2.5 text-center text-[12px] font-semibold text-muted" aria-live="polite">{caption}</p>
       </div>
-      <div className="no-scrollbar -mx-5 mt-4 flex gap-3 overflow-x-auto px-5 pb-1">
-        {blend.flowers.map((f) => <FlowerTile key={f} name={f} size={84} className="shrink-0" />)}
-      </div>
-      <div className="mt-4"><DoseTracker /></div>
+
+      <Link href="/app/remedies" className="-mb-2 mt-2 flex h-12 items-center justify-between border-t border-[#eef0f6] px-1 pt-1 text-[15px] font-semibold text-navy">
+        View my blend & progress<ChevronRight className="size-5" />
+      </Link>
     </section>
   )
 }

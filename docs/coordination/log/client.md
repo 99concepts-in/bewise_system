@@ -2,6 +2,10 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-20 · Home blend card redesigned (bottle + 4 drops)
+- Home "Your remedy" card: a remedy bottle (components/remedy-bottle.tsx) whose liquid follows the bottle's 25 days and lowers a notch with each dose today (ripple on each tap), Day X of 25, days left, streak, then the 4 tappable drops with a short caption, and "View my blend & progress" into My care.
+- Flowers row, stats, progress bar and the "Took a dose" button removed from Home; the full tracker (stats, 25-day calendar, past days) and the remedies with their emotions stay in My care.
+
 ## 2026-11-20 · Session feedback simplified
 - "How was your session?" now has only the faces and the quick tags (Felt heard, Clear guidance, ...), then an optional "Add a comment". The "How do you feel after the session?" benefit chips were removed on the owner's request; `feedback.benefits` is still sent (kept from earlier feedback, otherwise empty) so the consultant view keeps working.
 - Faces are grey until one is picked; only the picked face shows in colour.
