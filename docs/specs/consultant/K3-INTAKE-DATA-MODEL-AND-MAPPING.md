@@ -11,7 +11,7 @@
 1. **The client form never contains flower names.** `getIntakeForm()` returns statements as plain text only; the statement→flower link is consultant-only data.
 2. **Answers are encrypted at rest** (application-level AES-256-GCM envelope via HUB `lib/crypto`, key id stored with each row). Decrypted only inside `src/modules/intake` after `requirePermission` + an `audit_logs` `view_sensitive` row.
 3. **Deterministic first, AI second.** Flags and flowers-to-consider are computed by code from answers + mapping. AI only writes prose (summary, questions, progress note) and never decides anything.
-4. **Mapping is data, not code.** Jitu Bhaiya edits wording and flowers in-app; every edit is versioned; old answers keep their meaning.
+4. **Mapping is data, not code.** Jitendra Khimlani edits wording and flowers in-app; every edit is versioned; old answers keep their meaning.
 5. Nothing from answers, flags' text, or mapping reasons goes into events, logs, analytics or notifications (`// @sensitive`).
 
 ---
@@ -42,7 +42,7 @@ Note: `appointments.intake_id` (K1) points at the response or check-in through t
 | intake_mapping | ❌ **never** | read/write | ❌ | ❌ |
 | case_summaries | ❌ | read | ❌ | ❌ |
 
-"Assigned" = the client has an appointment (any status except `expired` unpaid) with this consultant, or the consultant has a completed session with them. With one consultant (D-14) this is effectively "Jitu Bhaiya".
+"Assigned" = the client has an appointment (any status except `expired` unpaid) with this consultant, or the consultant has a completed session with them. With one consultant (D-14) this is effectively "Jitendra Khimlani".
 
 ---
 
@@ -86,7 +86,7 @@ Validation: drafts accept partial objects (`IntakeAnswers` deep-partial); **subm
 
 ---
 
-## 4. Mapping table (seed = spec §4, **pending Jitu Bhaiya's approval** — CONTENT-CHECKLIST #4b)
+## 4. Mapping table (seed = spec §4, **pending Jitendra Khimlani's approval** — CONTENT-CHECKLIST #4b)
 
 `approved_at` stays null until he approves each row in CN-35's "Edit mapping" view. Unapproved rows are still used (owner decision: flowers-to-consider is ON) but CN-35 shows a small "draft wording" tag until approved.
 
@@ -194,11 +194,11 @@ Security-definer SQL function: remedy_order → client + case → active `alcoho
 1. IN-09 answer is saved with the draft as soon as the client leaves the step (`saveIntakeDraft`). On `sometimes|often`:
    - upsert `intake_flags(kind='safety', level)` (dedupe per response; escalate `sometimes → often`, never downgrade until submit),
    - emit `intake.safety_flagged { clientId, level }` — **no answer text, no name**,
-   - OWNER notifications routes it to **Jitu Bhaiya only**, priority (push + in-app). Template copy: "Priority: a client needs a gentle check-in. Open BeWise." — no client name on the lock screen.
+   - OWNER notifications routes it to **Jitendra Khimlani only**, priority (push + in-app). Template copy: "Priority: a client needs a gentle check-in. Open BeWise." — no client name on the lock screen.
 2. Client UI (CLIENT) shows the support card immediately: **Tele-MANAS 14416** (free, 24×7) and **112** for immediate danger — *numbers to be verified before launch*. The client can continue.
 3. CN-36 (consultant): priority card on Today + rose banner on Session prep: "She said *{level}* to the self-harm question on {date}. Consider calling before the session." Buttons: **Call** (tel:), **WhatsApp**, **Mark as reached out** (sets `acknowledged_at/by`; remains visible on prep until the session).
-4. Firing on draft save (not only submit) is deliberate — a client who stops at IN-09 must still reach him. The IN-09 copy must say "Jitu Bhaiya will be gently informed so he can support you" (request to CLIENT). DPDP basis: vital interest / consent at IN-01 — **HUB/owner to confirm**.
-5. Wording of the question and card: Jitu Bhaiya approves before launch (CONTENT-CHECKLIST #4b).
+4. Firing on draft save (not only submit) is deliberate — a client who stops at IN-09 must still reach him. The IN-09 copy must say "Jitendra Khimlani will be gently informed so he can support you" (request to CLIENT). DPDP basis: vital interest / consent at IN-01 — **HUB/owner to confirm**.
+5. Wording of the question and card: Jitendra Khimlani approves before launch (CONTENT-CHECKLIST #4b).
 
 ---
 

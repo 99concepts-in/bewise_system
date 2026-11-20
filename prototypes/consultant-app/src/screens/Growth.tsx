@@ -1,11 +1,13 @@
 /**
  * @screens CN-26 My month — momentum, busiest times, what people bring, milestones.
+ * v5 (HUB 2026-11-20): Blue Bloom; "what people bring" bars take each feeling's accent colour.
  */
 import { useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
 import { TrendingDown, TrendingUp } from 'lucide-react'
 import { useStore } from '../state/store'
-import { CountUp, softSpring } from '../ui/kit'
+import { AppHeader, CountUp, softSpring } from '../ui/kit'
+import { feelingTone } from '../ui/tone'
 import { growth } from '../lib/derive'
 import { ImpactPanel } from './Impact'
 import { fmtMonth, fmtShort } from '../lib/time'
@@ -26,6 +28,7 @@ export default function Growth() {
 
   return (
     <div className="screen growth">
+      <AppHeader />
       <h1 className="page-title">Growth</h1>
       <h2 className="sec-title">Your impact</h2>
       <ImpactPanel />
@@ -95,7 +98,7 @@ function Heatmap({ grid, hours }: { grid: number[][]; hours: number[] }) {
   // sequential: one hue, light → dark
   const shade = (v: number) => {
     const t = v / max
-    const a = [234, 238, 249], b = [38, 60, 120]
+    const a = [230, 237, 255], b = [36, 61, 145] // sky-100 → navy
     return `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * t)).join(',')})`
   }
   return (
@@ -130,7 +133,7 @@ function HBars({ rows }: { rows: [string, number][] }) {
       {rows.map(([name, v], i) => (
         <li key={name}>
           <span className="hb-name">{name}</span>
-          <span className="hb-track"><m.span className="hb-fill" initial={{ scaleX: 0 }} animate={{ scaleX: v / max }} transition={{ ...softSpring, delay: 0.1 + i * 0.06 }} /></span>
+          <span className="hb-track"><m.span className={`hb-fill tone-${feelingTone(name)}`} initial={{ scaleX: 0 }} animate={{ scaleX: v / max }} transition={{ ...softSpring, delay: 0.1 + i * 0.06 }} /></span>
           <span className="hb-v">{v}</span>
         </li>
       ))}

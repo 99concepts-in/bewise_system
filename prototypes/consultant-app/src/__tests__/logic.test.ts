@@ -3,7 +3,9 @@
  * suggestions, adherence, impact, insights, booking state changes and time formatting.
  */
 import { describe, expect, it } from 'vitest'
-import { DAY, HOUR, MIN, FLOWERS, makeSeed, startOfDay } from '../data/seed'
+import { DAY, HOUR, MIN, FLOWERS, INTAKE_FEELINGS, CONCERNS, makeSeed, startOfDay } from '../data/seed'
+import { feelingTone, feelingIconId, flowerId } from '../ui/tone'
+import { flowers as FLOWER_FILES, feelings as FEELING_FILES } from 'virtual:art-index'
 import { nextFree, slotsForDay, weekLoad } from '../lib/slots'
 import { adherence, impact, insights, nextMilestone, personView, sinceLastRemedy, suggestFlowers, growth } from '../lib/derive'
 import { fresh, reducer } from '../state/store'
@@ -245,5 +247,37 @@ describe('time formatting', () => {
     expect(dayLabel(NOW, NOW)).toBe('Today')
     expect(dayLabel(NOW + DAY, NOW)).toBe('Tomorrow')
     expect(dayLabel(NOW - DAY, NOW)).toBe('Yesterday')
+  })
+})
+
+// v5 (HUB 2026-11-20): Blue Bloom helpers and the intake data they show
+describe('v5 feelings, flowers and intake data', () => {
+  it('maps feelings to one consistent accent (spec §2)', () => {
+    expect(feelingTone('Anxiety')).toBe('coral')
+    expect(feelingTone('Fear')).toBe('coral')
+    expect(feelingTone('Sadness')).toBe('lilac')
+    expect(feelingTone('Sleep')).toBe('lilac')
+    expect(feelingTone('Hopelessness')).toBe('lilac')
+    expect(feelingTone('Exhaustion')).toBe('teal')
+    expect(feelingTone('Overwhelm')).toBe('navy')
+    expect(feelingTone('Overthinking')).toBe('rose')
+    expect(feelingTone('Worry')).toBe('sky')
+    expect(feelingTone('Joyful')).toBe('marigold')
+    expect(feelingTone('Hopeful')).toBe('marigold')
+  })
+  it('flower ids follow the API slug and every flower but a missing file has art', () => {
+    expect(flowerId('Star of Bethlehem')).toBe('star-of-bethlehem')
+    expect(flowerId('Rescue Remedy')).toBe('rescue-remedy')
+    for (const id of FLOWER_FILES) expect(FLOWERS.map(flowerId)).toContain(id)
+  })
+  it('every intake feeling and consultant concern has a line icon', () => {
+    for (const f of [...INTAKE_FEELINGS, ...CONCERNS]) expect(FEELING_FILES, f).toContain(feelingIconId(f))
+  })
+  it("today's later sessions carry the client's chosen feelings (1 to 3) and one safety flag", () => {
+    const seed = makeSeed(NOW)
+    const later = seed.appts.filter((a) => startOfDay(a.start) === TODAY && a.start > NOW && a.status === 'confirmed')
+    expect(later.length).toBeGreaterThan(0)
+    for (const a of later) { expect(a.feelings?.length).toBeGreaterThanOrEqual(1); expect(a.feelings!.length).toBeLessThanOrEqual(3) }
+    expect(seed.appts.filter((a) => a.safety)).toHaveLength(1)
   })
 })

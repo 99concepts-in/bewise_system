@@ -1,13 +1,17 @@
 /**
  * @screens CN-05 + CN-06 + CN-08 — the session itself: summary first, then today's troubling emotions,
  *          private notes, flowers to consider; End session → Give remedy.
+ * v5 (HUB 2026-11-20): troubling emotions as accent-coloured chips, flowers to consider as read-only flower tiles
+ *          (the old add buttons here did nothing), current blend as thumbnails, "End session" as the floating navy pill.
  */
 import { useEffect, useMemo, useState } from 'react'
 import { m } from 'motion/react'
-import { ArrowLeft, Leaf, Lock, MapPin, StopCircle, Video, UserRound } from 'lucide-react'
+import { ArrowLeft, Droplet, Lock, MapPin, ShieldAlert, StopCircle, Video, UserRound } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
 import { Chip, Empty, Segmented, Sheet, go, softSpring } from '../ui/kit'
 import { AdherenceCard, Suggestions } from '../ui/care'
+import { FeelingChips, FlowerStack } from '../ui/art'
+import { feelingTone } from '../ui/tone'
 import { useSheets, KIND_LABEL } from './Sheets'
 import { personView, sinceLastRemedy, suggestFlowers } from '../lib/derive'
 import { fmtShort, relative } from '../lib/time'
@@ -56,13 +60,15 @@ export default function Live({ id }: { id: string }) {
 
       <m.section className="card live-sum" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={softSpring}>
         <h2>Before you begin</h2>
+        {a.safety && !ended && <p className="safety-note"><ShieldAlert size={18} aria-hidden /><span><b>Safety answer in the intake.</b> Read it before you begin.</span></p>}
+        {a.feelings && <div className="live-feel"><span className="muted small">Chose when booking</span><FeelingChips items={a.feelings} max={6} size="sm" /></div>}
         {a.note && <blockquote className="quote-note">“{a.note}”<cite>{p.first}'s note when booking</cite></blockquote>}
         {last ? (
           <ul className="three">
             {(lines ?? [`Last session ${relative(last.start, now)}${last.troubling ? `: ${last.troubling.join(', ').toLowerCase()}` : ''}.`]).map((l, i) => <li key={i}>{l}</li>)}
           </ul>
         ) : <p className="muted small">First visit. {p.first}'s intake answers and an AI case summary will show here.</p>}
-        {v.blend?.remedy && <p className="live-blend"><Leaf size={14} /><span>Current blend since {fmtShort(v.blend.remedy.givenAt)}: <b>{v.blend.remedy.flowers.join(', ')}</b></span></p>}
+        {v.blend?.remedy && <div className="live-blend"><FlowerStack flowers={v.blend.remedy.flowers} size={30} max={5} /><span>Current blend since {fmtShort(v.blend.remedy.givenAt)}: <b>{v.blend.remedy.flowers.join(', ')}</b></span></div>}
       </m.section>
 
       {v.blend?.remedy && <div className="live-adh"><AdherenceCard p={p} now={now} compact /></div>}
@@ -72,7 +78,7 @@ export default function Live({ id }: { id: string }) {
         <div className="chips-wrap">
           {CONCERNS.map((c) => {
             const before = last?.troubling?.includes(c)
-            return <Chip key={c} active={today.includes(c)} onClick={() => toggle(c)}>{c}{before && !today.includes(c) ? <span className="chip-hint">last time</span> : null}</Chip>
+            return <Chip key={c} tone={feelingTone(c)} active={today.includes(c)} onClick={() => toggle(c)}><i className="feel-dot" aria-hidden />{c}{before && !today.includes(c) ? <span className="chip-hint">last time</span> : null}</Chip>
           })}
         </div>
       </section>
@@ -84,13 +90,13 @@ export default function Live({ id }: { id: string }) {
       </section>
 
       <section className="block">
-        <Suggestions first={p.first} items={suggestions} picked={[]} onToggle={() => {}} limit={4} />
+        <Suggestions first={p.first} items={suggestions} limit={6} />
       </section>
 
       <div className="live-foot">
         {ended
-          ? <button className="btn btn-primary btn-block" onClick={() => { go(`/people/${p.id}`); if (!a.remedy && a.status === 'completed') setTimeout(() => sheets.remedy(a.id), 120) }}><Leaf size={16} /> {a.remedy ? 'Back to profile' : 'Give remedy'}</button>
-          : <button className="btn btn-primary btn-block" onClick={() => setEnding(true)}><StopCircle size={17} /> End session</button>}
+          ? <m.button className="fab" whileTap={{ scale: 0.97 }} onClick={() => { go(`/people/${p.id}`); if (!a.remedy && a.status === 'completed') setTimeout(() => sheets.remedy(a.id), 120) }}><Droplet size={20} aria-hidden /> {a.remedy ? 'Back to profile' : 'Give remedy'}</m.button>
+          : <m.button className="fab" whileTap={{ scale: 0.97 }} onClick={() => setEnding(true)}><StopCircle size={20} aria-hidden /> End session</m.button>}
       </div>
 
       <Sheet open={ending} onClose={() => setEnding(false)} label="End session">
@@ -124,7 +130,7 @@ function EndBody({ first, poss, onEnd, onCancel }: { first: string; poss: string
       <div className="form-actions">
         <button className="btn btn-quiet" onClick={onCancel}>Keep going</button>
         <button className="btn btn-primary" onClick={() => onEnd(outcome, outcome === 'completed' ? weeks : undefined, share && summary.trim() ? summary.trim() : undefined)}>
-          {outcome === 'completed' ? <><Leaf size={16} /> End and give remedy</> : 'Mark as not attended'}
+          {outcome === 'completed' ? <><Droplet size={18} aria-hidden /> End and give remedy</> : 'Mark as not attended'}
         </button>
       </div>
     </div>

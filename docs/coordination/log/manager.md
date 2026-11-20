@@ -2,6 +2,13 @@
 
 > Only the MANAGER chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-18 — Consultant alignment: add client, shared check-in, remedy tracking, alcohol-free (branch claude/new-session-w9u6a1)
+**Status:** Prototype updated · `preview/manager` rebuilt · request `20261118-consultant-to-manager-clients-checkin-tracking` ACCEPTED (replied in file)
+**Done:** merged main + `claude/new-session-1j1y0u`. CRM `findClientByPhone` / `createClient` with `pronoun` (she/he/they, default they) + Clients → Add with duplicate check. Express booking = consultant's flow (next free times → Greet and confirm → payment link sent automatically) + "Paid at desk". Shared check-in labels (Check in → Checked in, Awaiting payment, Completed) via `checkInAppointment()`, emits `appointment.checked_in`. Every stage move emits `fulfilment.stage_changed` with `remedyOrderId`; `shipment.dispatched/delivered/failed` too; order detail shows "Jitu Bhaiya sees: Given · Preparing · Dispatched · Delivered". All blends alcohol-free: banner + ALCOHOL-FREE on every sheet/label, glycerine base, labelText/dosage/base from PrepSheet. Booking link `bewise.in/book/jitu-bhaiya?type=…` with the consultant's three messages. Payment reminders no longer carry a hand-sent link ("the payment link is in that chat").
+**Contracts changed (additive, proposed):** `crm.findClientByPhone`, `crm.createClient`, `clients.pronoun`; `remedyOrderId?` on `fulfilment.stage_changed` and `shipment.*`. Specs 01 & 05 updated.
+**Needs from others:** CLIENT `/book/jitu-bhaiya` page; HUB fold the additive contract entries into `docs/03-CONTRACTS.md`; FOUNDATION ✅ to start M1.
+**Next:** answer CLIENT catalog-fields and OWNER stock-valuation requests in M1/M4; port to `src/` when foundation lands.
+
 ## 2026-11-18 — Today screen simplified (owner feedback) (branch claude/new-session-w9u6a1)
 **Status:** Prototype updated · `preview/manager` rebuilt for GitHub Pages
 **Done:** MG-02 Today is now one list in Haresh's work order: **Share booking link** button (WhatsApp / copy, first ₹1,000 or follow-up ₹800) → **Sessions today** with big Check in / Send link → **Remedies to make** (Start / Continue / Check) → **Deliveries** (Retry, Replace, Ship, Hand over, Pack + "on the way" link) → **Payments pending** with Remind / Again and copy payment link. Stage rail and stat tiles removed. "Share booking link" added to the + menu.

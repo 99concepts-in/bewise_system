@@ -46,6 +46,9 @@ export interface Appt {
   privateNote?: string // 🔒 only him
   sharedSummary?: string // optional summary shared with the client (D-26)
   greeting?: string // the WhatsApp greeting he sent when booking
+  // v5 (HUB 2026-11-20): from the client's intake quiz (client app "Book" flow, API shape unchanged)
+  feelings?: string[] // feelings the client chose when booking, up to 3 (shown as coloured chips on Today)
+  safety?: boolean // the intake safety question needs his attention before the session (shown as a small dot)
 }
 
 export interface Notice {

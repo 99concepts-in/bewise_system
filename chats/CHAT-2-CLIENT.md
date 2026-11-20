@@ -4,6 +4,8 @@
 > **"Read `chats/CHAT-2-CLIENT.md` and follow it."**
 > Chat tag: **`client`** · PR titles `[CLIENT] …` · Brief version **v2 (2026-11-17)** — replaces all earlier versions.
 
+> 🔔 **UPDATE 2026-11-18 — the real backend is ready (D-44, replaces Supabase/Next server).** Backend = `api/` (PHP 8 + Hostinger MySQL), deployed at `/api/` with every push to `main`. **Step 0 is now ✅.** Your first task: `docs/coordination/requests/20261118-hub-to-client-wire-real-api.md` (P0) — swap demo data for API calls, keep demo data only when `BeWise.available()` is false. Your module files in `api/modules/` are yours to extend (new migrations in `api/migrations/`). Reference `api/README.md`. Where this brief says Supabase / RLS / `src/modules/*` / Postgres, read: `api/modules/<module>.php`, server-side role checks, MySQL.
+
 ---
 
 ## 1. Mission
@@ -21,7 +23,7 @@ pay safely (UPI first), always know what happens next, never feel pressured.
 3. **`docs/specs/client/00-CLIENT-FLOW-AND-SCREENS.md`** — screens **CL-01…CL-58** (incl. sections M no-refunds, N intake, K Ask BeWise).
 4. **`docs/specs/client/01-INTAKE-CASE-TAKING.md`** — intake **IN-01…IN-12** (you build the UI; consultant chat owns data/AI).
 5. `docs/03-CONTRACTS.md` — your modules *commerce, journal, companion*; what you call: *scheduling, intake, progress, consultation & remedies, catalog, crm, fulfilment, finance*.
-6. **Design (v4 "Soft Bloom", approved):** boards `design/client-v4/` (style master `CL4-board-00-home-feeling-journal.jpg`; index in its README), rules `design/v4-soft-bloom/README.md`, tokens `design/tokens.json → v4`, assets `design/assets/v4/` (**3D owl mascot**, **8 mood characters**, **illustrations**), motion `design/motion/` (splash, how-Bach-remedies-work), Jitu Bhaiya's photo `design/assets/people/`.
+6. **Design (v4 "Soft Bloom", approved):** boards `design/client-v4/` (style master `CL4-board-00-home-feeling-journal.jpg`; index in its README), rules `design/v4-soft-bloom/README.md`, tokens `design/tokens.json → v4`, assets `design/assets/v4/` (**3D owl mascot**, **8 mood characters**, **illustrations**), motion `design/motion/` (splash, how-Bach-remedies-work), Jitendra Khimlani's photo `design/assets/people/`.
 7. `docs/00-MASTER-PLAN.md`, `docs/01-DESIGN-SYSTEM.md` (components, states, accessibility, copy voice).
 
 ## 3. Decisions that shape your work
@@ -31,7 +33,7 @@ pay safely (UPI first), always know what happens next, never feel pressured.
 | Intake | **Before the first booking**: Choose consultation → **Intake (≈5 min, save & finish later)** → Online/In person → Time → Pay. **Follow-ups**: 2-min "Since we last met" check-in. Safety screen shows Tele-MANAS **14416** / **112** immediately (D-35, D-38) |
 | Refunds | **None** (D-16). Sessions: reschedule only (free ≥24 h before; <24 h one reschedule; no-show forfeits — D-08). Orders: "Request a replacement" for damaged/wrong items |
 | Journal | Minimal: date · time · emotion (8 mood characters) + search; weekly row + daily bars + insight; Goals separate (D-19) |
-| Feedback | After every session: rating (mood characters) + tags + notes for Jitu Bhaiya, editable later (D-20) |
+| Feedback | After every session: rating (mood characters) + tags + notes for Jitendra Khimlani, editable later (D-20) |
 | Progress | "Since your blend began" — 3 AI lines (client-safe) on Home & My Remedies (D-28) |
 | Ask BeWise | AI companion on the client's own data + product suggestions; guardrails: no diagnosis, no remedy changes, confirm before actions, crisis → helpline (D-29). Load the `claude-api` skill before coding |
 | Allergies / alcohol-free | From intake: warn on unsuitable products (e.g. "Contains lavender — you noted an allergy"); remedy prepared alcohol-free when asked |
@@ -73,7 +75,7 @@ Consultant/manager/owner routes and modules; finance/Razorpay server code (you o
 MANAGER needs correct `order.paid` items (kinds: product / remedy); OWNER finance needs correct order lines & tax categories; CONSULTANT needs intake answers and session feedback submitted through their functions.
 
 ## 9. Milestones (one PR each, in order)
-- **C1 Public site, sign-in & onboarding** — home, consultations (₹1,000 / ₹800 incl. remedy), about Jitu Bhaiya (real photo, website link, testimonials when supplied), shop preview, legal drafts; phone OTP; CL-01…CL-07.
+- **C1 Public site, sign-in & onboarding** — home, consultations (₹1,000 / ₹800 incl. remedy), about Jitendra Khimlani (real photo, website link, testimonials when supplied), shop preview, legal drafts; phone OTP; CL-01…CL-07.
 - **C2 Home, mood check-in, journal & goals** — CL-08…10, CL-30, CL-31 with mood characters, weekly row, daily bars + tooltip, daily insight.
 - **C3 Booking + intake** — CL-11…17 + IN-01…IN-11 (save & resume, voice note, body map, safety screen), follow-up check-in IN-12, Razorpay checkout.
 - **C4 Appointments & after-session** — CL-18…24 (waiting room, reschedule-only, feedback & notes, summary).

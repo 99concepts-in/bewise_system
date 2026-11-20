@@ -41,11 +41,11 @@ export default function ProductPage() {
   return (
     <main className="px-5 pb-36">
       <AppHeader back right={<IconBtn label={`Cart, ${cartCount} items`} href="/app/bag" badge={cartCount || undefined}><ShoppingBag className="size-5" /></IconBtn>} />
-      <motion.section initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, ease }} className="relative mt-1 overflow-hidden rounded-[30px] shadow-[var(--shadow-card)]">
-        <div ref={art}><ProductArt product={p} size="lg" className="h-[360px] rounded-[30px]" /></div>
+      <motion.section initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, ease }} className="relative mt-1 overflow-hidden rounded-[32px] shadow-[var(--shadow-card)]">
+        <div ref={art}><ProductArt product={p} size="lg" className="h-[360px] rounded-[32px]" /></div>
         <div className="absolute left-6 top-6 max-w-[52%]">
-          <h1 className="text-[32px] font-extrabold leading-[1.05] tracking-[-0.03em] text-navy">{title.split(' ')[0]} <span className="text-soft">{title.split(' ').slice(1).join(' ')}</span></h1>
-          <p className="mt-2 text-[14px] leading-5 text-muted">{p.tagline}.</p>
+          <h1 className="font-display text-[30px] font-semibold leading-[34px] text-ink">{title.split(' ')[0]}<br /><em className="font-medium text-navy">{title.split(' ').slice(1).join(' ')}</em></h1>
+          <p className="mt-2 text-[14px] leading-5 text-ink-2">{p.tagline}.</p>
         </div>
       </motion.section>
 
@@ -73,14 +73,14 @@ export default function ProductPage() {
       </div>
 
       {p.personal && (
-        <p className="mt-4 flex items-start gap-2.5 rounded-[22px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
+        <p className="mt-4 flex items-start gap-2.5 rounded-[20px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
           <span aria-hidden className="text-[18px] leading-5">🌼</span>
           <span>{hasBlend ? 'We’ll prepare the same blend Jitendra Khimlani chose for you.' : 'Your first blend is made for you after a consultation, and it’s included in the fee.'}</span>
         </p>
       )}
 
       {(hit || (pregnant && /pregnan/i.test(p.safety))) && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mt-4 flex items-center gap-3 rounded-[22px] bg-rose-50 p-4" role="alert">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mt-4 flex items-center gap-3 rounded-[20px] bg-rose-50 p-4" role="alert">
           <AlertTriangle className="size-6 shrink-0 text-rose" />
           <p className="text-[14px] font-semibold leading-5 text-rose">{hit ? `Contains ${hit}. You noted an allergy.` : 'Not recommended during pregnancy. Please check with your doctor.'}</p>
         </motion.div>
@@ -99,7 +99,7 @@ export default function ProductPage() {
         </AnimatePresence>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-[480px] items-center gap-3 bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-[480px] items-center gap-3 bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
         {/* owner 2026-11-18: same UI as the shop cards: Add to cart, then a counter once it's in the cart */}
         {p.soldOut ? <Btn full variant="primary" disabled>Sold out</Btn>
           : inCart > 0 && !p.personal ? (

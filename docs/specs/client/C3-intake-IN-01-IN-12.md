@@ -13,7 +13,7 @@
 - **Resume**: `/app/book` with a draft → jumps to the first incomplete step; returning clients get last answers pre-filled from `getIntakeForm` (label "From your last visit — update anything that's changed").
 - Route: `/app/book/intake/[stepId]` (stepId `intro|who|feelings|more|body|sleep|life|safety|gentle|goals|review|saved`). Deep-linkable, guarded (can't skip ahead past an unanswered required step).
 - Text inputs: 1,000 char max (counter after 800). Voice note: 2 min max.
-- Privacy line on every step footer (13 px): "🔒 Private — only Jitu Bhaiya sees your answers."
+- Privacy line on every step footer (13 px): "🔒 Private — only Jitendra Khimlani sees your answers."
 
 ## 2. Answer model (proposed `IntakeAnswers`, for CONSULTANT to confirm — request filed)
 
@@ -35,7 +35,7 @@ interface IntakeAnswers {
 }
 type BodyArea = 'head'|'neck'|'shoulders'|'upper_back'|'lower_back'|'chest'|'stomach'|'joints'|'skin'|'other'
 ```
-Statements and chip labels come from `getIntakeForm().template` (data, not hard-coded) so Jitu Bhaiya's wording edits need no client release.
+Statements and chip labels come from `getIntakeForm().template` (data, not hard-coded) so Jitendra Khimlani's wording edits need no client release.
 
 ## 3. Screens
 
@@ -53,8 +53,8 @@ Statements and chip labels come from `getIntakeForm().template` (data, not hard-
 | **IN-08** Safety | "For your *safety*" · sub "Helps us prepare your remedy and suggest products safely" | Yes/No rows; Yes reveals a short text field for Medicines, Allergies, Condition. No alcohol-free question — **all blends are alcohol-free** (owner 2026-11-18); a sage note says so | every row answered; text required when Yes for medicines/allergies | Allergies text → also parsed server-side into `allergens[]` used by shop warnings (CL-35) — see shop spec |
 | **IN-09** One gentle question | "One gentle *question*" | Exact wording from `01-INTAKE` §3 (template-driven). Pills No · Sometimes · Often | required | §4 safety protocol |
 | **IN-10** Goals | "How would you like to *feel*?" | Multi chips (10) + "In your own words —" text | ≥ 1 chip or text | CTA **Review answers** |
-| **IN-11** Review & consent | "Your *answers*" | Section cards (On your mind · Feelings · Body · Sleep · Life · Safety · Goals) each with summary + **Edit** (→ step, then "Back to review") · Toggles: 🔒 **Share with my consultant** (on) · ✨ **Let AI prepare a private summary for Jitu Bhaiya** (on, optional) + "What is this?" sheet | Share must be on to continue: if turned off → CTA disabled + note "Jitu Bhaiya needs your answers to prepare. You can keep them brief." | CTA **Save & choose a time** → `submitIntake({ intakeId, answers, consent:{ shareWithConsultant:true, aiSummary } })` |
-| **IN-11b** Saved | "Thank you, *{firstName}*" | Mascot holding bottle · "Jitu Bhaiya will read this before you meet. You can update it until 2 hours before your session." | — | CTA **Choose a time** → CL-13 |
+| **IN-11** Review & consent | "Your *answers*" | Section cards (On your mind · Feelings · Body · Sleep · Life · Safety · Goals) each with summary + **Edit** (→ step, then "Back to review") · Toggles: 🔒 **Share with my consultant** (on) · ✨ **Let AI prepare a private summary for Jitendra Khimlani** (on, optional) + "What is this?" sheet | Share must be on to continue: if turned off → CTA disabled + note "Jitendra Khimlani needs your answers to prepare. You can keep them brief." | CTA **Save & choose a time** → `submitIntake({ intakeId, answers, consent:{ shareWithConsultant:true, aiSummary } })` |
+| **IN-11b** Saved | "Thank you, *{firstName}*" | Mascot holding bottle · "Jitendra Khimlani will read this before you meet. You can update it until 2 hours before your session." | — | CTA **Choose a time** → CL-13 |
 
 ### IN-12 Follow-up check-in (`/app/book/check-in/[1|2|3]`, board CL4-14)
 | Step | Content | Required |
@@ -62,12 +62,12 @@ Statements and chip labels come from `getIntakeForm().template` (data, not hard-
 | a | "How are you *now*?" — 5 mood characters (overall) | yes |
 | b | "Since we last *met*" — each feeling from the last intake/check-in as a row: Better · Same · Harder; "+ Something new" → IN-03 chip picker (single sheet) | each row |
 | c | "Anything *new*?" — text/voice (optional) + "Took my drops": Every day · Most days · Sometimes · Rarely · Safety recap: "Still allergic to lavender?" quick confirm (edit opens IN-08 rows) | drops |
-| submit | `intake.submitCheckin(...)` (**not in contract yet** — request) → "Thanks — Jitu Bhaiya will see how you've been." → CL-13 | |
+| submit | `intake.submitCheckin(...)` (**not in contract yet** — request) → "Thanks — Jitendra Khimlani will see how you've been." → CL-13 | |
 
 ## 4. Safety protocol UI (IN-09 → Sometimes / Often)
-- Immediately (same screen, no extra tap) reveal the **support card**: heart icon · "**You're not alone.** Talk to someone now — free and confidential, 24×7." · row "Tele-MANAS · **14416**" + **Call** (`tel:14416`) · row "In immediate danger? Call **112**" + **Call** (`tel:112`) — *board omits 112; must be added* · line "Jitu Bhaiya will be gently informed before your session."
+- Immediately (same screen, no extra tap) reveal the **support card**: heart icon · "**You're not alone.** Talk to someone now — free and confidential, 24×7." · row "Tele-MANAS · **14416**" + **Call** (`tel:14416`) · row "In immediate danger? Call **112**" + **Call** (`tel:112`) — *board omits 112; must be added* · line "Jitendra Khimlani will be gently informed before your session."
 - Numbers come from `getSetting('safety.helplines')` with these defaults; **verify before launch** (D-38).
-- Answer is saved immediately (not debounced) so the `intake.safety_flagged` alert (CONSULTANT, to Jitu Bhaiya only) fires even if the client abandons.
+- Answer is saved immediately (not debounced) so the `intake.safety_flagged` alert (CONSULTANT, to Jitendra Khimlani only) fires even if the client abandons.
 - Client may continue booking. No judgement copy, no red colours (soft periwinkle card).
 - Same card component is reused by Ask BeWise crisis handling (CL-55) and Help (CL-51).
 

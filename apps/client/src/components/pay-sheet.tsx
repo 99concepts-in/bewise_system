@@ -14,7 +14,7 @@ import { formatINR } from '@/lib/format'
 
 const UPI = [
   { id: 'gpay', name: 'Google Pay', c: '#4285F4' }, { id: 'phonepe', name: 'PhonePe', c: '#5f259f' },
-  { id: 'paytm', name: 'Paytm', c: '#00b9f1' }, { id: 'bhim', name: 'Other UPI', c: '#182957' },
+  { id: 'paytm', name: 'Paytm', c: '#00b9f1' }, { id: 'bhim', name: 'Other UPI', c: '#243D91' },
 ]
 
 export function PaySheet({ open, amountPaise, purpose, onClose, onPaid }: { open: boolean; amountPaise: number; purpose: string; onClose: () => void; onPaid: () => void }) {
@@ -68,7 +68,7 @@ export function PaySheet({ open, amountPaise, purpose, onClose, onPaid }: { open
               {phase !== 'done' ? (
                 <motion.span className="absolute inset-0 rounded-full border-[6px] border-transparent border-t-navy" animate={{ rotate: 360 }} transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }} />
               ) : (
-                <motion.span className="absolute inset-0 grid place-items-center rounded-full bg-[linear-gradient(135deg,#82977e,#4f6249)]" initial={{ scale: 0.4 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 16 }}>
+                <motion.span className="absolute inset-0 grid place-items-center rounded-full bg-teal" initial={{ scale: 0.4 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 16 }}>
                   <motion.span initial={{ scale: 0, rotate: -40 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.12, type: 'spring', stiffness: 400, damping: 14 }}><Check className="size-12 text-white" strokeWidth={3} /></motion.span>
                 </motion.span>
               )}

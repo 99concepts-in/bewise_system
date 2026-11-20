@@ -53,7 +53,7 @@ function Field({ icon, label, err, children }: { icon: React.ReactNode; label: s
   return (
     <label className="block">
       <span className="mb-2 block text-[13px] font-semibold text-navy">{label}</span>
-      <span className={`flex h-16 items-center gap-3 rounded-[22px] bg-white px-5 shadow-[var(--shadow-card)] ring-1 transition focus-within:ring-2 focus-within:ring-navy ${err ? 'ring-rose' : 'ring-transparent'}`}>
+      <span className={`flex h-16 items-center gap-3 rounded-[20px] bg-white px-5 shadow-[var(--shadow-card)] ring-1 transition focus-within:ring-2 focus-within:ring-blue ${err ? 'ring-rose' : 'ring-sky-200'}`}>
         <span className="text-peri">{icon}</span>{children}
       </span>
       {err ? <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 block text-[13px] text-rose" role="alert">{err}</motion.span> : null}

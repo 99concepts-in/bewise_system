@@ -113,7 +113,7 @@ export function PrepSheet({ o, readOnly }: { o: Order; readOnly?: boolean }) {
           <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--ink)] text-[13px] font-extrabold text-[var(--surface)]">AF</span>
           <span>
             <span className="block text-[16px] font-extrabold tracking-[0.02em] text-ink">ALCOHOL-FREE BASE</span>
-            <span className="block text-[13.5px] font-medium text-ink">Use glycerine base. Not brandy. The client asked for this.</span>
+            <span className="block text-[13.5px] font-medium text-ink">Every BeWise blend uses the glycerine base. Never brandy.</span>
           </span>
         </motion.div>
       )}
@@ -133,12 +133,12 @@ export function PrepSheet({ o, readOnly }: { o: Order; readOnly?: boolean }) {
           ))}
         </ul>
         <div className="grid grid-cols-2 gap-px border-t border-[var(--line)] bg-[var(--line)]">
-          <div className="bg-surface px-5 py-3"><span className="block text-[12.5px] font-semibold text-ink-2">Base</span><span className="text-[14.5px] font-semibold text-ink">{o.alcoholFree ? 'Glycerine (alcohol-free)' : 'Brandy'} · fill to {o.prep.bottleMl} ml</span></div>
+          <div className="bg-surface px-5 py-3"><span className="block text-[12.5px] font-semibold text-ink-2">Base</span><span className="text-[14.5px] font-semibold text-ink">Glycerine (alcohol-free) · fill to {o.prep.bottleMl} ml</span></div>
           <div className="bg-surface px-5 py-3"><span className="block text-[12.5px] font-semibold text-ink-2">Bottle</span><span className="text-[14.5px] font-semibold text-ink">{o.prep.bottleMl} ml amber dropper</span></div>
         </div>
         <div className="flex items-center gap-3 border-t border-[var(--line)] bg-accent-soft/50 px-5 py-3.5">
           <Tag size={18} className="shrink-0 text-accent" />
-          <span className="text-[15px] font-semibold text-ink">{o.prep.label}{o.alcoholFree ? ' · AF' : ''}</span>
+          <span className="text-[15px] font-semibold text-ink">{o.prep.label}</span>
         </div>
       </Surface>
       <p className="flex items-center gap-2 px-2 text-[12.5px] font-medium text-ink-2"><Lock size={13} /> Consultation notes are private and not shown here.</p>
@@ -149,7 +149,7 @@ export function PrepSheet({ o, readOnly }: { o: Order; readOnly?: boolean }) {
 function PreparePanel({ o }: { o: Order }) {
   const s = useStore()
   const [sheet, setSheet] = useState(false)
-  const checks = o.alcoholFree ? [{ key: 'af', label: 'Alcohol-free base used' }, ...PREP_CHECKS] : PREP_CHECKS
+  const checks = [{ key: 'af', label: 'Alcohol-free (glycerine) base used' }, ...PREP_CHECKS]
   const done = checks.filter((x) => o.checks[x.key]).length
   const all = done === checks.length
   return (
@@ -177,10 +177,10 @@ function PrepSheetDoc({ o, open, onClose }: { o: Order; open: boolean; onClose: 
           <div className="text-right text-[12px] font-bold tracking-wide">PREP SHEET</div>
         </div>
         <div className="py-3 text-[13px]">Client: <b>{shortName(c.name)}</b> · {o.prep.blend} · {o.prep.bottleMl} ml dropper · due <b>{when(o.dueAt)}</b></div>
-        {o.alcoholFree && <div className="mb-3 border-[3px] border-[#182957] px-3 py-2 text-center text-[14px] font-extrabold tracking-wide">ALCOHOL-FREE BASE — glycerine, NOT brandy</div>}
+        {o.alcoholFree && <div className="mb-3 border-[3px] border-[#182957] px-3 py-2 text-center text-[14px] font-extrabold tracking-wide">ALCOHOL-FREE BASE — glycerine, never brandy</div>}
         <table className="w-full text-[14px]"><tbody>
           {o.prep.flowers.map((f) => <tr key={f.name} className="border-b border-dotted border-[#18295733]"><td className="py-1.5">☐ {f.name}</td><td className="py-1.5 text-right font-semibold tnum">{f.drops} drops</td></tr>)}
-          <tr><td className="py-1.5">☐ Base: {o.alcoholFree ? 'alcohol-free' : 'brandy'} — fill to {o.prep.bottleMl} ml</td><td /></tr>
+          <tr><td className="py-1.5">☐ Base: glycerine (alcohol-free) — fill to {o.prep.bottleMl} ml · {o.prep.dosage.drops} drops {o.prep.dosage.timesPerDay}× a day for {o.prep.dosage.weeks} weeks</td><td /></tr>
         </tbody></table>
         <div className="mt-3 text-[12px] font-semibold text-[#646b80]">Label text (print exactly)</div>
         <div className="mt-1 rounded-lg border border-[#18295744] px-3 py-2 text-[14px] font-semibold">{o.prep.label}</div>
@@ -600,6 +600,7 @@ function OrderFacts({ o, c }: { o: Order; c: Client }) {
         </div>
       </Divided>
       {showAddress && <><SectionTitle>Client</SectionTitle><AddressCard c={c} o={o} /></>}
+      {o.remedyOrderId && <ConsultantView o={o} />}
       <SectionTitle>History</SectionTitle>
       <Divided>
         {[...o.history].reverse().map((h, i) => (
@@ -615,3 +616,25 @@ function OrderFacts({ o, c }: { o: Order; c: Client }) {
   )
 }
 
+
+/** What Jitendra Khimlani's remedy tracker shows for this blend (driven by fulfilment.stage_changed + shipment.delivered). */
+const TRACK = ['Given', 'Preparing', 'Dispatched', 'Delivered'] as const
+function ConsultantView({ o }: { o: Order }) {
+  const step = o.stage === 'new' ? 0 : ['preparing', 'quality_check', 'packing', 'ready_to_dispatch'].includes(o.stage) ? 1 : o.stage === 'delivered' ? 3 : 2
+  return (
+    <>
+      <SectionTitle>Jitendra Khimlani sees</SectionTitle>
+      <Surface className="!py-4">
+        <div className="grid grid-cols-4 gap-1">
+          {TRACK.map((t, i) => (
+            <div key={t} className="flex flex-col items-center gap-1.5">
+              <motion.span initial={false} animate={{ backgroundColor: i <= step ? 'var(--sage)' : 'var(--surface-2)', scale: i === step ? 1.12 : 1 }} transition={spring}
+                className="grid size-7 place-items-center rounded-full">{i <= step && <Check size={14} strokeWidth={3} className="text-white" />}</motion.span>
+              <span className={cx('text-[12px] font-semibold', i === step ? 'text-ink' : 'text-ink-3')}>{t}</span>
+            </div>
+          ))}
+        </div>
+      </Surface>
+    </>
+  )
+}

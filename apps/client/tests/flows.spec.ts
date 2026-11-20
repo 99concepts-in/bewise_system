@@ -31,13 +31,13 @@ test('feedback sends benefits[]', async ({ page }) => {
 
 test('public booking link: new visitor → landing → sign-in; signed-in → booking with type', async ({ page }) => {
   await seed(page, { onboarded: false })
-  await page.goto('/book/jitu-bhaiya?type=followup')
+  await page.goto('/book/jitendra-khimlani?type=followup')
   await expect(page.getByRole('heading', { name: /Book with Jitendra Khimlani/ })).toBeVisible()
   await page.getByRole('button', { name: 'Book with Jitendra Khimlani' }).click()
   await page.waitForURL('**/sign-in')
   expect(await page.evaluate(() => sessionStorage.getItem('bw-next'))).toBe('/app/book?type=followup')
   await seed(page)
-  await page.goto('/book/jitu-bhaiya?type=followup'); await page.waitForURL('**/app/book?type=followup')
+  await page.goto('/book/jitendra-khimlani?type=followup'); await page.waitForURL('**/app/book?type=followup')
 })
 
 test('staff-made booking: pay without picking a slot; late payment → the team confirms a new time', async ({ page }) => {
@@ -182,4 +182,23 @@ test('launch offer: yearly screen links straight to the 6-month option', async (
   await page.getByRole('button', { name: /Try 6 months/ }).click()
   await expect(page.getByText('Scared of a big commitment? Try 6 months first.')).toBeVisible()
   await expect(page.getByText('Recommended minimum')).toBeVisible()
+})
+
+test('home feelings: pick → celebration → collapsed card for that feeling; Change reopens the grid', async ({ page }) => {
+  await seed(page)
+  await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('bewise-client-v1')!); r.state.journal = []; localStorage.setItem('bewise-client-v1', JSON.stringify(r)) })
+  await page.goto('/app')
+  await page.getByRole('button', { name: 'Anxious', exact: true }).click()
+  await expect(page.getByText('Anxious, noted')).toBeVisible()
+  await expect(page.getByText('Today you’re feeling')).toBeVisible({ timeout: 4000 })
+  await expect(page.getByRole('link', { name: /Rescue Remedy for stressful moments/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Calm', exact: true })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Change' }).click()
+  await expect(page.getByRole('button', { name: 'Calm', exact: true })).toBeVisible()
+})
+
+test('home shows the 4-dose remedy check-in when there is a blend', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app')
+  await expect(page.getByRole('group', { name: /Today: \d of 4 doses/ })).toBeVisible()
 })

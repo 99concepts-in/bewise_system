@@ -7,6 +7,7 @@ import { SheetsProvider } from './screens/Sheets'
 import Today from './screens/Today'
 import { SheetBody } from './screens/Sheets'
 import { lazyWithPreload } from './ui/lazy'
+import { Logo } from './ui/art'
 import type { Bucket } from './lib/derive'
 
 // Today ships in the first bundle; everything else is split and prefetched while idle, so taps stay instant.
@@ -60,14 +61,15 @@ function Shell() {
   return (
     <div className={'app' + (top === 'session' ? ' is-focus' : '')}>
       <a className="skip" href="#main">Skip to content</a>
+      {/* v5 (HUB 2026-11-20): white tab bar, active = navy icon + label + 4 px dot above; side rail with the official logo on wide screens */}
       <nav className="nav" aria-label="Main">
-        <img className="nav-logo" src="./img/owl-drops-160.webp" width={40} height={40} alt="BeWise" decoding="async" />
+        <Logo className="nav-logo" />
         {TABS.map(({ path, key: k, label, Icon }) => {
           const on = top === k
           return (
-            <button key={path} className={'nav-btn' + (on ? ' is-on' : '')} onClick={() => go(path)} aria-current={on ? 'page' : undefined} aria-label={label}>
-              {on && <m.span layoutId="nav-pill" className="nav-pill" transition={spring} />}
-              <Icon size={21} strokeWidth={on ? 2.3 : 1.9} />
+            <button key={path} className={'nav-btn' + (on ? ' is-on' : '')} onClick={() => go(path)} aria-current={on ? 'page' : undefined}>
+              {on && <m.span layoutId="nav-dot" className="nav-dot" transition={spring} />}
+              <Icon size={22} strokeWidth={on ? 2.2 : 1.75} aria-hidden />
               <span className="nav-label">{label}</span>
             </button>
           )
@@ -75,7 +77,7 @@ function Shell() {
       </nav>
       <main id="main" className={'main' + (top === '' ? ' main-wide' : '')}>
         {/* Enter-only transition: the new screen never waits for the old one to leave (instant, and nothing can stall it). */}
-        <m.div key={key} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}>
+        <m.div key={key} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
           <Suspense fallback={<ScreenSkeleton />}>{screen}</Suspense>
         </m.div>
       </main>

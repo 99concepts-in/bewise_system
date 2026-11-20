@@ -1,17 +1,21 @@
 /**
  * @screens CN-13 Client profile — progress since last remedy, feelings week, troubling over time, blend, all sessions.
+ * v5 (HUB 2026-11-20): mood colours (accent circles + labels), troubling grid in feeling colours,
+ *          current blend and blend history with flower thumbnails.
  */
 import { useMemo } from 'react'
 import { m } from 'motion/react'
-import { ArrowLeft, CalendarPlus, Leaf, MapPin, MessageCircle, Phone, Star, Video } from 'lucide-react'
+import { ArrowLeft, CalendarPlus, Droplet, MapPin, MessageCircle, Phone, Star, Video } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { Avatar, MoodFace, Empty, go, softSpring } from '../ui/kit'
+import { Avatar, Empty, go, softSpring } from '../ui/kit'
+import { FeelingChip, FlowerChip, FlowerStack, MoodCircle } from '../ui/art'
+import { feelingTone } from '../ui/tone'
 import { useSheets, KIND_LABEL, STATUS_LABEL, waLink } from './Sheets'
 import { personView, sinceLastRemedy } from '../lib/derive'
 import { AdherenceCard } from '../ui/care'
 import { dayLabel, fmtLong, fmtShort, fmtTime, fmtWeekday, relative } from '../lib/time'
 import { DAY, MIN, startOfDay } from '../data/seed'
-import { pron, type RemedyStage } from '../data/types'
+import { pron, type Mood, type RemedyStage } from '../data/types'
 
 const STAGES: RemedyStage[] = ['given', 'preparing', 'dispatched', 'delivered']
 const STAGE_LABEL: Record<RemedyStage, string> = { given: 'Given', preparing: 'Preparing', dispatched: 'Dispatched', delivered: 'Delivered' }
@@ -33,6 +37,8 @@ export default function Profile({ id }: { id: string }) {
   const her = pron(p).poss
   const them = pron(p).obj
   const doneCount = v.past.filter((a) => a.status === 'completed').length
+  const weekMoods = [...new Set(week.map((w) => w.mood).filter(Boolean))] as Mood[]
+  const blends = v.past.filter((a) => a.remedy).reverse()
 
   return (
     <div className="screen profile">
@@ -47,9 +53,9 @@ export default function Profile({ id }: { id: string }) {
         </m.div>
       </div>
       <div className="pf-actions">
-        <a className="btn btn-quiet" href={waLink(p.phone, `Namaste ${p.first}, this is Jitu Bhaiya from BeWise. `)} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a>
-        <a className="btn btn-quiet" href={`tel:${p.phone.replace(/\s/g, '')}`}><Phone size={16} /> Call</a>
-        <button className="btn btn-primary" onClick={() => sheets.express(p.id)}><CalendarPlus size={16} /> Book</button>
+        <a className="btn btn-quiet" href={waLink(p.phone, `Namaste ${p.first}, this is Jitendra Khimlani from BeWise. `)} target="_blank" rel="noreferrer"><MessageCircle size={18} aria-hidden /> WhatsApp</a>
+        <a className="btn btn-quiet" href={`tel:${p.phone.replace(/\s/g, '')}`}><Phone size={18} aria-hidden /> Call</a>
+        <button className="btn btn-primary" onClick={() => sheets.express(p.id)}><CalendarPlus size={18} aria-hidden /> Book</button>
       </div>
 
       {v.next && v.next.start - now < 60 * MIN && (
@@ -78,11 +84,12 @@ export default function Profile({ id }: { id: string }) {
         <div className="mood-week">
           {week.map(({ d, mood }, i) => (
             <div key={d} className="mw-day">
-              {mood ? <m.span initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...softSpring, delay: 0.1 + i * 0.04 }}><MoodFace mood={mood} size={38} /></m.span> : <span className="mw-empty" role="img" aria-label="No entry" />}
+              {mood ? <m.span initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...softSpring, delay: 0.1 + i * 0.04 }}><MoodCircle mood={mood} size={38} /></m.span> : <span className="mw-empty" role="img" aria-label="No entry" />}
               <small>{fmtWeekday(d).slice(0, 2)}</small>
             </div>
           ))}
         </div>
+        {weekMoods.length > 0 && <div className="feel-row mood-legend">{weekMoods.map((md) => <FeelingChip key={md} name={md.charAt(0).toUpperCase() + md.slice(1)} icon={false} size="sm" />)}</div>}
         {p.moods.length === 0 && <p className="muted small">{p.first} hasn't logged feelings yet, or keeps the journal private.</p>}
       </section>
 
@@ -95,7 +102,7 @@ export default function Profile({ id }: { id: string }) {
             {allConcerns.map((c) => (
               <div key={c} className="cg-row" style={{ display: 'contents' }}>
                 <span className="cg-name">{c}</span>
-                {troublingHistory.map((a) => <span key={a.id} role="img" className={'cg-cell' + (a.troubling!.includes(c) ? ' on' : '')} aria-label={a.troubling!.includes(c) ? `${c} on ${fmtShort(a.start)}` : `No ${c.toLowerCase()} on ${fmtShort(a.start)}`} />)}
+                {troublingHistory.map((a) => <span key={a.id} role="img" className={'cg-cell' + (a.troubling!.includes(c) ? ` on tone-${feelingTone(c)}` : '')} aria-label={a.troubling!.includes(c) ? `${c} on ${fmtShort(a.start)}` : `No ${c.toLowerCase()} on ${fmtShort(a.start)}`} />)}
               </div>
             ))}
           </div>
@@ -104,8 +111,8 @@ export default function Profile({ id }: { id: string }) {
 
       {v.blend?.remedy && (
         <section className="card pf-card">
-          <h2><Leaf size={16} /> Current blend</h2>
-          <div className="chips-wrap">{v.blend.remedy.flowers.map((f) => <span key={f} className="tag tag-sage">{f}</span>)}</div>
+          <h2><Droplet size={18} aria-hidden /> Current blend</h2>
+          <div className="fchips">{v.blend.remedy.flowers.map((f) => <FlowerChip key={f} name={f} />)}</div>
           <p className="muted small">Given {fmtLong(v.blend.remedy.givenAt)}. 4 drops, 4 times a day.</p>
           <ol className="stages">
             {STAGES.map((st, i) => {
@@ -113,6 +120,23 @@ export default function Profile({ id }: { id: string }) {
               return <li key={st} className={reached ? 'on' : ''}><m.span className="stage-dot" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ ...softSpring, delay: 0.2 + i * 0.08 }} />{STAGE_LABEL[st]}</li>
             })}
           </ol>
+        </section>
+      )}
+
+      {blends.length > 1 && (
+        <section className="card pf-card">
+          <h2>Blend history</h2>
+          <ul className="bh">
+            {blends.slice(0, 6).map((a) => (
+              <li key={a.id}>
+                <button className="bh-row" onClick={() => sheets.session(a.id)}>
+                  <span className="bh-date">{fmtShort(a.remedy!.givenAt)}</span>
+                  <FlowerStack flowers={a.remedy!.flowers} size={30} max={5} />
+                  <span className="bh-names">{a.remedy!.flowers.join(', ')}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
@@ -126,7 +150,7 @@ export default function Profile({ id }: { id: string }) {
                 <span className="row-time">{fmtShort(a.start)}<small>{fmtTime(a.start)}</small></span>
                 <span className="row-main"><b>{KIND_LABEL[a.kind]}</b><small>{a.start > now ? relative(a.start, now) : STATUS_LABEL[a.status]}{a.remedy ? `, ${a.remedy.flowers.length} flowers` : ''}</small></span>
                 <span className="row-end">
-                  {a.rating ? <span className="mini-rating"><Star size={12} />{a.rating}</span> : null}
+                  {a.rating ? <span className="mini-rating"><Star size={13} aria-hidden />{a.rating}</span> : null}
                   <span className="mode-ic">{a.mode === 'online' ? <Video size={15} /> : <MapPin size={15} />}</span>
                 </span>
               </button>

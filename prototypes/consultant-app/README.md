@@ -1,4 +1,4 @@
-# BeWise Consultant app — interactive prototype (Jitu Bhaiya)
+# BeWise Consultant app — interactive prototype (Jitendra Khimlani)
 
 > **Owner:** CONSULTANT chat · **Status:** prototype on demo data, built 2026-11-17 at the owner's request.
 > Lives in its own folder on purpose: the real app is built inside `src/app/(consultant)/consult/**` once the HUB
@@ -7,7 +7,7 @@
 ![Overview](screenshots/overview.jpg)
 
 ## What it does
-| Tab | What Jitu Bhaiya gets |
+| Tab | What Jitendra Khimlani gets |
 |---|---|
 | **Today** (CN-03) | Greeting · **Today's bloom**: one petal per session (done, next, later); tap a petal to open the session · next session with booking note, Prepare / Start · **Needs you**: a swipeable deck of insights computed from data (remedy not given yet, unpaid booking, a check-in where something feels harder, follow-ups overdue, next week almost full → open Saturday morning, quiet clients) with one-tap actions · today's timeline · **Your week**: weekly goal ring, people in care, and **what clients told him**, his kind words |
 | **Sessions** (CN-14/16) | Upcoming and Past in one place (segmented), search, filters (first / follow-up / online / in person / awaiting payment / no-show), grouped by day with sticky headers; tap → session sheet (Start, Reschedule with live slot picker, WhatsApp, Call, Give remedy, Book follow-up) |

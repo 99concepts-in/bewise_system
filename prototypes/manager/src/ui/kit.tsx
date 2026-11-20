@@ -391,8 +391,9 @@ export function Stat({ label, value, tone = 'neutral', onClick }: { label: strin
   const bg: Record<Tone, string> = { neutral: 'bg-surface', accent: 'bg-accent-soft', sage: 'bg-sage-soft', gold: 'bg-gold-soft', ok: 'bg-ok-soft', warn: 'bg-warn-soft', bad: 'bg-bad-soft' }
   const Comp = onClick ? motion.button : motion.div
   return (
-    <Comp whileTap={onClick ? { scale: 0.97 } : undefined} transition={spring} onClick={onClick} className={cx('rounded-[24px] p-4 text-left', bg[tone])}>
-      <div className="text-[30px] leading-none font-bold tracking-[-0.02em] text-ink">{value}</div>
+    <Comp whileTap={onClick ? { scale: 0.97 } : undefined} transition={spring} onClick={onClick} className={cx('@container min-w-0 rounded-[24px] p-3.5 text-left sm:p-4', bg[tone])}>
+      {/* @cross(OWNER): amount scales with the tile's own width so 3-up tiles never overflow on phones (request 20261118) */}
+      <div className="text-[clamp(16px,24cqw,30px)] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink">{value}</div>
       <div className="mt-2 text-[13.5px] font-semibold text-ink-2">{label}</div>
     </Comp>
   )

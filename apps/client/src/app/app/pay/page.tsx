@@ -12,7 +12,6 @@ import { Suspense, useState } from 'react'
 import { Mascot, Petals } from '@/components/brand'
 import { PaySheet } from '@/components/pay-sheet'
 import { AppHeader } from '@/components/shell'
-import { TimePicker } from '@/components/time-picker'
 import { Btn, ease, toast } from '@/components/ui'
 import { CONSULTATIONS, STUDIO } from '@/lib/data'
 import { useApp } from '@/lib/store'
@@ -29,7 +28,6 @@ function Pay() {
   const pay = useApp((s) => s.payAppointment)
   const pickNewTime = useApp((s) => s.pickNewTime)
   const [paying, setPaying] = useState(false)
-  const [slot, setSlot] = useState<Date>()
   const [done, setDone] = useState(false)
 
   if (!a) return (
@@ -90,7 +88,7 @@ function Pay() {
           </div>
         ))}
       </section>
-      <div className="mt-4 flex items-start gap-3 rounded-[22px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
+      <div className="mt-4 flex items-start gap-3 rounded-[20px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
         <Info className="mt-0.5 size-5 shrink-0" /><p>Sessions are non-refundable, but you can reschedule free up to 24 h before.</p>
       </div>
       <AnimatePresence>
@@ -99,7 +97,7 @@ function Pay() {
         )}
       </AnimatePresence>
       <div className="card mt-4 flex items-center justify-between p-5"><span className="text-[20px] font-extrabold text-navy">Total</span><span className="text-[30px] font-extrabold text-navy tnum">{formatINR(a.amountPaise)}</span></div>
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
         <Btn full variant="gradient" onClick={() => setPaying(true)}><span aria-hidden>🔒</span> Pay {formatINR(a.amountPaise)}</Btn>
         <p className="mt-2 text-center text-[12px] text-muted">Secured by Razorpay · UPI, cards, netbanking</p>
       </div>

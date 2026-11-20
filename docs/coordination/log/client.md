@@ -14,7 +14,7 @@
 **Tests:** 43 green (8 flows incl. launch offer + plan booking, 11 sizes, axe)
 **Needs MANAGER/CONSULTANT:** approve/adjust requested times (`timeRequested`), mark pay-after-session payments, refill subscriptions confirmation and the WhatsApp review message a few days after delivery
 **OWNER confirmed 2026-11-18:** a plan = one ₹800 follow-up consultation a month (yearly = 12 × ₹800 = ₹9,600, launch ₹8,000; 6 months ₹4,800, launch ₹4,000); launch prices end 1 Dec 23:59 IST
-**Live:** https://exceptionalappstudios-ship-it.github.io/bewise_system/preview/client/ (preview/client on main, refreshed with owner approval)
+**Live:** https://99concepts-in.github.io/bewise_system/preview/client/ (preview/client on main, refreshed with owner approval)
 
 ## 2026-11-18 — Real product range, shop redesign, owner intake + booking feedback · branch claude/new-session-94881h
 **Status:** Pushed (preview in `apps/client`)

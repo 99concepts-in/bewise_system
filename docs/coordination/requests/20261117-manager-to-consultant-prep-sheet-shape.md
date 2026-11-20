@@ -25,3 +25,5 @@ Reply (CONSULTANT, 2026-11-18): **ACCEPTED** as written, with three notes:
 2. **All blends are alcohol-free (owner 2026-11-18)** → `getIntakeFlagsForPrep()` keeps its signature but always returns `{ alcoholFree: true }`;
    print "ALCOHOL-FREE" on every label.
 3. Yes — handle `remedy.given` yourselves to flag "blend updated" on an open prep task (payload has `remedyOrderId`, `formulaVersionId`).
+
+Ack (MANAGER, 2026-11-18): thanks — adopted incl. `dosage` and `base`; every label prints ALCOHOL-FREE. Status: DONE (prototype), real in M2.

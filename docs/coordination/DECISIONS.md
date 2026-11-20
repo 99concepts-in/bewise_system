@@ -5,16 +5,16 @@
 
 | ID | Question | Default used until decided | Needed by | Status |
 |---|---|---|---|---|
-| D-01 | Tech stack & hosting | Next.js 15 + TypeScript + Tailwind + shadcn/ui · Supabase (Mumbai) · Vercel · Razorpay | Phase 0 | **OPEN — recommend approve** |
+| D-01 | Tech stack & hosting | **SUPERSEDED by D-44 (2026-11-18):** Hostinger — static apps (Next.js export / Vite) + **PHP 8 API + Hostinger MySQL**. Razorpay unchanged | Phase 0 | ✅ DECIDED (D-44) |
 | D-02 | Remedy charged separately? | **DECIDED 2026-11-17: remedy INCLUDED in the consultation fee** — remedy given after a paid session creates a ₹0 remedy order; **reorders** are charged at `remedy.reorder_price` (owner to set) | K4, C4 | ✅ DECIDED |
 | D-03 | Can the owner read practitioner private notes & questionnaire answers? | **No** by default; break-glass permission with audit | K2 | OPEN |
 | D-04 | Client sign-in method | Phone OTP (+91) primary, email fallback; staff email + password | Phase 0 | OPEN — needs SMS provider (MSG91/Twilio) |
 | D-05 | Payment account | Razorpay test keys in dev; live keys at go-live; GSTIN & legal entity name for invoices | O2 | OPEN — credentials needed |
 | D-06 | Courier partner | **DECIDED: Shiprocket** (multiple couriers, rates, labels, pickups, tracking); manual AWB fallback. Needs Shiprocket API credentials | M2 | ✅ DECIDED |
-| D-07 | WhatsApp provider | Meta WhatsApp Cloud API (or BSP like Interakt/AiSensy); templates need Meta approval | O3 | OPEN |
+| D-07 | WhatsApp provider | **DECIDED 2026-11-19: Mart2Meta** (WhatsJet-based WhatsApp Cloud API panel, login.mart2meta.com). Template messages via `api/lib/whatsapp.php`; credentials on `/api/tools.php` (private config); templates & texts `hosting/WHATSAPP-MART2META.md` | O3 | ✅ DECIDED |
 | D-08 | Cancellation / reschedule policy | **No refunds** (D-16). Default: reschedule free ≥24h before; <24h one reschedule; no-show forfeits — owner to confirm the reschedule window | K1, C2 | PARTLY DECIDED |
 | D-09 | Consultation types & fees | **DECIDED 2026-11-17: First consultation ₹1,000 · Follow-up ₹800 — both include the remedy blend.** Durations default 60 / 30 min (confirm); online link = consultant's Google Meet/Zoom | K1, O1 | ✅ DECIDED (fees) |
-| D-10 | Source & approval of Bach Flower library content | Names + 7 groups seeded; descriptions written/approved by Jitu Bhaiya before go-live | K4 | OPEN |
+| D-10 | Source & approval of Bach Flower library content | Names + 7 groups seeded; descriptions written/approved by Jitendra Khimlani before go-live | K4 | OPEN |
 | D-11 | Manager scope (Haresh) | **DECIDED:** office ops, catalogue (phone + **computer**), inventory, **production & purchases**, all money follow-ups (collect + pay + expenses); no accounting/approvals | Phase 0 | ✅ DECIDED |
 | D-12 | Domain, email sender, brand email | e.g. bewisewellness.in, `care@` sender | Go-live | OPEN |
 | D-13 | Chart of accounts, GST treatment, inventory valuation method | Draft CoA by OWNER chat, validated by a qualified accountant before go-live | O2 | OPEN |
@@ -37,16 +37,17 @@
 | D-30 | Bach library size: owner said 36; standard is 38 + Rescue | Configurable library seeded with 38, hideable | K | OPEN |
 | D-31 | Calendar sync | **DECIDED: yes** — Google two-way (OAuth; push sessions, pull busy times), Apple via iCloud CalDAV, private ICS feed for any app; clients get Add-to-calendar. Needs Google Cloud OAuth client (credential) | K1, CN-28 | ✅ DECIDED |
 | D-32 | Apple Health / Google Health Connect | **DECIDED: later phase** — requires native wrapper (Capacitor) since a PWA can't access them; consent per data type | Client P3 | ✅ DECIDED (later) |
-| D-33 | Consultant & manager see business numbers | **DECIDED: yes, sales AND profit** (owner 2026-11-17) — read-only for Jitu Bhaiya (CN-30…32), in reports for Haresh | K, M | ✅ DECIDED |
+| D-33 | Consultant & manager see business numbers | **DECIDED: yes, sales AND profit** (owner 2026-11-17) — read-only for Jitendra Khimlani (CN-30…32), in reports for Haresh | K, M | ✅ DECIDED |
 | D-34 | Design v3 "Luxe" | **REJECTED 2026-11-17** ("last one was nice, this is basic"). **v2 Quiet Luxury stays** for the whole app (Cormorant Garamond + Plus Jakarta Sans, tone-on-tone cards, no dark hero cards). The custom icon SVGs remain available as an optional asset only | All | ❌ REJECTED |
 | D-17 | (see above) Owner name & personal finance / payroll timing / accountant login | Asked in owner spec | O | OPEN |
 | D-35 | Intake / case-taking before booking | **DECIDED 2026-11-17: yes** — full intake before first booking (≈5 min, save & resume), 2-min check-in before follow-ups; emotional (Bach-mapped nuance), physical (body map), sleep/energy, life changes, safety (meds, pregnancy, alcohol-free, allergies), self-harm check, goals | C, K | ✅ DECIDED |
 | D-36 | AI case summary for consultant | **DECIDED: yes** — Claude server-side, consultant-only, consent-based, verify label, never in client view | K | ✅ DECIDED |
-| D-37 | "Flowers to consider" for consultant | **DECIDED: ON for Jitu Bhaiya only** — deterministic mapping with reasons, reference only, his judgement decides, never shown to client (PRD §6/§15: system must not autonomously prescribe) | K | ✅ DECIDED 2026-11-17: **yes, Jitu Bhaiya only** |
-| D-38 | Self-harm question + helpline | **DECIDED 2026-11-17:** keep the question; client sees Tele-MANAS 14416 / 112 immediately; **alert goes to Jitu Bhaiya only** (no owner/other contact); Jitu Bhaiya reviews wording; verify numbers before launch | C, K | ✅ DECIDED |
+| D-37 | "Flowers to consider" for consultant | **DECIDED: ON for Jitendra Khimlani only** — deterministic mapping with reasons, reference only, his judgement decides, never shown to client (PRD §6/§15: system must not autonomously prescribe) | K | ✅ DECIDED 2026-11-17: **yes, Jitendra Khimlani only** |
+| D-38 | Self-harm question + helpline | **DECIDED 2026-11-17:** keep the question; client sees Tele-MANAS 14416 / 112 immediately; **alert goes to Jitendra Khimlani only** (no owner/other contact); Jitendra Khimlani reviews wording; verify numbers before launch | C, K | ✅ DECIDED |
 | D-39 | Accountant / CA login | **DECIDED 2026-11-17: yes** — role `accountant`: view & export reports, invoices, bills, ledgers, GST; no edits; no consultation or intake data | O | ✅ DECIDED |
 | D-40 | Personal finance | **DECIDED: later phase** (not in first release) | O | ✅ DECIDED |
 | D-41 | Payroll | **DECIDED: later phase** | O | ✅ DECIDED |
 | D-42 | Owner greeting name | Pending — app says "Good morning" until the owner gives a name | O | OPEN |
 | D-43 | Design v4 "Soft Bloom" (owner refs: Sintelly mobile + mood-tracker dashboard) | **ACCEPTED 2026-11-17 for the client app; v4 is the visual language for the whole build** (tokens `design/tokens.json` → `v4`, rules `design/v4-soft-bloom/README.md`). Consultant/manager/owner boards to be restyled in v4; until then build their layouts from v2 boards with v4 tokens | All | ✅ DECIDED |
-
+| D-44 | Backend & database | **DECIDED 2026-11-18 (owner: "use Hostinger now", incl. DB):** PHP 8.1+ API in `api/` (RPC `POST /api/v1/<module>.<fn>`, names = contracts §5) + **Hostinger MySQL/MariaDB**, migrations in `api/migrations/`, one-time setup `/api/install.php`, private config outside `public_html`. Email-OTP for clients, password for staff. Sensitive columns encrypted (sodium). Works on every Hostinger plan (no Node server needed). Guide `hosting/HOSTINGER-DATABASE.md`, reference `api/README.md` | All | ✅ DECIDED |
+| D-45 | Design v5 for client + consultant apps | **DECIDED 2026-11-20 (owner): v5 "Blue Bloom".** Blue theme with colourful accents, uncluttered, the official vector logo identical everywhere (`design/brand/kit/`); Mindful Remedies and the Warm Bloom mockups were inspiration only. Fraunces display font (Roca once licensed) + Inter; 39 Bach flower vectors + 18 feeling icons; Jitendra Khimlani story, Care tab with FAQ, install + notification prompts. Spec `design/v5-blue/DESIGN-SYSTEM.md` | C, K | ✅ DECIDED |

@@ -13,7 +13,7 @@
 | A client never sees a slot that cannot be booked | slot list = same pure function used to validate a hold |
 | No double booking, ever | Postgres exclusion constraint is the last line of defence, not app code |
 | A slot is held while the client pays | 15-min hold, released automatically |
-| Jitu Bhaiya's personal calendar blocks client slots | Google free/busy + iCloud busy times, refreshed ≤ 10 min |
+| Jitendra Khimlani's personal calendar blocks client slots | Google free/busy + iCloud busy times, refreshed ≤ 10 min |
 | His BeWise sessions show up in his own calendar | Pushed to a dedicated "BeWise sessions" calendar (Google / iCloud) + private ICS feed |
 | Nothing private leaks to calendars | Event titles carry at most a first name; never notes, intake, remedy |
 
@@ -339,7 +339,7 @@ Each: loading skeleton · empty · error with retry · offline (read-only cached
 |---|---|---|
 | 1 | Durations 60 / 30 min (D-09) | 60 / 30 |
 | 2 | Free reschedules ≥24 h: unlimited or capped? | capped at 3 |
-| 3 | Can Jitu Bhaiya confirm a booking without online payment (cash / complimentary)? | No — needs owner decision + finance `recordPayment` path |
+| 3 | Can Jitendra Khimlani confirm a booking without online payment (cash / complimentary)? | No — needs owner decision + finance `recordPayment` path |
 | 4 | Consultant-initiated cancel of a paid session | becomes "needs new time", not a cancellation |
 | 5 | Calendar event title shows client first name + initial? | yes (`first_name`), switchable to anonymous in CN-28 |
 | 6 | Google OAuth client + Apple app-specific password | CONTENT-CHECKLIST #8a — needed before CN-28 works outside dev |

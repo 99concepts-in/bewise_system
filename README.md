@@ -15,7 +15,7 @@ Bach Flower Remedy consultations + aromatherapy store + office operations + fina
 
 | Chat | Brief | Space |
 |---|---|---|
-| 1 — Consultant (Jitu Bhaiya) | [`chats/CHAT-1-CONSULTANT.md`](chats/CHAT-1-CONSULTANT.md) | `/consult` |
+| 1 — Consultant (Jitendra Khimlani) | [`chats/CHAT-1-CONSULTANT.md`](chats/CHAT-1-CONSULTANT.md) | `/consult` |
 | 2 — Client | [`chats/CHAT-2-CLIENT.md`](chats/CHAT-2-CLIENT.md) | `/` + `/app` |
 | 3 — Manager (Haresh Moorjani) | [`chats/CHAT-3-MANAGER.md`](chats/CHAT-3-MANAGER.md) | `/ops` |
 | 4 — Owner | [`chats/CHAT-4-OWNER.md`](chats/CHAT-4-OWNER.md) | `/owner` |

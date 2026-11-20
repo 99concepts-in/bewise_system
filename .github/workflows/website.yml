@@ -1,0 +1,46 @@
+# @owner HUB · bewiseglobal.in public website (Razorpay-ready) → branch `website-site` (hPanel → bewiseglobal.in → Advanced → GIT)
+# Optional FTP: secrets WEBSITE_FTP_SERVER / WEBSITE_FTP_USERNAME / WEBSITE_FTP_PASSWORD (var WEBSITE_FTP_DIR, default ./)
+name: Website → bewiseglobal.in
+on:
+  push:
+    branches: [main]
+    paths: ['website/**', 'api/seed/**', 'api/sdk/**', 'apps/client/public/img/**', '.github/workflows/website.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: website
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      FTP_SERVER: ${{ secrets.WEBSITE_FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.WEBSITE_FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.WEBSITE_FTP_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pillow
+      - run: python3 website/build.py
+      - name: Publish to website-site branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist/website
+          publish_branch: website-site
+          force_orphan: true
+          enable_jekyll: true
+          commit_message: 'bewiseglobal.in build ${{ github.sha }}'
+      - name: FTP to Hostinger (optional)
+        if: env.FTP_SERVER != '' && env.FTP_USERNAME != '' && env.FTP_PASSWORD != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.WEBSITE_FTP_SERVER }}
+          username: ${{ secrets.WEBSITE_FTP_USERNAME }}
+          password: ${{ secrets.WEBSITE_FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: dist/website/
+          server-dir: ${{ vars.WEBSITE_FTP_DIR || './' }}

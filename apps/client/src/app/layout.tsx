@@ -1,6 +1,7 @@
 /**
  * @module client-shell  @owner CLIENT
- * Purpose: Root document — fonts (self-hosted Plus Jakarta Sans, D-21), v4 gradient wash, PWA meta.
+ * Purpose: Root document — fonts (self-hosted Fraunces + Inter), cool paper background, PWA meta.
+ * v5 (HUB 2026-11-20): Blue Bloom — the fixed v4 gradient wash is gone (one soft wash lives at the top of Home only).
  */
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
@@ -12,20 +13,19 @@ export const metadata: Metadata = {
   description: 'Bach flower remedy consultations with Jitendra Khimlani, your personal blend, mood journal and gentle aromatherapy rituals.',
   applicationName: 'BeWise',
   manifest: `${BP}/manifest.webmanifest`,
-  icons: { icon: `${BP}/img/logo-mark.png`, apple: `${BP}/icon-192.png` },
+  icons: { icon: `${BP}/img/brand/bewise-mark.svg`, apple: `${BP}/icon-192.png` },
   appleWebApp: { capable: true, title: 'BeWise', statusBarStyle: 'default' },
   formatDetection: { telephone: false },
   ...(process.env.NEXT_PUBLIC_NOINDEX === '1' ? { robots: { index: false, follow: false } } : {}),
 }
 export const viewport: Viewport = {
-  width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#dce2f5',
+  width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#f3f6ff',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-IN">
       <body>
-        <div className="bw-wash fixed inset-0 -z-10" aria-hidden />
         <Providers>
           <div className="relative mx-auto min-h-dvh w-full max-w-[480px]">{children}</div>
         </Providers>

@@ -2,7 +2,7 @@
 
 > **Owner:** HUB. Status: **IN PROGRESS (owner request 2026-11-17)** — references `design/inspiration/ref-04-mood-tracker-dashboard.png`
 > (desktop mood tracker) and `ref-05-sintelly-mobile.png` (mobile). Replaces v2 visuals for the **client app** once approved;
-> consultant (Jitu Bhaiya) follows. Layouts, flows and screen IDs (CL-xx, IN-xx) are unchanged — only the visual language changes.
+> consultant (Jitendra Khimlani) follows. Layouts, flows and screen IDs (CL-xx, IN-xx) are unchanged — only the visual language changes.
 
 ## What we take from the references → BeWise translation
 | Reference trait | BeWise v4 |

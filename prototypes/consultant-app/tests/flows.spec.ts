@@ -1,5 +1,5 @@
 /**
- * End-to-end flows Jitu Bhaiya uses every day. Run on phone, small phone, tablet and desktop.
+ * End-to-end flows Jitendra Khimlani uses every day. Run on phone, small phone, tablet and desktop.
  */
 import { expect, test, type Page } from '@playwright/test'
 
@@ -21,7 +21,7 @@ test.afterEach(() => expect(errors, 'no console errors').toEqual([]))
 test.describe('@flows', () => {
   test('Today shows impact, today\'s appointments and needs-you', async ({ page }) => {
     await fresh(page)
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Jitu Bhaiya')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Jitendra Khimlani')
     await expect(page.locator('.impact .ms-title')).toContainText(/sessions? to your \d/)
     await expect(page.locator('.tdl-row')).toHaveCount(5)
     await expect(page.getByRole('region', { name: 'Needs you' })).toBeVisible()

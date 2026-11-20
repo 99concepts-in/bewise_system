@@ -21,16 +21,16 @@ export const bachId = (name: string) => 'bach-' + name.toLowerCase().replace(/\s
 export function seed() {
   const t = now()
   const clients: Client[] = [
-    { id: 'c1', code: 'BW-C-00012', name: 'Priya Shah', city: 'Vadodara', phone: '+91 98250 41122', email: 'priya.s@example.com', address: '14 Shreeji Society, Karelibaug', pincode: '390018', since: t - 210 * 24 * H },
-    { id: 'c2', code: 'BW-C-00027', name: 'Rohan Mehta', city: 'Ahmedabad', phone: '+91 99099 30218', address: 'B-402 Shivalik Heights, Satellite', pincode: '380015', since: t - 90 * 24 * H },
-    { id: 'c3', code: 'BW-C-00031', name: 'Ananya Desai', city: 'Surat', phone: '+91 97277 55610', email: 'ananya.d@example.com', address: '7 Ghod Dod Road, Athwalines', pincode: '395007', since: t - 60 * 24 * H },
-    { id: 'c4', code: 'BW-C-00035', name: 'Kavita Joshi', city: 'Vadodara', phone: '+91 98988 12077', address: '22 Alkapuri Society', pincode: '390007', since: t - 45 * 24 * H },
-    { id: 'c5', code: 'BW-C-00038', name: 'Neel Patel', city: 'Mumbai', phone: '+91 98200 66431', email: 'neel.p@example.com', address: '9th floor, Sea Breeze, Andheri West', pincode: '400053', since: t - 40 * 24 * H },
-    { id: 'c6', code: 'BW-C-00041', name: 'Meera Iyer', city: 'Bengaluru', phone: '+91 99860 21934', address: '41 4th Cross, Indiranagar', pincode: '560038', since: t - 30 * 24 * H },
-    { id: 'c7', code: 'BW-C-00044', name: 'Dhaval Gohil', city: 'Rajkot', phone: '+91 94262 70115', address: '3 Kalawad Road', pincode: '360005', since: t - 21 * 24 * H },
-    { id: 'c8', code: 'BW-C-00046', name: 'Sneha Trivedi', city: 'Vadodara', phone: '+91 97129 88340', address: '5 New VIP Road', pincode: '390019', since: t - 14 * 24 * H },
-    { id: 'c9', code: 'BW-C-00049', name: 'Arjun Kapoor', city: 'Delhi', phone: '+91 98110 45672', address: 'C-12 Greater Kailash II', pincode: '110048', since: t - 9 * 24 * H },
-    { id: 'c10', code: 'BW-C-00051', name: 'Riya Bhatt', city: 'Pune', phone: '+91 98500 77213', address: '18 Koregaon Park Lane 5', pincode: '411001', since: t - 5 * 24 * H },
+    { id: 'c1', code: 'BW-C-00012', name: 'Priya Shah', city: 'Vadodara', phone: '+91 98250 41122', email: 'priya.s@example.com', address: '14 Shreeji Society, Karelibaug', pincode: '390018', since: t - 210 * 24 * H, pronoun: 'she' },
+    { id: 'c2', code: 'BW-C-00027', name: 'Rohan Mehta', city: 'Ahmedabad', phone: '+91 99099 30218', address: 'B-402 Shivalik Heights, Satellite', pincode: '380015', since: t - 90 * 24 * H, pronoun: 'he' },
+    { id: 'c3', code: 'BW-C-00031', name: 'Ananya Desai', city: 'Surat', phone: '+91 97277 55610', email: 'ananya.d@example.com', address: '7 Ghod Dod Road, Athwalines', pincode: '395007', since: t - 60 * 24 * H, pronoun: 'she' },
+    { id: 'c4', code: 'BW-C-00035', name: 'Kavita Joshi', city: 'Vadodara', phone: '+91 98988 12077', address: '22 Alkapuri Society', pincode: '390007', since: t - 45 * 24 * H, pronoun: 'she' },
+    { id: 'c5', code: 'BW-C-00038', name: 'Neel Patel', city: 'Mumbai', phone: '+91 98200 66431', email: 'neel.p@example.com', address: '9th floor, Sea Breeze, Andheri West', pincode: '400053', since: t - 40 * 24 * H, pronoun: 'he' },
+    { id: 'c6', code: 'BW-C-00041', name: 'Meera Iyer', city: 'Bengaluru', phone: '+91 99860 21934', address: '41 4th Cross, Indiranagar', pincode: '560038', since: t - 30 * 24 * H, pronoun: 'she' },
+    { id: 'c7', code: 'BW-C-00044', name: 'Dhaval Gohil', city: 'Rajkot', phone: '+91 94262 70115', address: '3 Kalawad Road', pincode: '360005', since: t - 21 * 24 * H, pronoun: 'he' },
+    { id: 'c8', code: 'BW-C-00046', name: 'Sneha Trivedi', city: 'Vadodara', phone: '+91 97129 88340', address: '5 New VIP Road', pincode: '390019', since: t - 14 * 24 * H, pronoun: 'she' },
+    { id: 'c9', code: 'BW-C-00049', name: 'Arjun Kapoor', city: 'Delhi', phone: '+91 98110 45672', address: 'C-12 Greater Kailash II', pincode: '110048', since: t - 9 * 24 * H, pronoun: 'he' },
+    { id: 'c10', code: 'BW-C-00051', name: 'Riya Bhatt', city: 'Pune', phone: '+91 98500 77213', address: '18 Koregaon Park Lane 5', pincode: '411001', since: t - 5 * 24 * H, pronoun: 'she' },
   ]
 
   const products: Product[] = [
@@ -80,8 +80,11 @@ export function seed() {
   ]
   const stock = [...fg, ...bach, ...raw, ...pack]
 
-  const remedy = (blend: string, flowers: [string, number][], label: string) => ({
-    blend, bottleMl: 30, flowers: flowers.map(([name, drops]) => ({ name, drops })), label,
+  // label text as consultation.getPrepSheet() returns it — every blend is alcohol-free (owner 2026-11-18)
+  const remedy = (blend: string, flowers: [string, number][], who: string) => ({
+    blend, bottleMl: 30, flowers: flowers.map(([name, drops]) => ({ name, drops })), base: 'alcohol_free' as const,
+    dosage: { drops: 4, timesPerDay: 4, weeks: 3 },
+    label: `${who.split(' ')[0]} · ${flowers.map(([n]) => n).join(', ')} · 4 drops 4× a day · 30 ml · ALCOHOL-FREE`,
   })
   const remedyItem = (id: string) => ({ id, name: 'Bach flower blend · 30 ml', qty: 1, kind: 'remedy' as const, pricePaise: 0 })
   const prod = (id: string, p: Product, vi: number, q = 1) => ({ id, name: `${p.name} ${p.variants[vi].label}`, qty: q, kind: 'product' as const, variantId: p.variants[vi].id, pricePaise: p.variants[vi].pricePaise })
@@ -89,23 +92,24 @@ export function seed() {
     const paidAt = t - paidH * H
     return {
       totalPaise: o.items.reduce((s, i) => s + i.pricePaise * i.qty, 0), paidAt, dueAt: t + dueH * H, delivery: 'courier',
-      alcoholFree: false, checks: {}, history: [{ stage: 'new', at: paidAt }], ...o,
+      checks: {}, history: [{ stage: 'new', at: paidAt }], ...o,
+      alcoholFree: true, remedyOrderId: o.kind === 'store' ? undefined : 'ro-' + o.id,
     }
   }
   const [p1, p2, p3, p4, p5] = products
   const orders: Order[] = [
-    order({ id: 'o42', code: 'BW-00042', clientId: 'c1', kind: 'remedy', stage: 'new', items: [remedyItem('i1')], prep: remedy('Blend v2', [['Mimulus', 2], ['Larch', 2], ['Elm', 2], ['Walnut', 2]], 'Priya — 4 drops, 4 times a day') }, 2, 3),
-    order({ id: 'o43', code: 'BW-00043', clientId: 'c8', kind: 'remedy', stage: 'new', alcoholFree: true, delivery: 'studio_pickup', items: [remedyItem('i1')], prep: remedy('Blend v1', [['White Chestnut', 2], ['Olive', 2], ['Impatiens', 2], ['Rescue Remedy', 4]], 'Sneha — 4 drops, 4 times a day') }, 1, 5),
-    order({ id: 'o44', code: 'BW-00044', clientId: 'c9', kind: 'combined', stage: 'new', items: [remedyItem('i1'), prod('i2', p1, 0)], prep: remedy('Blend v1', [['Agrimony', 2], ['Gentian', 2], ['Honeysuckle', 2]], 'Arjun — 4 drops, 4 times a day') }, 0.5, 22),
+    order({ id: 'o42', code: 'BW-00042', clientId: 'c1', kind: 'remedy', stage: 'new', items: [remedyItem('i1')], prep: remedy('Blend v2', [['Mimulus', 2], ['Larch', 2], ['Elm', 2], ['Walnut', 2]], 'Priya') }, 2, 3),
+    order({ id: 'o43', code: 'BW-00043', clientId: 'c8', kind: 'remedy', stage: 'new', delivery: 'studio_pickup', items: [remedyItem('i1')], prep: remedy('Blend v1', [['White Chestnut', 2], ['Olive', 2], ['Impatiens', 2], ['Rescue Remedy', 4]], 'Sneha') }, 1, 5),
+    order({ id: 'o44', code: 'BW-00044', clientId: 'c9', kind: 'combined', stage: 'new', items: [remedyItem('i1'), prod('i2', p1, 0)], prep: remedy('Blend v1', [['Agrimony', 2], ['Gentian', 2], ['Honeysuckle', 2]], 'Arjun') }, 0.5, 22),
     order({ id: 'o41', code: 'BW-00041', clientId: 'c2', kind: 'store', stage: 'packing', items: [prod('i1', p3, 0), prod('i2', p5, 0), prod('i3', p2, 0)], history: [{ stage: 'new', at: t - 20 * H }, { stage: 'packing', at: t - 2 * H }] }, 20, 6),
-    order({ id: 'o40', code: 'BW-00040', clientId: 'c3', kind: 'combined', stage: 'quality_check', items: [remedyItem('i1'), prod('i2', p4, 1)], prep: remedy('Blend v3', [['Cerato', 2], ['Scleranthus', 2], ['Wild Oat', 2], ['Walnut', 2]], 'Ananya — 4 drops, 4 times a day'), checks: { cleaned: true, flowers: true, base: true, label: true, sealed: true }, history: [{ stage: 'new', at: t - 26 * H }, { stage: 'preparing', at: t - 4 * H }, { stage: 'quality_check', at: t - 1 * H }] }, 26, 20),
-    order({ id: 'o39', code: 'BW-00039', clientId: 'c4', kind: 'remedy', stage: 'preparing', items: [remedyItem('i1')], prep: remedy('Blend v2', [['Red Chestnut', 2], ['Aspen', 2], ['Star of Bethlehem', 2]], 'Kavita — 4 drops, 4 times a day'), checks: { cleaned: true }, history: [{ stage: 'new', at: t - 5 * H }, { stage: 'preparing', at: t - 0.6 * H }] }, 5, 1),
+    order({ id: 'o40', code: 'BW-00040', clientId: 'c3', kind: 'combined', stage: 'quality_check', items: [remedyItem('i1'), prod('i2', p4, 1)], prep: remedy('Blend v3', [['Cerato', 2], ['Scleranthus', 2], ['Wild Oat', 2], ['Walnut', 2]], 'Ananya'), checks: { cleaned: true, flowers: true, base: true, label: true, sealed: true }, history: [{ stage: 'new', at: t - 26 * H }, { stage: 'preparing', at: t - 4 * H }, { stage: 'quality_check', at: t - 1 * H }] }, 26, 20),
+    order({ id: 'o39', code: 'BW-00039', clientId: 'c4', kind: 'remedy', stage: 'preparing', items: [remedyItem('i1')], prep: remedy('Blend v2', [['Red Chestnut', 2], ['Aspen', 2], ['Star of Bethlehem', 2]], 'Kavita'), checks: { cleaned: true }, history: [{ stage: 'new', at: t - 5 * H }, { stage: 'preparing', at: t - 0.6 * H }] }, 5, 1),
     order({ id: 'o38', code: 'BW-00038', clientId: 'c5', kind: 'store', stage: 'ready_to_dispatch', items: [prod('i1', p1, 1), prod('i2', p4, 0)], pack: { weightG: 520, box: 'Small' }, history: [{ stage: 'new', at: t - 30 * H }, { stage: 'packing', at: t - 8 * H }, { stage: 'ready_to_dispatch', at: t - 5 * H }] }, 30, -1),
-    order({ id: 'o37', code: 'BW-00037', clientId: 'c6', kind: 'remedy', stage: 'ready_to_dispatch', items: [remedyItem('i1')], prep: remedy('Blend v4', [['Holly', 2], ['Willow', 2], ['Pine', 2]], 'Meera — 4 drops, 4 times a day'), pack: { weightG: 140, box: 'Small' }, history: [{ stage: 'new', at: t - 28 * H }, { stage: 'ready_to_dispatch', at: t - 3 * H }] }, 28, 3),
+    order({ id: 'o37', code: 'BW-00037', clientId: 'c6', kind: 'remedy', stage: 'ready_to_dispatch', items: [remedyItem('i1')], prep: remedy('Blend v4', [['Holly', 2], ['Willow', 2], ['Pine', 2]], 'Meera'), pack: { weightG: 140, box: 'Small' }, history: [{ stage: 'new', at: t - 28 * H }, { stage: 'ready_to_dispatch', at: t - 3 * H }] }, 28, 3),
     shipped(order({ id: 'o36', code: 'BW-00036', clientId: 'c7', kind: 'store', stage: 'dispatched', items: [prod('i1', p2, 0), prod('i2', p5, 0)] }, 70, -40), 'Delhivery Surface', 'SR4417820931', 6400, t - 36 * H, ['Picked up', 'In transit · Ahmedabad hub']),
-    shipped(order({ id: 'o35', code: 'BW-00035', clientId: 'c10', kind: 'remedy', stage: 'failed_delivery', problem: 'Customer not reachable — courier will retry once you confirm', items: [remedyItem('i1')], prep: remedy('Blend v1', [['Mimulus', 2], ['Rock Rose', 2]], 'Riya — 4 drops, 4 times a day') }, 96, -70), 'Xpressbees', 'XB1290044716', 5900, t - 60 * H, ['Picked up', 'In transit', 'Out for delivery · Pune', 'Delivery attempt failed']),
+    shipped(order({ id: 'o35', code: 'BW-00035', clientId: 'c10', kind: 'remedy', stage: 'failed_delivery', problem: 'Customer not reachable — courier will retry once you confirm', items: [remedyItem('i1')], prep: remedy('Blend v1', [['Mimulus', 2], ['Rock Rose', 2]], 'Riya') }, 96, -70), 'Xpressbees', 'XB1290044716', 5900, t - 60 * H, ['Picked up', 'In transit', 'Out for delivery · Pune', 'Delivery attempt failed']),
     shipped(order({ id: 'o34', code: 'BW-00034', clientId: 'c5', kind: 'store', stage: 'rto', problem: 'Returned to origin after 3 failed attempts', items: [prod('i1', p3, 0)] }, 240, -200), 'Blue Dart', 'BD7781023345', 9800, t - 200 * H, ['Picked up', 'In transit', 'Delivery attempt failed', 'RTO initiated', 'RTO delivered']),
-    shipped(order({ id: 'o33', code: 'BW-00033', clientId: 'c1', kind: 'remedy', stage: 'delivered', items: [remedyItem('i1')], prep: remedy('Blend v1', [['Mimulus', 2], ['Larch', 2], ['Elm', 2]], 'Priya — 4 drops, 4 times a day') }, 300, -280), 'Delhivery Surface', 'SR4417712020', 5600, t - 280 * H, ['Picked up', 'In transit', 'Out for delivery', 'Delivered']),
+    shipped(order({ id: 'o33', code: 'BW-00033', clientId: 'c1', kind: 'remedy', stage: 'delivered', items: [remedyItem('i1')], prep: remedy('Blend v1', [['Mimulus', 2], ['Larch', 2], ['Elm', 2]], 'Priya') }, 300, -280), 'Delhivery Surface', 'SR4417712020', 5600, t - 280 * H, ['Picked up', 'In transit', 'Out for delivery', 'Delivered']),
     shipped(order({ id: 'o32', code: 'BW-00032', clientId: 'c3', kind: 'store', stage: 'delivered', items: [prod('i1', p4, 1), prod('i2', p1, 0, 2)] }, 150, -130), 'Ekart', 'EK5520918833', 7200, t - 130 * H, ['Picked up', 'In transit', 'Delivered']),
   ]
   // reservations for paid, undispatched store items
@@ -117,7 +121,7 @@ export function seed() {
     { id: 'a2', clientId: 'c1', startsAt: todayAt(11, 0), minutes: 30, type: 'Follow-up', mode: 'in_person', status: 'confirmed' },
     { id: 'a3', clientId: 'c6', startsAt: todayAt(13, 30), minutes: 30, type: 'Follow-up', mode: 'online', status: 'confirmed' },
     { id: 'a4', clientId: 'c10', startsAt: todayAt(16, 0), minutes: 60, type: 'First consultation', mode: 'in_person', status: 'confirmed' },
-    { id: 'a5', clientId: 'c9', startsAt: todayAt(18, 0), minutes: 60, type: 'First consultation', mode: 'online', status: 'confirmed' },
+    { id: 'a5', clientId: 'c9', startsAt: todayAt(18, 0), minutes: 60, type: 'First consultation', mode: 'online', status: 'awaiting_payment', invoiceId: 'v6' },
   ]
 
   const invoices: Invoice[] = [
@@ -125,6 +129,7 @@ export function seed() {
     inv('v2', 'INV/2026-27/0121', 'c2', 'Bulk order — 6 × Aura Spray 100 ml (corporate gifting)', 389400, 150000, dateKey(-12), dateKey(-2), []),
     inv('v3', 'INV/2026-27/0124', 'c5', 'First consultation (pay later)', 100000, 0, dateKey(-1), dateKey(0), []),
     inv('v4', 'INV/2026-27/0126', 'c6', 'Remedy reorder × 2', 120000, 0, dateKey(0), dateKey(5), []),
+    inv('v6', 'INV/2026-27/0127', 'c9', 'First consultation', 100000, 0, dateKey(0), dateKey(0), []),
     inv('v5', 'INV/2026-27/0109', 'c4', 'Workshop seat — Inner Calm (Sunday)', 250000, 0, dateKey(-25), dateKey(-15), [{ at: t - 240 * H, channel: 'whatsapp' }, { at: t - 100 * H, channel: 'email' }]),
   ]
   const suppliers: Supplier[] = [
@@ -154,12 +159,12 @@ export function seed() {
     { id: 'bt4', code: 'BW-B-2610-03', productId: 'p3', variantId: 'p3v0', units: 120, step: 5, mfg: dateKey(-26), expiry: dateKey(704), costPaise: 1650000, wastagePct: 0.8, materials: [] },
   ]
   const notes: Note[] = [
-    { id: 'n1', title: 'New remedy to prepare', body: 'Jitu Bhaiya gave Arjun K. a new blend · BW-00044', at: t - 0.5 * H, read: false, tone: 'info', route: { name: 'order', id: 'o44' } },
+    { id: 'n1', title: 'New remedy to prepare', body: 'Jitendra Khimlani gave Arjun K. a new blend · BW-00044', at: t - 0.5 * H, read: false, tone: 'info', route: { name: 'order', id: 'o44' } },
     { id: 'n2', title: 'Delivery failed', body: 'Riya B. was not reachable in Pune · BW-00035', at: t - 3 * H, read: false, tone: 'bad', route: { name: 'order', id: 'o35' } },
     { id: 'n3', title: 'Lavender oil is running low', body: '120 ml left · reorder level 250 ml', at: t - 5 * H, read: false, tone: 'warn', route: { name: 'stockItem', id: 'rm-lavender' } },
     { id: 'n4', title: 'Expense approved', body: 'EXP/2026-27/0061 · ₹380 courier', at: t - 20 * H, read: true, tone: 'good' },
   ]
-  return { clients, products, stock, orders, appointments, invoices, suppliers, pos, bills, expenses, batches, notes, seq: { order: 44, expense: 64, batch: 9, po: 22, inv: 126, client: 51 } }
+  return { clients, products, stock, orders, appointments, invoices, suppliers, pos, bills, expenses, batches, notes, events: [] as import('./types').DomainEvent[], seq: { order: 44, expense: 64, batch: 9, po: 22, inv: 126, client: 51 } }
 }
 
 function todayAt(h: number, m: number) {

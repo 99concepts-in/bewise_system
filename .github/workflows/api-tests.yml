@@ -1,0 +1,48 @@
+# @owner HUB · Backend API end-to-end test (all four roles, privacy rules, money) on a throwaway MySQL 8 database.
+name: API tests (PHP + MySQL)
+on:
+  push:
+    paths: ['api/**', '.github/workflows/api-tests.yml']
+  pull_request:
+    paths: ['api/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci-root-only
+          MYSQL_DATABASE: bw_test
+          MYSQL_USER: bw
+          MYSQL_PASSWORD: ci-only-password
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping -h 127.0.0.1" --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: PHP syntax
+        run: for f in api/*.php api/lib/*.php api/modules/*.php; do php -l "$f"; done
+      - name: Start API
+        run: php -S 127.0.0.1:8099 -t "$GITHUB_WORKSPACE" api/tests/router.php > /tmp/php.log 2>&1 &
+      - name: Install (web installer)
+        run: |
+          sleep 1
+          curl -fsS -X POST http://127.0.0.1:8099/api/install.php \
+            --data-urlencode db_name=bw_test --data-urlencode db_user=bw --data-urlencode db_pass=ci-only-password --data-urlencode db_host=127.0.0.1 \
+            --data-urlencode site_url=http://127.0.0.1:8099 --data-urlencode owner_email=owner@example.test --data-urlencode owner_password=ownerpass123 \
+            --data-urlencode consultant_email=jitu@example.test --data-urlencode consultant_password=jitupass1234 \
+            --data-urlencode manager_email=haresh@example.test --data-urlencode manager_password=hareshpass12 \
+            --data-urlencode mail_transport=mail --data-urlencode mail_from=care@example.test | grep -q 'All set'
+          CFG="$(dirname "$GITHUB_WORKSPACE")/bewise-private/config.php"
+          sed -i "s/'debug' => false/'debug' => true/; s/'debug_show_otp' => false/'debug_show_otp' => true/; s/'transport' => 'mail'/'transport' => 'log'/" "$CFG"
+      - name: End-to-end
+        run: node api/tests/e2e.mjs http://127.0.0.1:8099 owner@example.test ownerpass123 jitu@example.test jitupass1234 haresh@example.test hareshpass12
+      - name: Server log
+        if: always()
+        run: tail -50 /tmp/php.log

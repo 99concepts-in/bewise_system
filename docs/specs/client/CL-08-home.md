@@ -23,7 +23,7 @@ In 5 seconds the client knows: how they feel today (one tap), what happens next 
 | 4 | Remedy given & order not dispatched/paid | "Your remedy is ready" · **See your blend** (CL-25) |
 | 5 | Past appointment without feedback (≤ 14 days) | "How was your session?" · **Share feedback** (CL-23) |
 | 6 | Invoice due | "₹800 due on 25 Nov" · **Pay now** (CL-45) |
-| 7 | Upcoming appointment | "Next session — Thu 21 Nov · 11:00 AM · Online with Jitu Bhaiya" + illustration · **View** |
+| 7 | Upcoming appointment | "Next session — Thu 21 Nov · 11:00 AM · Online with Jitendra Khimlani" + illustration · **View** |
 | 8 | Follow-up due (`followup.due`) and none booked | "Time for your follow-up" · **Book follow-up** |
 | 9 | New client, nothing booked | "Begin with a first consultation — ₹1,000, your remedy blend included" · **Book** |
 

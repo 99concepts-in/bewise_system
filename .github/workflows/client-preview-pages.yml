@@ -1,6 +1,7 @@
 # @owner CLIENT · Builds the client app (apps/client) on every commit and deploys it.
 #   Job "pages"     → static export under /<repo>/ → branch gh-pages (GitHub Pages, if enabled)
-#   Job "hostinger" → static export for a domain root + .htaccess →
+#   (Hostinger: see .github/workflows/hostinger-site.yml — whole system, HUB)
+#   Former job "hostinger" → static export for a domain root + .htaccess →
 #                       1. zip artifact (manual upload)          — always
 #                       2. branch hostinger-build (hPanel Git)    — always
 #                       3. FTP sync to Hostinger                  — when secrets HOSTINGER_FTP_SERVER/USERNAME/PASSWORD exist
@@ -58,71 +59,5 @@ jobs:
           force_orphan: true
           commit_message: 'Client preview build ${{ github.sha }}'
 
-  hostinger:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/client
-    env:
-      FTP_SERVER: ${{ secrets.HOSTINGER_FTP_SERVER }}
-      FTP_USERNAME: ${{ secrets.HOSTINGER_FTP_USERNAME }}
-      FTP_PASSWORD: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
-      WEBHOOK_URL: ${{ secrets.HOSTINGER_WEBHOOK_URL }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: apps/client/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-
-      - name: Build for Hostinger
-        run: pnpm export:hostinger
-        env:
-          BASE_PATH: ${{ vars.HOSTINGER_BASE_PATH }}
-
-      - name: Zip for manual upload (Actions → this run → Artifacts)
-        uses: actions/upload-artifact@v4
-        with:
-          name: bewise-client-hostinger
-          path: apps/client/dist/bewise-client-hostinger.zip
-          retention-days: 30
-
-      - name: Publish to hostinger-build branch (for hPanel → Advanced → Git)
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: apps/client/out
-          publish_branch: hostinger-build
-          force_orphan: true
-          enable_jekyll: true
-          commit_message: 'Hostinger build ${{ github.sha }}'
-
-      - name: Deploy to Hostinger over FTP (only changed files)
-        if: env.FTP_SERVER != '' && env.FTP_USERNAME != '' && env.FTP_PASSWORD != ''
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.HOSTINGER_FTP_SERVER }}
-          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
-          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
-          protocol: ${{ vars.HOSTINGER_FTP_PROTOCOL || 'ftps' }}
-          port: ${{ vars.HOSTINGER_FTP_PORT || 21 }}
-          local-dir: apps/client/out/
-          server-dir: ${{ vars.HOSTINGER_FTP_DIR || './' }}
-
-      - name: Trigger Hostinger Git auto-deploy
-        if: env.WEBHOOK_URL != ''
-        run: curl -fsS -X POST "$WEBHOOK_URL" -o /dev/null && echo "Hostinger deploy triggered"
-
-      - name: Summary
-        run: |
-          {
-            echo "### BeWise client → Hostinger"
-            if [ -n "$FTP_SERVER" ]; then echo "- ✅ FTP sync to Hostinger (\`${{ vars.HOSTINGER_FTP_DIR || './' }}\`)"; else echo "- ⏭️ FTP deploy skipped — add secrets HOSTINGER_FTP_SERVER / _USERNAME / _PASSWORD (see apps/client/hosting/HOSTINGER.md)"; fi
-            if [ -n "$WEBHOOK_URL" ]; then echo "- ✅ Hostinger Git webhook pinged"; fi
-            echo "- 📦 Zip artifact + branch \`hostinger-build\` updated"
-          } >> "$GITHUB_STEP_SUMMARY"
+  # Hostinger deploy moved to .github/workflows/hostinger-site.yml (HUB, 2026-11-18): it ships the WHOLE system
+  # (landing + client + consultant + manager + owner). The old client-only job was removed so both never upload to the same folder.

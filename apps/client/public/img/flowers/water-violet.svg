@@ -1,0 +1,170 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="1024" height="1024">
+<defs>
+ <linearGradient id="stem-grad" x1="0" y1="0" x2="1" y2="0">
+  <stop stop-color="#466b16" /><stop offset=".45" stop-color="#94b536" /><stop offset=".68" stop-color="#708e1f" /><stop offset="1" stop-color="#3f6418" />
+ </linearGradient>
+ <linearGradient id="leaf-grad" x1="0" y1="1" x2=".5" y2="0">
+  <stop stop-color="#345e24" /><stop offset=".55" stop-color="#69902e" /><stop offset="1" stop-color="#98b84b" />
+ </linearGradient>
+ <radialGradient id="petal-grad" cx=".5" cy=".91" r=".93">
+  <stop stop-color="#fffef0" /><stop offset=".3" stop-color="#faf7fc" /><stop offset=".72" stop-color="#e9def3" /><stop offset="1" stop-color="#d3bce5" />
+ </radialGradient>
+ <radialGradient id="eye-grad">
+  <stop stop-color="#e4a800" /><stop offset=".55" stop-color="#f3ce17" /><stop offset="1" stop-color="#fff58c" />
+ </radialGradient>
+ <linearGradient id="bud-grad" x2=".8" y2=".3">
+  <stop stop-color="#c0a0d3" /><stop offset=".5" stop-color="#ebd7f1" /><stop offset="1" stop-color="#b490c4" />
+ </linearGradient>
+</defs>
+<g id="submerged-foliage" fill="none" stroke-linecap="round" stroke-linejoin="round">
+ <g stroke="#547d2a" stroke-width="5">
+  <path d="M500 959Q476 865 387 765T268 638M497 936Q555 775 655 682T744 631M486 914Q366 853 262 804T112 752M503 923Q655 848 756 801T915 769M489 927Q344 894 205 930M507 937Q654 905 811 948" />
+ </g>
+ <g stroke="#709438" stroke-width="2.5">
+  <path d="M391 771Q378 691 416 616M378 751Q304 720 263 679M362 730Q326 648 276 624M410 803Q454 716 472 685M418 823Q356 786 305 779M457 863Q444 786 478 749M569 794Q561 721 575 681M598 746Q631 651 686 621M623 718Q692 676 733 684M643 698Q654 638 679 614M556 829Q654 764 715 776M693 826Q733 748 748 708M733 807Q795 723 850 702M763 795Q858 747 932 786M787 787Q837 711 889 722M337 842Q314 782 268 740M304 823Q247 773 192 768M263 805Q214 732 164 733M234 791Q157 756 100 776M408 877Q362 860 320 879M362 896Q315 923 292 965M320 905Q241 865 180 891M296 910Q226 920 184 971M240 923Q177 909 143 931M548 922Q607 871 654 868M590 921Q636 946 660 982M637 929Q714 909 760 924M690 938Q758 969 788 988M730 936Q807 920 853 948M780 942Q850 937 881 970" />
+ </g>
+ <g stroke="#779d3c" stroke-width="1.35">
+  <path d="M276 624q-3 22 17 41m-12-37q24 1 42 35m-50-28q-17-10-31 1m51 28q-32-22-50-16m67 36q-34-17-53-5m63 21q-35-9-56 5m65 14q-18-38-17-59m25 76q-8-44 1-65m7 76q-8-38 7-58m-5 65q-30-10-53 4m84 33q-1-37 14-57m-6 72q7-41 28-50M416 616q-10-12-9-18m6 29q-28-7-31-27m30 41q-25-5-30-23m32 7q20-16 16-36m-17 53q24-15 29-29m-34 40q-25-9-31-24m31 33q26-26 45-24m-48 38q-25-13-27-28m26 42q25-27 46-25m-50 39q-26-21-29-39m28 54q24-28 44-26m-46 41q-26-18-32-40M472 685q-20 10-23 30m21-21q12 8 13 23m-18-7q-23 2-29 19m25-3q17 7 15 25M575 681q-21-20-24-20m25 34q18-21 24-19m-25 34q-20-25-34-24m34 41q22-23 38-24m-35 44q-27-31-44-28m49 51q22-30 45-32M686 621q19-10 26-7m-37 17q-4-25 7-34m-19 46q28-20 53-17m-40 10q34-5 49 9m-48 4q32-3 48 7m-65-10q-9-23 2-38m-16 52q-15-19-11-35m10 45q29-8 50-4m-66 21q-12-24-7-39m-5 51q24-5 45 0m-59 19q-16-22-11-43m5 55q32-16 53-10m-67 31q-15-17-13-40m4 54q24-18 46-13M164 733q-30-21-57 4m62 5q-34-7-60 16m69-6q2-25-13-38m26 47q-27-4-46 18m53-17q-1-30-16-40m29 48q-25-2-42 22m54-14q-1-29-18-45m32 53q-23 3-37 27m54-18q-3-31-17-44m30 54q-29 8-39 31m52-22q-3-31-21-46m37 56q-24 4-37 29m50-17q-5-31-24-44m41 56q-27 7-43 33m55-23q-7-28-22-40M268 740q-23-14-43-7m53 17q-3-28-17-39m29 53q-3-34-18-46m25 57q20-17 35-16M850 702q11-21 34-18m-44 24q10-25 29-28m-37 37q26-17 50-14m-61 23q34-10 60 0m-76 15q31-4 51 9m-67 6q-2-31 13-45m-24 54q29-3 49 13m-63 0q-1-32 11-47m-25 60q28 1 45 16m-56-8q-2-29 9-46M932 786q-12-27-33-28m26 21q-17-4-25-1m-7-11q-2 26 18 39m-31-44q1 32 22 49m-36-50q-4 28 12 50m-30-47q-7 34 11 56m-29-51q-13 31 5 59m-25-52q-13 29-2 52m-21-45q-17 25-5 54m-24-45q-12 26-3 50m-20-41q-11 28-3 48M205 930q-31 14-41 38m57-40q-29 27-31 51m43-53q-13 33-9 52m26-57q-6 30 2 48m16-51q-1 30 10 42m13-50q4 23 17 36m-90-54q-21-16-45-10m63 5q-27-26-50-20m70 16q-20-25-42-26m62 18q-15-26-35-29m57 28q-8-28-27-35M320 879q-22 0-33 14m52-19q-21-17-37-14m42 10q-3-25-16-34m34 39q-1-23-13-39M654 868q31 0 43 14m-60-9q24-29 43-31m-58 39q25 2 34 19m-45-11q13 8 16 22m133 13q-2-23-20-35m2 37q-15 13-15 31m51-30q8-23-6-36m24 41q-3 20 13 38m5-32q10-18 2-31m20 36q0 22 17 33m-228-6q-13 18-6 36m-21-48q-19 19-17 37m-7-52q-23 16-26 39" />
+ </g>
+</g>
+<g id="stem-and-pedicels">
+ <path d="M489 958C502 830 497 654 497 471L498 211Q498 143 509 69L519 69Q508 159 514 247L519 537Q523 789 506 949Z" fill="url(#stem-grad)" />
+ <g fill="none" stroke="url(#stem-grad)" stroke-width="7" stroke-linecap="round">
+  <path d="M507 585Q435 551 389 506M509 584Q589 569 629 497M503 546Q466 505 458 470M516 548Q544 509 538 477M562 565Q657 558 687 513M505 402Q438 355 396 314M509 402Q601 363 640 313M510 366Q536 308 557 289M455 364Q450 309 443 281M505 217Q472 194 454 169M508 216Q546 185 570 162M506 166Q490 115 477 83M515 132Q537 95 548 80" />
+ </g>
+ <g fill="#6e9327">
+  <path d="M507 223q-38-20-65-2 28-28 61-9-39-34-40-54 25 14 42 48-8-42 1-62 12 37 4 62 19-38 43-45-11 29-38 48 29-17 50 3-30-7-58 10Z" />
+  <path d="M508 409q-30-12-35-32 20 7 30 23-5-31 4-46 9 20 6 44 15-21 32-23-8 21-37 34ZM508 590q-27-10-39-31 26 6 36 24-5-35 4-50 10 19 6 47 18-21 38-21-12 22-45 31Z" />
+ </g>
+</g>
+<g id="buds">
+ <path d="M511 78C492 67 491 44 501 23L514 5Q539 30 529 58Z" fill="url(#bud-grad)" stroke="#c9a5d7" stroke-width="1" />
+ <path d="M510 82Q492 70 494 35L506 62 514 34 522 59 533 32Q532 70 518 83Z" fill="url(#leaf-grad)" />
+ <path d="M513 9Q507 31 513 51M517 13Q524 35 520 47" fill="none" stroke="#d7b7e2" stroke-width="1.5" />
+ <path d="M478 97Q457 82 468 53 492 57 489 90Z" fill="url(#bud-grad)" />
+ <path d="M479 107Q462 94 461 74L475 91 472 65 484 87 489 75Q496 98 479 107Z" fill="url(#leaf-grad)" />
+ <path d="M530 94Q528 64 560 55 570 78 541 97Z" fill="url(#bud-grad)" />
+ <path d="M528 103Q524 86 536 71L534 91 556 77 566 69Q562 94 538 104Z" fill="url(#leaf-grad)" />
+ <path d="M503 144Q485 121 503 97 522 107 516 130Z" fill="url(#bud-grad)" />
+ <path d="M503 153Q491 137 491 116L502 140 509 116 514 137 522 121Q520 148 503 153Z" fill="url(#leaf-grad)" />
+</g>
+<g id="upper-flowers" stroke="#ede3f3" stroke-width="1">
+ <g transform="translate(454 169) rotate(8) scale(.76)">
+  <path d="M0 0C-18-15-38-55-24-73-12-88-1-78 0-73 13-91 31-77 28-57 26-35 11-10 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-3-27 23-55 45-48 66-41 49-20 36-12 23-4 10 1 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C20-12 53-8 55 10 55 28 22 32 4 12Z" fill="url(#petal-grad)" transform="rotate(30)" />
+  <path d="M0 0C27 10 24 37 8 45-9 55-22 34-13 18Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-23 18-59 21-75 7-91-11-65-24-47-19-25-17-10-8 0 0Z" fill="url(#petal-grad)" />
+  <path d="m-6-8 7-8 4 11 10 1-9 7-2 10-7-8-11 1 7-7Z" fill="url(#eye-grad)" stroke="none" />
+  <ellipse rx="3.5" ry="5" fill="#bd9400" stroke="none" />
+ </g>
+ <g transform="translate(570 166) rotate(-30) scale(.65 .72)">
+  <path d="M0 0C-24-17-32-57-20-72-4-89 13-73 16-51 18-29 8-7 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C4-30 29-55 47-46 70-31 39-6 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C25-4 65 7 61 23 52 42 19 19 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C20 17 33 48 16 48-1 50-10 23 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-30 13-52 1-46-16-38-32-10-15 0 0Z" fill="url(#petal-grad)" />
+  <path d="M-10-4 0-14 8-6 15 3 4 7 0 13-5 5Z" fill="url(#eye-grad)" stroke="none" />
+ </g>
+</g>
+<g id="middle-whorl" stroke="#e9dff0" stroke-width="1">
+ <g transform="translate(445 295) scale(.66)">
+  <path d="M0 0C-27-26-28-58-14-74 3-91 19-70 17-50 16-28 6-7 0 0ZM0 0C5-32 30-64 47-52 66-37 37-10 0 0ZM0 0C30-16 62-9 60 9 59 30 19 22 0 0ZM0 0C22 15 26 47 8 50-15 54-21 26 0 0ZM0 0C-28 18-59 7-57-11-55-31-20-22 0 0Z" fill="url(#petal-grad)" />
+  <circle r="10" fill="url(#eye-grad)" stroke="none" />
+ </g>
+ <g transform="translate(558 295) rotate(-9) scale(.86 .8)">
+  <path d="M0 0C-28-19-41-52-31-68-19-86-2-66 6-44 12-22 7-8 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-4-29 7-64 25-66 47-69 44-42 32-26 20-10 9-3 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C9-29 39-48 57-32 74-17 42 3 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C28-4 66 15 58 32 49 50 16 25 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C16 24 6 49-12 46-30 41-23 13 0 0Z" fill="url(#petal-grad)" />
+  <path d="m-6-8 8-9 3 12 12 1-11 8-5 9-5-9-12-4Z" fill="url(#eye-grad)" stroke="none" />
+  <ellipse rx="3" ry="5" fill="#d2a200" stroke="none" />
+ </g>
+ <g transform="translate(398 315) rotate(10) scale(.9)">
+  <path d="M0 0C-16-20-45-64-28-83-9-104 7-84 10-62 14-38 6-12 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-1-27 25-65 46-65 67-64 51-35 34-22 18-9 10-3 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C23-15 53-10 49 8 43 30 18 27 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C17 21 3 57-16 65-40 73-42 47-25 26Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-24 20-61 26-76 9-94-13-67-27-46-23-22-20-8-8 0 0Z" fill="url(#petal-grad)" />
+  <path d="m-9-6 7-12 8 12 12 1-11 8-7 13-5-13-12-1Z" fill="url(#eye-grad)" stroke="none" />
+  <ellipse rx="3" ry="5" fill="#c99e08" stroke="none" />
+ </g>
+ <g transform="translate(639 315) rotate(-13) scale(.86)">
+  <path d="M0 0C-17-25-23-65-10-81 15-105 34-69 29-47 24-23 8-7 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C16-24 50-28 66-12 85 11 48 25 25 15Z" fill="url(#petal-grad)" />
+  <path d="M0 0C27 9 48 43 36 58 19 76-1 39-5 20Z" fill="url(#petal-grad)" />
+  <path d="M0 0C3 28-18 42-27 27-39 8-15-5 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-30-4-45-30-31-43-14-58-1-26 0 0Z" fill="url(#petal-grad)" />
+  <path d="m-5-11 7-7 4 13 9 5-13 6-7 5-1-10-9-7Z" fill="url(#eye-grad)" stroke="none" />
+  <ellipse rx="3" ry="4" fill="#c09b05" stroke="none" />
+ </g>
+ <g transform="translate(506 339)">
+  <path d="M0 0C-14-19-37-46-28-64-21-80-11-84-3-77 11-89 27-74 26-57 25-34 10-12 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C10-26 42-48 59-37 78-26 74-9 58-1 40 10 15 10 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C27 3 56 20 49 39 43 61 17 53 7 36-2 22-3 10 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C7 25-10 53-29 56-52 59-58 39-43 24-30 9-12 3 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-25 16-62 13-73-1-86-19-64-36-45-32-22-29-8-13 0 0Z" fill="url(#petal-grad)" />
+  <path d="m-7-8 6-12 6 10 10 2-7 9 1 12-9-6-10 5 2-12-8-6Z" fill="url(#eye-grad)" stroke="none" />
+  <g fill="#d8ac09" stroke="#b99113" stroke-width=".6">
+   <ellipse cx="-4" cy="-2" rx="2" ry="4" /><ellipse cx="1" cy="-5" rx="2" ry="4" /><ellipse cx="5" cy="0" rx="2" ry="4" /><ellipse cy="4" rx="2" ry="3" />
+  </g>
+  <g fill="none" stroke="#d2bfdf" stroke-width=".65" opacity=".65">
+   <path d="M-4-19Q-17-48-16-66M2-21Q10-49 7-68M18-6Q43-22 57-23M19 2Q43 2 55-6M12 17Q28 37 37 40M-8 19Q-23 43-35 45M-17 0Q-46-2-61-12" />
+  </g>
+ </g>
+</g>
+<g id="lower-whorl" stroke="#e9def0" stroke-width="1">
+ <g transform="translate(460 482) scale(.69)">
+  <path d="M0 0C-28-23-27-61-10-73 10-85 26-70 22-50 18-29 5-10 0 0ZM0 0C2-28 27-59 43-48 61-36 33-10 0 0ZM0 0C29-11 55 0 48 18 41 35 15 19 0 0ZM0 0C13 29-1 49-18 43-37 34-18 8 0 0ZM0 0C-29 15-55-2-49-20-42-38-14-20 0 0Z" fill="url(#petal-grad)" />
+  <circle r="10" fill="url(#eye-grad)" stroke="none" />
+ </g>
+ <g transform="translate(544 497) rotate(-12) scale(.64)">
+  <path d="M0 0C-27-22-32-59-17-70 1-82 23-59 17-36ZM0 0C-2-33 26-65 42-53 61-34 29-5 0 0ZM0 0C32-21 63-9 59 11 53 34 20 16 0 0ZM0 0C21 20 19 50 0 51-19 49-23 21 0 0ZM0 0C-32 15-56-2-48-19-39-39-11-17 0 0Z" fill="url(#petal-grad)" />
+  <circle r="10" fill="url(#eye-grad)" stroke="none" />
+ </g>
+ <g transform="translate(685 514) rotate(12) scale(.61)">
+  <path d="M0 0C-16-32-9-63 10-61 30-56 20-21 0 0ZM0 0C13-32 46-49 58-32 68-11 31 9 0 0ZM0 0C30-7 59 9 50 27 36 45 10 22 0 0ZM0 0C16 27 8 49-10 45-30 38-20 12 0 0ZM0 0C-30 4-51-15-40-32-27-49-5-24 0 0Z" fill="url(#petal-grad)" />
+  <circle r="10" fill="url(#eye-grad)" stroke="none" />
+ </g>
+ <g transform="translate(388 509) rotate(10) scale(.92)">
+  <path d="M0 0C-24-18-45-52-32-68-14-88 5-73 7-52 10-29 5-9 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C1-29 24-53 41-50 63-44 44-20 27-11 14-3 7 1 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C25-7 48 13 36 30 21 45 3 22 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C16 23 11 54-7 60-27 63-29 36-15 18Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-21 24-52 27-62 15-80-1-58-20-36-18Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-18 7-48 58-63 60-84 62-64 34-48 21-28 6-9 1 0 0Z" fill="url(#petal-grad)" />
+  <path d="m-7-10 8-9 6 12 12 3-13 7-3 11-9-9-10-1Z" fill="url(#eye-grad)" stroke="none" />
+  <ellipse rx="3" ry="5" fill="#c9a00d" stroke="none" />
+ </g>
+ <g transform="translate(627 499) rotate(-16) scale(.92)">
+  <path d="M0 0C-24-17-43-54-30-70-15-89 3-66 7-48 13-25 8-8 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C2-28 24-62 46-58 71-53 55-25 35-13 18-2 8 0 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C28-11 63 6 67 22 70 42 39 41 23 24Z" fill="url(#petal-grad)" />
+  <path d="M0 0C25 17 26 54 10 65-9 75-20 45-12 26Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-22 24-41 18-37-1-33-19-11-14 0 0Z" fill="url(#petal-grad)" />
+  <path d="m-5-10 7-8 5 13 11 5-12 5-4 11-8-12-8-4Z" fill="url(#eye-grad)" stroke="none" />
+  <ellipse rx="3" ry="5" fill="#c89f04" stroke="none" />
+ </g>
+ <g transform="translate(510 551) scale(1.06)">
+  <path d="M0 0C-15-18-42-51-33-66-26-80-12-72-8-71 5-82 20-71 21-56 22-35 10-13 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C12-25 44-47 61-34 83-18 65-2 48 4 29 12 11 8 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C26 9 59 34 57 48 53 67 29 59 14 45 0 30-3 13 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C5 29-13 57-32 59-56 61-45 36-33 24-22 11-10 3 0 0Z" fill="url(#petal-grad)" />
+  <path d="M0 0C-24 18-63 20-73 5-89-16-59-36-41-32-21-27-10-12 0 0Z" fill="url(#petal-grad)" />
+  <path d="m-7-8 6-13 7 13 11 3-10 9 1 11-10-8-9 6 2-12-8-7Z" fill="url(#eye-grad)" stroke="none" />
+  <g fill="#d5a806" stroke="#bc9307" stroke-width=".6">
+   <ellipse cx="-4" cy="-2" rx="2" ry="4" /><ellipse cx="1" cy="-4" rx="2" ry="4" /><ellipse cx="5" cy="1" rx="2" ry="4" /><ellipse cy="5" rx="2" ry="3" />
+  </g>
+  <g fill="none" stroke="#d4bfdf" stroke-width=".65" opacity=".65">
+   <path d="M-5-20Q-17-46-22-59M2-19Q10-45 6-59M18-5Q43-24 54-23M20 2Q40 3 55-7M12 18Q30 42 44 48M-7 20Q-18 42-31 49M-20 2Q-48 7-61-4M-19-5Q-43-20-57-20" />
+  </g>
+ </g>
+</g>
+<g id="foreground-leaves" fill="url(#leaf-grad)">
+ <path d="M499 918Q522 839 576 794 552 822 540 849 571 822 604 824 572 830 545 856 580 839 613 851 573 847 539 869 576 861 604 882 569 872 534 884 568 885 589 905 556 892 527 900 556 908 565 929 544 912 516 912Z" />
+ <path d="M490 899Q448 859 395 851 370 849 345 866 367 842 397 842 373 839 351 847 377 831 407 840 390 826 368 826 395 820 420 843 410 821 391 811 415 816 434 845 433 818 418 802 441 814 447 845 453 812 467 804 455 832 457 850 476 818 490 813 473 841 467 854 500 836 536 842 505 846 482 859 516 850 541 858 511 858 483 869 515 866 536 883 506 874 484 879 513 884 524 905 503 889 480 888Z" />
+ <path d="M460 855Q428 851 406 870 387 890 384 914 393 887 414 876 400 895 400 915 403 894 424 878 412 900 416 921 420 892 436 880 433 903 443 925 439 897 450 879 453 903 466 918 458 891 465 879 479 900 478 924 489 903 477 879 497 899 490 934 506 910 492 882 516 894 521 912 521 888 502 875 520 876 533 890 530 870 509 865 483 857 460 855Z" />
+ <path d="M505 920Q537 898 576 908 552 906 529 921 559 912 590 931 557 920 535 932 565 930 581 953 556 938 531 943 551 951 554 974 543 951 520 950 527 969 521 990 523 966 508 955 504 970 493 980 504 955 495 940Z" />
+</g>
+</svg>

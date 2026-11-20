@@ -101,7 +101,6 @@ function OrderCard({ o, i, onOpen }: { o: Order; i: number; onOpen: () => void }
         <span className="flex items-center gap-2">
           <span className="text-[17px] font-bold tracking-[-0.01em] text-ink tnum">{o.code}</span>
           {o.replacementOf && <Chip tone="accent" icon={<RefreshCw size={12} />}>Replacement</Chip>}
-          {o.alcoholFree && isOpen(o.stage) && <Chip tone="gold">Alcohol-free</Chip>}
         </span>
         <span className="mt-0.5 block truncate text-[14.5px] font-medium text-ink">{shortName(c.name)} · {c.city}</span>
         <span className={cx('mt-0.5 block text-[13px]', late ? 'font-semibold text-bad' : 'text-ink-2')}>

@@ -14,6 +14,7 @@ import { useApp } from '@/lib/store'
 import { DoseTracker } from './dose-tracker'
 import { fmtDay, fmtTime } from '@/lib/format'
 import { blendSupply, isoDay } from '@/lib/supply'
+import { BP } from '@/lib/asset'
 
 /** Amber dropper bottle; liquid height = level (0–1) with a slow moving surface. */
 export function Bottle({ level, height = 150 }: { level: number; height?: number }) {
@@ -40,7 +41,7 @@ export function Bottle({ level, height = 150 }: { level: number; height?: number
       </g>
       {/* label + highlight */}
       <rect x="24" y="104" width="52" height="44" rx="6" fill="#f5efe4" />
-      <text x="50" y="124" textAnchor="middle" fontSize="9" fontWeight="800" fill="#182957" fontFamily="inherit">BeWise</text>
+      <image href={`${BP}/img/brand/bewise-mark.svg`} x="41" y="108" width="18" height="18" />
       <text x="50" y="137" textAnchor="middle" fontSize="6.5" fontWeight="600" fill="#5b6275" fontFamily="inherit">personal blend</text>
       <path d="M22 70c0-6 3-10 8-10" stroke="#fff" strokeOpacity=".55" strokeWidth="4" strokeLinecap="round" fill="none" />
       <path d="M22 80v70" stroke="#fff" strokeOpacity=".25" strokeWidth="4" strokeLinecap="round" />
@@ -56,7 +57,7 @@ export function BlendBottleCard() {
   const sup = blendSupply(blend, appointments, now)
   const req = appointments.find((a) => a.status === 'confirmed' && a.timeTbc)
   return (
-    <section className={cx('relative overflow-hidden rounded-[28px] p-5 shadow-[var(--shadow-card)]', sup.low ? 'bg-[linear-gradient(140deg,#fff_35%,#fbefd9)]' : 'bg-[linear-gradient(140deg,#fff_40%,#f6efe4)]')} aria-labelledby="blend-h">
+    <section className={cx('relative overflow-hidden rounded-[24px] p-5 shadow-[var(--shadow-card)]', sup.low ? 'bg-marigold-100' : 'bg-white')} aria-labelledby="blend-h">
       <div className="flex gap-4">
         <div className="relative shrink-0 pt-1">
           <span className="absolute inset-x-0 bottom-1 mx-auto h-4 w-16 rounded-[50%] bg-[#7a4312]/15 blur-md" />
@@ -78,7 +79,7 @@ export function BlendBottleCard() {
       <div className="mt-4"><DoseTracker /></div>
 
       {/* next appointment / pre-book */}
-      <div className="mt-4 rounded-[20px] bg-white/85 p-3.5 ring-1 ring-[#efe5d4]">
+      <div className="mt-4 rounded-[20px] bg-sky-50 p-3.5">
         {req ? (
           <div className="flex items-center gap-3">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#fbf3dc] text-[#8a6a2c]"><CalendarPlus className="size-5" /></span>
@@ -87,7 +88,7 @@ export function BlendBottleCard() {
           </div>
         ) : sup.next ? (
           <div className="flex items-center gap-3">
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage-100 text-sage-text"><CalendarPlus className="size-5" /></span>
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-teal-100 text-sage-text"><CalendarPlus className="size-5" /></span>
             <div className="min-w-0 flex-1"><p className="text-[12px] font-semibold text-muted">Next session booked</p><p className="truncate text-[14px] font-bold text-navy">{fmtDay(sup.next.startsAt)} · {fmtTime(sup.next.startsAt)}</p></div>
             <BtnLink href={`/app/sessions/view?id=${sup.next.id}`} size="sm" variant="white">View</BtnLink>
           </div>

@@ -32,7 +32,7 @@ function CheckinLink() {
   return (
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       {step < 3 && (
-        <header className="sticky top-0 z-30 -mx-5 flex items-center gap-3 bg-[linear-gradient(180deg,#dce2f5_0%,#dce2f5_75%,rgba(220,226,245,0)_100%)] px-5 pb-5 pt-2">
+        <header className="sticky top-0 z-30 -mx-5 flex items-center gap-3 bg-sky-50/95 backdrop-blur-xl px-5 pb-5 pt-2">
           <IconBtn label="Back" onClick={() => (step ? setStep(step - 1) : router.push('/app'))}><ChevronLeft className="size-5" /></IconBtn>
           <div className="min-w-0 flex-1">
             <p className="text-[13px] font-semibold text-navy">2-minute check-in · {step + 1} of 3</p>
@@ -57,7 +57,7 @@ function CheckinLink() {
           </motion.div>
         </AnimatePresence>
       </div>
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
         {step < 2 && <Btn full variant="gradient" onClick={() => setStep(step + 1)}>Continue</Btn>}
         {step === 2 && <Btn full variant="gradient" onClick={finish}>Send to Jitendra Khimlani</Btn>}
         {step === 3 && <Btn full onClick={() => router.replace(appt ? `/app/sessions/view?id=${appt.id}` : '/app')}>{appt ? 'View my session' : 'Back to home'}</Btn>}

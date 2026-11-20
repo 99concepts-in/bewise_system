@@ -88,9 +88,9 @@ export function PhotoCapture({ initial, onDone, onSkip, skipLabel = 'Skip for no
           <motion.circle cx="144" cy="144" r="140" fill="none" stroke="url(#ring)" strokeWidth="4" strokeLinecap="round"
             animate={{ pathLength: mode === 'review' ? 1 : mode === 'live' ? 0.72 : 0.18, rotate: mode === 'live' ? 360 : 0 }}
             transition={{ pathLength: { duration: 0.8, ease }, rotate: { duration: 6, repeat: mode === 'live' ? Infinity : 0, ease: 'linear' } }} style={{ originX: '50%', originY: '50%' }} />
-          <defs><linearGradient id="ring" x1="0" x2="1"><stop offset="0" stopColor="#182957" /><stop offset="1" stopColor="#b89b64" /></linearGradient></defs>
+          <defs><linearGradient id="ring" x1="0" x2="1"><stop offset="0" stopColor="#243D91" /><stop offset="1" stopColor="#b89b64" /></linearGradient></defs>
         </svg>
-        <div className="relative size-[calc(100%-16px)] overflow-hidden rounded-full bg-[linear-gradient(135deg,#dce2f5,#dce7d9)] shadow-[inset_0_0_0_6px_rgba(255,255,255,.8)]">
+        <div className="relative size-[calc(100%-16px)] overflow-hidden rounded-full bg-sky-100 shadow-[inset_0_0_0_6px_rgba(255,255,255,.8)]">
           <AnimatePresence mode="wait">
             {mode === 'review' && shot ? (
               <motion.img key="shot" src={shot} alt="Your photo" className="h-full w-full object-cover" initial={{ scale: 1.15, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6, ease }} />
@@ -121,7 +121,7 @@ export function PhotoCapture({ initial, onDone, onSkip, skipLabel = 'Skip for no
           <div className="flex items-center justify-between px-6">
             <motion.button whileTap={{ scale: 0.9 }} aria-label="Cancel" onClick={() => { stop(); setMode(shot ? 'review' : 'idle') }} className="grid size-12 place-items-center rounded-full bg-white text-navy shadow-[var(--shadow-card)]"><X className="size-5" /></motion.button>
             <motion.button whileTap={{ scale: 0.86 }} aria-label="Take photo" onClick={capture} className="grid size-[78px] place-items-center rounded-full bg-white shadow-[var(--shadow-float)]">
-              <span className="size-[62px] rounded-full bg-[linear-gradient(135deg,#182957,#5e7fb8)] ring-4 ring-white" />
+              <span className="size-[62px] rounded-full bg-navy ring-4 ring-white" />
             </motion.button>
             <motion.button whileTap={{ scale: 0.9, rotate: 180 }} aria-label="Switch camera" onClick={flip} className="grid size-12 place-items-center rounded-full bg-white text-navy shadow-[var(--shadow-card)]"><SwitchCamera className="size-5" /></motion.button>
           </div>

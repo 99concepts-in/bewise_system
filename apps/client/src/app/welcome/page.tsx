@@ -3,12 +3,14 @@
  * @module   onboarding
  * @owner    CLIENT
  * @screens  CL-01 Splash · CL-02 Welcome story — owner copy 2026-11-18: welcome · book with Jitendra Khimlani · Bach flower benefits
+ * v5 (HUB 2026-11-20): splash shows the official stacked logo (no typed wordmark); headings in Fraunces; flower vectors.
  */
 import { useRouter } from 'next/navigation'
 import { preload } from 'react-dom'
 import { AnimatePresence, motion, type PanInfo } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
-import { LogoMark, Mascot, MoodImg } from '@/components/brand'
+import { LogoMark, LogoStacked, Mascot, MoodImg } from '@/components/brand'
+import { FlowerArt } from '@/components/flower'
 import { Btn, ease, cx } from '@/components/ui'
 import { BP } from '@/lib/asset'
 
@@ -20,7 +22,7 @@ const SLIDES = [
 ] as { lead: string; em: string; sub: string; chips?: string[] }[]
 
 // owner 2026-11-18: slide images felt slow; fetch them all up front (during the 1.9 s splash) at high priority
-const WELCOME_IMAGES = ['img/owl-wave.webp', 'img/jitu-portrait.webp', 'img/f-rose.webp', 'img/f-mimulus.webp']
+const WELCOME_IMAGES = ['img/owl-wave.webp', 'img/jitu-portrait.webp', 'img/brand/bewise-logo-stacked.svg', 'img/flowers/wild-rose.svg', 'img/flowers/mimulus.svg']
 
 export default function Welcome() {
   for (const src of WELCOME_IMAGES) preload(`${BP}/${src}`, { as: 'image', fetchPriority: 'high' })
@@ -43,31 +45,19 @@ export default function Welcome() {
         {phase === 'splash' ? (
           <motion.div key="splash" className="grid flex-1 place-items-center" exit={{ opacity: 0, scale: 1.04, filter: 'blur(6px)' }} transition={{ duration: 0.45, ease }}>
             <div className="flex flex-col items-center">
-              <div className="relative grid size-[150px] place-items-center">
-                <motion.span className="absolute inset-0 rounded-full bg-white/70" initial={{ scale: 0.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.9, ease }} />
-                <svg className="absolute inset-0 -rotate-90" viewBox="0 0 150 150" aria-hidden>
-                  <motion.circle cx="75" cy="75" r="72" fill="none" stroke="#b89b64" strokeWidth="1.5" strokeLinecap="round"
-                    initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }} transition={{ duration: 1.2, ease, delay: 0.25 }} />
-                </svg>
-                <motion.div layoutId="brand-mark" initial={{ scale: 0.6, opacity: 0, filter: 'blur(8px)' }} animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }} transition={{ duration: 0.8, ease, delay: 0.1 }}>
-                  <LogoMark size={110} />
+              <div className="relative grid place-items-center p-10">
+                <motion.span className="absolute inset-0 rounded-full bg-white" initial={{ scale: 0.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.9, ease }} />
+                <motion.div className="relative" initial={{ scale: 0.86, opacity: 0, filter: 'blur(8px)' }} animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }} transition={{ duration: 0.9, ease, delay: 0.15 }}>
+                  <LogoStacked height={168} />
                 </motion.div>
               </div>
-              <div className="mt-6 flex overflow-hidden text-[40px] font-extrabold tracking-[-0.03em] text-navy" role="img" aria-label="BeWise">
-                {'BeWise'.split('').map((c, k) => (
-                  <motion.span key={k} initial={{ y: 48, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease, delay: 0.55 + k * 0.05 }}>{c}</motion.span>
-                ))}
-              </div>
-              <motion.p className="mt-1 text-[15px] font-medium tracking-[0.18em] text-muted uppercase" initial={{ opacity: 0, letterSpacing: '0.4em' }} animate={{ opacity: 1, letterSpacing: '0.18em' }} transition={{ duration: 0.9, delay: 1 }}>
-                Holistic Wellness
-              </motion.p>
             </div>
           </motion.div>
         ) : (
           <motion.div key="story" className="flex flex-1 flex-col safe-t" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
             <header className="flex items-center justify-between px-5 pt-2">
-              <motion.div layoutId="brand-mark" className="flex items-center gap-2.5">
-                <LogoMark size={40} />
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, ease }}>
+                <LogoMark size={40} label="BeWise" />
               </motion.div>
               <button onClick={() => router.push('/sign-in')} className={cx('rounded-full px-4 py-2 text-[14px] font-semibold text-navy transition-opacity', i === 2 && 'pointer-events-none opacity-0')}>Skip</button>
             </header>
@@ -85,16 +75,16 @@ export default function Welcome() {
               <div className="relative z-10 mt-3 px-6">
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div key={i} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35, ease }}>
-                    <h1 className="text-[28px] font-extrabold leading-[1.12] tracking-[-0.025em] text-navy">
-                      {SLIDES[i].lead} <span className="text-soft">{SLIDES[i].em}</span>
+                    <h1 className="h-duo">
+                      {SLIDES[i].lead} <em>{SLIDES[i].em}</em>
                     </h1>
-                    <p className="mt-3 text-[15px] leading-6 text-muted">{SLIDES[i].sub}</p>
+                    <p className="mt-3 text-[16px] leading-6 text-ink-2">{SLIDES[i].sub}</p>
                     {SLIDES[i].chips && (
                       <div className="mt-4 flex flex-wrap gap-2">
                         {SLIDES[i].chips!.map((c, k) => (
                           <motion.span key={c} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + k * 0.08 }}
                             className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">
-                            <span className="size-1.5 rounded-full bg-sage" />{c}
+                            <span className="size-1.5 rounded-full bg-teal" />{c}
                           </motion.span>
                         ))}
                       </div>
@@ -108,7 +98,7 @@ export default function Welcome() {
               <div className="mb-4 flex justify-center gap-2" role="tablist" aria-label="Welcome slides">
                 {SLIDES.map((_, k) => (
                   <button key={k} role="tab" aria-selected={k === i} aria-label={`Slide ${k + 1}`} onClick={() => go(k)} className="grid h-6 place-items-center px-0.5">
-                    <motion.span className="block h-2 rounded-full" animate={{ width: k === i ? 26 : 8, backgroundColor: k === i ? '#182957' : '#c7cde0' }} transition={{ duration: 0.35, ease }} />
+                    <motion.span className="block h-2 rounded-full" animate={{ width: k === i ? 26 : 8, backgroundColor: k === i ? '#243D91' : '#CFDBFF' }} transition={{ duration: 0.35, ease }} />
                   </button>
                 ))}
               </div>
@@ -126,8 +116,8 @@ export default function Welcome() {
 function Halo({ inner = 0.76 }: { inner?: number }) {
   return (
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
-      <span className="animate-breathe absolute aspect-square rounded-full bg-white/70" style={{ height: `${inner * 100}%` }} />
-      <span className="animate-breathe absolute aspect-square rounded-full border border-white/80" style={{ height: '92%', animationDelay: '1s' }} />
+      <span className="animate-breathe absolute aspect-square rounded-full bg-sky-100" style={{ height: `${inner * 100}%` }} />
+      <span className="animate-breathe absolute aspect-square rounded-full border border-sky-200" style={{ height: '92%', animationDelay: '1s' }} />
     </div>
   )
 }
@@ -146,8 +136,8 @@ function ArtWelcome() {
     <div className="relative h-full">
       <Halo />
       <div className="absolute inset-0 grid place-items-center"><Mascot pose="wave" height={220} priority /></div>
-      <Float className="left-[7%] top-[12%]" delay={0.2} dy={6}><img src={`${BP}/img/f-rose.webp`} alt="" className="h-[78px] w-auto" /></Float>
-      <Float className="right-[6%] top-[8%]" delay={0.35} dy={8}><img src={`${BP}/img/f-mimulus.webp`} alt="" className="h-[96px] w-auto" /></Float>
+      <Float className="left-[5%] top-[10%]" delay={0.2} dy={6}><FlowerArt name="Wild Rose" decorative className="h-[88px] w-[88px]" /></Float>
+      <Float className="right-[4%] top-[6%]" delay={0.35} dy={8}><FlowerArt name="Mimulus" decorative className="h-[100px] w-[100px]" /></Float>
       <Float className="bottom-[16%] left-[11%]" delay={0.55} dy={6}><MoodImg mood="calm" size={46} /></Float>
       <Float className="bottom-[20%] right-[12%]" delay={0.7} dy={7}><MoodImg mood="happy" size={50} /></Float>
     </div>
@@ -168,7 +158,7 @@ function ArtBook() {
         <div className="rounded-[18px] rounded-bl-md bg-white px-3.5 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Bach Flower Remedy Therapist</div>
       </Float>
       <Float className="bottom-[12%] left-[10%]" delay={0.6} dy={5}>
-        <div className="flex items-center gap-1.5 rounded-full bg-sage-100 px-3.5 py-2 text-[13px] font-semibold text-sage-text shadow-[var(--shadow-card)]">✓ Remedy blend included</div>
+        <div className="flex items-center gap-1.5 rounded-full bg-teal-100 px-3.5 py-2 text-[13px] font-semibold text-sage-text shadow-[var(--shadow-card)]">✓ Remedy blend included</div>
       </Float>
     </div>
   )
@@ -207,8 +197,8 @@ function ArtEssence() {
   return (
     <div ref={box} className="relative h-full">
       <Halo inner={0.72} />
-      <Float className="left-[4%] top-[10%]" delay={0.1} dy={6}><img src={`${BP}/img/f-rose.webp`} alt="" className="h-[78px] w-auto" /></Float>
-      <Float className="right-[2%] top-[4%]" delay={0.25} dy={8}><img src={`${BP}/img/f-mimulus.webp`} alt="" className="h-[96px] w-auto" /></Float>
+      <Float className="left-[3%] top-[8%]" delay={0.1} dy={6}><FlowerArt name="Rock Rose" decorative className="h-[84px] w-[84px]" /></Float>
+      <Float className="right-[2%] top-[4%]" delay={0.25} dy={8}><FlowerArt name="White Chestnut" decorative className="h-[96px] w-[96px]" /></Float>
       <div className="absolute left-1/2 top-1/2" style={{ width: STAGE.w, height: STAGE.h, transform: `translate(-50%, -50%) scale(${fit})` }} aria-hidden>
         {/* open amber bottle */}
         <svg viewBox="0 0 90 130" className="absolute" style={{ left: 46, top: 128, width: 82, height: 118 }}>
@@ -230,7 +220,7 @@ function ArtEssence() {
         {/* label drawn above the pipette so the text is never covered (owner 2026-11-20: "Flower Remedy") */}
         <svg viewBox="0 0 90 130" className="pointer-events-none absolute" style={{ left: 46, top: 128, width: 82, height: 118 }}>
           <rect x="18" y="58" width="54" height="40" rx="6" fill="#f5efe4" />
-          <text x="45" y="76" textAnchor="middle" fontSize="9" fontWeight="800" fill="#182957">BeWise</text>
+          <image href={`${BP}/img/brand/bewise-mark.svg`} x="37" y="62" width="16" height="16" />
           <text x="45" y="88" textAnchor="middle" fontSize="6.4" fontWeight="600" fill="#5f667a">Flower Remedy</text>
         </svg>
         {/* drops: fall from the pipette tip (stage ≈ x 199, y 108) onto the mood character */}

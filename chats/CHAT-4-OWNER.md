@@ -4,6 +4,8 @@
 > **"Read `chats/CHAT-4-OWNER.md` and follow it."**
 > Chat tag: **`owner`** · PR titles `[OWNER] …` · Brief version **v2 (2026-11-17)** — replaces all earlier versions.
 
+> 🔔 **UPDATE 2026-11-18 — the real backend is ready (D-44, replaces Supabase/Next server).** Backend = `api/` (PHP 8 + Hostinger MySQL), deployed at `/api/` with every push to `main`. **Step 0 is now ✅.** Your first task: `docs/coordination/requests/20261118-hub-to-owner-wire-real-api.md` (P0) — swap demo data for API calls, keep demo data only when `BeWise.available()` is false. Your module files in `api/modules/` are yours to extend (new migrations in `api/migrations/`). Reference `api/README.md`. Where this brief says Supabase / RLS / `src/modules/*` / Postgres, read: `api/modules/<module>.php`, server-side role checks, MySQL.
+
 ---
 
 ## 1. Mission
@@ -30,9 +32,9 @@ Finance is a real accounting system (PRD §10) — correctness beats speed.
 | Refunds | **None** (D-16) — no refund flows or approvals; credit notes only for owner accounting corrections |
 | Accountant | Role **`accountant`**: view & export reports, invoices, bills, ledgers, GST; no edits; no consultation/intake data; own computer view OW-30 (D-39) |
 | Later | **Personal finance** and **payroll** are later phases — don't build now (D-40, D-41) |
-| Numbers for team | Jitu Bhaiya and Haresh see **sales and profit** read-only — expose read-only analytics functions for them (D-33) |
+| Numbers for team | Jitendra Khimlani and Haresh see **sales and profit** read-only — expose read-only analytics functions for them (D-33) |
 | Privacy | Owner cannot read practitioner notes, flower reasons or intake answers (only aggregate, anonymous stats) (D-03, D-38) |
-| Safety alerts | Go to Jitu Bhaiya only — not the owner (D-38) |
+| Safety alerts | Go to Jitendra Khimlani only — not the owner (D-38) |
 | Integrations | Razorpay (payments), Shiprocket (via manager), WhatsApp Business (reminders, templates), Google Calendar (via consultant), email — show true status: Connected / Test mode / Not set up |
 | Greeting | "Good morning" until the owner gives a name (D-42) |
 | AI | Ask BeWise (business): read-only answers over analytics views, never acts; load the `claude-api` skill before coding |

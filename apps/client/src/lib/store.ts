@@ -220,7 +220,7 @@ export const useApp = create<State>()(
       // owner 2026-11-18: a chosen time is a request until Jitendra Khimlani or Haresh bhai confirm it
       pickNewTime: (id, startsAt) => {
         set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, startsAt, status: 'confirmed' as const, needsNewTime: false, timeRequested: true } : x)) }))
-        get().notify({ title: 'Time requested', body: 'Jitendra Khimlani or Haresh bhai will confirm your time soon. If it doesn’t suit, our team will call you.', href: `/app/sessions/view?id=${id}` })
+        get().notify({ title: 'Time requested', body: 'Jitendra Khimlani or our team will confirm your time soon and message you on WhatsApp.', href: `/app/sessions/view?id=${id}` })
       },
       submitCheckin: (appointmentId, answers) => set((s) => ({ checkins: { ...s.checkins, [appointmentId]: { at: new Date().toISOString(), answers } } })),
       simulateStaffBooking: (late = false) => {

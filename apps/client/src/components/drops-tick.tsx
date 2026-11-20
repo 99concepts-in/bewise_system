@@ -33,19 +33,19 @@ export function DropsTick({ full = false }: { full?: boolean }) {
       <AnimatePresence mode="wait" initial={false}>
         {v === undefined ? (
           <motion.div key="ask" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}>
-            <p className="text-[14px] font-bold text-navy">Took your drops today?</p>
+            <p className="text-[15px] font-semibold text-ink">Took your drops today?</p>
             <div className="mt-2 flex gap-2">
-              <motion.button whileTap={{ scale: 0.95 }} onClick={() => set(k0, true)} className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-navy text-[14px] font-semibold text-white shadow-[var(--shadow-cta)]">
+              <motion.button whileTap={{ scale: 0.95 }} onClick={() => set(k0, true)} className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 rounded-[16px] bg-navy font-display text-[16px] font-semibold text-white shadow-[var(--shadow-cta)]">
                 <Check className="size-4" strokeWidth={3} /> Yes, took them
               </motion.button>
-              <motion.button whileTap={{ scale: 0.95 }} onClick={() => set(k0, false)} className="h-11 flex-1 rounded-full bg-white text-[14px] font-semibold text-navy ring-1 ring-[#e3e6ef]">Not today</motion.button>
+              <motion.button whileTap={{ scale: 0.95 }} onClick={() => set(k0, false)} className="h-12 flex-1 rounded-[16px] bg-white font-display text-[16px] font-semibold text-navy ring-1 ring-sky-200">Not today</motion.button>
             </div>
           </motion.div>
         ) : (
           <motion.div key={String(v)} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={spring}
-            className={cx('flex items-center gap-3 rounded-[18px] px-3.5 py-3', v ? 'bg-sage-100/80' : 'bg-peri-50')}>
+            className={cx('flex items-center gap-3 rounded-[18px] px-3.5 py-3', v ? 'bg-teal-100' : 'bg-sky-50')}>
             <motion.span initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 14 }}
-              className={cx('grid size-9 shrink-0 place-items-center rounded-full', v ? 'bg-sage-text text-white' : 'bg-white text-navy')} aria-hidden>
+              className={cx('grid size-9 shrink-0 place-items-center rounded-full', v ? 'bg-teal text-white' : 'bg-white text-navy')} aria-hidden>
               {v ? <Check className="size-5" strokeWidth={3} /> : <span className="text-[16px]">🌙</span>}
             </motion.span>
             <p className="flex-1 text-[14px] leading-5 text-ink">{v ? <><b className="text-navy">Drops taken today.</b> Lovely.</> : <><b className="text-navy">Not today, that’s okay.</b> Tomorrow is a new day.</>}</p>
@@ -63,7 +63,7 @@ export function DropsTick({ full = false }: { full?: boolean }) {
               <span className="flex-1 font-medium text-muted">{label(d, i)}</span>
               {([true, false] as const).map((t) => (
                 <button key={String(t)} aria-pressed={pv === t} onClick={() => set(k, t, true)}
-                  className={cx('h-8 rounded-full px-3 text-[12px] font-semibold transition-colors', pv === t ? (t ? 'bg-sage-text text-white' : 'bg-navy text-white') : 'bg-white text-navy ring-1 ring-[#e3e6ef]')}>
+                  className={cx('min-h-9 rounded-full px-3 text-[12px] font-semibold transition-colors', pv === t ? (t ? 'bg-teal text-white' : 'bg-navy text-white') : 'bg-white text-navy ring-1 ring-sky-200')}>
                   {t ? 'Took them' : 'Not that day'}
                 </button>
               ))}
@@ -77,7 +77,7 @@ export function DropsTick({ full = false }: { full?: boolean }) {
           <div className="flex gap-1" role="img" aria-label={`Drops ticked on ${took} of the last 14 days`}>
             {strip.map((d) => {
               const x = drops[dayKey(d)]
-              return <span key={dayKey(d)} title={d.toDateString()} className={cx('h-6 flex-1 rounded-[6px]', x === true ? 'bg-[linear-gradient(180deg,#e7b768,#c48a3a)]' : x === false ? 'bg-[#e3e6ef]' : 'bg-white ring-1 ring-dashed ring-[#d9dce6]')} />
+              return <span key={dayKey(d)} title={d.toDateString()} className={cx('h-6 flex-1 rounded-[6px]', x === true ? 'bg-marigold' : x === false ? 'bg-sky-200' : 'bg-white ring-1 ring-line')} />
             })}
           </div>
           <p className="mt-2 text-[12px] text-muted">{counted.length ? `You took them on ${took} of the last ${counted.length} days you logged. Every day counts.` : 'Tick once a day. It helps Jitendra Khimlani see how your blend is going.'}</p>

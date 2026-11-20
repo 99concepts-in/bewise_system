@@ -3,202 +3,321 @@
  * @module   client-home
  * @owner    CLIENT
  * @screens  CL-08 Home (spec docs/specs/client/CL-08-home.md) · CL-56 progress (compact)
+ * v5 (HUB 2026-11-20): Blue Bloom Home (DESIGN-SYSTEM §7) — greeting + "How are you feeling today?" as 6 colourful feeling
+ *   circles (logs a journal mood, petal burst, one gentle line) → one actionable card when something needs the client
+ *   (pay / resume answers / next session / feedback) → "Meet Jitendra Khimlani" (opens the full-screen story) → today's blend →
+ *   shop row → journal · goals · Ask BeWise tiles. Floating "Book" pill above the tab bar. Kept uncluttered: the v4 goals
+ *   card, daily insight and progress moved to Journal / Goals / Care (all still one tap away).
  */
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { AnimatePresence, motion } from 'motion/react'
-import { ArrowRight, BookOpen, Check, ChevronRight, Lightbulb, Sparkles, Video } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { ArrowRight, BookHeart, Check, ChevronRight, MessageCircleHeart, Target, Video } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Mascot, MoodButton, MoodImg } from '@/components/brand'
+import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
+import { AppHeader, useNavShown } from '@/components/shell'
+import { SessionDateArt } from '@/components/session-art'
+import { FeelingIcon, FlowerTile } from '@/components/flower'
+import { JituPortrait, JituStory, Sparkle } from '@/components/jitu-story'
+import { ProductCard } from '@/components/product-card'
+import { BtnLink, Item, Reveal, buzz, cx, ease, toast, useChrome, useNow } from '@/components/ui'
+import { CONSULTATIONS, CONSULTANT, PRODUCTS, moodOf, type Emotion } from '@/lib/data'
+import { ACCENTS, HOME_FEELINGS, type HomeFeeling } from '@/lib/feelings'
 import { isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { GoalCheck } from '@/components/goal-check'
 import { doneToday, kindOf, streak } from '@/lib/goals'
-import { AppHeader } from '@/components/shell'
-import { ConsultInviteArt, SessionDateArt } from '@/components/session-art'
-import { BlendBottleCard } from '@/components/blend-bottle'
-import { Btn, BtnLink, Item, Reveal, Ring, buzz, spring, toast, useChrome, useNow } from '@/components/ui'
-import { CONSULTATIONS, QUICK_MOODS, moodOf, type Emotion } from '@/lib/data'
+import { DoseTracker } from '@/components/dose-tracker'
 import { useApp, type Appointment } from '@/lib/store'
 import { dayKey, firstName, fmtDay, fmtTime, formatINR } from '@/lib/format'
-import { dailyInsight, progressLines } from '@/lib/insights'
-import { BP } from '@/lib/asset'
+import { blendSupply } from '@/lib/supply'
+
+const greet = (h: number) => (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening')
 
 export default function Home() {
   const profile = useApp((s) => s.profile)
-  const journal = useApp((s) => s.journal)
-  const logMood = useApp((s) => s.logMood)
   const blend = useApp((s) => s.blend)
-  const { openLog, openEntry } = useChrome()
-  const [burst, setBurst] = useState<{ mood: Emotion; n: number } | null>(null)
-  const todays = journal.filter((e) => dayKey(e.at) === dayKey(new Date()))
-  const lastToday = todays[0]
-
-  const tapMood = (m: Emotion) => {
-    logMood(m); buzz(10)
-    setBurst((b) => ({ mood: m, n: (b?.n ?? 0) + 1 }))
-  }
+  const [story, setStory] = useState(false)
+  const now = useNow(60_000)
 
   return (
-    <main className="px-5 pb-32">
+    <main className="home-wash -mx-0 min-h-dvh px-5 pb-[calc(env(safe-area-inset-bottom)+176px)]">
       <AppHeader />
-      <Reveal className="space-y-4">
-        <Item className="pt-2"><LaunchBanner /></Item>
+      <Reveal className="space-y-6">
+        <Item className="pt-1"><LaunchBanner /></Item>
         <Item>
-          <h1 className="text-[34px] font-extrabold leading-[1.05] tracking-[-0.03em] text-navy">Hi {firstName(profile?.name)}</h1>
-          <p className="mt-1 text-[24px] font-bold leading-tight tracking-[-0.02em] text-soft">how are you feeling today?</p>
+          <p className="text-[16px] font-medium text-ink-2">{greet(new Date(now).getHours())}, {firstName(profile?.name)}</p>
+          <h1 className="h-display mt-1">How are you feeling today?</h1>
         </Item>
 
-        <Item>
-          <section className="card px-3 pb-3 pt-5" aria-labelledby="mood-h">
-            <div className="px-2">
-              <h2 id="mood-h" className="h-section">Today’s mood</h2>
-              <p className="mt-0.5 text-[13px] text-muted">Tap once to reflect. Takes 3 seconds.</p>
-            </div>
-            <div className="mt-3 grid grid-cols-5 gap-0.5">
-              {QUICK_MOODS.map((m) => (
-                <MoodButton key={m} mood={m} size={54} fluid burstKey={burst?.mood === m ? burst.n : undefined} selected={lastToday?.emotion === m} onPick={() => tapMood(m)} />
-              ))}
-            </div>
-            <div className="mt-2 flex min-h-9 items-center justify-between px-2">
-              <AnimatePresence mode="wait">
-                {lastToday ? (
-                  <motion.p key={lastToday.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-[13px] text-muted">
-                    Logged <b className="text-navy">{moodOf(lastToday.emotion).label}</b> at {fmtTime(lastToday.at)} ·{' '}
-                    <button onClick={() => openEntry(lastToday.id)} className="font-semibold text-navy underline underline-offset-2">{lastToday.note ? 'Edit note' : 'Add a note'}</button>
-                  </motion.p>
-                ) : <motion.p key="none" className="text-[13px] text-muted">Nothing logged yet today</motion.p>}
-              </AnimatePresence>
-              <div className="flex gap-3 text-[13px] font-semibold text-navy">
-                <button onClick={openLog}>More</button>
-                <Link href="/app/journal" className="inline-flex items-center gap-0.5">Journal<ChevronRight className="size-4" /></Link>
-              </div>
-            </div>
-          </section>
-        </Item>
+        <Item><FeelingCircles /></Item>
 
-        <Item><ContextCard /></Item>
+        <ContextCard />
 
-        {blend && <Item><BlendBottleCard /></Item>}
+        <Item><MeetCard open={story} onOpen={() => { buzz(8); setStory(true) }} /></Item>
+
+        {blend && <Item><TodaysBlend /></Item>}
 
         <GoalsCard />
 
-        <Item>
-          <Link href="/app/ask" className="card group relative block overflow-hidden p-5 pr-[42%]">
-            <span className="absolute -right-6 -top-6 size-44 rounded-full bg-[radial-gradient(circle,#dce2f5_0%,transparent_70%)]" />
-            <h2 className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">Ask <span className="text-soft">BeWise</span></h2>
-            <p className="mt-1.5 text-[14px] leading-5 text-muted">Your wise companion for questions about your remedy, journal and orders.</p>
-            <span className="mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-navy px-5 text-[14px] font-semibold text-white shadow-[var(--shadow-cta)]"><Sparkles className="size-4" /> Start a chat</span>
-            <div className="absolute bottom-2 right-3"><Mascot pose="wave" height={150} /></div>
-          </Link>
-        </Item>
+        <Item><ShopRow /></Item>
 
-        {blend && <Item><ProgressCompact /></Item>}
-
-        <Item>
-          <div className="card flex items-start gap-3 p-5">
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#fbf3dc] text-gold"><Lightbulb className="size-5" /></span>
-            <p className="text-[14px] leading-6 text-ink"><b className="text-navy">Your daily insight</b>, {dailyInsight(journal)}</p>
-          </div>
-        </Item>
+        <Item><YourSpace /></Item>
       </Reveal>
+
+      <BookPill />
+      <JituStory open={story} onClose={() => setStory(false)} />
     </main>
   )
 }
 
+/* ---------------- feelings ---------------- */
+/** owner 2026-11-20: after picking, a short celebration plays, then the grid collapses into a card made for that feeling. */
+const NEXT_STEP: Record<string, { label: string; href?: string; note?: boolean }> = {
+  happy: { label: 'Note what made today good', note: true },
+  calm: { label: 'Explore the evening ritual', href: '/app/shop' },
+  grateful: { label: 'Add a gratitude note', note: true },
+  anxious: { label: 'Rescue Remedy for stressful moments', href: '/app/shop/rescue-remedy' },
+  sad: { label: 'Talk to Jitendra Khimlani', href: '/app/book' },
+  stressed: { label: 'Find a calming ritual', href: '/app/shop' },
+}
+
+function FeelingCircles() {
+  const journal = useApp((s) => s.journal)
+  const logMood = useApp((s) => s.logMood)
+  const { openLog, openEntry } = useChrome()
+  const reduce = useReducedMotion()
+  const todays = journal.filter((e) => dayKey(e.at) === dayKey(new Date()))
+  const last = todays[0]
+  const [phase, setPhase] = useState<'pick' | 'celebrate' | 'done'>(() => (last ? 'done' : 'pick'))
+  const [picked, setPicked] = useState<HomeFeeling | null>(null)
+  const current = picked ?? HOME_FEELINGS.find((f) => f.mood === last?.emotion) ?? null
+
+  const tap = (f: HomeFeeling) => {
+    logMood(f.mood); buzz(12); setPicked(f)
+    if (reduce) return setPhase('done')
+    setPhase('celebrate'); window.setTimeout(() => setPhase('done'), 1700)
+  }
+
+  return (
+    <motion.section layout transition={{ duration: 0.45, ease }} aria-label="Log how you feel">
+      <AnimatePresence mode="wait" initial={false}>
+        {phase === 'pick' && (
+          <motion.div key="pick" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.3, ease }}>
+            <div className="grid grid-cols-3 gap-x-3 gap-y-4">
+              {HOME_FEELINGS.map((f) => <FeelingCircle key={f.mood} f={f} selected={last?.emotion === f.mood} onPick={() => tap(f)} />)}
+            </div>
+            <p className="mt-4 flex flex-wrap items-center justify-between gap-2 text-[14px] text-ink-2">
+              <span>One tap. Takes 3 seconds.</span>
+              <span className="flex items-center gap-1">
+                <button onClick={openLog} className="min-h-11 rounded-full px-2 font-semibold text-navy underline-offset-4 hover:underline">More feelings</button>
+                {last && <button onClick={() => setPhase('done')} className="min-h-11 rounded-full px-2 font-semibold text-navy">Cancel</button>}
+              </span>
+            </p>
+          </motion.div>
+        )}
+        {phase === 'celebrate' && current && <Celebrate key="celebrate" f={current} />}
+        {phase === 'done' && current && last && (
+          <motion.div key="done" initial={{ opacity: 0, y: 14, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.45, ease }}
+            className="overflow-hidden rounded-[28px] p-4 shadow-[var(--shadow-card)]" style={{ background: `linear-gradient(135deg, ${ACCENTS[current.accent].c100}, #ffffff 70%)` }} role="status">
+            <div className="flex items-center gap-3.5">
+              <span className="grid size-14 shrink-0 place-items-center rounded-full shadow-[0_8px_18px_rgba(23,33,74,.12)]" style={{ background: ACCENTS[current.accent].c500, color: ACCENTS[current.accent].onInk ? '#17214A' : '#FFFFFF' }}>
+                <FeelingIcon icon={current.icon} size={30} strokeWidth={1.9} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] text-ink-2">Today you’re feeling</p>
+                <p className="font-display text-[20px] font-semibold leading-6 text-ink">{current.label} <span className="text-[13px] font-medium text-ink-2">· {fmtTime(last.at)}</span></p>
+              </div>
+              <button onClick={() => setPhase('pick')} className="min-h-11 shrink-0 rounded-full bg-white px-3.5 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Change</button>
+            </div>
+            <p className="mt-3 text-[14px] leading-5 text-ink">{current.tip}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {(() => {
+                const n = NEXT_STEP[current.mood]
+                if (!n) return null
+                return n.note
+                  ? <button onClick={() => openEntry(last.id)} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white">{last.note ? 'Edit your note' : n.label}<ChevronRight className="size-4" /></button>
+                  : <Link href={n.href!} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-navy px-4 text-[13px] font-semibold text-white">{n.label}<ChevronRight className="size-4" /></Link>
+              })()}
+              {!NEXT_STEP[current.mood]?.note && <button onClick={() => openEntry(last.id)} className="inline-flex min-h-10 items-center rounded-full bg-white px-4 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">{last.note ? 'Edit note' : 'Add a note'}</button>}
+              <Link href="/app/journal" className="inline-flex min-h-10 items-center gap-0.5 rounded-full px-2 text-[13px] font-semibold text-navy">Journal<ChevronRight className="size-4" /></Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.section>
+  )
+}
+
+/** The moment between tap and the collapsed card: the circle blooms, rings ripple out, petals fly. */
+function Celebrate({ f }: { f: HomeFeeling }) {
+  const a = ACCENTS[f.accent]
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.25 } }}
+      className="relative flex h-[300px] flex-col items-center justify-center overflow-hidden rounded-[28px]" style={{ background: `radial-gradient(circle at 50% 45%, ${a.c100}, #ffffff 75%)` }} aria-live="polite">
+      {[0, 1, 2].map((i) => (
+        <motion.span key={i} aria-hidden className="absolute left-1/2 top-[42%] size-[120px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
+          style={{ borderColor: a.c500 }} initial={{ scale: 0.6, opacity: 0.7 }} animate={{ scale: 2.6, opacity: 0 }} transition={{ duration: 1.4, delay: i * 0.25, ease: 'easeOut' }} />
+      ))}
+      <motion.span className="relative grid size-[120px] place-items-center rounded-full shadow-[0_18px_40px_rgba(23,33,74,.18)]"
+        style={{ background: a.c500, color: a.onInk ? '#17214A' : '#FFFFFF' }}
+        initial={{ scale: 0.4, rotate: -20 }} animate={{ scale: [0.4, 1.12, 1], rotate: [-20, 6, 0] }} transition={{ duration: 0.8, ease }}>
+        <FeelingIcon icon={f.icon} size={64} strokeWidth={1.75} />
+        <PetalBurst color={a.c500} big />
+      </motion.span>
+      <motion.p className="mt-6 font-display text-[22px] font-semibold text-ink" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.4 }}>
+        {f.label}, noted
+      </motion.p>
+      <motion.p className="mt-1 text-[14px] text-ink-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>Thank you for checking in with yourself</motion.p>
+    </motion.div>
+  )
+}
+
+function FeelingCircle({ f, selected, burstKey, onPick }: { f: HomeFeeling; selected: boolean; burstKey?: number; onPick: () => void }) {
+  const a = ACCENTS[f.accent]
+  const reduce = useReducedMotion()
+  return (
+    <button type="button" onClick={onPick} aria-pressed={selected} aria-label={f.label} className="group flex flex-col items-center gap-2 rounded-[20px] pb-1">
+      <motion.span key={burstKey} className="relative grid aspect-square w-full max-w-[96px] place-items-center rounded-full shadow-[0_8px_18px_rgba(23,33,74,.10)]"
+        style={{ background: a.c500, color: a.onInk ? '#17214A' : '#FFFFFF' }}
+        animate={burstKey && !reduce ? { scale: [0.94, 1.04, 1] } : undefined} transition={{ duration: 0.45, ease }} whileTap={{ scale: 0.94 }}>
+        <FeelingIcon icon={f.icon} size={54} strokeWidth={1.75} />
+        <AnimatePresence>{selected && (
+          <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className="absolute right-0.5 top-0.5 grid size-6 place-items-center rounded-full bg-white text-navy shadow-[var(--shadow-card)]">
+            <Check className="size-3.5" strokeWidth={3} aria-hidden />
+          </motion.span>
+        )}</AnimatePresence>
+        <AnimatePresence>{burstKey && !reduce ? <PetalBurst key={burstKey} color={a.c500} /> : null}</AnimatePresence>
+      </motion.span>
+      <span className="text-[13px] font-semibold text-ink">{f.label}</span>
+    </button>
+  )
+}
+
+/** Small petal burst from the tapped circle (signature moment §8). */
+function PetalBurst({ color, big }: { color: string; big?: boolean }) {
+  const ps = useMemo(() => Array.from({ length: big ? 16 : 9 }, (_, i, arr = big ? 16 : 9) => ({ a: (i / arr) * Math.PI * 2 + 0.3, d: (big ? 110 : 58) + (i % 3) * (big ? 22 : 10), r: (i % 2 ? 1 : -1) * (90 + i * 20) })), [big])
+  return (
+    <span className="pointer-events-none absolute inset-0" aria-hidden>
+      {ps.map((p, i) => (
+        <motion.span key={i} className="absolute left-1/2 top-1/2 block h-3 w-2 rounded-[60%_10%_60%_10%]"
+          style={{ background: i % 3 === 0 ? '#F2A93B' : color, marginLeft: -4, marginTop: -6 }}
+          initial={{ x: 0, y: 0, opacity: 1, scale: 0.4, rotate: 0 }} animate={{ x: Math.cos(p.a) * p.d, y: Math.sin(p.a) * p.d, opacity: 0, scale: 1, rotate: p.r }}
+          transition={{ duration: 0.75, ease }} />
+      ))}
+    </span>
+  )
+}
+
+/* ---------------- Meet Jitendra Khimlani ---------------- */
+function MeetCard({ open, onOpen }: { open: boolean; onOpen: () => void }) {
+  return (
+    <button onClick={onOpen} aria-label="Meet Jitendra Khimlani, your consultant" aria-haspopup="dialog"
+      className="relative flex w-full items-center gap-4 overflow-hidden rounded-[28px] bg-sky-100 p-3 pr-4 text-left transition-transform active:scale-[0.99]">
+      <span className="relative h-[116px] w-[92px] shrink-0">
+        {!open && <JituPortrait className="h-full w-full ring-[3px] ring-white" radius="999px 999px 18px 18px" />}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="eyebrow text-navy">Your consultant</span>
+        <span className="mt-1 block font-display text-[22px] font-semibold leading-7 text-ink">Meet Jitendra Khimlani</span>
+        <span className="mt-0.5 block text-[14px] leading-5 text-ink-2">{CONSULTANT.title} · 12+ years</span>
+        <span className="mt-2 inline-flex items-center gap-1 text-[14px] font-semibold text-navy">Hear his story <ArrowRight className="size-4" /></span>
+      </span>
+      <Sparkle size={22} className="absolute left-[94px] top-3" />
+    </button>
+  )
+}
+
+/* ---------------- one actionable card (only when something needs the client) ---------------- */
 function useNextAppointment() {
   const appts = useApp((s) => s.appointments)
   const now = useNow()
   return useMemo(() => {
     const upcoming = appts.filter((a) => a.status === 'confirmed' && isUpcoming(a, now)).sort((a, b) => Number(tbc(b)) - Number(tbc(a)) || +new Date(a.startsAt) - +new Date(b.startsAt))[0]
     const needsFeedback = appts.find((a) => !tbc(a) && (a.status === 'completed' || new Date(a.startsAt).getTime() + 60 * 60_000 < now) && !a.feedback && now - new Date(a.startsAt).getTime() < 14 * 86_400_000)
-    return { upcoming, needsFeedback, any: appts.length > 0, now }
+    return { upcoming, needsFeedback, now }
   }, [appts, now])
 }
 
-/** CL-08 ONE contextual card — priority order from the spec. */
 function ContextCard() {
   const intake = useApp((s) => s.intake)
-  const blend = useApp((s) => s.blend)
-  const { upcoming, needsFeedback, any, now } = useNextAppointment()
-  const router = useRouter()
-
-  const appts = useApp.getState().appointments
+  const appts = useApp((s) => s.appointments)
+  const { upcoming, needsFeedback, now } = useNextAppointment()
   const toPay = appts.find((x) => (x.status === 'awaiting_payment' || x.status === 'expired') && !x.paidAt)
+  let card: React.ReactNode = null
   if (toPay)
-    return <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitendra Khimlani'} title="Complete your booking" body={`${whenShort(toPay)}. Pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
-
-  if (intake && !intake.submittedAt && intake.step > 0)
-    return <Ctx tone="peri" kicker="Almost there" title="Your answers are saved" body="Finish in about 3 minutes, then send your request." cta="Continue" href="/app/book?resume=1" img={`${BP}/img/owl-read.webp`} />
-
-  if (upcoming && tbc(upcoming))
-    return <Ctx tone="sage" kicker="Request received" title="We’ll confirm your time" body="Jitendra Khimlani or our team will set a time and message you on WhatsApp." cta="View request" href={`/app/sessions/view?id=${upcoming.id}`} />
-  if (upcoming) {
+    card = <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitendra Khimlani'} title="Complete your booking" body={`${whenShort(toPay)}. Pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
+  else if (intake && !intake.submittedAt && intake.step > 0)
+    card = <Ctx tone="sky" kicker="Almost there" title="Your answers are saved" body="Finish in about 3 minutes, then send your request." cta="Continue" href="/app/book?resume=1" />
+  else if (upcoming && tbc(upcoming))
+    card = <Ctx tone="teal" kicker="Request received" title="We’ll confirm your time" body="Jitendra Khimlani or our team will set a time and message you on WhatsApp." cta="View request" href={`/app/sessions/view?id=${upcoming.id}`} />
+  else if (upcoming) {
     const mins = Math.round((new Date(upcoming.startsAt).getTime() - now) / 60_000)
-    if (mins <= 60) return <Ctx tone="navy" kicker="Starting soon" title={mins > 0 ? `Your session begins in ${mins} min` : 'Your session is live'} body="Find a quiet spot. Jitendra Khimlani will join you." cta={mins <= 10 ? 'Join now' : 'Open'} href={`/app/sessions/view?id=${upcoming.id}`} icon={<Video className="size-5" />} />
-    return <NextSession a={upcoming} onOpen={() => router.push(`/app/sessions/view?id=${upcoming.id}`)} />
-  }
-  if (needsFeedback)
-    return <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitendra Khimlani." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} art={<div className="absolute bottom-4 right-4"><MoodImg mood="grateful" size={84} /></div>} />
-  if (blend && any) return null // the "Your blend" card carries the follow-up pre-book (owner 2026-11-18)
-  return <Ctx tone="peri" kicker="Begin gently" title="Your first consultation" body={`A calm, unhurried conversation with Jitendra Khimlani · ₹1,000, your remedy blend included.`} cta="Book" href="/app/book" art={<ConsultInviteArt />} wide />
+    card = mins <= 60
+      ? <Ctx tone="navy" kicker="Starting soon" title={mins > 0 ? `Your session begins in ${mins} min` : 'Your session is live'} body="Find a quiet spot. Jitendra Khimlani will join you." cta={mins <= 10 ? 'Join now' : 'Open'} href={`/app/sessions/view?id=${upcoming.id}`} icon={<Video className="size-5" />} />
+      : <NextSession a={upcoming} />
+  } else if (needsFeedback)
+    card = <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitendra Khimlani." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} art={<div className="absolute bottom-4 right-4"><MoodImg mood="grateful" size={72} /></div>} />
+  return card ? <Item>{card}</Item> : null
 }
 
-const TONES = { peri: 'bg-[linear-gradient(135deg,#ffffff_40%,#e9edfa)]', navy: 'bg-[linear-gradient(135deg,#182957,#3c5596)] text-white', rose: 'bg-[linear-gradient(135deg,#fff_40%,#fbe9ee)]', sage: 'bg-[linear-gradient(135deg,#fff_40%,#e5efe2)]' }
-function Ctx({ tone, kicker, title, body, cta, href, img, icon, wide, art }: { tone: keyof typeof TONES; kicker: string; title: string; body: string; cta: string; href: string; img?: string; icon?: React.ReactNode; wide?: boolean; art?: React.ReactNode }) {
+const TONES = { sky: 'bg-white', navy: 'bg-navy text-white', rose: 'bg-rose-100', teal: 'bg-teal-100' }
+function Ctx({ tone, kicker, title, body, cta, href, icon, art }: { tone: keyof typeof TONES; kicker: string; title: string; body: string; cta: string; href: string; icon?: React.ReactNode; art?: React.ReactNode }) {
   const dark = tone === 'navy'
   return (
-    <section className={`relative overflow-hidden rounded-[28px] p-5 shadow-[var(--shadow-card)] ${TONES[tone]}`}>
-      <div className={wide ? 'pr-[38%]' : 'pr-24'}>
-        <p className={`text-[12px] font-bold uppercase tracking-[0.12em] ${dark ? 'text-white/70' : 'text-peri'}`}>{kicker}</p>
-        <h2 className={`mt-1 text-[20px] font-extrabold leading-tight tracking-[-0.02em] ${dark ? 'text-white' : 'text-navy'}`}>{title}</h2>
-        <p className={`mt-1 text-[14px] leading-5 ${dark ? 'text-white/80' : 'text-muted'}`}>{body}</p>
+    <section className={cx('relative overflow-hidden rounded-[24px] p-5 shadow-[var(--shadow-card)]', TONES[tone])}>
+      <div className={art ? 'pr-24' : ''}>
+        <p className={cx('eyebrow', dark ? 'text-white/75' : 'text-navy')}>{kicker}</p>
+        <h2 className={cx('mt-1 font-display text-[20px] font-semibold leading-[26px]', dark ? 'text-white' : 'text-ink')}>{title}</h2>
+        <p className={cx('mt-1 text-[14px] leading-5', dark ? 'text-white/80' : 'text-ink-2')}>{body}</p>
         <BtnLink href={href} size="sm" variant={dark ? 'white' : 'primary'} className="mt-4">{icon}{cta}<ArrowRight className="size-4" /></BtnLink>
       </div>
       {art}
-      {img && <motion.img src={img} alt="" aria-hidden className={`absolute bottom-0 object-contain ${wide ? 'multiply -right-2 h-[118px]' : 'right-3 h-[108px]'}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, ...spring }} />}
     </section>
   )
 }
 
-function NextSession({ a, onOpen }: { a: Appointment; onOpen: () => void }) {
+function NextSession({ a }: { a: Appointment }) {
   const c = CONSULTATIONS.find((x) => x.id === a.type)!
   return (
-    <section className="card relative overflow-hidden p-5">
-      <h2 className="h-section">Next session</h2>
-      <div className="mt-3 flex items-center gap-4">
-        <SessionDateArt startsAt={a.startsAt} mode={a.mode} />
-        <div className="flex-1">
-          <p className="text-[15px] font-semibold text-navy">{fmtDay(a.startsAt)} · {fmtTime(a.startsAt)}</p>
-          <p className="text-[13px] text-muted">{c.name} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitendra Khimlani</p>
-          <Btn size="sm" className="mt-3 px-6" onClick={onOpen}>View</Btn>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function ProgressCompact() {
-  const journal = useApp((s) => s.journal)
-  const blend = useApp((s) => s.blend)
-  const lines = progressLines(journal, blend?.startedOn)
-  if (!lines.length) return null
-  return (
-    <Link href="/app/remedies#progress" className="card block p-5">
-      <div className="flex items-center justify-between">
-        <h2 className="h-section">Since your blend <span className="text-soft">began</span></h2>
-        <ChevronRight className="size-5 text-soft" />
-      </div>
-      <div className="mt-3 flex items-center gap-3">
-        <MoodImg mood={lines[0].mood} size={44} />
-        <p className="text-[14px] leading-5 text-ink">{lines[0].text}</p>
-      </div>
-      <p className="mt-3 flex items-center gap-1.5 text-[12px] text-muted"><BookOpen className="size-3.5" /> From your journal · not medical advice</p>
+    <Link href={`/app/sessions/view?id=${a.id}`} className="card flex items-center gap-4 p-4">
+      <SessionDateArt startsAt={a.startsAt} mode={a.mode} />
+      <span className="min-w-0 flex-1">
+        <span className="eyebrow text-navy">{tbc(a) ? 'Requested' : 'Next session'}</span>
+        <span className="mt-0.5 block font-display text-[18px] font-semibold leading-6 text-ink">{whenShort(a)}</span>
+        <span className="block text-[13px] text-ink-2">{c.name} · {a.mode === 'online' ? 'Online' : 'In person'}</span>
+      </span>
+      <ChevronRight className="size-5 shrink-0 text-muted" />
     </Link>
   )
 }
 
-/** Goals the client set (CL-31) — shown on Home once there is at least one (owner 2026-11-18). */
+/* ---------------- today's blend ---------------- */
+function TodaysBlend() {
+  const blend = useApp((s) => s.blend)!
+  const appts = useApp((s) => s.appointments)
+  const now = useNow(60_000)
+  const day = Math.min(blend.days, Math.max(1, Math.floor((now - +new Date(blend.startedOn)) / 86_400_000) + 1))
+  return (
+    <section className="card p-5" aria-labelledby="blend-h">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 id="blend-h" className="h-section">Today’s blend</h2>
+          <p className="mt-0.5 text-[14px] text-ink-2"><span className="tnum">Day {day} of {blend.days}</span> · {blend.drops} drops, {blend.timesPerDay}× a day</p>
+        </div>
+        <Link href="/app/remedies" className="-mr-2 inline-flex min-h-11 items-center gap-0.5 rounded-full px-2 text-[14px] font-semibold text-navy">Care<ChevronRight className="size-4" /></Link>
+      </div>
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-sky-100" role="progressbar" aria-label="Blend progress" aria-valuemin={1} aria-valuemax={blend.days} aria-valuenow={day}>
+        <motion.div className="h-full rounded-full bg-blue" initial={{ width: 0 }} animate={{ width: `${(day / blend.days) * 100}%` }} transition={{ duration: 0.9, ease }} />
+      </div>
+      <div className="no-scrollbar -mx-5 mt-4 flex gap-3 overflow-x-auto px-5 pb-1">
+        {blend.flowers.map((f) => <FlowerTile key={f} name={f} size={84} className="shrink-0" />)}
+      </div>
+      <div className="mt-4"><DoseTracker /></div>
+    </section>
+  )
+}
+
+/* ---------------- goals: daily check-in (owner 2026-11-18) ---------------- */
 function GoalsCard() {
   const goals = useApp((s) => s.goals)
   if (!goals.length) return null
@@ -229,5 +348,68 @@ function GoalsCard() {
         </ul>
       </section>
     </Item>
+  )
+}
+
+/* ---------------- shop row ---------------- */
+const SHOP_PICKS = ['sleep-roll-on', 'aura-spray', 'rescue-remedy', 'abundance-bath-salt']
+function ShopRow() {
+  const picks = SHOP_PICKS.map((s) => PRODUCTS.find((p) => p.slug === s)).filter((p): p is (typeof PRODUCTS)[number] => !!p)
+  return (
+    <section aria-labelledby="shop-h">
+      <div className="flex items-end justify-between">
+        <h2 id="shop-h" className="h-section">Gentle rituals</h2>
+        <Link href="/app/shop" className="-mr-2 inline-flex min-h-11 items-center gap-0.5 rounded-full px-2 text-[14px] font-semibold text-navy">Shop<ChevronRight className="size-4" /></Link>
+      </div>
+      <div className="no-scrollbar -mx-5 mt-3 flex gap-3 overflow-x-auto px-5 pb-2">
+        {picks.map((p, i) => <ProductCard key={p.slug} p={p} i={i} wide />)}
+      </div>
+    </section>
+  )
+}
+
+/* ---------------- journal · goals · ask ---------------- */
+function YourSpace() {
+  const journal = useApp((s) => s.journal.length)
+  const goals = useApp((s) => s.goals.length)
+  const tiles = [
+    { href: '/app/journal', t: 'Journal', d: journal ? `${journal} entries` : 'Your feelings', icon: <BookHeart className="size-[22px]" strokeWidth={1.75} />, tint: 'bg-lilac-100' },
+    { href: '/app/goals', t: 'Goals', d: goals ? `${goals} active` : 'Small steps', icon: <Target className="size-[22px]" strokeWidth={1.75} />, tint: 'bg-teal-100' },
+    { href: '/app/ask', t: 'Ask BeWise', d: 'Your companion', icon: <MessageCircleHeart className="size-[22px]" strokeWidth={1.75} />, tint: 'bg-marigold-100' },
+  ]
+  return (
+    <section aria-label="Your space" className="grid grid-cols-3 gap-3">
+      {tiles.map((t) => (
+        <Link key={t.href} href={t.href} className="card flex flex-col items-start gap-3 p-4">
+          <span className={cx('grid size-11 place-items-center rounded-full text-ink', t.tint)}>{t.icon}</span>
+          <span><span className="block font-display text-[16px] font-semibold leading-5 text-ink">{t.t}</span><span className="block text-[12px] text-ink-2">{t.d}</span></span>
+        </Link>
+      ))}
+    </section>
+  )
+}
+
+/* ---------------- floating Book pill ---------------- */
+function BookPill() {
+  const shown = useNavShown()
+  const appts = useApp((s) => s.appointments)
+  const hasBlend = useApp((s) => !!s.blend)
+  const now = useNow()
+  const busy = appts.some((a) => isUpcoming(a, now))
+  if (busy) return null
+  const follow = hasBlend || appts.length > 0
+  const c = CONSULTATIONS.find((x) => x.id === (follow ? 'followup' : 'first'))!
+  return (
+    <AnimatePresence>
+      {shown && (
+        <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: 0.28, ease, delay: 0.3 }}
+          className="pointer-events-none fixed inset-x-0 z-30 mx-auto max-w-[480px] px-5" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 76px)' }}>
+          <Link href={`/app/book${follow ? '?type=followup' : ''}`} onClick={() => buzz()}
+            className="pointer-events-auto flex h-[60px] items-center justify-center gap-2 rounded-full bg-navy px-6 font-display text-[17px] font-semibold text-white shadow-[var(--shadow-float)] transition-colors hover:bg-navy-2">
+            {follow ? 'Book a follow-up' : 'Book your consultation'} <span className="text-white/60" aria-hidden>·</span> <span className="font-sans text-[16px] font-semibold tnum">{formatINR(c.feePaise)}</span> <ArrowRight className="size-5" />
+          </Link>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
