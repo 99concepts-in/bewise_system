@@ -42,8 +42,8 @@ export default function ProductPage() {
       <motion.section initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, ease }} className="relative mt-1 overflow-hidden rounded-[32px] shadow-[var(--shadow-card)]">
         <div ref={art}><ProductArt product={p} size="lg" className="h-[360px] rounded-[32px]" /></div>
         <div className="absolute left-6 top-6 max-w-[52%]">
-          <h1 className="text-[32px] font-extrabold leading-[1.05] tracking-[-0.03em] text-navy">{title.split(' ')[0]} <span className="text-soft">{title.split(' ').slice(1).join(' ')}</span></h1>
-          <p className="mt-2 text-[14px] leading-5 text-muted">{p.tagline}.</p>
+          <h1 className="font-display text-[30px] font-semibold leading-[34px] text-ink">{title.split(' ')[0]}<br /><em className="font-medium text-navy">{title.split(' ').slice(1).join(' ')}</em></h1>
+          <p className="mt-2 text-[14px] leading-5 text-ink-2">{p.tagline}.</p>
         </div>
       </motion.section>
 

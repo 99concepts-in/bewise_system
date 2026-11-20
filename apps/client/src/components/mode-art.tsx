@@ -4,15 +4,17 @@
  * @owner    CLIENT
  * @screens  CL-13 Online or in person — custom art (owner 2026-11-18: replace flat clip-art with something premium)
  * Purpose:  Code-drawn illustrations (crisp at any size, theme-aware on the selected navy card):
+ *           v5 (HUB 2026-11-20): flower accents use the real Bach vectors.
  *           OnlineArt = tilted phone with Jitu Bhaiya on a video call · InPersonArt = soft map tile of Alkapuri with a pulsing pin.
  */
 import { motion } from 'motion/react'
 import { BP } from '@/lib/asset'
+import { FlowerArt } from './flower'
 
 export function OnlineArt({ on }: { on: boolean }) {
   return (
     <div className="pointer-events-none absolute -right-2 top-[8px] h-[156px] w-[150px]" aria-hidden>
-      <motion.img src={`${BP}/img/f-mimulus.webp`} alt="" className="absolute -right-3 top-0 h-[92px] opacity-90" animate={{ rotate: [0, 4, 0] }} transition={{ duration: 6, repeat: Infinity }} />
+      <motion.div className="absolute -right-3 top-0" animate={{ rotate: [0, 4, 0] }} transition={{ duration: 6, repeat: Infinity }}><FlowerArt name="Mimulus" decorative className="h-[92px] w-[92px]" /></motion.div>
       <motion.div className="absolute bottom-1 left-6 h-[148px] w-[84px] overflow-hidden rounded-[20px] bg-white p-[5px] shadow-[0_18px_30px_rgba(23,33,74,.28)]"
         style={{ rotate: -8 }} animate={{ y: [0, -5, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
         <div className="relative h-full w-full overflow-hidden rounded-[15px] bg-[#e9edf8]">
@@ -58,7 +60,7 @@ export function InPersonArt({ on }: { on: boolean }) {
           <circle cx="12" cy="11.5" r="4.6" fill={on ? '#243D91' : '#ffffff'} />
         </motion.svg>
       </div>
-      <img src={`${BP}/img/f-rose.webp`} alt="" className="absolute -bottom-3 left-1 h-[50px] opacity-95" />
+      <FlowerArt name="Wild Rose" decorative className="absolute -bottom-3 left-1 h-[54px] w-[54px]" />
     </div>
   )
 }

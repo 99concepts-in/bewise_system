@@ -7,6 +7,7 @@
  */
 import { motion } from 'motion/react'
 import { BP } from '@/lib/asset'
+import { FlowerArt } from './flower'
 
 /** Tilted calendar tile with the session date, Jitu Bhaiya's photo badge and a mode marker. */
 export function SessionDateArt({ startsAt, mode }: { startsAt: string; mode: 'online' | 'in_person' }) {
@@ -42,7 +43,7 @@ export function ConsultInviteArt() {
       <div className="absolute right-3 top-2 size-[96px] overflow-hidden rounded-full bg-white p-1 shadow-[0_14px_26px_rgba(23,33,74,.2)]">
         <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="h-full w-full rounded-full object-cover object-[50%_18%]" />
       </div>
-      <motion.img src={`${BP}/img/f-rose.webp`} alt="" className="absolute -bottom-1 left-0 h-[50px]" animate={{ rotate: [0, 6, 0] }} transition={{ duration: 6, repeat: Infinity }} />
+      <motion.div className="absolute -bottom-1 left-0" animate={{ rotate: [0, 6, 0] }} transition={{ duration: 6, repeat: Infinity }}><FlowerArt name="Wild Rose" decorative className="h-[54px] w-[54px]" /></motion.div>
     </div>
   )
 }
