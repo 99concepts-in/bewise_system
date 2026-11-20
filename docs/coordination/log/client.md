@@ -2,6 +2,10 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-20 · Session feedback simplified
+- "How was your session?" now has only the faces and the quick tags (Felt heard, Clear guidance, ...), then an optional "Add a comment". The "How do you feel after the session?" benefit chips were removed on the owner's request; `feedback.benefits` is still sent (kept from earlier feedback, otherwise empty) so the consultant view keeps working.
+- Faces are grey until one is picked; only the picked face shows in colour.
+
 ## 2026-11-20 · Welcome copy, studio renamed to center, Home feeling card
 - Welcome slides 1 and 2 use the owner's new copy: "Get Started" on slide 1, "I already have an account" at the bottom; slide 2 "Meet Jitendra Khimlani · Your Bach Flower Therapist" with a "Personal guidance, just for you." kicker (duplicate title chip on the photo removed). Kept "Jitendra Khimlani" instead of "Jitu Bhaiya", per the earlier rename-everywhere rule.
 - "studio" renamed to "center" in all visible text: client (FAQ, checkout pickup, data), website, consultant and manager apps, and API messages. Identifiers and the `studio` settings key are unchanged.

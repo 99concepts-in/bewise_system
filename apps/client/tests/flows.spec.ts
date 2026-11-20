@@ -19,14 +19,17 @@ test('dose check-ins: dots light up, streak, 25-day calendar with past days', as
   expect(Object.values(s.doses).filter((n) => n === 4).length).toBeGreaterThanOrEqual(2)
 })
 
-test('feedback sends benefits[]', async ({ page }) => {
+test('feedback: face, quick tag, optional comment', async ({ page }) => {
   await seed(page)
   await page.goto('/app/sessions/view?id=a1&feedback=1')
+  await expect(page.getByText('How do you feel after the session?')).toHaveCount(0)
   await page.getByRole('button', { name: '5 of 5' }).click()
-  await page.getByRole('checkbox', { name: 'Calmer' }).click(); await page.getByRole('checkbox', { name: 'Sleeping better' }).click()
+  await page.getByRole('checkbox', { name: 'Felt heard' }).click()
+  await page.getByRole('button', { name: 'Add a comment' }).click()
+  await page.getByLabel('Your comment').fill('Thank you')
   await page.getByRole('button', { name: 'Send to Jitendra Khimlani' }).click()
-  const s = await state(page)
-  expect(s.appointments.find((a: { id: string }) => a.id === 'a1').feedback.benefits).toEqual(['Calmer', 'Sleeping better'])
+  const fb = (await state(page)).appointments.find((a: { id: string }) => a.id === 'a1').feedback
+  expect(fb).toMatchObject({ rating: 5, tags: ['Felt heard'], notes: 'Thank you' })
 })
 
 test('public booking link: new visitor → landing → sign-in; signed-in → booking with type', async ({ page }) => {

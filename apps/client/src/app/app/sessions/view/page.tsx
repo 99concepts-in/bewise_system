@@ -6,12 +6,12 @@
  */
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { CalendarPlus, Check, Clock, Droplets, FileText, Headphones, Laptop, MapPin, Sun, Video, Phone } from 'lucide-react'
+import { CalendarPlus, Check, Clock, Plus, Droplets, FileText, Headphones, Laptop, MapPin, Sun, Video, Phone } from 'lucide-react'
 import { Suspense, useEffect, useState } from 'react'
 import { Mascot, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
 import { Btn, Chip, Sheet, buzz, cx, ease, spring, toast, useNow } from '@/components/ui'
-import { BENEFITS, CONSULTATIONS, STUDIO, istDate, slotsFor, type Emotion } from '@/lib/data'
+import { CONSULTATIONS, STUDIO, istDate, slotsFor, type Emotion } from '@/lib/data'
 import { HELPLINE } from '@/lib/offer'
 import { useApp } from '@/lib/store'
 import { addDays, fmtDay, fmtLongDay, fmtTime, formatINR, startOfDay, fmtIso } from '@/lib/format'
@@ -168,8 +168,8 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
   const give = useApp((s) => s.giveFeedback)
   const [rating, setRating] = useState(existing?.rating ?? 0)
   const [tags, setTags] = useState<string[]>(existing?.tags ?? [])
-  const [benefits, setBenefits] = useState<string[]>(existing?.benefits ?? [])
   const [notes, setNotes] = useState(existing?.notes ?? '')
+  const [comment, setComment] = useState(!!existing?.notes)
   const [sent, setSent] = useState(false)
   useEffect(() => { if (open) setSent(false) }, [open])
   return (
@@ -188,19 +188,23 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
             <div className="mt-5 flex justify-between">
               {RATING.map((m, i) => (
                 <motion.button key={m} whileTap={{ scale: 0.85 }} aria-label={`${i + 1} of 5`} aria-pressed={rating === i + 1} onClick={() => { buzz(8); setRating(i + 1) }}
-                  animate={{ scale: rating === i + 1 ? 1.15 : rating ? 0.9 : 1, opacity: rating && rating !== i + 1 ? 0.5 : 1 }} transition={spring}>
+                  animate={{ scale: rating === i + 1 ? 1.15 : 0.94, filter: rating === i + 1 ? 'grayscale(0)' : 'grayscale(1)', opacity: rating === i + 1 ? 1 : 0.55 }} transition={spring}>
                   <MoodImg mood={m} size={54} />
                 </motion.button>
               ))}
             </div>
             <div className="mt-5 flex flex-wrap gap-2">{TAGS.map((t) => <Chip key={t} on={tags.includes(t)} onClick={() => setTags(tags.includes(t) ? tags.filter((x) => x !== t) : [...tags, t])}>{t}</Chip>)}</div>
-            <p className="mt-6 text-[15px] font-bold text-navy">How do you feel after the session?</p>
-            <p className="text-[13px] text-muted">Pick any that fit, in your own words.</p>
-            <div className="mt-3 flex flex-wrap gap-2">{BENEFITS.map((b) => <Chip key={b} on={benefits.includes(b)} onClick={() => setBenefits(benefits.includes(b) ? benefits.filter((x) => x !== b) : [...benefits, b])}>{b}</Chip>)}</div>
-            <label className="mt-6 block text-[15px] font-bold text-navy" htmlFor="fbnotes">Notes for Jitendra Khimlani</label>
-            <textarea id="fbnotes" rows={3} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder="Anything you’d like him to know…" className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] outline-none focus:ring-2 focus:ring-blue" />
+            {/* owner 2026-11-20: faces + quick tags only, then an optional comment */}
+            {comment ? (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                <label className="mt-6 block text-[15px] font-bold text-navy" htmlFor="fbnotes">Your comment</label>
+                <textarea id="fbnotes" rows={3} autoFocus={!notes} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder="Anything you’d like Jitendra Khimlani to know…" className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] outline-none focus:ring-2 focus:ring-blue" />
+              </motion.div>
+            ) : (
+              <button type="button" onClick={() => setComment(true)} className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-peri-50 px-4 py-2.5 text-[14px] font-semibold text-navy"><Plus className="size-4" /> Add a comment</button>
+            )}
             <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-muted"><Check className="size-3.5" /> Visible only to your consultant</p>
-            <Btn full className="mt-5" disabled={!rating} onClick={() => { give(id, { rating, tags, notes, benefits }); setSent(true); buzz(20) }}>Send to Jitendra Khimlani</Btn>
+            <Btn full className="mt-5" disabled={!rating} onClick={() => { give(id, { rating, tags, notes: comment ? notes : '', benefits: existing?.benefits ?? [] }); setSent(true); buzz(20) }}>Send to Jitendra Khimlani</Btn>
           </motion.div>
         )}
       </AnimatePresence>
