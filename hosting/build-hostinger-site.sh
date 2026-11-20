@@ -3,7 +3,7 @@
 #
 #   yourdomain/             landing page (links to every app)
 #   yourdomain/client/      client app        (apps/client, Next.js static export)
-#   yourdomain/consultant/  Jitu Bhaiya's app (prototypes/consultant-app)
+#   yourdomain/consultant/  Jitendra Khimlani's app (prototypes/consultant-app)
 #   yourdomain/manager/     Haresh's app      (prototypes/manager)
 #   yourdomain/owner/       owner app         (docs/specs/owner/prototype)
 #   yourdomain/api/         backend API (PHP + MySQL) · one-time setup at /api/install.php

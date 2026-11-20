@@ -28,7 +28,7 @@ export default function Sessions() {
           <div className="card flex flex-col items-center p-8 text-center">
             <Mascot pose="sleep" height={120} />
             <p className="mt-3 text-[16px] font-bold text-navy">{tab === 'up' ? 'Nothing booked yet' : 'No past sessions'}</p>
-            <p className="mt-1 text-[14px] text-muted">{tab === 'up' ? 'When you’re ready, Jitu Bhaiya is here.' : 'Your session history will appear here.'}</p>
+            <p className="mt-1 text-[14px] text-muted">{tab === 'up' ? 'When you’re ready, Jitendra Khimlani is here.' : 'Your session history will appear here.'}</p>
             {tab === 'up' && <BtnLink href="/app/book" size="md" className="mt-5">Book a session</BtnLink>}
           </div>
         ) : list.map((a, i) => {

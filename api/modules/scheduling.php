@@ -227,7 +227,7 @@ function scheduling_ics_feed(string $token): string
     $out = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//BeWise//Appointments//EN", "X-WR-CALNAME:BeWise", "CALSCALE:GREGORIAN"];
     foreach ($rows as $a) {
         if (!$a['starts_at']) continue;
-        $title = $isConsultant ? 'BeWise · ' . ($a['cname'] ?: 'Client') : 'BeWise consultation with Jitu Bhaiya';
+        $title = $isConsultant ? 'BeWise · ' . ($a['cname'] ?: 'Client') : 'BeWise consultation with Jitendra Khimlani';
         $out[] = 'BEGIN:VEVENT';
         $out[] = 'UID:' . $a['id'] . '@bewise';
         $out[] = 'DTSTAMP:' . gmdate('Ymd\THis\Z');
@@ -420,7 +420,7 @@ return [
         update('appointments', ['status' => 'completed', 'completed_at' => now_utc()], 'id = ?', [$a['id']]);
         scheduling_history($a['id'], 'completed');
         Events::emit('appointment.completed', ['appointmentId' => $a['id']]);
-        notify(['clientId' => $a['client_id']], 'How do you feel after your session?', 'Share a quick note for Jitu Bhaiya — it helps him prepare next time.', '/client/app/appointments');
+        notify(['clientId' => $a['client_id']], 'How do you feel after your session?', 'Share a quick note for Jitendra Khimlani — it helps him prepare next time.', '/client/app/appointments');
         return scheduling_view(one('SELECT * FROM appointments WHERE id = ?', [$a['id']]));
     },
 

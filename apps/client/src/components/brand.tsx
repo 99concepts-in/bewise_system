@@ -27,7 +27,7 @@ export function LogoMark({ size = 40, white, label }: { size?: number; white?: b
 export function Logo({ white, height = 32, className }: { white?: boolean; height?: number; compact?: boolean; className?: string }) {
   return <img src={kitSrc('horizontal', white)} height={height} width={Math.round(height * KIT.horizontal)} style={{ height, width: 'auto' }} alt="BeWise · Holistic Wellness" className={cx('shrink-0 select-none', className)} draggable={false} />
 }
-/** Stacked lock-up for splash, welcome and the Jitu Bhaiya story. */
+/** Stacked lock-up for splash, welcome and the Jitendra Khimlani story. */
 export function LogoStacked({ white, height = 96, className }: { white?: boolean; height?: number; className?: string }) {
   return <img src={kitSrc('stacked', white)} height={height} width={Math.round(height * KIT.stacked)} style={{ height, width: 'auto' }} alt="BeWise · Holistic Wellness" className={cx('shrink-0 select-none', className)} draggable={false} />
 }

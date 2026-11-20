@@ -1,7 +1,7 @@
 {
   "name": "BeWise Consultant",
   "short_name": "BeWise",
-  "description": "Jitu Bhaiya's consultant workspace",
+  "description": "Jitendra Khimlani's consultant workspace",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

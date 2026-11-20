@@ -52,7 +52,7 @@ WCAG 2.1 AA · 44 px targets · focus ring 2 px navy + 2 px ivory offset · `pre
 
 ## 6. Copy voice (enforced in review)
 
-Warm, plain, short. **No** cure/medical claims ("heals", "treats", "therapeutic", "clinically proven"), **no refund wording** (D-16) except "Sessions are non-refundable". Practitioner is **"Jitu Bhaiya"**, title **"Bach Remedy Therapist"** (board QA note — boards say "Holistic Wellness Consultant", don't copy). Fees: **First consultation ₹1,000 · Follow-up ₹800, both include your remedy blend** (D-09/D-02) — boards showing ₹2,500 are illustrative only.
+Warm, plain, short. **No** cure/medical claims ("heals", "treats", "therapeutic", "clinically proven"), **no refund wording** (D-16) except "Sessions are non-refundable". Practitioner is **"Jitendra Khimlani"**, title **"Bach Remedy Therapist"** (board QA note — boards say "Holistic Wellness Consultant", don't copy). Fees: **First consultation ₹1,000 · Follow-up ₹800, both include your remedy blend** (D-09/D-02) — boards showing ₹2,500 are illustrative only.
 
 ## 7. Drafts & local storage
 

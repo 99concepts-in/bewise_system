@@ -50,7 +50,7 @@ function CheckinLink() {
               <div className="flex flex-col items-center pt-12 text-center">
                 <Mascot pose="bottle" height={220} priority />
                 <h1 className="h-duo mt-6 text-[32px]">Thank <em>you</em></h1>
-                <p className="mt-2 max-w-[300px] text-[15px] leading-6 text-muted">Jitu Bhaiya will see how you’ve been before you meet.</p>
+                <p className="mt-2 max-w-[300px] text-[15px] leading-6 text-muted">Jitendra Khimlani will see how you’ve been before you meet.</p>
               </div>
             )}
           </motion.div>
@@ -58,7 +58,7 @@ function CheckinLink() {
       </div>
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
         {step < 2 && <Btn full variant="gradient" onClick={() => setStep(step + 1)}>Continue</Btn>}
-        {step === 2 && <Btn full variant="gradient" onClick={finish}>Send to Jitu Bhaiya</Btn>}
+        {step === 2 && <Btn full variant="gradient" onClick={finish}>Send to Jitendra Khimlani</Btn>}
         {step === 3 && <Btn full onClick={() => router.replace(appt ? `/app/sessions/view?id=${appt.id}` : '/app')}>{appt ? 'View my session' : 'Back to home'}</Btn>}
       </div>
     </main>

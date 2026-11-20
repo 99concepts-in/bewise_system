@@ -8,11 +8,11 @@ import { HELPLINE, waLink } from '@/lib/offer'
 import { SafetyCard } from '../book/intake'
 
 const FAQ = [
-  ['What happens in a consultation?', 'A calm, private conversation with Jitu Bhaiya about how you’ve been feeling. Afterwards he prepares your personal blend of Bach flower essences, included in the fee.'],
+  ['What happens in a consultation?', 'A calm, private conversation with Jitendra Khimlani about how you’ve been feeling. Afterwards he prepares your personal blend of Bach flower essences, included in the fee.'],
   ['How much does it cost?', 'First consultation ₹1,000 · Follow-up ₹800. Both include your remedy blend. Reorders of the same blend are charged separately.'],
   ['Can I cancel?', 'Sessions are non-refundable, but you can reschedule, free up to 24 hours before; within 24 hours you can move it once. A missed session can’t be moved.'],
   ['My product arrived damaged', 'We’re sorry! Go to My orders → Request a replacement and add a photo. We don’t offer returns for change of mind.'],
-  ['Is my information private?', 'Yes. Only Jitu Bhaiya sees your answers and journal. Our office team sees only what’s needed to prepare and ship your order. You can download or delete your data anytime in Me → Privacy & data.'],
+  ['Is my information private?', 'Yes. Only Jitendra Khimlani sees your answers and journal. Our office team sees only what’s needed to prepare and ship your order. You can download or delete your data anytime in Me → Privacy & data.'],
   ['Are Bach remedies medicine?', 'No. They’re a gentle, complementary wellness practice for emotional balance, not a substitute for your doctor. Please don’t stop any medicine without medical advice.'],
 ]
 const POLICIES = [

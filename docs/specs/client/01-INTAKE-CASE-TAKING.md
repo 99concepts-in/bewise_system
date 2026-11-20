@@ -5,7 +5,7 @@
 > **CN-33…CN-36** (consultant chat). Design language: v2 Quiet Luxury.
 
 ## 1. Why
-Jitu Bhaiya needs a proper case before he meets someone: what is troubling them emotionally, how it shows up in the body,
+Jitendra Khimlani needs a proper case before he meets someone: what is troubling them emotionally, how it shows up in the body,
 sleep/energy, life context, safety factors, and what they want to feel instead. The client fills it once (≈5 min) before
 their first booking; follow-ups get a 2-minute "Since we last met" check-in. An AI model turns the answers into a short,
 verifiable case summary for him and a transparent list of **flowers to consider** (his judgement decides; client never sees).
@@ -36,15 +36,15 @@ UPDATE          Client can edit intake answers until 2 h before the session (App
 | 8 | IN-09 | One gentle question | single | "Lately, have you had thoughts of harming yourself, or that life isn't worth living?" No · Sometimes · Often → **§6 safety protocol** |
 | 8 | IN-10 | How would you like to feel? | multi chips + text | Calm · Confident · Rested · Clear-minded · Hopeful · Connected · Patient · Lighter · Free · Focused |
 | — | IN-11 | Review & consent | summary + toggles | Edit per section; "Share with my consultant" (required); "Let AI prepare a private summary for my consultant" (default on, can turn off) |
-| — | IN-11b | Saved → continue booking | info | "Jitu Bhaiya will read this before you meet." |
+| — | IN-11b | Saved → continue booking | info | "Jitendra Khimlani will read this before you meet." |
 
 **Follow-up check-in (IN-12):** (a) overall now (5 owl faces) · (b) each feeling from last time → Better / Same / Harder + "Something new" · (c) anything new (text/voice) + "Took my drops": Every day / Most days / Sometimes / Rarely.
 
 ## 4. Nuance statements → Bach flower mapping (reference for the consultant)
 
-Shown to the client as plain statements; each maps to the flower(s) Dr Bach described for that state. Jitu Bhaiya may edit wording and mapping (`intake_mapping` table, versioned).
+Shown to the client as plain statements; each maps to the flower(s) Dr Bach described for that state. Jitendra Khimlani may edit wording and mapping (`intake_mapping` table, versioned).
 
-> ✅ **Owner decision 2026-11-17:** "Flowers to consider" stays — **visible to Jitu Bhaiya only**. ⏳ **Jitu Bhaiya to review and approve every statement and flower below before launch** (CONTENT-CHECKLIST #4b). Build the mapping as editable data so his changes need no code.
+> ✅ **Owner decision 2026-11-17:** "Flowers to consider" stays — **visible to Jitendra Khimlani only**. ⏳ **Jitendra Khimlani to review and approve every statement and flower below before launch** (CONTENT-CHECKLIST #4b). Build the mapping as editable data so his changes need no code.
 
 | Feeling chip | Client statement ("which feels closest?") | Flower(s) |
 |---|---|---|
@@ -98,8 +98,8 @@ Shown to the client as plain statements; each maps to the flower(s) Dr Bach desc
 
 ## 6. Safety protocol (IN-09)
 - **No:** continue. **Sometimes / Often:** immediately show the support card (Tele-MANAS **14416**, free, 24×7 — *verify number before launch*), plus "If you are in immediate danger call **112**"; client can continue booking.
-- Creates a **priority flag for Jitu Bhaiya only** (push notification + rose banner on session prep) — owner decision 2026-11-17: nobody else is alerted. The answer is visible only to him.
-- Wording reviewed and approved by Jitu Bhaiya before launch (D-38).
+- Creates a **priority flag for Jitendra Khimlani only** (push notification + rose banner on session prep) — owner decision 2026-11-17: nobody else is alerted. The answer is visible only to him.
+- Wording reviewed and approved by Jitendra Khimlani before launch (D-38).
 
 ## 7. Cross-module effects
 | Data | Used by |

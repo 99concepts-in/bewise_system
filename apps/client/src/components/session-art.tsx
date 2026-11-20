@@ -9,7 +9,7 @@ import { motion } from 'motion/react'
 import { BP } from '@/lib/asset'
 import { FlowerArt } from './flower'
 
-/** Tilted calendar tile with the session date, Jitu Bhaiya's photo badge and a mode marker. */
+/** Tilted calendar tile with the session date, Jitendra Khimlani's photo badge and a mode marker. */
 export function SessionDateArt({ startsAt, mode }: { startsAt: string; mode: 'online' | 'in_person' }) {
   const d = new Date(startsAt)
   const month = d.toLocaleDateString('en-IN', { month: 'short', timeZone: 'Asia/Kolkata' }).toUpperCase()
@@ -35,7 +35,7 @@ export function SessionDateArt({ startsAt, mode }: { startsAt: string; mode: 'on
   )
 }
 
-/** Jitu Bhaiya in a soft ring with a flower accent — for the "first consultation" invitation. */
+/** Jitendra Khimlani in a soft ring with a flower accent — for the "first consultation" invitation. */
 export function ConsultInviteArt() {
   return (
     <div className="pointer-events-none absolute bottom-3 right-3 h-[124px] w-[120px]" aria-hidden>

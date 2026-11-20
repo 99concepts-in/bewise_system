@@ -53,7 +53,7 @@ export default function Profile({ id }: { id: string }) {
         </m.div>
       </div>
       <div className="pf-actions">
-        <a className="btn btn-quiet" href={waLink(p.phone, `Namaste ${p.first}, this is Jitu Bhaiya from BeWise. `)} target="_blank" rel="noreferrer"><MessageCircle size={18} aria-hidden /> WhatsApp</a>
+        <a className="btn btn-quiet" href={waLink(p.phone, `Namaste ${p.first}, this is Jitendra Khimlani from BeWise. `)} target="_blank" rel="noreferrer"><MessageCircle size={18} aria-hidden /> WhatsApp</a>
         <a className="btn btn-quiet" href={`tel:${p.phone.replace(/\s/g, '')}`}><Phone size={18} aria-hidden /> Call</a>
         <button className="btn btn-primary" onClick={() => sheets.express(p.id)}><CalendarPlus size={18} aria-hidden /> Book</button>
       </div>

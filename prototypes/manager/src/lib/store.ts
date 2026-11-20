@@ -57,7 +57,7 @@ interface Actions {
   receivePO: (id: string, received: Record<string, number>, billPaise: number) => void
   createPO: (stockId: string) => string
 
-  /** scheduling.checkInAppointment() — shared with Jitu Bhaiya's Today: confirmed → checked_in */
+  /** scheduling.checkInAppointment() — shared with Jitendra Khimlani's Today: confirmed → checked_in */
   checkIn: (apptId: string) => void
   /** crm.findClientByPhone() — duplicate check */
   findClientByPhone: (phone: string) => Client | undefined

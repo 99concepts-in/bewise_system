@@ -132,7 +132,7 @@ return [
         insert('case_summaries', ['id' => uuid(), 'intake_id' => $row['id'], 'client_id' => $cid, 'summary_enc' => seal(intake_rules_summary($answers, $flags, $name)), 'source' => 'rules']);
         Events::emit('intake.submitted', ['intakeId' => $row['id'], 'clientId' => $cid, 'appointmentId' => $row['appointment_id']]);
         foreach ($flags as $f) if ($f['flag'] === 'safety') {
-            // D-38: alert to Jitu Bhaiya ONLY — never manager / owner. Client already saw Tele-MANAS 14416 / 112 in the app.
+            // D-38: alert to Jitendra Khimlani ONLY — never manager / owner. Client already saw Tele-MANAS 14416 / 112 in the app.
             Events::emit('intake.safety_flagged', ['clientId' => $cid, 'level' => $f['level']]);
             foreach (all("SELECT u.id FROM users u JOIN user_roles r ON r.user_id = u.id AND r.role = 'consultant' WHERE u.status = 'active'") as $c) {
                 wa_staff('consultant', 'Please check in personally with ' . ($name ?: 'a client') . ' — they answered "' . ucfirst($f['level']) . '" to the safety question in their intake. Details in your app.', $c['id']);

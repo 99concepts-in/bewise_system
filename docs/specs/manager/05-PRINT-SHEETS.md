@@ -51,7 +51,7 @@ Priya — 4 drops, 4 times a day       ← label text from prep sheet (max 2 lin
 Bach flower blend · 30 ml   [AF]     ← AF only when alcohol-free
 Prepared 21 Nov 2026 · Use within 3 months · FT-00042-1
 ```
-"Use within" = setting `remedy.use_within_months` (default 3, `@decision`; Jitu Bhaiya to confirm). Remedy names are **not** printed on the label unless the consultant's label text includes them.
+"Use within" = setting `remedy.use_within_months` (default 3, `@decision`; Jitendra Khimlani to confirm). Remedy names are **not** printed on the label unless the consultant's label text includes them.
 
 ## 3. Production batch sheet (A4 portrait) — MG-20
 Visible/printable only with permission `manufacturing.formula.view` 🔒. Watermark "CONFIDENTIAL — BeWise formula".

@@ -5,7 +5,7 @@
  * @screens  CL-08 Home (spec docs/specs/client/CL-08-home.md) · CL-56 progress (compact)
  * v5 (HUB 2026-11-20): Blue Bloom Home (DESIGN-SYSTEM §7) — greeting + "How are you feeling today?" as 6 colourful feeling
  *   circles (logs a journal mood, petal burst, one gentle line) → one actionable card when something needs the client
- *   (pay / resume answers / next session / feedback) → "Meet Jitu Bhaiya" (opens the full-screen story) → today's blend →
+ *   (pay / resume answers / next session / feedback) → "Meet Jitendra Khimlani" (opens the full-screen story) → today's blend →
  *   shop row → journal · goals · Ask BeWise tiles. Floating "Book" pill above the tab bar. Kept uncluttered: the v4 goals
  *   card, daily insight and progress moved to Journal / Goals / Care (all still one tap away).
  */
@@ -152,17 +152,17 @@ function PetalBurst({ color }: { color: string }) {
   )
 }
 
-/* ---------------- Meet Jitu Bhaiya ---------------- */
+/* ---------------- Meet Jitendra Khimlani ---------------- */
 function MeetCard({ open, onOpen }: { open: boolean; onOpen: () => void }) {
   return (
-    <button onClick={onOpen} aria-label="Meet Jitu Bhaiya, your consultant" aria-haspopup="dialog"
+    <button onClick={onOpen} aria-label="Meet Jitendra Khimlani, your consultant" aria-haspopup="dialog"
       className="relative flex w-full items-center gap-4 overflow-hidden rounded-[28px] bg-sky-100 p-3 pr-4 text-left transition-transform active:scale-[0.99]">
       <span className="relative h-[116px] w-[92px] shrink-0">
         {!open && <JituPortrait className="h-full w-full ring-[3px] ring-white" radius="999px 999px 18px 18px" />}
       </span>
       <span className="min-w-0 flex-1">
         <span className="eyebrow text-navy">Your consultant</span>
-        <span className="mt-1 block font-display text-[22px] font-semibold leading-7 text-ink">Meet Jitu Bhaiya</span>
+        <span className="mt-1 block font-display text-[22px] font-semibold leading-7 text-ink">Meet Jitendra Khimlani</span>
         <span className="mt-0.5 block text-[14px] leading-5 text-ink-2">{CONSULTANT.title} · 12+ years</span>
         <span className="mt-2 inline-flex items-center gap-1 text-[14px] font-semibold text-navy">Hear his story <ArrowRight className="size-4" /></span>
       </span>
@@ -189,18 +189,18 @@ function ContextCard() {
   const toPay = appts.find((x) => x.needsNewTime || ((x.status === 'awaiting_payment' || x.status === 'expired') && !x.paidAt))
   let card: React.ReactNode = null
   if (toPay?.needsNewTime)
-    card = <Ctx tone="teal" kicker={toPay.payLater ? 'Almost booked' : 'Payment received'} title={toPay.status === 'expired' ? 'Pick a new time' : 'Choose your preferred time'} body={toPay.status === 'expired' ? 'The held time was released before your payment arrived. Choose any time at no extra cost.' : 'Pick a time that suits you. Jitu Bhaiya or Haresh bhai will confirm it.'} cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
+    card = <Ctx tone="teal" kicker={toPay.payLater ? 'Almost booked' : 'Payment received'} title={toPay.status === 'expired' ? 'Pick a new time' : 'Choose your preferred time'} body={toPay.status === 'expired' ? 'The held time was released before your payment arrived. Choose any time at no extra cost.' : 'Pick a time that suits you. Jitendra Khimlani or Haresh bhai will confirm it.'} cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
   else if (toPay)
-    card = <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitu Bhaiya'} title="Complete your booking" body={`${fmtDay(toPay.startsAt)} · ${fmtTime(toPay.startsAt)}, pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
+    card = <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitendra Khimlani'} title="Complete your booking" body={`${fmtDay(toPay.startsAt)} · ${fmtTime(toPay.startsAt)}, pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
   else if (intake && !intake.submittedAt && intake.step > 0)
     card = <Ctx tone="sky" kicker="Almost there" title="Your answers are saved" body="Finish in about 3 minutes, then pick a time." cta="Continue" href="/app/book?resume=1" />
   else if (upcoming) {
     const mins = Math.round((new Date(upcoming.startsAt).getTime() - now) / 60_000)
     card = mins <= 60
-      ? <Ctx tone="navy" kicker="Starting soon" title={mins > 0 ? `Your session begins in ${mins} min` : 'Your session is live'} body="Find a quiet spot. Jitu Bhaiya will join you." cta={mins <= 10 ? 'Join now' : 'Open'} href={`/app/sessions/view?id=${upcoming.id}`} icon={<Video className="size-5" />} />
+      ? <Ctx tone="navy" kicker="Starting soon" title={mins > 0 ? `Your session begins in ${mins} min` : 'Your session is live'} body="Find a quiet spot. Jitendra Khimlani will join you." cta={mins <= 10 ? 'Join now' : 'Open'} href={`/app/sessions/view?id=${upcoming.id}`} icon={<Video className="size-5" />} />
       : <NextSession a={upcoming} />
   } else if (needsFeedback)
-    card = <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitu Bhaiya." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} art={<div className="absolute bottom-4 right-4"><MoodImg mood="grateful" size={72} /></div>} />
+    card = <Ctx tone="rose" kicker="Two minutes" title="How was your session?" body="Your notes go straight to Jitendra Khimlani." cta="Share feedback" href={`/app/sessions/view?id=${needsFeedback.id}&feedback=1`} art={<div className="absolute bottom-4 right-4"><MoodImg mood="grateful" size={72} /></div>} />
   return card ? <Item>{card}</Item> : null
 }
 

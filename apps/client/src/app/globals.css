@@ -154,7 +154,7 @@
 
 @keyframes floaty { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
 @keyframes breathe { 0%, 100% { transform: scale(1); opacity: .55 } 50% { transform: scale(1.06); opacity: .9 } }
-/* Jitu story: line-flower petals drifting slowly (18–30 s loops) */
+/* Consultant story: line-flower petals drifting slowly (18–30 s loops) */
 @keyframes drift {
   0% { transform: translate3d(0, 0, 0) rotate(0deg); }
   25% { transform: translate3d(14px, -18px, 0) rotate(8deg); }

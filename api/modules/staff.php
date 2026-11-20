@@ -1,7 +1,7 @@
 <?php
 /**
  * @owner OWNER · staff.* — team & roles (OW-16/17/23/28). Only the owner manages people.
- * Roles: consultant (Jitu Bhaiya) · manager (Haresh) · owner · accountant (D-39, read-only finance).
+ * Roles: consultant (Jitendra Khimlani) · manager (Haresh) · owner · accountant (D-39, read-only finance).
  */
 declare(strict_types=1);
 

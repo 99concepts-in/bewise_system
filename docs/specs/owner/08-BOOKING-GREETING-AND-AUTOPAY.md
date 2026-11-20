@@ -4,11 +4,11 @@
 > Related: `04-RAZORPAY-FLOW.md` (payment links), `05-REMINDERS-AND-WHATSAPP.md` (templates), `06-SETTINGS-KEYS.md`.
 
 ## 1. The rule
-When **Jitu Bhaiya or Haresh** books someone (CN-15, MG-12):
+When **Jitendra Khimlani or Haresh** books someone (CN-15, MG-12):
 1. They **greet and confirm** first, in their own words.
 2. **BeWise** then creates the appointment payment link and **sends it automatically**.
 3. **Staff never send payment links themselves.** No "copy payment link" or "send link" button exists for appointments in `/consult` or `/ops`.
-4. Later nudges from Jitu Bhaiya are his own warm WhatsApp messages and never contain a link. Payment reminders with the link come only from BeWise.
+4. Later nudges from Jitendra Khimlani are his own warm WhatsApp messages and never contain a link. Payment reminders with the link come only from BeWise.
 
 Client self-bookings (C2) are unchanged: they pay in the app via checkout (`04` §2).
 
@@ -53,24 +53,24 @@ Additions to `05-REMINDERS-AND-WHATSAPP.md` §3. Category utility unless noted. 
 
 | Template | Body (draft) | Variables | Button |
 |---|---|---|---|
-| `booking_greeting` | Hi {{1}}, this is {{2}} from BeWise. 🌿 Your {{3}} is booked for {{4}} at {{5}} ({{6}}). {{7}} | first_name, sender (Jitu Bhaiya / Haresh), type, date, time, mode (online / at the studio), optional personal line ("" allowed) | — |
+| `booking_greeting` | Hi {{1}}, this is {{2}} from BeWise. 🌿 Your {{3}} is booked for {{4}} at {{5}} ({{6}}). {{7}} | first_name, sender (Jitendra Khimlani / Haresh), type, date, time, mode (online / at the studio), optional personal line ("" allowed) | — |
 | `payment_link_appointment` | Hi {{1}}, to confirm your {{2}} on {{3}}, please complete the payment of ₹{{4}}. The slot is held for you until {{5}}. | first_name, type, date-time, amount, hold expiry | Pay now (URL) |
-| `checkin_form_ask` | Hi {{1}}, before your follow-up on {{2}}, a 2-minute check-in helps Jitu Bhaiya prepare. | first_name, date | Start check-in |
+| `checkin_form_ask` | Hi {{1}}, before your follow-up on {{2}}, a 2-minute check-in helps Jitendra Khimlani prepare. | first_name, date | Start check-in |
 | `drops_nudge` | Hi {{1}}, a gentle reminder for your blend today: {{2}} drops, {{3}} times. Small steps count. 🌿 | first_name, drops, times | Open my ritual |
 | `intake_unfinished_24h` | Hi {{1}}, your answers are saved. Whenever you're ready, you can finish them in a few minutes. | first_name | Continue |
 
 Tone check (brand §7): no shaming, no urgency words ("last chance", "failed"), no medical claims. `drops_nudge` respects quiet hours and is opt-in (`notification_preferences.ritual_reminders`).
 
-**Safety alert (`intake.safety_flagged`, D-38):** push + in-app to **Jitu Bhaiya only**, priority. The lock-screen text is **"BeWise: a client needs your attention — open the app"**, with **no client name and no answer text**. Details show only after unlock and sign-in. It's never sent on WhatsApp, email or SMS, and never to the owner or Haresh.
+**Safety alert (`intake.safety_flagged`, D-38):** push + in-app to **Jitendra Khimlani only**, priority. The lock-screen text is **"BeWise: a client needs your attention — open the app"**, with **no client name and no answer text**. Details show only after unlock and sign-in. It's never sent on WhatsApp, email or SMS, and never to the owner or Haresh.
 
 ## 5. "Your impact" numbers (CN-30 area, D-33)
 `analytics.getConsultantImpact({ consultantId, period: 'month' | 'year' | 'all' })` → **counts only**:
 `peopleHelped, sessions, hours, fiveStarSessions, cameBackPct, cities, feltTags: { tag: string; count: number }[], lifetimeReach` (from `consultant.lifetime_reach`).
 - Built on analytics views over appointments, `session_feedback` (rating + tags only) and client city. **No** notes, intake answers, feedback free text or names.
 - `feltTags` counts are hidden when fewer than 5 responses ("Not enough answers yet").
-- The owner sees the same totals on OW-05 (`analytics.clinical_aggregate.view`). Individual answers are never shown to anyone but Jitu Bhaiya.
+- The owner sees the same totals on OW-05 (`analytics.clinical_aggregate.view`). Individual answers are never shown to anyone but Jitendra Khimlani.
 
 ## 6. Owner questions
 1. Can staff confirm a booking as **cash paid** or **complimentary** (no link)? Default: no.
 2. Hold time for staff bookings: **24 h** (proposed by the consultant chat) vs 15 min for self-booking — confirm.
-3. Should the greeting go out from the **business WhatsApp number** (default) or does Jitu Bhaiya want his own number shown as sender? (Only the business number can use templates.)
+3. Should the greeting go out from the **business WhatsApp number** (default) or does Jitendra Khimlani want his own number shown as sender? (Only the business number can use templates.)

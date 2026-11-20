@@ -13,7 +13,7 @@ export const FLOWERS = [
   'Star of Bethlehem', 'Sweet Chestnut', 'Vervain', 'Vine', 'Walnut', 'Water Violet', 'White Chestnut',
   'Wild Oat', 'Wild Rose', 'Willow', 'Rescue Remedy',
 ]
-/** One-line Bach description per flower (draft, pending Jitu Bhaiya's approval — D-10). Shown as the reason. */
+/** One-line Bach description per flower (draft, pending Jitendra Khimlani's approval — D-10). Shown as the reason. */
 export const FLOWER_NOTE: Record<string, string> = {
   Agrimony: 'worries hidden behind a cheerful face', Aspen: 'vague fear without a clear reason', Beech: 'critical, intolerant of others',
   Centaury: "can't say no, pleases others", Cerato: 'doubts own judgement', 'Cherry Plum': 'fear of losing control',

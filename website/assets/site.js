@@ -115,7 +115,7 @@
   function detail(p) {
     var v = p.variants[0]
     var buy = p.soldOut ? '<p class="tag">Sold out — back soon</p>'
-      : p.personal ? '<div class="note">Your personal blend is prepared by Jitu Bhaiya after a consultation — the first bottle is included in the consultation fee. Reorders are ' + inr(v.pricePaise) + ' from <a href="account.html">My account</a> or the BeWise app.</div><div class="actions"><a class="btn" href="consultations.html">Book a consultation</a></div>'
+      : p.personal ? '<div class="note">Your personal blend is prepared by Jitendra Khimlani after a consultation — the first bottle is included in the consultation fee. Reorders are ' + inr(v.pricePaise) + ' from <a href="account.html">My account</a> or the BeWise app.</div><div class="actions"><a class="btn" href="consultations.html">Book a consultation</a></div>'
       : '<div class="actions"><button class="btn" data-add="' + esc(v.id) + '">Add to bag · ' + inr(v.pricePaise) + '</button><a class="btn ghost" href="cart.html">View bag</a></div>'
     return '<div class="pd">' + art(p, 'big') + '<div>' +
       '<span class="fmt muted small" style="font-weight:700;text-transform:uppercase;letter-spacing:.05em">' + esc(p.format) + ' · ' + esc(v.label) + '</span><h2 style="margin-top:6px">' + esc(p.name) + '</h2><p class="lead" style="font-size:17px">' + esc(p.about || p.tagline) + '</p>' +

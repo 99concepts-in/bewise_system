@@ -6,7 +6,7 @@
 > |---|---|
 > | `https://YOURDOMAIN/` | landing page (links to every app) |
 > | `https://YOURDOMAIN/client/` | client app |
-> | `https://YOURDOMAIN/consultant/` | Jitu Bhaiya's app |
+> | `https://YOURDOMAIN/consultant/` | Jitendra Khimlani's app |
 > | `https://YOURDOMAIN/manager/` | Haresh's app |
 > | `https://YOURDOMAIN/owner/` | owner app |
 >

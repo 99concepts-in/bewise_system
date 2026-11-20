@@ -1,74 +1,7 @@
-'use client'
 /**
- * @module   booking
+ * @module   client-booking
  * @owner    CLIENT
- * @screens  Public booking link (owner 2026-11-18; consultant request §3) — /book/jitu-bhaiya?type=first|followup
- *           Shared by Jitu Bhaiya and Haresh on WhatsApp and as a QR code. Signed-in clients go straight to booking;
- *           new visitors see a short welcome, then sign-in → onboarding → booking (type kept).
- * v5 (HUB 2026-11-20): official logo kit in the header (no typed wordmark), arch portrait, Blue Bloom chips.
+ * Old public booking address kept so links / QR codes already shared keep working (owner 2026-11-20:
+ * the consultant is named "Jitendra Khimlani" everywhere; new address /book/jitendra-khimlani).
  */
-import { useRouter, useSearchParams } from 'next/navigation'
-import { motion } from 'motion/react'
-import { Check, MapPin, Sparkles, Video } from 'lucide-react'
-import { Suspense, useEffect } from 'react'
-import { Logo, LogoMark } from '@/components/brand'
-import { Sparkle } from '@/components/jitu-story'
-import { Btn, cx, ease } from '@/components/ui'
-import { CONSULTANT, CONSULTATIONS, STUDIO } from '@/lib/data'
-import { formatINR } from '@/lib/format'
-import { setNextStep } from '@/lib/next-step'
-import { BP } from '@/lib/asset'
-import { useApp } from '@/lib/store'
-
-export default function Page() { return <Suspense><BookingLink /></Suspense> }
-
-function BookingLink() {
-  const router = useRouter()
-  const params = useSearchParams()
-  const type = params.get('type') === 'followup' ? 'followup' : 'first'
-  const hydrated = useApp((s) => s.hydrated)
-  const onboarded = useApp((s) => !!s.profile?.onboardedAt)
-  const dest = `/app/book?type=${type}`
-  useEffect(() => { if (hydrated && onboarded) router.replace(dest) }, [hydrated, onboarded, dest, router])
-  const go = () => { setNextStep(dest); router.push('/sign-in') }
-  if (!hydrated || onboarded) return <div className="grid min-h-dvh place-items-center"><LogoMark size={64} label="BeWise" /></div>
-
-  return (
-    <main className="flex min-h-dvh flex-col px-5 pb-4 safe-t">
-      <header className="flex items-center pt-3"><Logo height={32} /></header>
-      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }} className="mt-6 flex flex-col items-center text-center">
-        <div className="relative">
-          <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani (Jitu Bhaiya)" className="relative h-[190px] w-[152px] rounded-[999px_999px_24px_24px] object-cover object-[50%_30%] ring-4 ring-white shadow-[var(--shadow-float)]" />
-          <Sparkle size={26} className="absolute -right-4 top-6" />
-        </div>
-        <h1 className="h-duo mt-6 text-[30px]">Book with <em>Jitu Bhaiya</em></h1>
-        <p className="mt-1 text-[14px] font-semibold text-navy">{CONSULTANT.fullName} · {CONSULTANT.title}</p>
-        <p className="mt-3 max-w-[330px] text-[16px] leading-6 text-ink-2">{CONSULTANT.approach}</p>
-      </motion.div>
-
-      <div className="mt-6 space-y-3">
-        {CONSULTATIONS.map((c, i) => {
-          const on = c.id === type
-          return (
-            <motion.div key={c.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.08 }}
-              className={cx('flex items-center gap-3 rounded-[24px] p-4', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
-              <span className={cx('grid size-10 shrink-0 place-items-center rounded-full', on ? 'bg-white/15' : 'bg-sky-100')}>{on ? <Check className="size-5" strokeWidth={3} /> : <Sparkles className="size-5" />}</span>
-              <span className="flex-1"><span className="block text-[16px] font-bold">{c.name}</span><span className={cx('text-[13px]', on ? 'text-white/75' : 'text-muted')}>Remedy blend included</span></span>
-              <span className="text-[20px] font-extrabold tnum">{formatINR(c.feePaise)}</span>
-            </motion.div>
-          )
-        })}
-      </div>
-      <div className="mt-4 flex flex-wrap justify-center gap-2 text-[12px] font-semibold text-navy">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-sky-200"><Video className="size-3.5" /> Online</span>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-sky-200"><MapPin className="size-3.5" /> {STUDIO.short}</span>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-sky-200">🌿 Remedy blend included</span>
-      </div>
-
-      <div className="mt-auto space-y-2 pt-8 safe-b">
-        <Btn full variant="gradient" onClick={go}>Book with Jitu Bhaiya</Btn>
-        <p className="text-center text-[12px] text-muted">Takes about 3 minutes · sessions are non-refundable, but you can reschedule</p>
-      </div>
-    </main>
-  )
-}
+export { default } from '../jitendra-khimlani/page'

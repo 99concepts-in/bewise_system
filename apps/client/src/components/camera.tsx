@@ -111,7 +111,7 @@ export function PhotoCapture({ initial, onDone, onSkip, skipLabel = 'Skip for no
       </div>
 
       <p className="mx-auto mt-5 max-w-[300px] text-center text-[14px] leading-5 text-muted" aria-live="polite">
-        {mode === 'live' ? 'Centre your face in the circle. Soft light works best.' : mode === 'review' ? 'Lovely. You can change this anytime from Me.' : mode === 'blocked' ? blockedMsg : 'Optional. Your photo stays private. Only you and Jitu Bhaiya can see it.'}
+        {mode === 'live' ? 'Centre your face in the circle. Soft light works best.' : mode === 'review' ? 'Lovely. You can change this anytime from Me.' : mode === 'blocked' ? blockedMsg : 'Optional. Your photo stays private. Only you and Jitendra Khimlani can see it.'}
       </p>
 
       <input ref={file} type="file" accept="image/*" className="hidden" onChange={(e) => fromFile(e.target.files?.[0])} />

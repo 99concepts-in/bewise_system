@@ -14,7 +14,7 @@ import { CheckInControl, ExpressBookingSheet } from './Desk'
 import { Chip, Choices, Divided, Field, IconButton, Row, Sheet, copyText, cx, inputCls, spring, useDesktop, useIntent } from '../ui/kit'
 
 // Same link as the consultant app; the page itself is owned by the CLIENT chat. @decision(D-12) domain pending
-export const BOOKING_LINK = 'https://bewise.in/book/jitu-bhaiya'
+export const BOOKING_LINK = 'https://app.bewiseglobal.in/client/book/jitendra-khimlani'
 const waLink = (phone: string, text: string) => {
   const d = phone.replace(/\D/g, '')
   return `https://wa.me/${d.length === 10 ? '91' + d : d}?text=${encodeURIComponent(text)}`
@@ -164,9 +164,9 @@ function PaymentRow({ i }: { i: Invoice }) {
 
 /* ───────── share booking link (same link + messages as the consultant app) ───────── */
 const SHARE_MSGS = {
-  new: { label: 'New client', type: 'first', text: 'Namaste 🙏 You can book a calm, one-to-one consultation with Jitu Bhaiya here. Pick any time that suits you:' },
-  followup: { label: 'Follow-up', type: 'followup', text: 'Namaste 🙏 Time for your follow-up with Jitu Bhaiya. Choose a time that works for you here:' },
-  workshop: { label: 'Workshop', type: 'first', text: 'Thank you for joining the workshop today 🙏 If you would like a personal session with Jitu Bhaiya, book here:' },
+  new: { label: 'New client', type: 'first', text: 'Namaste 🙏 You can book a calm, one-to-one consultation with Jitendra Khimlani here. Pick any time that suits you:' },
+  followup: { label: 'Follow-up', type: 'followup', text: 'Namaste 🙏 Time for your follow-up with Jitendra Khimlani. Choose a time that works for you here:' },
+  workshop: { label: 'Workshop', type: 'first', text: 'Thank you for joining the workshop today 🙏 If you would like a personal session with Jitendra Khimlani, book here:' },
 } as const
 export function ShareBookingSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const s = useStore()
@@ -178,7 +178,7 @@ export function ShareBookingSheet({ open, onClose }: { open: boolean; onClose: (
   return (
     <Sheet open={open} onClose={onClose} title="Share booking link">
       <div className="space-y-4">
-        <p className="text-[13.5px] text-ink-2">Anyone with this link sees Jitu Bhaiya's free times and can book. BeWise sends the payment link after they book.</p>
+        <p className="text-[13.5px] text-ink-2">Anyone with this link sees Jitendra Khimlani's free times and can book. BeWise sends the payment link after they book.</p>
         <Choices id="bk-kind" value={kind} onChange={setKind} options={(Object.keys(SHARE_MSGS) as (keyof typeof SHARE_MSGS)[]).map((k) => ({ value: k, label: SHARE_MSGS[k].label }))} />
         <Field label="Client's WhatsApp number (optional)"><input id="bk-phone" inputMode="tel" className={cx(inputCls, 'tnum')} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98250 00000" /></Field>
         <div className="rounded-[22px] bg-[var(--wa-bg)] p-3">

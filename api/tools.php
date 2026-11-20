@@ -1,7 +1,7 @@
 <?php
 /**
  * @owner HUB · Owner tools — https://app.bewiseglobal.in/api/tools.php (owner password required).
- *   • add Jitu Bhaiya / Haresh / accountant (with default consulting hours for the consultant)
+ *   • add Jitendra Khimlani / Haresh / accountant (with default consulting hours for the consultant)
  *   • create the test login Razorpay's review team uses (username + password, a client account)
  *   • paste Razorpay keys (test or live) — written to the PRIVATE config, never to GitHub
  * Temporary until the owner app (OWNER chat) has these screens; same server functions underneath.
@@ -198,16 +198,16 @@ $ok = $msg ? '<div class=ok>' . $h(implode(' ', $msg)) . '</div>' : '';
 $bad = $err ? '<div class=err>' . $h(implode(' ', $err)) . '</div>' : '';
 $t = $h($csrf());
 $webhook = $h(bw_public_url('api/webhooks/razorpay'));
-$consultantNote = $hasConsultant ? '' : '<div class=err>No consultant yet — clients can\'t see booking times until you add Jitu Bhaiya below.</div>';
+$consultantNote = $hasConsultant ? '' : '<div class=err>No consultant yet — clients can\'t see booking times until you add Jitendra Khimlani below.</div>';
 
 tools_page(<<<HTML
 <section><h1>Owner tools</h1>$ok$bad$consultantNote
 <p>Signed in as {$h($me['email'])}. <form method=post style="display:inline"><input type=hidden name=action value=logout><button style="margin:0;padding:6px 14px;font-size:13px;background:#eef1fb;color:#243D91">Sign out</button></form></p>
 <table>$rows</table><p><small>Payments: {$h($rzState)}</small></p></section>
 
-<section><h2>Add a team member</h2><p><small>Give them the temporary password in person. Jitu Bhaiya gets default hours Mon–Sat 10–1 &amp; 4–7.</small></p>
+<section><h2>Add a team member</h2><p><small>Give them the temporary password in person. Jitendra Khimlani gets default hours Mon–Sat 10–1 &amp; 4–7.</small></p>
 <form method=post><input type=hidden name=action value=team><input type=hidden name=csrf value="$t">
-<div class=row><div><label>Role</label><select name=role><option value=consultant>Consultant (Jitu Bhaiya)</option><option value=manager>Manager (Haresh)</option><option value=accountant>Accountant / CA</option></select></div>
+<div class=row><div><label>Role</label><select name=role><option value=consultant>Consultant (Jitendra Khimlani)</option><option value=manager>Manager (Haresh)</option><option value=accountant>Accountant / CA</option></select></div>
 <div><label>Name</label><input name=name required></div></div>
 <div class=row><div><label>Email</label><input type=email name=email required></div><div><label>WhatsApp number <small>(for alerts)</small></label><input name=phone placeholder="98xxxxxxxx"></div></div>
 <label>Temporary password <small>(10+ characters)</small></label><input type=password name=password required minlength=10>

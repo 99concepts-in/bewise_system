@@ -617,13 +617,13 @@ function OrderFacts({ o, c }: { o: Order; c: Client }) {
 }
 
 
-/** What Jitu Bhaiya's remedy tracker shows for this blend (driven by fulfilment.stage_changed + shipment.delivered). */
+/** What Jitendra Khimlani's remedy tracker shows for this blend (driven by fulfilment.stage_changed + shipment.delivered). */
 const TRACK = ['Given', 'Preparing', 'Dispatched', 'Delivered'] as const
 function ConsultantView({ o }: { o: Order }) {
   const step = o.stage === 'new' ? 0 : ['preparing', 'quality_check', 'packing', 'ready_to_dispatch'].includes(o.stage) ? 1 : o.stage === 'delivered' ? 3 : 2
   return (
     <>
-      <SectionTitle>Jitu Bhaiya sees</SectionTitle>
+      <SectionTitle>Jitendra Khimlani sees</SectionTitle>
       <Surface className="!py-4">
         <div className="grid grid-cols-4 gap-1">
           {TRACK.map((t, i) => (

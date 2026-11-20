@@ -96,7 +96,7 @@ PRODUCTION  Production batches → Batch (request → materials → produce → 
 | MG-29 | Empty & states | All caught up, offline, failed sync |
 
 ## Owner answers (2026-11-16)
-1. ✅ Haresh **does production and purchases** (MG-19…22 are his). Jitu Bhaiya also sees **sales and business overview** (read-only) — consultant CN-30/31/32.
+1. ✅ Haresh **does production and purchases** (MG-19…22 are his). Jitendra Khimlani also sees **sales and business overview** (read-only) — consultant CN-30/31/32.
 2. ✅ Courier = **Shiprocket** (multiple couriers). Dispatch compares Shiprocket courier rates → Create shipment → auto AWB, label PDF, pickup scheduling, tracking via webhook. Manual AWB entry kept as fallback.
 3. ✅ **No refunds** — anywhere in the system. Failed delivery → reattempt; RTO/damaged/wrong item → **replacement order**. Client cancellations → reschedule only.
 4. ✅ He sees **everything** in Money: to collect (clients), to pay (suppliers, recurring like Shiprocket wallet), expenses (owner approves).

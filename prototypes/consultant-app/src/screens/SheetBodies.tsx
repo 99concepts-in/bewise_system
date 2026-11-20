@@ -74,7 +74,7 @@ function SessionBody({ id, close, api }: { id: string; close: () => void; api: A
           </button>
           <div className="btn-row">
             <button className="btn btn-quiet" onClick={() => api.reschedule(a.id)}><CalendarClock size={16} /> Reschedule</button>
-            <a className="btn btn-quiet" href={waLink(p.phone, `Namaste ${p.first}, this is Jitu Bhaiya from BeWise. `)} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a>
+            <a className="btn btn-quiet" href={waLink(p.phone, `Namaste ${p.first}, this is Jitendra Khimlani from BeWise. `)} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a>
             <a className="btn btn-quiet" href={`tel:${p.phone.replace(/\s/g, '')}`}><Phone size={16} /> Call</a>
           </div>
         </>}
@@ -303,7 +303,7 @@ function greetingFor(p: Person, start: number, kind: Kind, mode: Mode, now: numb
   const when = `${dayLabel(start, now) === 'Today' || dayLabel(start, now) === 'Tomorrow' ? dayLabel(start, now).toLowerCase() + ', ' + fmtShort(start) : fmtDay(start)} at ${fmtTime(start)}`
   return [
     `Namaste ${p.first} 🙏`,
-    `This is Jitu Bhaiya from BeWise. Your ${KIND_LABEL[kind].toLowerCase()} is booked for ${when}, ${mode === 'online' ? 'online (the video link comes with your reminder)' : 'at the studio in Vadodara'}.`,
+    `This is Jitendra Khimlani from BeWise. Your ${KIND_LABEL[kind].toLowerCase()} is booked for ${when}, ${mode === 'online' ? 'online (the video link comes with your reminder)' : 'at the studio in Vadodara'}.`,
     kind === 'first' ? 'Before we meet, please fill the short intake form so I can understand you better.' : 'Looking forward to hearing how you have been.',
   ].join('\n\n')
 }
@@ -451,13 +451,13 @@ function ShareBody() {
       <div className="form-actions">
         <a className="btn btn-quiet" href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a>
         {canShare
-          ? <button className="btn btn-primary" onClick={() => navigator.share({ title: 'Book with Jitu Bhaiya', text: SHARE_MSGS[kind].text, url: BOOKING_LINK }).catch(() => {})}><Share2 size={16} /> Share</button>
+          ? <button className="btn btn-primary" onClick={() => navigator.share({ title: 'Book with Jitendra Khimlani', text: SHARE_MSGS[kind].text, url: BOOKING_LINK }).catch(() => {})}><Share2 size={16} /> Share</button>
           : <button className="btn btn-primary" onClick={() => copy(msg, 'Message copied')}><Copy size={16} /> Copy message</button>}
       </div>
       <div className="qr">
         {qr ? <m.img src={qr} width={180} height={180} alt="QR code for your booking link" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={softSpring} /> : <span className="qr-ph" />}
         <div><b>QR code</b><p className="muted small">Show it at workshops or keep it at the studio desk. People scan and book.</p>
-          {qr && <a className="link" href={qr} download="jitu-bhaiya-booking-qr.png">Download QR</a>}</div>
+          {qr && <a className="link" href={qr} download="jitendra-khimlani-booking-qr.png">Download QR</a>}</div>
       </div>
     </div>
   )

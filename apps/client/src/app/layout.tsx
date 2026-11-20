@@ -10,7 +10,7 @@ import { BP } from '@/lib/asset'
 
 export const metadata: Metadata = {
   title: { default: 'BeWise · Holistic Wellness', template: '%s · BeWise' },
-  description: 'Bach flower remedy consultations with Jitu Bhaiya, your personal blend, mood journal and gentle aromatherapy rituals.',
+  description: 'Bach flower remedy consultations with Jitendra Khimlani, your personal blend, mood journal and gentle aromatherapy rituals.',
   applicationName: 'BeWise',
   manifest: `${BP}/manifest.webmanifest`,
   icons: { icon: `${BP}/img/brand/bewise-mark.svg`, apple: `${BP}/icon-192.png` },

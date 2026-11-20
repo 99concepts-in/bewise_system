@@ -2,7 +2,7 @@
  * @module   client-data
  * @owner    CLIENT
  * Purpose:  v5 "Blue Bloom" (HUB 2026-11-20, D-45) — accent colour + line icon for every feeling, so the same feeling
- *           wears the same colour on Home, in the intake and (later) on Jitu Bhaiya's Today timeline.
+ *           wears the same colour on Home, in the intake and (later) on Jitendra Khimlani's Today timeline.
  *           Pure presentation: intake answer values (FEELINGS strings) and journal Emotion keys are unchanged.
  */
 import type { Emotion } from './data'

@@ -1,7 +1,7 @@
 /**
  * Care widgets shared by Profile, Live session and the remedy sheet:
  * - AdherenceCard: is the person taking their drops (client ticks "took my drops" daily)?
- * - Suggestions: flowers to consider, with reasons (D-37 — Jitu Bhaiya only; reference, he decides).
+ * - Suggestions: flowers to consider, with reasons (D-37 — Jitendra Khimlani only; reference, he decides).
  * v5 (HUB 2026-11-20): suggestions and the remedy builder use flower tiles (FlowerTile); adherence restyled to Blue Bloom.
  */
 import { AnimatePresence, m } from 'motion/react'
@@ -13,7 +13,7 @@ import { softSpring, spring } from './kit'
 import type { Person } from '../data/types'
 
 export function nudgeText(first: string) {
-  return `Namaste ${first} 🙏 A gentle reminder to take your drops today: 4 drops, 4 times a day. Small steps, every day. Jitu Bhaiya`
+  return `Namaste ${first} 🙏 A gentle reminder to take your drops today: 4 drops, 4 times a day. Small steps, every day. Jitendra Khimlani`
 }
 
 export function AdherenceCard({ p, now, compact }: { p: Person; now: number; compact?: boolean }) {

@@ -229,7 +229,7 @@ export const WEEK_GOAL = 25
 export const LIFETIME_REACH = 200000
 export const HOURS_PER_SESSION = HOUR
 
-// ---------------------------------------------------------------- suggested flowers (D-37: for Jitu Bhaiya only, his judgement decides)
+// ---------------------------------------------------------------- suggested flowers (D-37: for Jitendra Khimlani only, his judgement decides)
 export interface Suggestion { flower: string; note: string; reasons: string[]; score: number }
 const CHECKIN_FLOWERS: Record<string, string[]> = { Sleep: ['White Chestnut', 'Olive'] }
 

@@ -1,11 +1,11 @@
-# Consultant Workspace (Jitu Bhaiya) — Flow & Screen List (v2)
+# Consultant Workspace (Jitendra Khimlani) — Flow & Screen List (v2)
 
 > **Owner:** HUB (designed with the business owner). Status: **APPROVED FLOW — designs in `design/consultant-v2/`.**
 > Supersedes K-01…K-11 in `docs/02-FLOWS-AND-SCREENS.md`. Screen IDs `CN-xx` are stable.
 > Visual direction: Quiet Luxury v2 (`design/inspiration/README.md`), same family as `design/client-v2/`.
 
 ## Owner changes (2026-11-16, round 2)
-1. ❌ **No approval workflow.** Jitu Bhaiya builds the blend and taps **Give remedy** → goes to the client and the office at once. No draft/review/approve states visible to him (drafts autosave silently).
+1. ❌ **No approval workflow.** Jitendra Khimlani builds the blend and taps **Give remedy** → goes to the client and the office at once. No draft/review/approve states visible to him (drafts autosave silently).
 2. ✏️ **Summary for client is optional** — a toggle in End session and a tab in Live session; never required.
 3. ✏️ Remedy builder uses the **Bach Flower library** (owner said "36" — standard system is 38 + Rescue Remedy; library is configurable: he can hide flowers he doesn't use. **D-30 open**).
 4. ➕ **Troubling emotions**: in each session he selects what is troubling the client (Anger, Insecurity, Loneliness, …) from an editable list. Stored per session; drives progress tracking.
@@ -16,7 +16,7 @@
 7. 📱 **Phone first** (D-24 decided). iPad/laptop layouts (boards 00–15) remain as the larger-screen adaptation. Phone boards: `CN-phone-*`.
 8. ➕ **Calendar sync with Google & Apple** (CN-28): two-way with Google (sessions added to his calendar; his busy times block client slots), Apple/iCloud via CalDAV connect, plus a private subscribe (ICS) link for any calendar app. Event details from his personal calendar are never stored — only busy/free.
 9. ➕ **Me hub** (CN-29) — now also has a **Business** tile.
-10. ➕ **Jitu Bhaiya sees sales & business overview** (owner, 2026-11-16) — read-only CN-30…32. No accounting/expenses/personal finance. on phone: Library · Follow-ups · Blend templates · My month · Calendar sync · My profile · Settings.
+10. ➕ **Jitendra Khimlani sees sales & business overview** (owner, 2026-11-16) — read-only CN-30…32. No accounting/expenses/personal finance. on phone: Library · Follow-ups · Blend templates · My month · Calendar sync · My profile · Settings.
 
 ## Design intent
 His day = **people, not paperwork**. A calm, private study: one thing at a time, everything about a client one tap away,

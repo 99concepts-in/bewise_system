@@ -630,7 +630,7 @@ V.home=()=>{
     </section>
     <section class="card datecard">
       <div class="d">17th</div><div class="muted">November</div>
-      <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;font-size:13px"><span class="chip info" style="justify-content:flex-start;white-space:normal">${ic('cal')}Jitu Bhaiya · 4 sessions today</span><span class="chip gold" style="justify-content:flex-start;white-space:normal">${ic('box')}Haresh · 6 orders to pack</span></div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;font-size:13px"><span class="chip info" style="justify-content:flex-start;white-space:normal">${ic('cal')}Jitendra Khimlani · 4 sessions today</span><span class="chip gold" style="justify-content:flex-start;white-space:normal">${ic('box')}Haresh · 6 orders to pack</span></div>
       <div class="note">${APPROVALS.length} decisions are waiting for you.<br><a class="link" href="#approvals" style="padding:8px 0 0">Review now ${ic('arrow')}</a></div>
     </section>
   </div>
@@ -692,10 +692,10 @@ V.sales=()=>{
       <div class="row"><span class="grow">Sessions held<small>${firsts} first · ${follows} follow-ups</small></span><b class="num mid">${sessions}</b></div>
       <div class="row"><span class="grow">New clients</span><b class="num">${firsts}</b></div>
       <div class="row"><span class="grow">Average rating<small>from session feedback</small></span><b class="num">4.8 / 5</b></div>
-      <div class="row"><span class="grow">Jitu Bhaiya's diary<small>booked hours this month</small></span><b class="num">78%</b></div></section>
+      <div class="row"><span class="grow">Jitendra Khimlani's diary<small>booked hours this month</small></span><b class="num">78%</b></div></section>
     <section class="card"><h3>What clients are working on</h3><p class="sub-t">Anonymous totals across all clients. Nobody's details are shown.</p>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">${[['Anxiety',31],['Sleep',24],['Fear',18],['Loneliness',12],['Anger',11],['Insecurity',9]].map(([n,c])=>`<span class="chip info">${n} · ${c}</span>`).join('')}</div>
-      <p class="hint" style="margin-top:14px">${ic('lock')} Notes, intake answers and remedy reasons stay private to Jitu Bhaiya.</p></section>
+      <p class="hint" style="margin-top:14px">${ic('lock')} Notes, intake answers and remedy reasons stay private to Jitendra Khimlani.</p></section>
   </div>
   <section class="card" style="margin-top:20px"><div class="chead"><div><h2>Best sellers</h2><p class="sub-t">Shop and remedies, this month</p></div></div>
     <div class="tablewrap"><table><thead><tr><th>Product</th><th class="r">Units</th><th class="r">Sales</th><th class="r">Margin</th><th>Stock</th></tr></thead><tbody>
@@ -860,15 +860,15 @@ V.ask.after=()=>{
 
 const MEMBERS=[
   {id:'you',n:'You',r:'Owner',c:'linear-gradient(135deg,#5E7FB8,#182957)',l:'Active now',ini:'Y'},
-  {id:'jitu',n:'Jitu Bhaiya',r:'Consultant',c:'linear-gradient(135deg,#82977E,#4f6a4b)',l:'Active 10 min ago',ini:'JB'},
+  {id:'jitu',n:'Jitendra Khimlani',r:'Consultant',c:'linear-gradient(135deg,#82977E,#4f6a4b)',l:'Active 10 min ago',ini:'JB'},
   {id:'haresh',n:'Haresh Moorjani',r:'Manager',c:'linear-gradient(135deg,#B89B64,#8a6f3e)',l:'Active 2 min ago',ini:'HM'},
   {id:'ca',n:'Your accountant',r:'Accountant · not invited yet',c:'linear-gradient(135deg,#B5BAC7,#8A90A0)',l:'Read-only reports & export',ini:'CA'},
 ];
 const PERMS={
-  jitu:[['Money',[['See sales & profit (read-only)',1],['Record payments',0],['Approve expenses',0,1]]],['Clients',[['Consultation notes & intake',1,1,'Only Jitu Bhaiya — private by design'],['Client contact details',1]]],['Operations',[['Orders & stock (read-only)',1],['Edit catalogue',0]]]],
+  jitu:[['Money',[['See sales & profit (read-only)',1],['Record payments',0],['Approve expenses',0,1]]],['Clients',[['Consultation notes & intake',1,1,'Only Jitendra Khimlani — private by design'],['Client contact details',1]]],['Operations',[['Orders & stock (read-only)',1],['Edit catalogue',0]]]],
   haresh:[['Money',[['Create invoices & record payments',1],['Send payment reminders',1],['Submit expenses & bills',1],['Approve expenses',0,1,'Owner only']]],['Clients',[['Client contact details',1],['Consultation notes & intake',0,1,'Private to the consultant']]],['Operations',[['Orders, dispatch, stock',1],['Production & purchases',1],['Edit catalogue (price changes need approval)',1]]],['Reports',[['See sales & profit',1]]]],
   ca:[['Reports',[['P&L, balance sheet, cash flow, trial balance',1,1],['GST summary & export',1,1],['Ledgers, invoices, bills, expenses',1,1]]],['Never',[['Edit or approve anything',0,1,'Accountants are read-only'],['Consultation & intake data',0,1,'Never shared']]]],
-  you:[['Everything',[['Full access to business, settings and team',1,1]]],['Private by design',[['Consultation notes & intake answers',0,1,'Only Jitu Bhaiya']]]],
+  you:[['Everything',[['Full access to business, settings and team',1,1]]],['Private by design',[['Consultation notes & intake answers',0,1,'Only Jitendra Khimlani']]]],
 };
 let selMember='haresh';
 V.team=()=>`${header('Team &amp; roles','Who can see and do what.',sampleTag)}
@@ -926,12 +926,12 @@ V.business.after=()=>{document.querySelector('[data-save]').addEventListener('su
 
 V.integrations=()=>`${header('Integrations','Connections to payment, delivery and messaging services. Shown exactly as they are.',sampleTag)}
   <div class="grid g3">
-    ${[['Razorpay','Online payments: UPI, cards, netbanking','warn','Test mode','Add live keys and run a ₹1 test payment','wallet'],['Shiprocket','Courier rates, labels, pickups, tracking','neutral','Not set up','Haresh needs the API login','truck'],['WhatsApp Business','Booking confirmations and reminders','neutral','Not set up','Choose a provider; templates need Meta approval','send'],['Google Calendar','Jitu Bhaiya\'s sessions and busy times','neutral','Not set up','Jitu Bhaiya connects his own calendar','cal'],['Email','Invoices and receipts by email','neutral','Not set up','Needs your domain, e.g. care@bewise…','file'],['Accountant access','Read-only reports for your CA','neutral','Not invited','Invite from Team & roles','users']].map(c=>`<section class="card"><div class="chead"><span class="ico-sq a">${ic(c[5])}</span><div class="act"><span class="chip ${c[2]}">${c[3]}</span></div></div><h3>${c[0]}</h3><p class="sub-t">${c[1]}</p><p class="hint" style="margin-top:12px">${c[4]}</p></section>`).join('')}
+    ${[['Razorpay','Online payments: UPI, cards, netbanking','warn','Test mode','Add live keys and run a ₹1 test payment','wallet'],['Shiprocket','Courier rates, labels, pickups, tracking','neutral','Not set up','Haresh needs the API login','truck'],['WhatsApp Business','Booking confirmations and reminders','neutral','Not set up','Choose a provider; templates need Meta approval','send'],['Google Calendar','Jitendra Khimlani\'s sessions and busy times','neutral','Not set up','Jitendra Khimlani connects his own calendar','cal'],['Email','Invoices and receipts by email','neutral','Not set up','Needs your domain, e.g. care@bewise…','file'],['Accountant access','Read-only reports for your CA','neutral','Not invited','Invite from Team & roles','users']].map(c=>`<section class="card"><div class="chead"><span class="ico-sq a">${ic(c[5])}</span><div class="act"><span class="chip ${c[2]}">${c[3]}</span></div></div><h3>${c[0]}</h3><p class="sub-t">${c[1]}</p><p class="hint" style="margin-top:12px">${c[4]}</p></section>`).join('')}
   </div>`;
 
 V.activity=()=>`${header('Activity log','Who did what, and when.',sampleTag)}
-  <section class="card"><div class="chead"><div class="tabs" role="group" aria-label="Filter"><button aria-pressed="true">Everyone</button><button aria-pressed="false">Haresh</button><button aria-pressed="false">Jitu Bhaiya</button><button aria-pressed="false">System</button></div></div>
-  ${[['10:42','Haresh Moorjani','recorded a cash payment of ₹800 from Meera P. · RC/2026-27/0212','HM','#B89B64'],['10:15','System','issued INV/2026-27/0151 after an online payment of ₹1,000','S','#8A90A0'],['09:58','Jitu Bhaiya','gave a remedy to a client (details stay private)','JB','#82977E'],['09:30','Haresh Moorjani','dispatched 8 orders via Shiprocket','HM','#B89B64'],['Yesterday','You','approved expense EXP/2026-27/0033 · ₹1,850','Y','#5E7FB8'],['Yesterday','Haresh Moorjani','changed stock of Aura Spray 100 ml: −3 (damaged in transit)','HM','#B89B64'],['15 Nov','You','changed the follow-up fee to ₹800','Y','#5E7FB8']].map(r=>`<div class="row"><span class="av" style="width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;background:${r[4]};flex:none">${r[3]}</span><span class="grow"><b>${r[1]}</b> ${r[2]}</span><small class="muted num" style="white-space:nowrap">${r[0]}</small></div>`).join('')}
+  <section class="card"><div class="chead"><div class="tabs" role="group" aria-label="Filter"><button aria-pressed="true">Everyone</button><button aria-pressed="false">Haresh</button><button aria-pressed="false">Jitendra Khimlani</button><button aria-pressed="false">System</button></div></div>
+  ${[['10:42','Haresh Moorjani','recorded a cash payment of ₹800 from Meera P. · RC/2026-27/0212','HM','#B89B64'],['10:15','System','issued INV/2026-27/0151 after an online payment of ₹1,000','S','#8A90A0'],['09:58','Jitendra Khimlani','gave a remedy to a client (details stay private)','JB','#82977E'],['09:30','Haresh Moorjani','dispatched 8 orders via Shiprocket','HM','#B89B64'],['Yesterday','You','approved expense EXP/2026-27/0033 · ₹1,850','Y','#5E7FB8'],['Yesterday','Haresh Moorjani','changed stock of Aura Spray 100 ml: −3 (damaged in transit)','HM','#B89B64'],['15 Nov','You','changed the follow-up fee to ₹800','Y','#5E7FB8']].map(r=>`<div class="row"><span class="av" style="width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;background:${r[4]};flex:none">${r[3]}</span><span class="grow"><b>${r[1]}</b> ${r[2]}</span><small class="muted num" style="white-space:nowrap">${r[0]}</small></div>`).join('')}
   </section>`;
 
 /* ---------- router ---------- */
@@ -961,7 +961,7 @@ window.addEventListener('hashchange',()=>{ if(!document.body.classList.contains(
    demo: no backend (GitHub Pages, Claude preview) — any email + password, remembered for this tab only */
 const AUTH={mode:'demo',me:null};
 const ALLOWED_ROLES=['owner'];
-const APP_FOR_ROLE={consultant:['Jitu Bhaiya\'s app','../consultant/'],manager:['the office app','../manager/'],client:['the client app','../client/'],accountant:['the accountant view','#']};
+const APP_FOR_ROLE={consultant:['Jitendra Khimlani\'s app','../consultant/'],manager:['the office app','../manager/'],client:['the client app','../client/'],accountant:['the accountant view','#']};
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function firstName(){const n=(AUTH.me&&AUTH.me.name||'').trim();return n&&!/^owner\b/i.test(n)&&!/demo/i.test(n)?esc(n.split(/\s+/)[0]):'';}
 function initials(){const n=(AUTH.me&&(AUTH.me.name||(AUTH.mode==='live'?AUTH.me.email:''))||'You').trim();return esc(n.split(/[\s@.]+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'Y');}

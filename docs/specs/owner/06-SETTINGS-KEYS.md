@@ -37,8 +37,8 @@
 |---|---|---|---|
 | `consultant.weekly_goal` | `number` sessions per week, default **25** | CN settings (consultant edits own) / OW-23 | consultant Today & "Your impact" |
 | `consultant.lifetime_reach` | `{ count: 200000, label: '2,00,000+' }` (from his website; owner confirms) | OW-23 | consultant "Your impact" |
-| `booking.link_slug` | `'jitu-bhaiya'` → `https://{domain}/book/jitu-bhaiya` (domain pending D-12) | OW-23 | consultant share-link + QR, manager share-link |
-| `booking.staff_hold_hours` | `24` (holds created by Jitu Bhaiya or Haresh; self-booking stays 15 min) | OW-23 | scheduling, notifications (08) |
+| `booking.link_slug` | `'jitu-bhaiya'` → `https://{domain}/book/jitendra-khimlani` (domain pending D-12) | OW-23 | consultant share-link + QR, manager share-link |
+| `booking.staff_hold_hours` | `24` (holds created by Jitendra Khimlani or Haresh; self-booking stays 15 min) | OW-23 | scheduling, notifications (08) |
 | `safety.helplines` | `[{ name: 'Tele-MANAS', number: '14416' }, { name: 'Emergency', number: '112' }]`, `verifiedOn` date — must be re-verified before launch | OW-23 (read-only for staff) | client intake IN-09 |
 | `privacy.intake_retention_months` | `null` ⇒ keep while the client is active (owner + lawyer to decide) | OW-23 | intake |
 | `fulfilment.sla` | `{ remedyHours: 24, storeHours: 48, workingHours: { days: 'Mon–Sat', from: '10:00', to: '19:00' } }` | OW-23 | manager |
@@ -50,4 +50,4 @@
 | `catalog.price_change_approval` | default `false` | OW-23 | manager, approvals |
 | `notifications.whatsapp_templates` | system-written status per template: `draft / submitted / approved / rejected` | OW-24 | notifications |
 
-All of these use the same rules as above: zod schema, owner-only writes (except `consultant.weekly_goal`, which Jitu Bhaiya can also edit), audited, never secrets.
+All of these use the same rules as above: zod schema, owner-only writes (except `consultant.weekly_goal`, which Jitendra Khimlani can also edit), audited, never secrets.

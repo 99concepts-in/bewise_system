@@ -36,7 +36,7 @@ function Detail() {
   const past = a.status === 'completed' || now > start + c.minutes * 60_000
   const joinable = !past && mins <= 10
   const soon = !past && mins <= 60
-  const ics = () => downloadIcs('bewise-session.ics', sessionIcs({ id: a.id, title: 'BeWise session with Jitu Bhaiya', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online (link in the BeWise app)' : `${STUDIO.name}, ${STUDIO.full}`, description: c.name }))
+  const ics = () => downloadIcs('bewise-session.ics', sessionIcs({ id: a.id, title: 'BeWise session with Jitendra Khimlani', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online (link in the BeWise app)' : `${STUDIO.name}, ${STUDIO.full}`, description: c.name }))
 
   return (
     <main className="px-5 pb-36">
@@ -58,12 +58,12 @@ function Detail() {
       <div className="mt-4 space-y-3">
         {a.timeRequested && !past && (
           <div className="rounded-[20px] bg-marigold-100 p-4 text-[14px] leading-5 text-[#6b5320]">
-            <p><b>Waiting for confirmation.</b> Jitu Bhaiya or Haresh bhai will confirm this time. If it doesn’t work, our team will call you.</p>
+            <p><b>Waiting for confirmation.</b> Jitendra Khimlani or Haresh bhai will confirm this time. If it doesn’t work, our team will call you.</p>
             <a href={`tel:${HELPLINE.tel}`} className="mt-2 inline-flex items-center gap-1.5 font-semibold text-navy underline underline-offset-4"><Phone className="size-4" /> Helpline {HELPLINE.label} ({HELPLINE.name})</a>
           </div>
         )}
         <div className="card divide-y divide-line px-5">
-          <Row icon={<img src={`${BP}/img/jitu.webp`} alt="" className="size-10 rounded-full object-cover" />} t="Jitu Bhaiya" d="Bach Remedy Therapist" />
+          <Row icon={<img src={`${BP}/img/jitu.webp`} alt="" className="size-10 rounded-full object-cover" />} t="Jitendra Khimlani" d="Bach Remedy Therapist" />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{a.mode === 'online' ? <Laptop className="size-5" /> : <MapPin className="size-5" />}</span>} t={c.name} d={a.mode === 'online' ? 'Online video call' : STUDIO.full} />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><FileText className="size-5" /></span>} t={a.payLater && !a.paidAt ? `${formatINR(a.amountPaise)} due after your session` : `Paid ${formatINR(a.amountPaise)}`} d={a.payLater && !a.paidAt ? 'Pay by UPI, card or at the studio' : 'Remedy blend included · receipt in Payments'} />
           {a.payLater && !a.paidAt && <Btn size="md" variant={past ? 'gradient' : 'white'} className="mt-3" onClick={() => router.push(`/app/pay?appointment=${a.id}`)}>Pay {formatINR(a.amountPaise)} now</Btn>}
@@ -71,11 +71,11 @@ function Detail() {
 
         {!past && (
           checkin ? (
-            <div className="flex items-center gap-3 rounded-[20px] bg-sage-100/80 p-4 text-[14px] text-sage-text"><Check className="size-5" strokeWidth={3} /><span className="flex-1"><b>Check-in shared</b> · Jitu Bhaiya will read it before you meet</span><button onClick={() => router.push(`/app/checkin?appointment=${a.id}`)} className="font-semibold underline underline-offset-2">Edit</button></div>
+            <div className="flex items-center gap-3 rounded-[20px] bg-sage-100/80 p-4 text-[14px] text-sage-text"><Check className="size-5" strokeWidth={3} /><span className="flex-1"><b>Check-in shared</b> · Jitendra Khimlani will read it before you meet</span><button onClick={() => router.push(`/app/checkin?appointment=${a.id}`)} className="font-semibold underline underline-offset-2">Edit</button></div>
           ) : (
             <button onClick={() => router.push(`/app/checkin?appointment=${a.id}`)} className="card flex w-full items-center gap-3 p-4 text-left">
               <span className="grid size-11 shrink-0 place-items-center rounded-full bg-peri-50 text-[18px]" aria-hidden>📝</span>
-              <span className="flex-1"><span className="block text-[15px] font-bold text-navy">2-minute check-in</span><span className="text-[13px] text-muted">Tell Jitu Bhaiya how you’ve been since last time</span></span>
+              <span className="flex-1"><span className="block text-[15px] font-bold text-navy">2-minute check-in</span><span className="text-[13px] text-muted">Tell Jitendra Khimlani how you’ve been since last time</span></span>
               <span className="text-[13px] font-semibold text-navy">Start</span>
             </button>
           )
@@ -99,7 +99,7 @@ function Detail() {
             {a.feedback ? (
               <div className="mt-3 flex items-center gap-3"><MoodImg mood={RATING[a.feedback.rating - 1]} size={44} /><p className="flex-1 text-[14px] text-muted">{[...(a.feedback.benefits ?? []), ...a.feedback.tags].join(' · ') || 'Thank you for sharing.'}</p><button onClick={() => setFb(true)} className="text-[14px] font-semibold text-navy underline underline-offset-4">Edit</button></div>
             ) : (
-              <><p className="mt-1 text-[14px] text-muted">Your notes go straight to Jitu Bhaiya.</p><Btn size="md" className="mt-4" onClick={() => setFb(true)}>Share feedback</Btn></>
+              <><p className="mt-1 text-[14px] text-muted">Your notes go straight to Jitendra Khimlani.</p><Btn size="md" className="mt-4" onClick={() => setFb(true)}>Share feedback</Btn></>
             )}
           </div>
         )}
@@ -180,7 +180,7 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
           <motion.div key="ok" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center py-6 text-center">
             <Mascot pose="wave" height={160} />
             <p className="mt-3 text-[22px] font-extrabold text-navy">Thank you</p>
-            <p className="mt-1 text-[14px] text-muted">Jitu Bhaiya will read this. You can edit it anytime.</p>
+            <p className="mt-1 text-[14px] text-muted">Jitendra Khimlani will read this. You can edit it anytime.</p>
             <Btn className="mt-6" onClick={onClose}>Done</Btn>
           </motion.div>
         ) : (
@@ -198,10 +198,10 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
             <p className="mt-6 text-[15px] font-bold text-navy">How do you feel after the session?</p>
             <p className="text-[13px] text-muted">Pick any that fit, in your own words.</p>
             <div className="mt-3 flex flex-wrap gap-2">{BENEFITS.map((b) => <Chip key={b} on={benefits.includes(b)} onClick={() => setBenefits(benefits.includes(b) ? benefits.filter((x) => x !== b) : [...benefits, b])}>{b}</Chip>)}</div>
-            <label className="mt-6 block text-[15px] font-bold text-navy" htmlFor="fbnotes">Notes for Jitu Bhaiya</label>
+            <label className="mt-6 block text-[15px] font-bold text-navy" htmlFor="fbnotes">Notes for Jitendra Khimlani</label>
             <textarea id="fbnotes" rows={3} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder="Anything you’d like him to know…" className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] outline-none focus:ring-2 focus:ring-blue" />
             <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-muted"><Check className="size-3.5" /> Visible only to your consultant</p>
-            <Btn full className="mt-5" disabled={!rating} onClick={() => { give(id, { rating, tags, notes, benefits }); setSent(true); buzz(20) }}>Send to Jitu Bhaiya</Btn>
+            <Btn full className="mt-5" disabled={!rating} onClick={() => { give(id, { rating, tags, notes, benefits }); setSent(true); buzz(20) }}>Send to Jitendra Khimlani</Btn>
           </motion.div>
         )}
       </AnimatePresence>

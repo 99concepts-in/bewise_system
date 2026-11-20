@@ -63,7 +63,7 @@ export default function Today() {
       </AppHeader>
 
       <p className="eyebrow">{fmtDay(now)}</p>
-      <h1 className="hello">{greeting(now)}, Jitu Bhaiya</h1>
+      <h1 className="hello">{greeting(now)}, Jitendra Khimlani</h1>
       <p className="hello-sub">{sub}</p>
 
       <m.section className="summary" aria-label="Today at a glance" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
@@ -168,7 +168,7 @@ function TodayList({ todays, next, done, now }: { todays: Appt[]; next?: Appt; d
                 {(action || (!fin && form) || (fin && a.remedy)) && (
                   <div className="tl-foot">
                     {!fin && form === 'filled' && <button className="form-ok" onClick={() => go(`/people/${p.id}`)}><ClipboardCheck size={15} aria-hidden /> Check-in filled {relative(p.checkin!.at, now)}</button>}
-                    {!fin && form === 'missing' && <a className="form-miss" href={waLink(p.phone, `Namaste ${p.first} 🙏 Before our follow-up at ${fmtTime(a.start)}, please fill the 2-minute check-in in the BeWise app so I can see how you've been. Jitu Bhaiya`)} target="_blank" rel="noreferrer"><ClipboardList size={15} aria-hidden /> Ask for check-in</a>}
+                    {!fin && form === 'missing' && <a className="form-miss" href={waLink(p.phone, `Namaste ${p.first} 🙏 Before our follow-up at ${fmtTime(a.start)}, please fill the 2-minute check-in in the BeWise app so I can see how you've been. Jitendra Khimlani`)} target="_blank" rel="noreferrer"><ClipboardList size={15} aria-hidden /> Ask for check-in</a>}
                     {fin && a.remedy && <span className="tl-blend"><FlowerStack flowers={a.remedy.flowers} size={26} /><span className="muted small">Blend given</span></span>}
                     {action}
                   </div>

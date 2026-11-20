@@ -1,7 +1,7 @@
 'use client'
 /**
  * @module   remedies-ux
- * @owner    CLIENT (UI) · copy pending Jitu Bhaiya's approval (design/v5-bloom/BRIEF.md §8)
+ * @owner    CLIENT (UI) · copy pending Jitendra Khimlani's approval (design/v5-bloom/BRIEF.md §8)
  * @screens  v5 Care tab — FAQ accordion (DESIGN-SYSTEM §5): navy card, white Fraunces questions, marigold +/× circles,
  *           answers in sky-100, a flower peeking from the bottom-right.
  * v5 (HUB 2026-11-20): new. Plain words, no medical claims.
@@ -12,14 +12,14 @@ import { useId, useState } from 'react'
 import { FlowerArt } from './flower'
 import { buzz, ease } from './ui'
 
-// @decision(D-45) draft wording — Jitu Bhaiya approves before launch
+// @decision(D-45) draft wording — Jitendra Khimlani approves before launch
 export const FAQ: { q: string; a: string }[] = [
   { q: 'What are Bach flower remedies?', a: 'Gentle flower essences, chosen for how you feel, to support your emotional balance. There are 38, each linked to a feeling.' },
-  { q: 'How do I take my blend?', a: '4 drops, 4 times a day, straight on the tongue or in any drink, or as Jitu Bhaiya advises. A bottle lasts about 25 days.' },
+  { q: 'How do I take my blend?', a: '4 drops, 4 times a day, straight on the tongue or in any drink, or as Jitendra Khimlani advises. A bottle lasts about 25 days.' },
   { q: 'How soon will I notice a change?', a: 'Everyone is different. Many people notice small shifts in 2 to 3 weeks. Your journal helps you see them.' },
-  { q: 'Can I take them with my medicines?', a: 'They’re a complementary practice and never replace your doctor. Please tell Jitu Bhaiya about any medicines you take.' },
+  { q: 'Can I take them with my medicines?', a: 'They’re a complementary practice and never replace your doctor. Please tell Jitendra Khimlani about any medicines you take.' },
   { q: 'Is there alcohol in it?', a: 'Traditionally a little brandy keeps the blend fresh. Alcohol-free blends are available, just ask.' },
-  { q: 'Are they safe for children and in pregnancy?', a: 'Tell us before your session and Jitu Bhaiya will advise you. Always check with your doctor too.' },
+  { q: 'Are they safe for children and in pregnancy?', a: 'Tell us before your session and Jitendra Khimlani will advise you. Always check with your doctor too.' },
   { q: 'Online or in person?', a: 'Both. Online by video call, or at our studio in Alkapuri, Vadodara. You choose when you book.' },
   { q: 'What if I need to reschedule?', a: 'It’s free up to 24 hours before. We don’t offer refunds, but your session is always kept for you.' },
 ]

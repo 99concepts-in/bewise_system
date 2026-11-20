@@ -15,7 +15,7 @@ export function waLink(phone: string, text: string) {
 }
 /** A warm payment reminder — he never sends the link himself; BeWise already did. */
 export function reminderText(first: string, start: number | undefined, now: number) {
-  return `Namaste ${first} 🙏 Just checking you got the BeWise message about your session${start ? ` on ${dayLabel(start, now).toLowerCase()} at ${fmtTime(start)}` : ''}. The payment link is in that chat. Looking forward to seeing you. Jitu Bhaiya`
+  return `Namaste ${first} 🙏 Just checking you got the BeWise message about your session${start ? ` on ${dayLabel(start, now).toLowerCase()} at ${fmtTime(start)}` : ''}. The payment link is in that chat. Looking forward to seeing you. Jitendra Khimlani`
 }
 
-export const BOOKING_LINK = 'https://bewise.in/book/jitu-bhaiya' // illustrative until the domain is set (D-12)
+export const BOOKING_LINK = 'https://app.bewiseglobal.in/client/book/jitendra-khimlani' // live address (owner 2026-11-20); old /book/jitu-bhaiya still works

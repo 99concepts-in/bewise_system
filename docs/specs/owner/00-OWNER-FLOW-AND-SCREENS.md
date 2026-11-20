@@ -21,7 +21,7 @@ UNDERSTAND  Insights → Sales (streams, compare) · Clients & consultations · 
 MONEY       Money → Cash & bank · To collect / To pay (ageing) · Expenses by category · Profit & loss · GST · Reports (PDF/Excel)
 DECIDE      Approvals → item (receipt photo, who, why) → Approve / Reject with note
 ASK         Ask BeWise → "How did shop sales compare to last month?" → answer + small chart + link
-PEOPLE      Team (Jitu Bhaiya, Haresh, future staff) → roles & permissions · Payroll run (salary, advances, payslips)
+PEOPLE      Team (Jitendra Khimlani, Haresh, future staff) → roles & permissions · Payroll run (salary, advances, payslips)
 PERSONAL    Personal finance (separate) → net worth, monthly spend, budgets, accounts · Owner transfers (capital / drawing / loan)
 SETUP       Settings → business & GST, fees & policies, products tax · Integrations (Razorpay, Shiprocket, WhatsApp, Google) · Audit log
 ```
@@ -94,7 +94,7 @@ SETUP       Settings → business & GST, fees & policies, products tax · Integr
 - v3 rejected → v2 Quiet Luxury. Greeting: "Good morning" until a name is given (D-42).
 - **Personal finance → later** (OW-19…21 deferred). **Payroll → later** (OW-18 deferred).
 - **Accountant login → yes** (OW-28 invite, OW-30 accountant desktop view; read-only + export).
-- **Jitu Bhaiya and Haresh see sales and profit** (read-only).
+- **Jitendra Khimlani and Haresh see sales and profit** (read-only).
 
 ## Added / final screens (first release)
 | ID | Screen | Board |
@@ -114,4 +114,4 @@ SETUP       Settings → business & GST, fees & policies, products tax · Integr
 2. Do you want **personal finance** in the first release, or later?
 3. **Payroll** now (salaries for Haresh & staff), or later?
 4. Will an **accountant/CA** need their own login (view reports, export)?
-5. Should Jitu Bhaiya and Haresh see **profit** too, or only sales? (Default: sales only.)
+5. Should Jitendra Khimlani and Haresh see **profit** too, or only sales? (Default: sales only.)

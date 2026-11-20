@@ -2,10 +2,10 @@
 /**
  * @module   client-home
  * @owner    CLIENT
- * @screens  v5 "Meet Jitu Bhaiya" story (DESIGN-SYSTEM §7) — opened from the Home card and from Book → Meet Jitu Bhaiya
+ * @screens  v5 "Meet Jitendra Khimlani" story (DESIGN-SYSTEM §7) — opened from the Home card and from Book → Meet Jitendra Khimlani
  * v5 (HUB 2026-11-20): new full-screen experience. The card's portrait grows into a tall arch (shared layoutId, 450 ms),
  *   navy hero with the white stacked logo and slowly drifting line-flower petals (CSS 18–30 s loops), headline reveals word by
- *   word, stats count up, "His approach" icons draw in, real testimonials only (TESTIMONIALS), sticky "Book with Jitu Bhaiya".
+ *   word, stats count up, "His approach" icons draw in, real testimonials only (TESTIMONIALS), sticky "Book with Jitendra Khimlani".
  *   Close with ⨯, Esc or a swipe down from the top. prefers-reduced-motion → fades only.
  * Copy rule: no cure / medical claims.
  */
@@ -26,7 +26,7 @@ const HERO_EASE = [0.22, 1, 0.36, 1] as const
 export function JituPortrait({ className, radius, priority }: { className?: string; radius: string; priority?: boolean }) {
   return (
     <motion.div layoutId={JITU_LAYOUT_ID} transition={{ duration: 0.45, ease: HERO_EASE }} className={cx('overflow-hidden bg-sky-100', className)} style={{ borderRadius: radius }}>
-      <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitu Bhaiya (Jitendra Khimlani), smiling" className="h-full w-full object-cover object-[50%_30%]"
+      <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani, smiling" className="h-full w-full object-cover object-[50%_30%]"
         draggable={false} decoding="async" fetchPriority={priority ? 'high' : undefined} />
     </motion.div>
   )
@@ -70,7 +70,7 @@ function Story({ onClose }: { onClose: () => void }) {
   const book = () => { buzz(); onClose(); router.push('/app/book?type=first') }
 
   return (
-    <motion.div role="dialog" aria-modal="true" aria-label="Meet Jitu Bhaiya" className="fixed inset-0 z-[60] mx-auto max-w-[480px]"
+    <motion.div role="dialog" aria-modal="true" aria-label="Meet Jitendra Khimlani" className="fixed inset-0 z-[60] mx-auto max-w-[480px]"
       initial={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.28 } }}>
       {/* navy ground fades in under the morphing portrait */}
       <motion.div className="absolute inset-0 bg-sky-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} />
@@ -101,7 +101,7 @@ function Story({ onClose }: { onClose: () => void }) {
         <motion.article className="relative -mt-8 rounded-t-[32px] bg-sky-50 px-5 pb-40 pt-7"
           initial={{ y: reduce ? 0 : 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, ease, delay: 0.2 }}>
           <span className="inline-flex items-center rounded-full bg-marigold-100 px-3 py-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-ink">Your consultant</span>
-          <Words className="h-display mt-4" text="Jitu Bhaiya listens first." delay={0.35} />
+          <Words className="h-display mt-4" text="Jitendra Khimlani listens first." delay={0.35} />
           <motion.p className="mt-3 text-[16px] leading-6 text-ink-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}>
             {CONSULTANT.fullName}, {CONSULTANT.title}. For more than 12 years he has guided people, gently and without judgement, with the wisdom of Bach flower remedies.
           </motion.p>
@@ -136,7 +136,7 @@ function Story({ onClose }: { onClose: () => void }) {
       <motion.div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-[max(env(safe-area-inset-bottom),16px)] pt-10"
         initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6, duration: 0.45, ease }}>
         <button onClick={book} className="pointer-events-auto flex h-[60px] w-full items-center justify-center gap-2 rounded-full bg-navy font-display text-[18px] font-semibold text-white shadow-[var(--shadow-float)] transition-colors hover:bg-navy-2">
-          Book with Jitu Bhaiya <ArrowRight className="size-5" />
+          Book with Jitendra Khimlani <ArrowRight className="size-5" />
         </button>
       </motion.div>
     </motion.div>
@@ -229,7 +229,7 @@ function Testimonials() {
   )
 }
 
-/** Four-point marigold sparkle (the "Meet Jitu Bhaiya" accent). */
+/** Four-point marigold sparkle (the "Meet Jitendra Khimlani" accent). */
 export function Sparkle({ size = 24, className }: { size?: number; className?: string }) {
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} className={cx('animate-twinkle', className)} aria-hidden>

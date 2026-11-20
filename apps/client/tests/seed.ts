@@ -33,4 +33,4 @@ export async function seed(page: Page, opts: { onboarded?: boolean } = {}) {
 }
 export const ROUTES = ['/app', '/app/journal', '/app/goals', '/app/remedies', '/app/book', '/app/sessions', '/app/sessions/view?id=a2', '/app/checkin?appointment=a2',
   '/app/pay?appointment=a3', '/app/shop', '/app/shop/sleep-roll-on', '/app/bag', '/app/checkout', '/app/orders', '/app/orders/view?id=o1', '/app/ask', '/app/me', '/app/help']
-export const PUBLIC = ['/welcome', '/sign-in', '/book/jitu-bhaiya?type=followup', '/onboarding/about', '/onboarding/photo', '/onboarding/privacy']
+export const PUBLIC = ['/welcome', '/sign-in', '/book/jitendra-khimlani?type=followup', '/onboarding/about', '/onboarding/photo', '/onboarding/privacy']

@@ -1,4 +1,4 @@
-# CHAT 1 — CONSULTANT APP (Jitu Bhaiya · Jitendra Khimlani)
+# CHAT 1 — CONSULTANT APP (Jitendra Khimlani)
 
 > **Start a new Claude Code chat on `exceptionalappstudios-ship-it/bewise_system` and send:**
 > **"Read `chats/CHAT-1-CONSULTANT.md` and follow it."**
@@ -9,11 +9,11 @@
 ---
 
 ## 1. Mission
-You are the product designer + full-stack engineer for **Jitu Bhaiya's consultant app** (`/consult`) and the logic behind it:
+You are the product designer + full-stack engineer for **Jitendra Khimlani's consultant app** (`/consult`) and the logic behind it:
 **scheduling & calendar sync, intake/case-taking data + AI case summary, consultation sessions, troubling emotions,
 progress summaries, the Bach Flower library, the remedy builder ("Give remedy"), follow-ups and client feedback.**
 
-**User:** Jitendra Khimlani ("Jitu Bhaiya") — Bach Remedy Therapist, Life Transformation Coach, 12+ years, 2,00,000+ people reached,
+**User:** Jitendra Khimlani — Bach Remedy Therapist, Life Transformation Coach, 12+ years, 2,00,000+ people reached,
 based in Vadodara, website www.jitendrakhimlani.com. Uses his **phone first** (iPad/laptop adaptation second).
 His day = people, not paperwork: one calm screen at a time, everything about a client one tap away, notes never lost,
 a remedy in under a minute. **The system never prescribes — it organises, remembers, summarises; he decides.**
@@ -36,8 +36,8 @@ a remedy in under a minute. **The system never prescribes — it organises, reme
 | Troubling emotions | He selects per session from an **editable** list; pre-filled from intake (D-27) |
 | Intake | Clients fill a case intake before the first booking; 2-min check-in before follow-ups (D-35). **You own the data, mapping, AI** |
 | AI | **AI case summary** + **3-line progress summary** (Claude, server-side; load the `claude-api` skill before coding) (D-28, D-36) |
-| Flowers to consider | Deterministic list from the intake mapping with reasons — **Jitu Bhaiya only**, never the client (D-37) |
-| Safety | Self-harm answer "Sometimes/Often" → priority alert **to Jitu Bhaiya only**; client sees Tele-MANAS 14416 / 112 (D-38) |
+| Flowers to consider | Deterministic list from the intake mapping with reasons — **Jitendra Khimlani only**, never the client (D-37) |
+| Safety | Self-harm answer "Sometimes/Often" → priority alert **to Jitendra Khimlani only**; client sees Tele-MANAS 14416 / 112 (D-38) |
 | Bach library | Seed **38 + Rescue Remedy**, configurable/hideable (owner said "36" — D-30 open). Descriptions + the 38 intake statements need **his approval** |
 | Calendar | **Google two-way + Apple (iCloud CalDAV) + private ICS feed**; busy times block client slots (D-31) |
 | Business view | He sees **sales and profit** read-only (CN-30…32) (D-33) |

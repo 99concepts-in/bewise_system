@@ -2,7 +2,7 @@
 /**
  * @module   booking
  * @owner    CLIENT (UI) · OWNER finance sends the link & owns Razorpay · CONSULTANT scheduling owns appointment states
- * @screens  Pay for a session booked by Jitu Bhaiya / Haresh — /app/pay?appointment=<id>  (owner 2026-11-18; consultant request §4)
+ * @screens  Pay for a session booked by Jitendra Khimlani / Haresh — /app/pay?appointment=<id>  (owner 2026-11-18; consultant request §4)
  *           No slot picking. If payment lands after the hold expired → "Payment received — pick a new time" (K1 §4.3, point 8).
  */
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -37,7 +37,7 @@ function Pay() {
     </main>
   )
   const c = CONSULTATIONS.find((x) => x.id === a.type)!
-  const by = a.source === 'manager' ? 'The BeWise team' : 'Jitu Bhaiya'
+  const by = a.source === 'manager' ? 'The BeWise team' : 'Jitendra Khimlani'
 
   // ---- paid after the held time expired → pick a new time (no cost)
   if (a.needsNewTime) return (
@@ -45,7 +45,7 @@ function Pay() {
       <AppHeader back="/app" />
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-2 flex items-start gap-3 rounded-[24px] bg-sage-100/80 p-4">
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage-text text-white"><Check className="size-5" strokeWidth={3} /></span>
-        <div><p className="text-[16px] font-extrabold text-navy">{a.status === 'expired' ? 'Payment received. Pick a new time' : 'Choose your preferred time'}</p><p className="text-[13px] leading-5 text-sage-text">{a.status === 'expired' ? 'The time we were holding was released before the payment arrived. Choose any time below at no extra cost.' : 'Jitu Bhaiya or Haresh bhai will confirm it. If it doesn’t suit, our team will call you.'}</p></div>
+        <div><p className="text-[16px] font-extrabold text-navy">{a.status === 'expired' ? 'Payment received. Pick a new time' : 'Choose your preferred time'}</p><p className="text-[13px] leading-5 text-sage-text">{a.status === 'expired' ? 'The time we were holding was released before the payment arrived. Choose any time below at no extra cost.' : 'Jitendra Khimlani or Haresh bhai will confirm it. If it doesn’t suit, our team will call you.'}</p></div>
       </motion.div>
       <div className="mt-5"><TimePicker slot={slot} setSlot={setSlot} /></div>
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
@@ -80,7 +80,7 @@ function Pay() {
       <AppHeader back="/app" />
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="mt-2 flex items-center gap-3">
         <img src={`${BP}/img/jitu.webp`} alt="" className="size-14 rounded-full object-cover ring-4 ring-white shadow-[var(--shadow-card)]" />
-        <div><p className="text-[13px] font-semibold text-peri">{a.payLater ? 'Your session with Jitu Bhaiya' : `${by} booked this for you`}</p><h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">{a.payLater ? <>Pay for your <span className="text-soft">session</span></> : <>Complete your <span className="text-soft">booking</span></>}</h1></div>
+        <div><p className="text-[13px] font-semibold text-peri">{a.payLater ? 'Your session with Jitendra Khimlani' : `${by} booked this for you`}</p><h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-navy">{a.payLater ? <>Pay for your <span className="text-soft">session</span></> : <>Complete your <span className="text-soft">booking</span></>}</h1></div>
       </motion.div>
       <section className="card mt-5 p-5">
         {[

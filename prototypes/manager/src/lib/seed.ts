@@ -159,7 +159,7 @@ export function seed() {
     { id: 'bt4', code: 'BW-B-2610-03', productId: 'p3', variantId: 'p3v0', units: 120, step: 5, mfg: dateKey(-26), expiry: dateKey(704), costPaise: 1650000, wastagePct: 0.8, materials: [] },
   ]
   const notes: Note[] = [
-    { id: 'n1', title: 'New remedy to prepare', body: 'Jitu Bhaiya gave Arjun K. a new blend · BW-00044', at: t - 0.5 * H, read: false, tone: 'info', route: { name: 'order', id: 'o44' } },
+    { id: 'n1', title: 'New remedy to prepare', body: 'Jitendra Khimlani gave Arjun K. a new blend · BW-00044', at: t - 0.5 * H, read: false, tone: 'info', route: { name: 'order', id: 'o44' } },
     { id: 'n2', title: 'Delivery failed', body: 'Riya B. was not reachable in Pune · BW-00035', at: t - 3 * H, read: false, tone: 'bad', route: { name: 'order', id: 'o35' } },
     { id: 'n3', title: 'Lavender oil is running low', body: '120 ml left · reorder level 250 ml', at: t - 5 * H, read: false, tone: 'warn', route: { name: 'stockItem', id: 'rm-lavender' } },
     { id: 'n4', title: 'Expense approved', body: 'EXP/2026-27/0061 · ₹380 courier', at: t - 20 * H, read: true, tone: 'good' },

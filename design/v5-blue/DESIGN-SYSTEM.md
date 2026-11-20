@@ -1,4 +1,4 @@
-# BeWise v5 "Blue Bloom": design system (client app + Jitu Bhaiya's app)
+# BeWise v5 "Blue Bloom": design system (client app + Jitendra Khimlani's app)
 
 > **Owner:** HUB · 2026-11-20 · Owner direction:
 > - Blue theme only, with colourful elements.
@@ -16,7 +16,7 @@
   - **Clear space** = the owl circle's radius on every side. **Minimum size:** horizontal 28 px high, mark 24 px.
   - **Colour:** navy `#243D91` on light backgrounds; the white version on navy or photos. Never recolour, stretch, rotate or add effects.
 - **App headers:** horizontal lockup, 32 px high (client) or 28 px (consultant).
-- **Splash / welcome / Jitu Bhaiya story:** stacked logo or mark.
+- **Splash / welcome / Jitendra Khimlani story:** stacked logo or mark.
 
 ## 2. Colour: blue base, colourful accents
 | Token | Hex | Role |
@@ -95,7 +95,7 @@ Sentence case everywhere. Never more than **one Display per screen**.
   - client: "Book your consultation · ₹1,000 →";
   - during intake: "Your check-in · 3/8";
   - consultant: "Build remedy · 3/7 flowers".
-- **Cards:** white, radius 24, padding 20, Fraunces title, Inter body. A *feature card* may use one accent-100 fill (for example "Meet Jitu Bhaiya" on `sky-100` with a marigold sparkle).
+- **Cards:** white, radius 24, padding 20, Fraunces title, Inter body. A *feature card* may use one accent-100 fill (for example "Meet Jitendra Khimlani" on `sky-100` with a marigold sparkle).
 - **FAQ accordion** (Care tab): a navy card (`#243D91`) with white Fraunces questions, 32 px marigold "+" circles that rotate to "×", answers in `sky-100` text, and a flower vector peeking from the bottom-right.
 - **Flower tile:** square 1:1, `sky-50` background, flower SVG at 80%, Fraunces 15 px name below. Used in the library, the remedy builder and "Your blend".
 - **Tab bar:** white, 64 px plus safe area. Active tab = navy icon + label with a 4 px navy dot above. Inactive = `muted`.
@@ -110,16 +110,16 @@ Sentence case everywhere. Never more than **one Display per screen**.
 ## 7. Key experiences
 **Client home:**
 1. Greeting + "How are you feeling today?" as 6 feeling circles. Tapping one logs the mood with a petal burst, then shows a one-line suggestion.
-2. **Meet Jitu Bhaiya** card.
+2. **Meet Jitendra Khimlani** card.
 3. Today's blend (when one exists).
 4. Shop row.
 5. The floating "Book" pill.
 
-**Jitu Bhaiya story (tap the card):** full-screen.
+**Jitendra Khimlani story (tap the card):** full-screen.
 - The portrait card grows into a tall arch (shared-element feel: scale + radius morph, 450 ms).
 - Navy hero with the white stacked logo small at the top and floating line-flower petals drifting slowly (CSS, 18–30 s loops).
 - The headline reveals word by word; stats count up; "His approach" in 3 steps with icons drawing in.
-- A testimonial carousel, then a sticky "Book with Jitu Bhaiya" button. Close with a ⨯ or swipe down.
+- A testimonial carousel, then a sticky "Book with Jitendra Khimlani" button. Close with a ⨯ or swipe down.
 - *prefers-reduced-motion* turns all motion into fades.
 
 **Intake quiz (Book):**
@@ -130,7 +130,7 @@ Sentence case everywhere. Never more than **one Display per screen**.
 
 A thin blue progress bar, the sticky primary "Next", autosave, and back. The answers keep the same shape (API unchanged).
 
-**Care (2nd tab, today "Remedies"):** next appointment → your blend (flower tiles, day x of 25, drops tick) → **FAQ accordion** (8 questions, `design/v5-bloom/BRIEF.md` §8, pending Jitu Bhaiya's wording).
+**Care (2nd tab, today "Remedies"):** next appointment → your blend (flower tiles, day x of 25, drops tick) → **FAQ accordion** (8 questions, `design/v5-bloom/BRIEF.md` §8, pending Jitendra Khimlani's wording).
 
 **Install prompt:**
 - Shown after the 2nd visit or right after the first booking; never on the first screen.
@@ -143,7 +143,7 @@ A thin blue progress bar, the sticky primary "Next", autosave, and back. The ans
 - Only "Yes" triggers `Notification.requestPermission()`. On iOS it's offered only when installed.
 - It can be changed later in Me → Reminders.
 
-**Consultant (Jitu Bhaiya):**
+**Consultant (Jitendra Khimlani):**
 - **Today:** a serif greeting, a navy summary card (sessions · blends to give · today's sales), and a timeline of sessions showing each client's chosen feelings as coloured chips.
 - **Remedy builder:** a flower-tile grid with "Flowers to consider" first; the floating pill shows the count out of 7.
 - **Client profile:** mood colours, blend history with flower thumbnails.

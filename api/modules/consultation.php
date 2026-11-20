@@ -62,7 +62,7 @@ return [
             'body' => req_str($in, 'body', 4000), 'shared_at' => $share ? now_utc() : null]);
         if ($share) {
             Events::emit('client_summary.shared', ['summaryId' => $id, 'clientId' => $client['id']]);
-            notify(['clientId' => $client['id']], 'A note from Jitu Bhaiya', 'Your session summary is in the app.', '/client/app/appointments');
+            notify(['clientId' => $client['id']], 'A note from Jitendra Khimlani', 'Your session summary is in the app.', '/client/app/appointments');
         }
         return ['id' => $id, 'shared' => $share];
     },

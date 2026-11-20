@@ -8,7 +8,7 @@
 |---|---|---|
 | All apps (landing) | https://99concepts-in.github.io/bewise_system/ | |
 | Client app | https://99concepts-in.github.io/bewise_system/preview/client/ | CLIENT up to `7980628` (blend bottle on Home, studio address & maps, alcohol-free remedies) |
-| Consultant (Jitu Bhaiya) | https://99concepts-in.github.io/bewise_system/preview/consultant/ | CONSULTANT up to `10eec57` (share booking link + QR, today's appointments & check-in, month calendar) |
+| Consultant (Jitendra Khimlani) | https://99concepts-in.github.io/bewise_system/preview/consultant/ | CONSULTANT up to `10eec57` (share booking link + QR, today's appointments & check-in, month calendar) |
 | Manager (Haresh) | https://99concepts-in.github.io/bewise_system/preview/manager/ | MANAGER up to `11da981` (simpler Today, share booking link) |
 | Owner | https://99concepts-in.github.io/bewise_system/preview/owner/ | OWNER up to `54dd340` |
 
@@ -19,10 +19,10 @@ Prototypes with sample data only — no real payments, OTP or messages. Rebuild:
 - **app.bewiseglobal.in** — apps + API, database installed 2026-11-19 ✅. Owner tools: `/api/tools.php` (team, Razorpay test login, Razorpay keys).
 
 ## 🎨 v5 Blue Bloom (2026-11-20)
-- Client app + Jitu Bhaiya's app redesigned (D-45) and live on app.bewiseglobal.in. Official logo kit everywhere. Manager + owner apps: logo swap and v5 in a later phase.
+- Client app + Jitendra Khimlani's app redesigned (D-45) and live on app.bewiseglobal.in. Official logo kit everywhere. Manager + owner apps: logo swap and v5 in a later phase.
 
 ## 💬 WhatsApp (2026-11-19)
-- Mart2Meta connected in code: booking confirmed, payment due, 24 h / 2 h reminders (cron), blend ready, order confirmed / dispatched, staff alerts (safety → Jitu Bhaiya only), optional WhatsApp sign-in code. Owner connects on `/api/tools.php`; guide `hosting/WHATSAPP-MART2META.md`. Log table `whatsapp_log`.
+- Mart2Meta connected in code: booking confirmed, payment due, 24 h / 2 h reminders (cron), blend ready, order confirmed / dispatched, staff alerts (safety → Jitendra Khimlani only), optional WhatsApp sign-in code. Owner connects on `/api/tools.php`; guide `hosting/WHATSAPP-MART2META.md`. Log table `whatsapp_log`.
 
 ## Foundation
 
@@ -83,7 +83,7 @@ End-to-end test across all four roles: `api/tests/e2e.mjs` (58 checks ✅ on Mar
 - **P0 (HUB → all four):** wire your app to the real API — `requests/20261118-hub-to-{client,consultant,manager,owner}-wire-real-api.md`.
 
 ## Owner reminders
-⏳ **10–15 testimonials** and more photos of Jitu Bhaiya — see `CONTENT-CHECKLIST.md` (HUB reminds at the end of each module).
+⏳ **10–15 testimonials** and more photos of Jitendra Khimlani — see `CONTENT-CHECKLIST.md` (HUB reminds at the end of each module).
 
 ## Blockers / needs from the business
 See `DECISIONS.md` — credentials and content approvals are the main external blockers.

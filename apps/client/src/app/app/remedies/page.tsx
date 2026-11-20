@@ -26,7 +26,7 @@ import { DropsTick } from '@/components/drops-tick'
 import { blendSupply } from '@/lib/supply'
 import { BP } from '@/lib/asset'
 
-// @decision(D-10) generic Bach descriptions — Jitu Bhaiya approves final wording before launch. Never the reason it was chosen.
+// @decision(D-10) generic Bach descriptions — Jitendra Khimlani approves final wording before launch. Never the reason it was chosen.
 const ABOUT: Record<string, string> = {
   Mimulus: 'Dr Bach described Mimulus for everyday fears of known things, a gentle companion for quiet courage.',
   'White Chestnut': 'Associated with a busy mind and repeating thoughts, for a calmer, clearer head.',
@@ -58,7 +58,7 @@ export default function Remedies() {
           <div className="card flex flex-col items-center p-7 text-center">
             <Mascot pose="sleep" height={132} />
             <p className="mt-4 font-display text-[20px] font-semibold text-ink">Your blend will bloom here</p>
-            <p className="mt-1 max-w-[290px] text-[14px] leading-5 text-ink-2">After your first session, Jitu Bhaiya prepares a personal blend of flower essences, included in your consultation.</p>
+            <p className="mt-1 max-w-[290px] text-[14px] leading-5 text-ink-2">After your first session, Jitendra Khimlani prepares a personal blend of flower essences, included in your consultation.</p>
             {!next && <BtnLink href="/app/book" size="md" className="mt-5">Book a consultation</BtnLink>}
           </div>
         </Item>

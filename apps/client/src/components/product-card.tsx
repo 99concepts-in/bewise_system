@@ -16,7 +16,7 @@ export const allergyHit = (p: Product, allergies: string[]) => p.allergens.find(
 
 /**
  * Adding to bag. Personal Bach blends are made after a consultation, so they become a reorder of the client's own blend
- * (or a nudge to book, if Jitu Bhaiya hasn't prepared one yet).
+ * (or a nudge to book, if Jitendra Khimlani hasn't prepared one yet).
  */
 export function useAddProduct() {
   const add = useApp((s) => s.addToCart)
