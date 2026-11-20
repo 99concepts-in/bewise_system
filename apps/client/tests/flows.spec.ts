@@ -33,7 +33,7 @@ test('public booking link: new visitor → landing → sign-in; signed-in → bo
   await seed(page, { onboarded: false })
   await page.goto('/book/jitendra-khimlani?type=followup')
   await expect(page.getByRole('heading', { name: /Book with Jitendra Khimlani/ })).toBeVisible()
-  await page.getByRole('button', { name: 'Book with Jitendra Khimlani' }).click()
+  await page.getByRole('button', { name: 'Book an appointment' }).click()
   await page.waitForURL('**/sign-in')
   expect(await page.evaluate(() => sessionStorage.getItem('bw-next'))).toBe('/app/book?type=followup')
   await seed(page)
