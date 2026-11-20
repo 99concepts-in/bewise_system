@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-20 · Check-in order
+- "Since we last met" (check-in and follow-up intake): options now read Harder · Same · Better, so Better sits on the right (owner).
+
 ## 2026-11-20 · Home blend card redesigned (bottle + 4 drops)
 - Home "Your remedy" card: a remedy bottle (components/remedy-bottle.tsx) whose liquid follows the bottle's 25 days and lowers a notch with each dose today (ripple on each tap), Day X of 25, days left, streak, then the 4 tappable drops with a short caption, and "View my blend & progress" into My care.
 - Flowers row, stats, progress bar and the "Took a dose" button removed from Home; the full tracker (stats, 25-day calendar, past days) and the remedies with their emotions stay in My care.

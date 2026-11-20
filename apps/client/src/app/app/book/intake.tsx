@@ -488,7 +488,7 @@ export function CheckinChanges({ c, set, feelings }: { c: Checkin; set: (p: Part
       {list.map((f) => (
         <div key={f} className="card p-4">
           <p className="mb-3 text-[16px] font-bold text-navy">{f}</p>
-          <Segmented value={c.changes[f]} onChange={(v) => set({ changes: { ...c.changes, [f]: v } })} options={(['Better', 'Same', 'Harder'] as const).map((x) => ({ value: x, label: x }))} />
+          <Segmented value={c.changes[f]} onChange={(v) => set({ changes: { ...c.changes, [f]: v } })} options={(['Harder', 'Same', 'Better'] as const).map((x) => ({ value: x, label: x }))} />
         </div>
       ))}
     </div>
