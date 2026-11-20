@@ -352,3 +352,49 @@ export const HELPLINES = [
   { name: 'Tele-MANAS', number: '14416', note: 'Free, confidential, 24×7' }, // @decision(D-38) verify before launch
   { name: 'Emergency', number: '112', note: 'If you are in immediate danger' },
 ]
+
+/**
+ * Owner 2026-11-20: show each remedy in the client's blend and the emotion it addresses.
+ * Standard Bach indications, in plain wellbeing language (no medical claims). `mood` picks the face colour.
+ * @decision(D-10) Jitendra Khimlani can edit wording; it never states why a remedy was chosen for this client.
+ */
+export const BACH_REMEDIES: Record<string, { emotion: string; mood: string }> = {
+  Agrimony: { emotion: 'Hiding worries behind a cheerful face', mood: 'worried' },
+  Aspen: { emotion: 'Vague fears you can’t explain', mood: 'scared' },
+  Beech: { emotion: 'Feeling critical or intolerant of others', mood: 'irritated' },
+  Centaury: { emotion: 'Finding it hard to say no', mood: 'tired' },
+  Cerato: { emotion: 'Doubting your own judgement', mood: 'confused' },
+  'Cherry Plum': { emotion: 'Fear of losing control', mood: 'stressed' },
+  'Chestnut Bud': { emotion: 'Repeating the same patterns', mood: 'confused' },
+  Chicory: { emotion: 'Needing to be needed', mood: 'lonely' },
+  Clematis: { emotion: 'Daydreaming, not feeling present', mood: 'tired' },
+  'Crab Apple': { emotion: 'Not feeling good about yourself', mood: 'hurt' },
+  Elm: { emotion: 'Overwhelmed by responsibilities', mood: 'overwhelmed' },
+  Gentian: { emotion: 'Discouraged after a setback', mood: 'sad' },
+  Gorse: { emotion: 'Feeling hopeless', mood: 'sad' },
+  Heather: { emotion: 'Feeling alone and needing to be heard', mood: 'lonely' },
+  Holly: { emotion: 'Jealousy, anger or suspicion', mood: 'angry' },
+  Honeysuckle: { emotion: 'Living in the past', mood: 'hurt' },
+  Hornbeam: { emotion: 'Monday-morning tiredness, putting things off', mood: 'tired' },
+  Impatiens: { emotion: 'Impatience and irritation', mood: 'irritated' },
+  Larch: { emotion: 'Low confidence', mood: 'worried' },
+  Mimulus: { emotion: 'Everyday fears of known things', mood: 'scared' },
+  Mustard: { emotion: 'Sadness that comes without a reason', mood: 'sad' },
+  Oak: { emotion: 'Pushing on even when exhausted', mood: 'tired' },
+  Olive: { emotion: 'Mental and physical exhaustion', mood: 'tired' },
+  Pine: { emotion: 'Guilt and self-blame', mood: 'guilty' },
+  'Red Chestnut': { emotion: 'Worrying about loved ones', mood: 'worried' },
+  'Rock Rose': { emotion: 'Panic and sudden fear', mood: 'scared' },
+  'Rock Water': { emotion: 'Being too strict with yourself', mood: 'stressed' },
+  Scleranthus: { emotion: 'Unable to decide between two choices', mood: 'confused' },
+  'Star of Bethlehem': { emotion: 'Shock or grief', mood: 'hurt' },
+  'Sweet Chestnut': { emotion: 'Feeling you’ve reached your limit', mood: 'overwhelmed' },
+  Vervain: { emotion: 'Over-enthusiasm and tension', mood: 'restless' },
+  Vine: { emotion: 'Needing to be in control', mood: 'frustrated' },
+  Walnut: { emotion: 'Adjusting to change', mood: 'restless' },
+  'Water Violet': { emotion: 'Keeping to yourself, seeming distant', mood: 'lonely' },
+  'White Chestnut': { emotion: 'A busy mind, repeating thoughts', mood: 'stressed' },
+  'Wild Oat': { emotion: 'Unsure of your direction in life', mood: 'confused' },
+  'Wild Rose': { emotion: 'Feeling flat and resigned', mood: 'bored' },
+  Willow: { emotion: 'Resentment, feeling life is unfair', mood: 'frustrated' },
+}

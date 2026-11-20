@@ -15,6 +15,7 @@ import { PhotoCapture } from '@/components/camera'
 import { AppHeader } from '@/components/shell'
 import { Btn, Item, Reveal, Sheet, Toggle, toast } from '@/components/ui'
 import { useApp } from '@/lib/store'
+import { fmtIso } from '@/lib/format'
 
 export default function Me() {
   const router = useRouter()
@@ -107,7 +108,7 @@ function DetailsSheet({ open, onClose }: { open: boolean; onClose: () => void })
           <label key={k} className="block"><span className="mb-1 block px-1 text-[12px] font-semibold text-muted">{l}</span>
             <input value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} className="h-12 w-full rounded-[16px] bg-peri-50 px-4 text-[15px] font-semibold text-navy outline-none focus:ring-2 focus:ring-navy" /></label>
         ))}
-        <p className="px-1 text-[12px] text-muted">Phone: +91 {p.phone} · date of birth {p.dob}</p>
+        <p className="px-1 text-[12px] text-muted">Phone: +91 {p.phone} · date of birth {fmtIso(p.dob)}</p>
       </div>
       <Btn full className="mt-5" onClick={() => { set({ name: f.name.trim() || p.name, city: f.city.trim() || p.city, allergies: f.allergies.toLowerCase().split(/[,\s]+/).filter(Boolean) }); toast('Details saved'); onClose() }}>Save</Btn>
     </Sheet>

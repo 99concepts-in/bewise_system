@@ -11,6 +11,7 @@ import { ArrowRight, BookOpen, Check, ChevronRight, Lightbulb, Sparkles, Video }
 import { useMemo, useState } from 'react'
 import { Mascot, MoodButton, MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
+import { isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { GoalCheck } from '@/components/goal-check'
 import { doneToday, kindOf, streak } from '@/lib/goals'
 import { AppHeader } from '@/components/shell'
@@ -109,8 +110,8 @@ function useNextAppointment() {
   const appts = useApp((s) => s.appointments)
   const now = useNow()
   return useMemo(() => {
-    const upcoming = appts.filter((a) => a.status === 'confirmed' && new Date(a.startsAt).getTime() + 60 * 60_000 > now).sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))[0]
-    const needsFeedback = appts.find((a) => (a.status === 'completed' || new Date(a.startsAt).getTime() + 60 * 60_000 < now) && !a.feedback && now - new Date(a.startsAt).getTime() < 14 * 86_400_000)
+    const upcoming = appts.filter((a) => a.status === 'confirmed' && isUpcoming(a, now)).sort((a, b) => Number(tbc(b)) - Number(tbc(a)) || +new Date(a.startsAt) - +new Date(b.startsAt))[0]
+    const needsFeedback = appts.find((a) => !tbc(a) && (a.status === 'completed' || new Date(a.startsAt).getTime() + 60 * 60_000 < now) && !a.feedback && now - new Date(a.startsAt).getTime() < 14 * 86_400_000)
     return { upcoming, needsFeedback, any: appts.length > 0, now }
   }, [appts, now])
 }
@@ -123,15 +124,15 @@ function ContextCard() {
   const router = useRouter()
 
   const appts = useApp.getState().appointments
-  const toPay = appts.find((x) => x.needsNewTime || ((x.status === 'awaiting_payment' || x.status === 'expired') && !x.paidAt))
-  if (toPay?.needsNewTime)
-    return <Ctx tone="sage" kicker={toPay.payLater ? 'Almost booked' : 'Payment received'} title={toPay.status === 'expired' ? 'Pick a new time' : 'Choose your preferred time'} body={toPay.status === 'expired' ? 'The held time was released before your payment arrived. Choose any time at no extra cost.' : 'Pick a time that suits you. Jitendra Khimlani or Haresh bhai will confirm it.'} cta="Choose a time" href={`/app/pay?appointment=${toPay.id}`} />
+  const toPay = appts.find((x) => (x.status === 'awaiting_payment' || x.status === 'expired') && !x.paidAt)
   if (toPay)
-    return <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitendra Khimlani'} title="Complete your booking" body={`${fmtDay(toPay.startsAt)} · ${fmtTime(toPay.startsAt)}, pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
+    return <Ctx tone="navy" kicker={toPay.source === 'manager' ? 'From the BeWise team' : 'From Jitendra Khimlani'} title="Complete your booking" body={`${whenShort(toPay)}. Pay to confirm your session.`} cta={`Pay ${formatINR(toPay.amountPaise)}`} href={`/app/pay?appointment=${toPay.id}`} />
 
   if (intake && !intake.submittedAt && intake.step > 0)
-    return <Ctx tone="peri" kicker="Almost there" title="Your answers are saved" body="Finish in about 3 minutes, then pick a time." cta="Continue" href="/app/book?resume=1" img={`${BP}/img/owl-read.webp`} />
+    return <Ctx tone="peri" kicker="Almost there" title="Your answers are saved" body="Finish in about 3 minutes, then send your request." cta="Continue" href="/app/book?resume=1" img={`${BP}/img/owl-read.webp`} />
 
+  if (upcoming && tbc(upcoming))
+    return <Ctx tone="sage" kicker="Request received" title="We’ll confirm your time" body="Jitendra Khimlani or our team will set a time and message you on WhatsApp." cta="View request" href={`/app/sessions/view?id=${upcoming.id}`} />
   if (upcoming) {
     const mins = Math.round((new Date(upcoming.startsAt).getTime() - now) / 60_000)
     if (mins <= 60) return <Ctx tone="navy" kicker="Starting soon" title={mins > 0 ? `Your session begins in ${mins} min` : 'Your session is live'} body="Find a quiet spot. Jitendra Khimlani will join you." cta={mins <= 10 ? 'Join now' : 'Open'} href={`/app/sessions/view?id=${upcoming.id}`} icon={<Video className="size-5" />} />

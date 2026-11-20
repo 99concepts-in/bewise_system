@@ -11,8 +11,9 @@ import { useRef, useState } from 'react'
 import { Mascot, MoodImg } from '@/components/brand'
 import { AppHeader } from '@/components/shell'
 import { Btn, BtnLink, Item, Reveal, Ring, Sheet, buzz, ease, toast, useChrome } from '@/components/ui'
-import { moodOf, REORDER_PRICE_PAISE } from '@/lib/data'
-import { useApp, type Appointment } from '@/lib/store'
+import { BACH_REMEDIES, moodOf, REORDER_PRICE_PAISE } from '@/lib/data'
+import { useApp } from '@/lib/store'
+import { isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { dayKey, fmtDay, fmtTime, formatINR } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
 import { DoseTracker } from '@/components/dose-tracker'
@@ -87,15 +88,27 @@ export default function Remedies() {
 
         <Item>
           <section className="card p-5">
-            <h2 className="h-section">Flowers in your blend</h2>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {blend.flowers.map((f, i) => (
-                <motion.button key={f} onClick={() => setFlower(f)} whileTap={{ scale: 0.95 }} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 + i * 0.05 }}
-                  className="inline-flex h-11 items-center gap-2 rounded-full bg-[#f6f1e8] pl-1.5 pr-4 text-[14px] font-semibold text-navy">
-                  <img src={`${BP}/img/${FLOWER_IMG[i % 2]}.webp`} alt="" className="size-8 rounded-full bg-white object-contain p-0.5" />{f}
-                </motion.button>
-              ))}
-            </div>
+            {/* owner 2026-11-20: every remedy in the blend and the emotion it addresses */}
+            <h2 className="h-section">Remedies in your blend</h2>
+            <p className="text-[13px] text-muted">{blend.flowers.length} Bach flower remedies, and the feeling each one supports.</p>
+            <ul className="mt-3 space-y-2">
+              {blend.flowers.map((f, i) => {
+                const info = BACH_REMEDIES[f]
+                return (
+                  <motion.li key={f} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.05 }}>
+                    <button onClick={() => setFlower(f)} className="flex w-full items-center gap-3 rounded-[20px] bg-[#f8f4ec] p-3 text-left">
+                      <img src={`${BP}/img/${FLOWER_IMG[i % 2]}.webp`} alt="" className="size-11 shrink-0 rounded-full bg-white object-contain p-1" />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[15px] font-bold text-navy">{f}</span>
+                        <span className="block text-[13px] leading-[18px] text-muted">For: {info?.emotion ?? 'emotional balance'}</span>
+                      </span>
+                      {info && <MoodImg mood={info.mood as never} size={34} />}
+                      <ChevronRight className="size-4 shrink-0 text-soft" />
+                    </button>
+                  </motion.li>
+                )
+              })}
+            </ul>
           </section>
         </Item>
 
@@ -152,7 +165,8 @@ export default function Remedies() {
           <div className="pb-2">
             <motion.img src={`${BP}/img/${FLOWER_IMG[blend.flowers.indexOf(flower) % 2]}.webp`} alt="" className="mx-auto h-[180px]" initial={{ scale: 0.7, rotate: -8, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 16 }} />
             <h2 className="h-duo mt-2 text-[28px]">{flower}</h2>
-            <p className="mt-3 text-[15px] leading-6 text-ink">{ABOUT[flower] ?? 'One of Dr Bach’s flower remedies.'}</p>
+            {BACH_REMEDIES[flower] && <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-peri-50 py-1 pl-1 pr-3 text-[13px] font-semibold text-navy"><MoodImg mood={BACH_REMEDIES[flower].mood as never} size={26} /> For: {BACH_REMEDIES[flower].emotion}</p>}
+            <p className="mt-3 text-[15px] leading-6 text-ink">{ABOUT[flower] ?? (BACH_REMEDIES[flower] ? `Associated with ${BACH_REMEDIES[flower].emotion.charAt(0).toLowerCase()}${BACH_REMEDIES[flower].emotion.slice(1)}.` : 'One of Dr Bach’s flower remedies.')}</p>
             <p className="mt-4 rounded-[18px] bg-[#f6f1e8] p-3 text-[13px] font-semibold text-[#8a6a2c]">In your blend since {fmtDay(blend.startedOn)}</p>
           </div>
         )}
@@ -214,7 +228,6 @@ function ReminderSheet({ open, onClose }: { open: boolean; onClose: () => void }
   )
 }
 
-const isUpcoming = (a: Appointment, now: number) => (a.status === 'confirmed' || a.status === 'awaiting_payment' || !!a.needsNewTime) && (!!a.needsNewTime || +new Date(a.startsAt) + 3600_000 > now)
 
 /** owner 2026-11-18: sessions live here too, with booking one tap away (the separate Book tab is gone). */
 function Upcoming() {
@@ -232,11 +245,11 @@ function Upcoming() {
         <ul className="mt-3 space-y-2.5">
           {up.map((a) => (
             <li key={a.id}>
-              <Link href={a.needsNewTime || a.status === 'awaiting_payment' ? `/app/pay?appointment=${a.id}` : `/app/sessions/view?id=${a.id}`} className="flex items-center gap-3 rounded-[20px] bg-peri-50/70 p-3.5">
+              <Link href={a.status === 'awaiting_payment' ? `/app/pay?appointment=${a.id}` : `/app/sessions/view?id=${a.id}`} className="flex items-center gap-3 rounded-[20px] bg-peri-50/70 p-3.5">
                 <span className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-navy text-white"><CalendarHeart className="size-6" /></span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[12px] font-semibold text-peri">{a.needsNewTime ? 'Booked · choose your time' : a.status === 'awaiting_payment' ? 'Awaiting payment' : a.timeRequested ? 'Time awaiting confirmation' : a.type === 'first' ? 'First consultation' : 'Follow-up'}</span>
-                  <span className="block text-[16px] font-bold text-navy">{a.needsNewTime ? 'Pick a preferred time' : `${fmtDay(a.startsAt)} · ${fmtTime(a.startsAt)}`}</span>
+                  <span className="block text-[12px] font-semibold text-peri">{a.status === 'awaiting_payment' ? 'Awaiting payment' : tbc(a) ? 'Requested · we’ll confirm the time' : a.type === 'first' ? 'First consultation' : 'Follow-up'}</span>
+                  <span className="block text-[16px] font-bold text-navy">{whenShort(a)}</span>
                   <span className="block text-[12px] text-muted">{a.mode === 'online' ? 'Online' : 'In person'} with Jitendra Khimlani</span>
                 </span>
                 <ChevronRight className="size-5 text-navy" />
@@ -255,7 +268,7 @@ function Upcoming() {
 function PastSessions() {
   const appts = useApp((s) => s.appointments)
   const now = Date.now()
-  const past = appts.filter((a) => a.status === 'completed' || (a.status === 'confirmed' && !a.needsNewTime && +new Date(a.startsAt) + 3600_000 <= now))
+  const past = appts.filter((a) => a.status === 'completed' || (a.status === 'confirmed' && !tbc(a) && +new Date(a.startsAt) + 3600_000 <= now))
     .sort((a, b) => +new Date(b.startsAt) - +new Date(a.startsAt)).slice(0, 5)
   if (!past.length) return null
   return (

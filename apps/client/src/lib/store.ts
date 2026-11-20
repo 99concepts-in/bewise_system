@@ -11,7 +11,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { ConsultationId, Emotion } from './data'
-import { PRODUCTS, REORDER_PRICE_PAISE, STUDIO, productTitle, variantById } from './data'
+import { PRODUCTS, REORDER_PRICE_PAISE, STUDIO, istDate, productTitle, variantById } from './data'
 import { isoDay } from './supply'
 import { COUPON_DAYS, COUPON_PCT, PLANS, type PlanId } from './offer'
 import { uid, dayKey } from './format'
@@ -39,6 +39,10 @@ export type Appointment = {
   timeRequested?: boolean
   /** covered by a consultation plan */
   planId?: PlanId
+  /** owner 2026-11-20: clients only request; the Manager or Jitendra Khimlani set the time. True until they do. */
+  timeTbc?: boolean
+  /** the client's optional hints for the team */
+  prefs?: { days?: string; times?: string[]; date?: string; note?: string }
 }
 export type Plan = { id: PlanId; months: number; pricePaise: number; startedAt: string; used: number }
 export type Coupon = { code: string; pct: number; expiresAt: string; usedAt?: string }
@@ -104,7 +108,8 @@ type State = {
   saveIntake: (answers: IntakeAnswers, step: number) => void // intake.saveIntakeDraft
   submitIntake: () => void                                   // intake.submitIntake
   book: (a: Omit<Appointment, 'id' | 'code' | 'createdAt' | 'status'>) => Appointment // holdAppointment + payment.captured
-  reschedule: (id: string, startsAt: string) => void         // scheduling.rescheduleAppointment
+  reschedule: (id: string, startsAt: string) => void         // scheduling.rescheduleAppointment (staff side)
+  requestNewTime: (id: string, note?: string) => void          // client asks for a different time; the team sets it
   giveFeedback: (id: string, f: Feedback) => void            // scheduling.submitSessionFeedback
   logDrops: (date: string, taken: boolean) => void            // remedies.logDrops
   logDoses: (date: string, n: number) => void                  // remedies.logDrops({ date, doses })
@@ -189,8 +194,12 @@ export const useApp = create<State>()(
         const seq = get().seq + 1
         const appt: Appointment = { ...a, id: uid(), code: `BW-A-${String(seq).padStart(5, '0')}`, createdAt: new Date().toISOString(), status: 'confirmed' }
         set((s) => ({ appointments: [...s.appointments, appt], seq, ...(a.planId && s.plan ? { plan: { ...s.plan, used: s.plan.used + 1 } } : {}) }))
-        if (!appt.needsNewTime) get().notify(appt.timeRequested ? { title: 'Time requested', body: 'Jitendra Khimlani or Haresh bhai will confirm your time soon. If it doesn’t suit, our team will call you.', href: `/app/sessions/view?id=${appt.id}` } : { title: 'You’re booked', body: 'Jitendra Khimlani will read your answers before you meet.', href: `/app/sessions/view?id=${appt.id}` })
+        if (!appt.needsNewTime) get().notify(appt.timeRequested ? { title: 'Request sent', body: 'Jitendra Khimlani or the team will confirm a time and message you on WhatsApp.', href: `/app/sessions/view?id=${appt.id}` } : { title: 'You’re booked', body: 'Jitendra Khimlani will read your answers before you meet.', href: `/app/sessions/view?id=${appt.id}` })
         return appt
+      },
+      requestNewTime: (id, note) => {
+        set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, timeTbc: true, timeRequested: true, rescheduled: (a.rescheduled ?? 0) + 1, prefs: { ...a.prefs, note: note || a.prefs?.note } } : a)) }))
+        get().notify({ title: 'New time requested', body: 'The team will confirm a new time and message you on WhatsApp.', href: `/app/sessions/view?id=${id}` })
       },
       reschedule: (id, startsAt) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, startsAt, rescheduled: (a.rescheduled ?? 0) + 1 } : a)) })),
       giveFeedback: (id, f) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, feedback: f } : a)) })),
@@ -204,8 +213,9 @@ export const useApp = create<State>()(
         if (!a) return
         if (a.payLater) { set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString() } : x)) })); get().notify({ title: 'Payment received', body: 'Thank you. Your receipt is in Payments.', href: `/app/sessions/view?id=${id}` }); return }
         const late = a.status === 'expired'
-        set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString(), ...(late ? { needsNewTime: true } : { status: 'confirmed' as const }) } : x)) }))
-        get().notify(late ? { title: 'Payment received', body: 'Please pick a new time for your session, no extra cost.', href: `/app/pay?appointment=${id}` } : { title: 'You’re booked', body: 'Payment received. See you soon.', href: `/app/sessions/view?id=${id}` })
+        // owner 2026-11-20: a late payment no longer asks the client to pick; the team confirms a new time
+        set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString(), status: 'confirmed' as const, ...(late ? { timeTbc: true, timeRequested: true } : {}) } : x)) }))
+        get().notify(late ? { title: 'Payment received', body: 'The team will confirm a new time with you, at no extra cost.', href: `/app/sessions/view?id=${id}` } : { title: 'You’re booked', body: 'Payment received. See you soon.', href: `/app/sessions/view?id=${id}` })
       },
       // owner 2026-11-18: a chosen time is a request until Jitendra Khimlani or Haresh bhai confirm it
       pickNewTime: (id, startsAt) => {
@@ -264,7 +274,13 @@ export const useApp = create<State>()(
       },
       setOffer: (o) => set((s) => ({ offer: { ...s.offer, ...o } })),
       confirmTime: (id) => {
-        set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, timeRequested: false } : x)) }))
+        // preview of the staff side: the team sets a time (next day, 11:00 IST, or the client's preferred date)
+        set((s) => ({ appointments: s.appointments.map((x) => {
+          if (x.id !== id) return x
+          if (!x.timeTbc) return { ...x, timeRequested: false }
+          const day = x.prefs?.date ? new Date(`${x.prefs.date}T00:00:00+05:30`) : new Date(Date.now() + 864e5)
+          return { ...x, timeTbc: false, timeRequested: false, startsAt: istDate(day, '11:00').toISOString() }
+        }) }))
         get().notify({ title: 'Your time is confirmed', body: 'Jitendra Khimlani will see you then.', href: `/app/sessions/view?id=${id}` })
       },
       subscribeOrder: (id, keys) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, subscribed: keys } : o)) })),

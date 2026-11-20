@@ -11,7 +11,7 @@ import { CalendarDays, Droplet, Flame, Plus, Undo2 } from 'lucide-react'
 import { useState } from 'react'
 import { Btn, Sheet, buzz, cx, spring, toast } from './ui'
 import { useApp } from '@/lib/store'
-import { dayKey } from '@/lib/format'
+import { dayKey, fmtDay } from '@/lib/format'
 import { blendDays, doseStats, dosesOn, perDay } from '@/lib/doses'
 
 function Dots({ n, of, size = 'lg', onTap, label }: { n: number; of: number; size?: 'lg' | 'sm' | 'xs'; onTap?: (i: number) => void; label?: string }) {
@@ -122,7 +122,7 @@ export function DoseCalendar({ open, onClose }: { open: boolean; onClose: () => 
       <AnimatePresence mode="wait">
         {picked && !picked.future && (
           <motion.div key={picked.key} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={spring} className="mt-4 rounded-[22px] bg-peri-50/70 p-4">
-            <p className="text-[14px] font-bold text-navy">{picked.today ? 'Today' : picked.d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })} · day {picked.index}</p>
+            <p className="text-[14px] font-bold text-navy">{picked.today ? 'Today' : fmtDay(picked.d)} · day {picked.index}</p>
             <div className="mt-3 flex items-center justify-between gap-3">
               <Dots n={picked.n} of={of} size="sm" onTap={(i) => { s.logDoses(picked.key, i < picked.n ? i : i + 1); buzz(8) }} />
               <div className="flex gap-1.5">

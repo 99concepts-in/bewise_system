@@ -14,8 +14,9 @@ import { Btn, Chip, Sheet, buzz, cx, ease, spring, toast, useNow } from '@/compo
 import { BENEFITS, CONSULTATIONS, STUDIO, istDate, slotsFor, type Emotion } from '@/lib/data'
 import { HELPLINE } from '@/lib/offer'
 import { useApp } from '@/lib/store'
-import { addDays, fmtDay, fmtLongDay, fmtTime, formatINR, startOfDay } from '@/lib/format'
+import { addDays, fmtDay, fmtLongDay, fmtTime, formatINR, startOfDay, fmtIso } from '@/lib/format'
 import { addToCalendar } from '@/lib/ics'
+import { tbc } from '@/lib/appt'
 import { BP } from '@/lib/asset'
 
 export default function Page() { return <Suspense><Detail /></Suspense> }
@@ -33,7 +34,8 @@ function Detail() {
   const c = CONSULTATIONS.find((x) => x.id === a.type)!
   const start = +new Date(a.startsAt)
   const mins = Math.round((start - now) / 60_000)
-  const past = a.status === 'completed' || now > start + c.minutes * 60_000
+  const isTbc = tbc(a)
+  const past = !isTbc && (a.status === 'completed' || now > start + c.minutes * 60_000)
   const joinable = !past && mins <= 10
   const soon = !past && mins <= 60
   const ics = () => addToCalendar(({ id: a.id, title: 'BeWise session with Jitendra Khimlani', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online (link in the BeWise app)' : `${STUDIO.name}, ${STUDIO.full}`, description: c.name }))
@@ -44,10 +46,16 @@ function Detail() {
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }}
         className={cx('relative mt-2 overflow-hidden rounded-[30px] p-6', past ? 'bg-white shadow-[var(--shadow-card)]' : 'bg-[linear-gradient(140deg,#182957,#3c5596_60%,#5e7fb8)] text-white shadow-[var(--shadow-float)]')}>
         {!past && <motion.span className="absolute -right-10 -top-10 size-48 rounded-full bg-white/10" animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 5, repeat: Infinity }} />}
-        <p className={cx('text-[13px] font-semibold', past ? 'text-peri' : 'text-white/70')}>{past ? 'Completed' : a.timeRequested ? 'Preferred time · awaiting confirmation' : soon ? 'Starting soon' : 'Upcoming'}</p>
-        <p className="mt-1 text-[30px] font-extrabold leading-tight tracking-[-0.02em]">{fmtTime(a.startsAt)}</p>
-        <p className={cx('text-[16px] font-semibold', past ? 'text-navy' : 'text-white/90')}>{fmtLongDay(a.startsAt)}</p>
-        {!past && (
+        <p className={cx('text-[13px] font-semibold', past ? 'text-peri' : 'text-white/70')}>{past ? 'Completed' : isTbc ? 'Request received' : soon ? 'Starting soon' : 'Upcoming'}</p>
+        {isTbc ? <>
+          <p className="mt-1 text-[28px] font-extrabold leading-tight tracking-[-0.02em]">Time to be confirmed</p>
+          <p className="text-[15px] font-semibold text-white/90">Jitendra Khimlani or our team will set the time and message you on WhatsApp.</p>
+          {(a.prefs?.days || a.prefs?.times?.length || a.prefs?.date) && <p className="mt-3 text-[13px] text-white/75">You said: {[a.prefs.days, a.prefs.times?.join(', '), a.prefs.date && `around ${fmtIso(a.prefs.date)}`].filter(Boolean).join(' · ')}</p>}
+        </> : <>
+          <p className="mt-1 text-[30px] font-extrabold leading-tight tracking-[-0.02em]">{fmtTime(a.startsAt)}</p>
+          <p className={cx('text-[16px] font-semibold', past ? 'text-navy' : 'text-white/90')}>{fmtLongDay(a.startsAt)}</p>
+        </>}
+        {!past && !isTbc && (
           <div className="mt-4 flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-[14px] backdrop-blur" aria-live="polite">
             <Clock className="size-4" />
             {mins > 1440 ? `In ${Math.round(mins / 1440)} days` : mins > 60 ? `In ${Math.floor(mins / 60)} h ${mins % 60} min` : mins > 0 ? `Your session begins in ${mins} min` : 'Happening now'}
@@ -56,9 +64,9 @@ function Detail() {
       </motion.section>
 
       <div className="mt-4 space-y-3">
-        {a.timeRequested && !past && (
+        {isTbc && !past && (
           <div className="rounded-[22px] bg-[#fbf3dc] p-4 text-[14px] leading-5 text-[#6b5320]">
-            <p><b>Waiting for confirmation.</b> Jitendra Khimlani or Haresh bhai will confirm this time. If it doesn’t work, our team will call you.</p>
+            <p><b>Waiting for a time.</b> Jitendra Khimlani or our team will confirm it. If anything is unclear, we’ll call you.</p>
             <a href={`tel:${HELPLINE.tel}`} className="mt-2 inline-flex items-center gap-1.5 font-semibold text-navy underline underline-offset-4"><Phone className="size-4" /> Helpline {HELPLINE.label} ({HELPLINE.name})</a>
           </div>
         )}
@@ -107,12 +115,12 @@ function Detail() {
 
       {!past && (
         <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] space-y-2.5 bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
-          {a.mode === 'online'
+          {isTbc ? null : a.mode === 'online'
             ? <Btn full variant={joinable ? 'gradient' : 'primary'} disabled={!joinable} onClick={() => toast('The video link opens here at session time')}><Video className="size-5" /> {joinable ? 'Join session' : 'Join opens 10 min before'}</Btn>
             : <Btn full variant="gradient" onClick={() => window.open(STUDIO.directionsUrl, '_blank', 'noopener')}><MapPin className="size-5" /> Directions</Btn>}
           <div className="flex gap-2.5">
-            <Btn full size="md" variant="white" onClick={ics}><CalendarPlus className="size-4" /> Calendar</Btn>
-            <Btn full size="md" variant="white" onClick={() => setMove(true)}>Can’t make it?</Btn>
+            {!isTbc && <Btn full size="md" variant="white" onClick={ics}><CalendarPlus className="size-4" /> Calendar</Btn>}
+            {!isTbc && <Btn full size="md" variant="white" onClick={() => setMove(true)}>Can’t make it?</Btn>}
           </div>
         </div>
       )}
@@ -127,35 +135,26 @@ function Row({ icon, t, d }: { icon: React.ReactNode; t: string; d: string }) {
   return <div className="flex items-center gap-3 py-3.5">{icon}<div><p className="text-[15px] font-bold text-navy">{t}</p><p className="text-[13px] text-muted">{d}</p></div></div>
 }
 
+/** owner 2026-11-20: clients can't pick times; they ask, and the team sets the new time. */
 function RescheduleSheet({ open, onClose, id, startsAt, used }: { open: boolean; onClose: () => void; id: string; startsAt: string; used: number }) {
-  const reschedule = useApp((s) => s.reschedule)
+  const request = useApp((s) => s.requestNewTime)
   const hoursLeft = (+new Date(startsAt) - Date.now()) / 3600_000
   const late = hoursLeft < 24
   const blocked = late && used >= 1
-  const opts = Array.from({ length: 10 }, (_, i) => addDays(startOfDay(), i + 1)).flatMap((d) => slotsFor(d).slice(0, 2).map((t) => istDate(d, t))).slice(0, 8)
-  const [pick, setPick] = useState<Date>()
-  useEffect(() => { if (open) setPick(undefined) }, [open])
+  const [note, setNote] = useState('')
+  useEffect(() => { if (open) setNote('') }, [open])
   return (
     <Sheet open={open} onClose={onClose} title="Can’t make it?">
       <h2 className="h-duo text-[26px]">Can’t make <em>it?</em></h2>
-      <p className="mt-2 text-[14px] leading-5 text-muted">Sessions are non-refundable, but you can move yours to another time.</p>
+      <p className="mt-2 text-[14px] leading-5 text-muted">Sessions are non-refundable, but we can move yours. Tell us what suits you and the team will confirm a new time.</p>
       <div className={cx('mt-3 rounded-[18px] p-3 text-[13px] font-semibold', blocked ? 'bg-rose-50 text-rose' : 'bg-sage-100 text-sage-text')}>
         {blocked ? 'You’ve already moved this session once within 24 hours. Please message us on WhatsApp.' : late ? 'Less than 24 h to go. You can move it once.' : 'Free to reschedule with more than 24 h to go.'}
       </div>
       {!blocked && (
         <>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            {opts.map((d) => {
-              const on = pick && +pick === +d
-              return (
-                <button key={+d} onClick={() => { buzz(5); setPick(d) }} aria-pressed={!!on} className={cx('relative rounded-[18px] px-3 py-3 text-left', on ? 'text-white' : 'bg-peri-50 text-navy')}>
-                  {on && <motion.span layoutId="rs-pill" transition={spring} className="absolute inset-0 rounded-[18px] bg-navy" />}
-                  <span className="relative block text-[13px] font-semibold opacity-80">{fmtDay(d)}</span><span className="relative text-[16px] font-bold">{fmtTime(d)}</span>
-                </button>
-              )
-            })}
-          </div>
-          <Btn full className="mt-5" disabled={!pick} onClick={() => { if (!pick) return; reschedule(id, pick.toISOString()); toast(`Moved to ${fmtDay(pick)} · ${fmtTime(pick)}`); onClose() }}>Move my session</Btn>
+          <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 300))} rows={3} placeholder="e.g. Any weekday evening next week" aria-label="When suits you"
+            className="mt-4 w-full resize-none rounded-[18px] bg-peri-50 p-3.5 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
+          <Btn full className="mt-4" onClick={() => { request(id, note.trim()); toast('Request sent. We’ll confirm a new time'); onClose() }}>Request a new time</Btn>
         </>
       )}
     </Sheet>

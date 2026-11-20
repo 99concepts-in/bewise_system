@@ -40,7 +40,7 @@ test('public booking link: new visitor → landing → sign-in; signed-in → bo
   await page.goto('/book/jitu-bhaiya?type=followup'); await page.waitForURL('**/app/book?type=followup')
 })
 
-test('staff-made booking: pay without picking a slot; late payment → pick a new time', async ({ page }) => {
+test('staff-made booking: pay without picking a slot; late payment → the team confirms a new time', async ({ page }) => {
   await seed(page)
   await page.goto('/app')
   await expect(page.getByText('Complete your booking')).toBeVisible()
@@ -52,10 +52,10 @@ test('staff-made booking: pay without picking a slot; late payment → pick a ne
   // late payment
   await page.goto('/app/me'); await page.getByRole('button', { name: '…paid after hold expired' }).click()
   await page.getByRole('button', { name: /Pay ₹/ }).click(); await page.getByRole('button', { name: 'Google Pay' }).click()
-  await expect(page.getByText('Payment received. Pick a new time')).toBeVisible({ timeout: 8000 })
-  await page.locator('button[aria-pressed="false"]:has-text(":")').first().click()
-  await page.getByRole('button', { name: /^Request/ }).click()
-  await page.waitForURL('**/app/sessions/view?id=*')
+  await expect(page.getByRole('button', { name: 'View my request' })).toBeVisible({ timeout: 8000 })
+  const late = (await state(page)).appointments.find((x: { source?: string; timeTbc?: boolean; paidAt?: string }) => x.timeTbc && x.paidAt && x.source)
+  expect(late).toBeTruthy()
+  await page.goto(`/app/sessions/view?id=${late.id}`); await expect(page.getByText('Time to be confirmed')).toBeVisible()
 })
 
 test('check-in deep link saves against the appointment', async ({ page }) => {
@@ -108,7 +108,7 @@ test('launch offer: yearly reveal → are you sure → 6-month offer → pay →
   await page.goto('/app/bag'); await expect(page.getByText(/WELCOME15/)).toBeVisible()
 })
 
-test('follow-up with a plan: pay first, then request a preferred time', async ({ page }) => {
+test('follow-up with a plan: request only (optional preferences, typed date), the team sets the time', async ({ page }) => {
   await seed(page)
   await page.goto('/app/book?type=followup')
   await expect(page.getByRole('radio', { name: /6 months/ })).toHaveAttribute('aria-checked', 'true')
@@ -117,14 +117,19 @@ test('follow-up with a plan: pay first, then request a preferred time', async ({
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await page.getByRole('radio', { name: /^Online/ }).click()
   await page.getByRole('button', { name: 'Continue', exact: true }).click()
+  await expect(page.getByRole('heading', { name: /suits you/ })).toBeVisible()
+  await page.getByRole('checkbox', { name: 'Evening' }).click()
+  await page.getByRole('textbox', { name: 'Preferred date (DD/MM/YYYY)' }).fill('05122026')
+  await expect(page.getByRole('textbox', { name: 'Preferred date (DD/MM/YYYY)' })).toHaveValue('05/12/2026')
+  await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await page.getByRole('button', { name: /Pay ₹8,000/ }).click(); await page.getByRole('button', { name: 'Google Pay' }).click()
-  await expect(page.getByRole('heading', { name: /preferred time/ })).toBeVisible({ timeout: 8000 })
-  await page.locator('button[aria-pressed="false"]:has-text(":")').first().click()
-  await page.getByRole('button', { name: 'Request this time' }).click()
-  await expect(page.getByRole('heading', { name: /Time requested/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /Request sent/ })).toBeVisible({ timeout: 8000 })
   const s = await state(page)
   const a = s.appointments[s.appointments.length - 1]
-  expect(a.timeRequested).toBe(true); expect(a.planId).toBe('yearly'); expect(s.plan.used).toBe(1)
+  expect(a.timeTbc).toBe(true); expect(a.prefs).toMatchObject({ times: ['Evening'], date: '2026-12-05' }); expect(a.planId).toBe('yearly'); expect(s.plan.used).toBe(1)
+  // the team sets the time (preview tool) → the session shows a real date
+  await page.goto('/app/me'); await page.getByRole('button', { name: 'Team confirms my time' }).click()
+  await page.goto(`/app/sessions/view?id=${a.id}`); await expect(page.getByText('05/12/2026')).toBeVisible()
 })
 
 test('checkout: pick up from studio, pay, then say yes to subscribing', async ({ page }) => {

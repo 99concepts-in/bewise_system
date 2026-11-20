@@ -13,6 +13,7 @@ import { Btn, IconBtn, ProgressBar, ease } from '@/components/ui'
 import { CheckinChanges, CheckinNews, CheckinNow, type Checkin } from '../book/intake'
 import { useApp } from '@/lib/store'
 import { fmtLongDay, fmtTime } from '@/lib/format'
+import { tbc } from '@/lib/appt'
 
 export default function Page() { return <Suspense><CheckinLink /></Suspense> }
 
@@ -39,7 +40,7 @@ function CheckinLink() {
           </div>
         </header>
       )}
-      {appt && step < 3 && <p className="-mt-2 mb-3 text-[13px] text-muted">For your session on <b className="text-navy">{fmtLongDay(appt.startsAt)} · {fmtTime(appt.startsAt)}</b> · everything optional</p>}
+      {appt && step < 3 && <p className="-mt-2 mb-3 text-[13px] text-muted">For your session <b className="text-navy">{tbc(appt) ? '(time to be confirmed)' : `on ${fmtLongDay(appt.startsAt)} · ${fmtTime(appt.startsAt)}`}</b> · everything optional</p>}
       <div className="flex-1 pb-36">
         <AnimatePresence mode="wait">
           <motion.div key={step} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3, ease }}>

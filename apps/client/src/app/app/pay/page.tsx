@@ -17,6 +17,7 @@ import { Btn, ease, toast } from '@/components/ui'
 import { CONSULTATIONS, STUDIO } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { fmtLongDay, fmtTime, formatINR } from '@/lib/format'
+import { whenLong } from '@/lib/appt'
 import { BP } from '@/lib/asset'
 
 export default function Page() { return <Suspense><Pay /></Suspense> }
@@ -40,19 +41,15 @@ function Pay() {
   const by = a.source === 'manager' ? 'The BeWise team' : 'Jitendra Khimlani'
 
   // ---- paid after the held time expired → pick a new time (no cost)
-  if (a.needsNewTime) return (
-    <main className="px-5 pb-40">
+  // owner 2026-11-20: clients don't pick times; a late payment means the team confirms a new one
+  if (a.needsNewTime || (a.timeTbc && a.paidAt)) return (
+    <main className="px-5 pb-32">
       <AppHeader back="/app" />
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-2 flex items-start gap-3 rounded-[24px] bg-sage-100/80 p-4">
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage-text text-white"><Check className="size-5" strokeWidth={3} /></span>
-        <div><p className="text-[16px] font-extrabold text-navy">{a.status === 'expired' ? 'Payment received. Pick a new time' : 'Choose your preferred time'}</p><p className="text-[13px] leading-5 text-sage-text">{a.status === 'expired' ? 'The time we were holding was released before the payment arrived. Choose any time below at no extra cost.' : 'Jitendra Khimlani or Haresh bhai will confirm it. If it doesn’t suit, our team will call you.'}</p></div>
+        <div><p className="text-[16px] font-extrabold text-navy">Payment received</p><p className="text-[13px] leading-5 text-sage-text">Jitendra Khimlani or our team will confirm your time and message you on WhatsApp, at no extra cost.</p></div>
       </motion.div>
-      <div className="mt-5"><TimePicker slot={slot} setSlot={setSlot} /></div>
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
-        <Btn full variant="gradient" disabled={!slot} onClick={() => { if (!slot) return; pickNewTime(a.id, slot.toISOString()); toast('Time requested. We’ll confirm soon'); router.replace(`/app/sessions/view?id=${a.id}`) }}>
-          {slot ? `Request ${fmtLongDay(slot).split(',')[0]} · ${fmtTime(slot)}` : 'Choose a time'}
-        </Btn>
-      </div>
+      <Btn full className="mt-5" onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View my request</Btn>
     </main>
   )
 
@@ -69,7 +66,7 @@ function Pay() {
       <Petals />
       <h1 className="h-duo mt-12 text-[36px]">{a.payLater ? <>Thank <em>you</em></> : <>You’re <em>booked</em></>}</h1>
       <motion.div className="mx-auto mt-4" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 13 }}><Mascot pose="wave" height={230} priority /></motion.div>
-      <p className="mt-3 text-center text-[15px] text-muted">{fmtLongDay(a.startsAt)} · {fmtTime(a.startsAt)}</p>
+      <p className="mt-3 text-center text-[15px] text-muted">{whenLong(a)}</p>
       <div className="mt-auto pb-3 pt-6 safe-b"><Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View appointment</Btn></div>
     </main>
   )
@@ -84,7 +81,7 @@ function Pay() {
       </motion.div>
       <section className="card mt-5 p-5">
         {[
-          { i: <Clock className="size-5" />, t: `${fmtLongDay(a.startsAt)} · ${fmtTime(a.startsAt)}` },
+          { i: <Clock className="size-5" />, t: whenLong(a) },
           { i: a.mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: a.mode === 'online' ? 'Online · video call' : `In person · ${STUDIO.short}` },
           { i: <Check className="size-5" />, t: `${c.name} · remedy blend included` },
         ].map((r, k) => (
@@ -106,8 +103,8 @@ function Pay() {
         <Btn full variant="gradient" onClick={() => setPaying(true)}><span aria-hidden>🔒</span> Pay {formatINR(a.amountPaise)}</Btn>
         <p className="mt-2 text-center text-[12px] text-muted">Secured by Razorpay · UPI, cards, netbanking</p>
       </div>
-      <PaySheet open={paying} amountPaise={a.amountPaise} purpose={`${c.name} · ${fmtTime(a.startsAt)}`} onClose={() => setPaying(false)}
-        onPaid={() => { const late = a.status === 'expired'; pay(a.id); setPaying(false); if (!late) setDone(true) }} />
+      <PaySheet open={paying} amountPaise={a.amountPaise} purpose={c.name} onClose={() => setPaying(false)}
+        onPaid={() => { pay(a.id); setPaying(false); setDone(true) }} />
     </main>
   )
 }

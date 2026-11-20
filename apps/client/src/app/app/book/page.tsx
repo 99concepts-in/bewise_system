@@ -12,12 +12,11 @@ import { CalendarPlus, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, In
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Mascot, Petals } from '@/components/brand'
 import { PaySheet } from '@/components/pay-sheet'
+import { DateInput } from '@/components/date-input'
 import { AppHeader, useUi } from '@/components/shell'
-import { Btn, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, useStableCallback } from '@/components/ui'
+import { Btn, Chip, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, useStableCallback } from '@/components/ui'
 import { CONSULTANT, CONSULTATIONS, NUANCE, STUDIO, TESTIMONIALS, TESTIMONIALS_SOURCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
 import { InPersonArt, OnlineArt } from '@/components/mode-art'
-import { TimePicker } from '@/components/time-picker'
-import { parseIsoDay } from '@/lib/supply'
 import { emptyIntake, planLeft, useApp, type Appointment, type IntakeAnswers, type Plan } from '@/lib/store'
 import { HELPLINE, PLANS, offerLive, planFull, planPrice, planSaving, type PlanId } from '@/lib/offer'
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
@@ -29,7 +28,7 @@ import { BP } from '@/lib/asset'
 const INTAKE = ['intro', 'feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle', 'review', 'saved'] as const // owner 2026-11-18: "How would you like to feel?" removed
 const COUNTED = ['feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle']
 const CHECKIN = ['ck-now', 'ck-changes', 'ck-news'] as const
-type Step = 'choose' | (typeof INTAKE)[number] | (typeof CHECKIN)[number] | 'mode' | 'time' | 'pay' | 'done'
+type Step = 'choose' | (typeof INTAKE)[number] | (typeof CHECKIN)[number] | 'mode' | 'prefs' | 'pay' | 'done'
 
 export default function BookPage() { return <Suspense><Book /></Suspense> }
 
@@ -41,7 +40,6 @@ function Book() {
   const saveIntake = useApp((s) => s.saveIntake)
   const submitIntake = useApp((s) => s.submitIntake)
   const book = useApp((s) => s.book)
-  const pickTime = useApp((s) => s.pickNewTime)
   const buyPlan = useApp((s) => s.buyPlan)
   const plan = useApp((s) => s.plan)
   const hasHistory = useApp((s) => s.appointments.length > 0 || !!s.blend)
@@ -52,7 +50,7 @@ function Book() {
   const [answers, setAnswers] = useState<IntakeAnswers>(() => intake?.answers ?? emptyIntake())
   const [checkin, setCheckin] = useState<I.Checkin>({ changes: {}, news: '' })
   const [mode, setMode] = useState<'online' | 'in_person'>()
-  const [slot, setSlot] = useState<Date>()
+  const [prefs, setPrefs] = useState<NonNullable<Appointment['prefs']>>(() => ({ date: params.get('date') ?? undefined }))
   const [paying, setPaying] = useState(false)
   const [booked, setBooked] = useState<Appointment>()
   const [meet, setMeet] = useState(false)
@@ -61,7 +59,6 @@ function Book() {
   const [payWhen, setPayWhen] = useState<'now' | 'later'>('now')
   // owner 2026-11-18: after the first consultation, offer 6 months (recommended), yearly (best value) or one time
   const [planPick, setPlanPick] = useState<PlanPick>('half')
-  const [pending, setPending] = useState<Appointment>() // paid (or pay later) → choose a preferred time next
 
   // decided once per visit: submitting the intake mid-flow must not remove the steps we're standing on
   const [needIntake] = useState(() => !intake?.submittedAt)
@@ -69,8 +66,9 @@ function Book() {
   const skipNuance = !answers.feelings.some((f) => NUANCE[f])
   const flow: Step[] = useMemo(() => {
     // owner 2026-11-18: payment first, then a preferred time (confirmed by Jitendra Khimlani or Haresh bhai)
-    if (type === 'followup') return ['choose', ...CHECKIN, 'mode', 'pay', 'time', 'done']
-    return ['choose', ...(needIntake ? INTAKE.filter((x) => x !== 'nuance' || !skipNuance) : []), 'mode', 'pay', 'time', 'done'] as Step[]
+    // owner 2026-11-20: clients only request; the Manager or Jitendra Khimlani set the time afterwards
+    if (type === 'followup') return ['choose', ...CHECKIN, 'mode', 'prefs', 'pay', 'done']
+    return ['choose', ...(needIntake ? INTAKE.filter((x) => x !== 'nuance' || !skipNuance) : []), 'mode', 'prefs', 'pay', 'done'] as Step[]
   }, [type, needIntake, skipNuance])
 
   useEffect(() => { setNavHidden(step !== 'choose'); return () => setNavHidden(false) }, [step, setNavHidden])
@@ -98,24 +96,20 @@ function Book() {
   const feeLabel = inPlan ? 'Included in your plan' : pick === 'once' ? c.name : `${PLANS[pick].name} · launch offer`
 
   // owner 2026-11-18: every intake / check-in question is optional — only mode and time are needed to book
-  const can: Partial<Record<Step, boolean>> = { mode: !!mode, time: !!slot }
+  const can: Partial<Record<Step, boolean>> = { mode: !!mode }
   const steps = COUNTED.filter((x) => x !== 'nuance' || !skipNuance)
   const counted = steps.indexOf(step as string)
   const isIntake = INTAKE.includes(step as never) && step !== 'saved'
 
-  // paid (or chose to pay later / covered by a plan): the booking exists, the time comes next
+  // paid (or chose to pay later / covered by a plan): the request goes to the team, who set the time
   const confirmPaid = (later = false) => {
     if (!mode) return
     if (pick !== 'once' && !inPlan && !later) buyPlan(pick, fee)
     const usePlan = inPlan || (pick !== 'once' && !later)
-    const a = book({ type: c.id, mode, startsAt: new Date().toISOString(), amountPaise: usePlan ? 0 : fee, needsNewTime: true,
+    const clean = { ...prefs, note: prefs.note?.trim() || undefined }
+    const a = book({ type: c.id, mode, startsAt: new Date(Date.now() + 7 * 864e5).toISOString(), amountPaise: usePlan ? 0 : fee, timeTbc: true, timeRequested: true, prefs: clean,
       ...(later ? { payLater: true } : { paidAt: new Date().toISOString() }), ...(usePlan ? { planId: pick === 'once' ? plan?.id : pick } : {}) })
-    setPaying(false); setPending(a); go('time')
-  }
-  const requestTime = () => {
-    if (!pending || !slot) return
-    pickTime(pending.id, slot.toISOString())
-    setBooked({ ...pending, startsAt: slot.toISOString(), needsNewTime: false, timeRequested: true }); go('done')
+    setPaying(false); setBooked(a); go('done')
   }
 
   if (step === 'done' && booked) return <Booked a={booked} />
@@ -131,7 +125,7 @@ function Book() {
                 <p className="text-[13px] font-semibold text-navy">{step === 'intro' ? 'A moment for you' : counted >= 0 ? `Step ${counted + 1} of ${steps.length}` : 'Almost done'}</p>
                 <ProgressBar value={step === 'intro' ? 0.02 : counted >= 0 ? (counted + 1) / steps.length : 1} className="mt-1.5" />
               </div>
-            ) : <Stepper at={CHECKIN.includes(step as never) || INTAKE.includes(step as never) ? 0 : step === 'time' ? 2 : 1} />}
+            ) : <Stepper at={CHECKIN.includes(step as never) || INTAKE.includes(step as never) ? 0 : step === 'pay' ? 2 : 1} />}
             {isIntake && step !== 'intro' && (
               <button onClick={() => (hasHistory ? skipIntake() : setSkipAsk(true))}
                 className="shrink-0 rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-navy shadow-[var(--shadow-card)]">Skip</button>
@@ -159,7 +153,7 @@ function Book() {
             {step === 'ck-changes' && <I.CheckinChanges c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} feelings={intake?.answers.feelings ?? []} />}
             {step === 'ck-news' && <I.CheckinNews c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} />}
             {step === 'mode' && <Mode mode={mode} setMode={setMode} />}
-            {step === 'time' && <><TimeHead /><TimePicker slot={slot} setSlot={setSlot} initialDay={parseIsoDay(params.get('date'))} heading={false} /></>}
+            {step === 'prefs' && <Prefs prefs={prefs} setPrefs={setPrefs} />}
             {step === 'pay' && mode && <Review c={c} mode={mode} fee={fee} feeLabel={feeLabel} inPlan={inPlan} canLater={pick === 'once' && !inPlan} payWhen={payWhen} setPayWhen={setPayWhen} />}
           </motion.div>
         </AnimatePresence>
@@ -171,20 +165,15 @@ function Book() {
         ) : step === 'pay' ? (
           <>
             {inPlan ? <>
-              <Btn full variant="gradient" onClick={() => confirmPaid()}><CalendarCheck2 className="size-5" /> Continue to choose a time</Btn>
+              <Btn full variant="gradient" onClick={() => confirmPaid()}><CalendarCheck2 className="size-5" /> Send request</Btn>
               <p className="mt-2 text-center text-[12px] text-muted">{planLeft(plan)} sessions left in your plan</p>
             </> : payWhen === 'now' || pick !== 'once' ? <>
-              <Btn full variant="gradient" onClick={() => setPaying(true)}><span aria-hidden>🔒</span> Pay {formatINR(fee)}</Btn>
-              <p className="mt-2 text-center text-[12px] text-muted">Secured by Razorpay · then choose your preferred time</p>
+              <Btn full variant="gradient" onClick={() => setPaying(true)}><span aria-hidden>🔒</span> Pay {formatINR(fee)} & send request</Btn>
+              <p className="mt-2 text-center text-[12px] text-muted">Secured by Razorpay · the team confirms your time</p>
             </> : <>
-              <Btn full variant="gradient" onClick={() => confirmPaid(true)}><CalendarCheck2 className="size-5" /> Continue to choose a time</Btn>
+              <Btn full variant="gradient" onClick={() => confirmPaid(true)}><CalendarCheck2 className="size-5" /> Send request</Btn>
               <p className="mt-2 text-center text-[12px] text-muted">Pay {formatINR(fee)} after your session</p>
             </>}
-          </>
-        ) : step === 'time' ? (
-          <>
-            <Btn full variant={slot ? 'gradient' : 'primary'} disabled={!slot} onClick={requestTime}>Request this time</Btn>
-            <p className="mt-2 text-center text-[12px] text-muted">Jitendra Khimlani or Haresh bhai will confirm it</p>
           </>
         ) : (
           <Btn full variant={can[step] === false ? 'primary' : 'gradient'} disabled={can[step] === false} onClick={next}>
@@ -434,12 +423,30 @@ function Mode({ mode, setMode }: { mode?: 'online' | 'in_person'; setMode: (m: '
 
 type PlanPick = 'once' | PlanId
 
-function TimeHead() {
+const DAYS = ['Weekdays', 'Weekends', 'Any day'] as const
+const TIMES = ['Morning', 'Afternoon', 'Evening'] as const
+
+/** owner 2026-11-20: the client only requests; these optional hints help the team pick a time. */
+function Prefs({ prefs, setPrefs }: { prefs: NonNullable<Appointment['prefs']>; setPrefs: (p: NonNullable<Appointment['prefs']>) => void }) {
+  const up = (p: Partial<NonNullable<Appointment['prefs']>>) => setPrefs({ ...prefs, ...p })
   return (
-    <div className="mb-4">
-      <p className="inline-flex items-center gap-1.5 rounded-full bg-sage-100 px-3 py-1.5 text-[12px] font-bold text-sage-text"><Check className="size-3.5" strokeWidth={3} /> You’re all set</p>
-      <h1 className="h-duo mt-3">Your preferred <em>time</em></h1>
-      <p className="mt-1 text-[14px] leading-5 text-muted">Pick what suits you. Jitendra Khimlani or Haresh bhai will confirm it, or our team will call you to find a better time.</p>
+    <div className="space-y-4">
+      <div>
+        <h1 className="h-duo">When usually <em>suits you?</em></h1>
+        <p className="mt-1 text-[14px] leading-5 text-muted">Optional. Jitendra Khimlani or our team will confirm the exact time and message you on WhatsApp.</p>
+      </div>
+      <div className="card p-5">
+        <p className="mb-3 text-[15px] font-bold text-navy">Days</p>
+        <div className="flex flex-wrap gap-2">{DAYS.map((d) => <Chip key={d} on={prefs.days === d} onClick={() => up({ days: prefs.days === d ? undefined : d })}>{d}</Chip>)}</div>
+        <p className="mb-3 mt-5 text-[15px] font-bold text-navy">Time of day</p>
+        <div className="flex flex-wrap gap-2">{TIMES.map((t) => { const on = !!prefs.times?.includes(t); return <Chip key={t} on={on} onClick={() => up({ times: on ? prefs.times!.filter((x) => x !== t) : [...(prefs.times ?? []), t] })}>{t}</Chip> })}</div>
+        <p className="mb-2 mt-5 text-[15px] font-bold text-navy">Preferred date <span className="font-medium text-muted">(optional)</span></p>
+        <DateInput value={prefs.date ?? ''} onChange={(date) => up({ date: date || undefined })} label="Preferred date (DD/MM/YYYY)"
+          className="h-12 w-full rounded-full bg-peri-50 px-4 text-[16px] font-semibold tracking-[0.04em] text-navy outline-none placeholder:font-medium placeholder:text-[#9aa2b8] focus:ring-2 focus:ring-navy" />
+        <p className="mb-2 mt-5 text-[15px] font-bold text-navy">Anything else? <span className="font-medium text-muted">(optional)</span></p>
+        <textarea value={prefs.note ?? ''} onChange={(e) => up({ note: e.target.value.slice(0, 300) })} rows={2} placeholder="e.g. after 6 PM works best"
+          aria-label="Note for the team" className="w-full resize-none rounded-[18px] bg-peri-50 p-3.5 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
+      </div>
     </div>
   )
 }
@@ -456,7 +463,7 @@ function Review({ c, mode, fee, feeLabel, inPlan, canLater, payWhen, setPayWhen 
         {[
           { i: <Sparkles className="size-5" />, t: feeLabel === c.name ? c.name : `${c.name} · ${feeLabel}` },
           { i: mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: mode === 'online' ? 'Online · video call' : `In person · ${STUDIO.short}` },
-          { i: <Clock className="size-5" />, t: 'Preferred time: you choose next' },
+          { i: <Clock className="size-5" />, t: 'Time: confirmed by the team after your request' },
         ].map((r, k) => (
           <motion.div key={k} className="flex items-center gap-3 border-b border-line py-3.5 last:border-0" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + k * 0.06 }}>
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-peri-50 text-navy">{r.i}</span><span className="text-[15px] font-semibold text-ink">{r.t}</span>
@@ -502,24 +509,26 @@ function Booked({ a }: { a: Appointment }) {
   return (
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       <Petals />
-      <h1 className="h-duo mt-12 text-[38px]">{a.timeRequested ? <>Time <em>requested</em></> : <>You’re <em>booked</em></>}</h1>
+      <h1 className="h-duo mt-12 text-[38px]">{a.timeTbc ? <>Request <em>sent</em></> : a.timeRequested ? <>Time <em>requested</em></> : <>You’re <em>booked</em></>}</h1>
       <motion.div className="mx-auto mt-4" initial={{ scale: 0.4, rotate: -10, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.1 }}>
         <Mascot pose="wave" height={250} priority />
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5, ease }} className="card mt-4 flex items-center gap-4 p-5">
         <span className="grid size-12 place-items-center rounded-full bg-peri-50 text-navy"><CalendarPlus className="size-6" /></span>
-        <div><p className="text-[16px] font-bold text-navy">{fmtLongDay(a.startsAt)}</p><p className="text-[14px] text-muted">{fmtTime(a.startsAt)} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitendra Khimlani</p></div>
+        {a.timeTbc
+          ? <div><p className="text-[16px] font-bold text-navy">{c.name}</p><p className="text-[14px] text-muted">{a.mode === 'online' ? 'Online' : 'In person'} with Jitendra Khimlani · time to be confirmed</p></div>
+          : <div><p className="text-[16px] font-bold text-navy">{fmtLongDay(a.startsAt)}</p><p className="text-[14px] text-muted">{fmtTime(a.startsAt)} · {a.mode === 'online' ? 'Online' : 'In person'} with Jitendra Khimlani</p></div>}
       </motion.div>
       {a.timeRequested && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }} className="mt-3 rounded-[22px] bg-[#fbf3dc] p-4 text-[14px] leading-5 text-[#6b5320]">
-          <p><b>Waiting for confirmation.</b> Jitendra Khimlani or Haresh bhai will confirm this time. If it doesn’t work, our team will call you.</p>
+          <p><b>What happens next:</b> Jitendra Khimlani or our team will set a time for you and confirm it on WhatsApp. If anything is unclear, we’ll call you.</p>
           <a href={`tel:${HELPLINE.tel}`} className="mt-2 inline-flex items-center gap-1.5 font-semibold text-navy underline underline-offset-4"><Phone className="size-4" /> Helpline {HELPLINE.label} ({HELPLINE.name})</a>
         </motion.div>
       )}
       <p className="mt-3 text-center text-[13px] text-muted">{a.payLater ? `Booking ${a.code}. You can pay ${formatINR(a.amountPaise)} after your session.` : `Receipt ${a.code} is in Payments.`} Jitendra Khimlani will read your answers before you meet.</p>
       <div className="mt-auto space-y-3 pb-3 pt-6 safe-b">
         <Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View appointment</Btn>
-        <Btn full variant="white" onClick={() => (isAndroid() ? addToCalendar(ev) : setCal(true))}><CalendarPlus className="size-5" /> Add to calendar</Btn>
+        {!a.timeTbc && <Btn full variant="white" onClick={() => (isAndroid() ? addToCalendar(ev) : setCal(true))}><CalendarPlus className="size-5" /> Add to calendar</Btn>}
       </div>
       <Sheet open={cal} onClose={() => setCal(false)} title="Add to calendar">
         <h2 className="h-duo text-[24px]">Add to <em>calendar</em></h2>

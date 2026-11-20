@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import { CalendarDays, MapPin, User } from 'lucide-react'
 import { OnboardShell } from '@/components/onboard-shell'
+import { DateInput } from '@/components/date-input'
 import { Btn, Chip, rise, stagger } from '@/components/ui'
 import { useApp } from '@/lib/store'
 
@@ -32,7 +33,7 @@ export default function About() {
           <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Priya Shah" className="w-full bg-transparent text-[17px] font-semibold text-navy outline-none placeholder:font-medium placeholder:text-[#b6bccb]" />
         </Field></motion.div>
         <motion.div variants={rise}><Field icon={<CalendarDays className="size-5" />} label="Date of birth" err={touched ? errs.dob : ''}>
-          <input type="date" value={dob} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setDob(e.target.value)} autoComplete="bday" className="w-full bg-transparent text-[17px] font-semibold text-navy outline-none" />
+          <DateInput value={dob} onChange={setDob} label="Date of birth (DD/MM/YYYY)" autoComplete="bday" className="w-full bg-transparent text-[17px] font-semibold tracking-[0.04em] text-navy outline-none placeholder:font-medium placeholder:text-[#b6bccb]" />
         </Field></motion.div>
         <motion.div variants={rise}><Field icon={<MapPin className="size-5" />} label="City" err={touched ? errs.city : ''}>
           <input value={city} onChange={(e) => setCity(e.target.value)} list="cities" autoComplete="address-level2" placeholder="Vadodara" className="w-full bg-transparent text-[17px] font-semibold text-navy outline-none placeholder:font-medium placeholder:text-[#b6bccb]" />

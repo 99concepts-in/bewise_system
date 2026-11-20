@@ -63,7 +63,9 @@ export function respond(raw: string, c: Ctx): Reply {
     return { text: `This week you logged ${d.length} days. Most often: ${top.slice(0, 2).map(([m, n]) => `${moodOf(m as never).label.toLowerCase()} (${n})`).join(' and ')}. Thank you for noticing. It all helps your next session.`, actions: [{ id: 'open-journal', label: 'Open journal' }] }
   }
   if (/(next|session|appointment|book|meet)/.test(t)) {
-    const up = c.appointments.filter((a) => a.status === 'confirmed' && +new Date(a.startsAt) > Date.now()).sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))[0]
+    const req = c.appointments.find((a) => a.timeTbc && a.status === 'confirmed')
+    if (req) return { text: 'Your session request is in. Jitendra Khimlani or our team will confirm the time and message you on WhatsApp.', actions: [{ id: `open-session-${req.id}`, label: 'View request' }] }
+    const up = c.appointments.filter((a) => a.status === 'confirmed' && !a.timeTbc && +new Date(a.startsAt) > Date.now()).sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))[0]
     if (up) return { text: `Your next session is ${fmtDay(up.startsAt)} at ${fmtTime(up.startsAt)}, ${CONSULTATIONS.find((x) => x.id === up.type)!.name.toLowerCase()}, ${up.mode === 'online' ? 'online' : 'in person'} with Jitendra Khimlani.`, actions: [{ id: `open-session-${up.id}`, label: 'View session' }] }
     return { text: 'You don’t have a session booked. A first consultation is ₹1,000 and a follow-up ₹800, both include your remedy blend.', actions: [{ id: c.appointments.length ? 'book-followup' : 'book-first', label: 'Book now' }] }
   }

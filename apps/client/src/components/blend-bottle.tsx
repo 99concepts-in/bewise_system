@@ -54,6 +54,7 @@ export function BlendBottleCard() {
   const now = useNow(60_000)
   if (!blend) return null
   const sup = blendSupply(blend, appointments, now)
+  const req = appointments.find((a) => a.status === 'confirmed' && a.timeTbc)
   return (
     <section className={cx('relative overflow-hidden rounded-[28px] p-5 shadow-[var(--shadow-card)]', sup.low ? 'bg-[linear-gradient(140deg,#fff_35%,#fbefd9)]' : 'bg-[linear-gradient(140deg,#fff_40%,#f6efe4)]')} aria-labelledby="blend-h">
       <div className="flex gap-4">
@@ -68,7 +69,7 @@ export function BlendBottleCard() {
           </div>
           <p className="mt-1 text-[30px] font-extrabold leading-none tracking-[-0.02em] text-navy tnum">{sup.daysLeft}<span className="ml-1 text-[15px] font-bold text-muted">{sup.daysLeft === 1 ? 'day' : 'days'} left</span></p>
           <p className="mt-1.5 text-[13px] leading-[18px] text-muted">
-            {sup.next ? <>Lasts until your session · <b className="text-navy">{fmtDay(sup.next.startsAt)}</b></> : sup.low ? <b className="text-[#9a5b12]">Running low. Pre-book your follow-up</b> : <>Runs low around <b className="text-navy">{fmtDay(sup.runOut)}</b></>}
+            {sup.next ? <>Lasts until your session · <b className="text-navy">{fmtDay(sup.next.startsAt)}</b></> : sup.low ? <b className="text-[#9a5b12]">Running low. Request your follow-up</b> : <>Runs low around <b className="text-navy">{fmtDay(sup.runOut)}</b></>}
           </p>
           <p className="mt-2 text-[12px] text-muted">{blend.drops} drops, {blend.timesPerDay}× a day</p>
         </div>
@@ -78,7 +79,13 @@ export function BlendBottleCard() {
 
       {/* next appointment / pre-book */}
       <div className="mt-4 rounded-[20px] bg-white/85 p-3.5 ring-1 ring-[#efe5d4]">
-        {sup.next ? (
+        {req ? (
+          <div className="flex items-center gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#fbf3dc] text-[#8a6a2c]"><CalendarPlus className="size-5" /></span>
+            <div className="min-w-0 flex-1"><p className="text-[12px] font-semibold text-muted">Follow-up requested</p><p className="truncate text-[14px] font-bold text-navy">We’ll confirm the time</p></div>
+            <BtnLink href={`/app/sessions/view?id=${req.id}`} size="sm" variant="white">View</BtnLink>
+          </div>
+        ) : sup.next ? (
           <div className="flex items-center gap-3">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage-100 text-sage-text"><CalendarPlus className="size-5" /></span>
             <div className="min-w-0 flex-1"><p className="text-[12px] font-semibold text-muted">Next session booked</p><p className="truncate text-[14px] font-bold text-navy">{fmtDay(sup.next.startsAt)} · {fmtTime(sup.next.startsAt)}</p></div>
@@ -89,13 +96,13 @@ export function BlendBottleCard() {
             <div className="flex items-center gap-3">
               <span className={cx('grid size-10 shrink-0 place-items-center rounded-full', sup.low ? 'bg-[#fbe3c0] text-[#9a5b12]' : 'bg-peri-50 text-navy')}><CalendarPlus className="size-5" /></span>
               <div className="min-w-0 flex-1">
-                <p className="text-[12px] font-semibold text-muted">Pre-book your follow-up</p>
+                <p className="text-[12px] font-semibold text-muted">Request your follow-up</p>
                 <p className="text-[15px] font-bold text-navy">Suggested · {fmtDay(sup.suggest)}</p>
               </div>
             </div>
             <div className="mt-3 flex gap-2">
               <BtnLink href="/app/book?type=followup" size="sm" variant="white" className="flex-1 whitespace-nowrap">Other date</BtnLink>
-              <BtnLink href={`/app/book?type=followup&date=${isoDay(sup.suggest)}`} size="sm" variant={sup.low ? 'gradient' : 'primary'} className="flex-1">Pre-book</BtnLink>
+              <BtnLink href={`/app/book?type=followup&date=${isoDay(sup.suggest)}`} size="sm" variant={sup.low ? 'gradient' : 'primary'} className="flex-1">Request</BtnLink>
             </div>
           </>
         )}

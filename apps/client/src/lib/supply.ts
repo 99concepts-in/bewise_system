@@ -13,7 +13,7 @@ const DAY = 86_400_000
 export function blendSupply(blend: Blend, appointments: Appointment[], now = Date.now()) {
   const start = new Date(blend.startedOn).getTime()
   const next = appointments
-    .filter((a) => a.status === 'confirmed' && +new Date(a.startsAt) > now)
+    .filter((a) => a.status === 'confirmed' && !a.timeTbc && !a.needsNewTime && +new Date(a.startsAt) > now)
     .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))[0]
   const runOut = start + blend.days * DAY
   const end = next ? +new Date(next.startsAt) : runOut
