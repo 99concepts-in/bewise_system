@@ -2,6 +2,12 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-20 — Typed DD/MM/YYYY dates, request-only booking, remedies with emotions · branch claude/new-session-94881h
+**Status:** Pushed; live preview refreshed (preview/client on main)
+**Done:** dates DD/MM/YYYY everywhere, typed number boxes (no date pickers) · clients only request sessions (optional days / time of day / preferred date / note), "Time to be confirmed" until the team sets it, "Can't make it?" asks for a new time · My care lists every remedy in the blend with the feeling it supports (38 mapped) · earlier today: name Jitendra Khimlani, remedies not essences, privacy note before the form, no helplines/AI mention in the form, pay at the center, Android calendar, shop scroll, back buttons, cart icons, dose check-ins + streak + 25-day calendar, My care tab
+**Tests:** 49 green
+**Requests:** 20261120-client-to-manager-consultant-request-only-booking.md (OPEN)
+
 ## 2026-11-18 — Launch offer, plans, coupon, subscriptions, pay-first booking with time approval · branch claude/new-session-94881h
 **Status:** Pushed (preview in `apps/client`)
 **Done:** top-of-Home launch banner → full-screen animated offer: Yearly ₹9,600 cut to ₹8,000 (2 months free, save ₹1,600), Pay or WhatsApp 90542 20952 "I want to avail the yearly offer"; ✕ → "Are you sure?" → 6-month offer ₹4,800 → ₹4,000 (1 month free) with claim / skip; live countdown to 1 Dec · after paying: congratulations animation + 15% first-purchase coupon WELCOME15 (7 days, applied at bag/checkout on products) · checkout asks to subscribe per product (every 30 days) and places the order only after confirm · delivered orders ask for a review (stars + note) · follow-up booking offers 6 months (Recommended) / Yearly (Best value) / One time; plans cover later follow-ups · booking order is now pay → preferred time → "Time requested" (confirmed by Jitu Bhaiya or Haresh bhai, else the team calls) · helpline Mr. Haresh 96013 45289 on Help, booking done and session screens
