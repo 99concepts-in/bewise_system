@@ -11,7 +11,7 @@
  */
 import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { ArrowRight, BookHeart, Check, ChevronRight, MessageCircleHeart, Target, Video } from 'lucide-react'
+import { ArrowRight, BookHeart, CalendarHeart, Check, ChevronRight, MessageCircleHeart, Target, Video } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
@@ -197,21 +197,44 @@ function PetalBurst({ color, big }: { color: string; big?: boolean }) {
 }
 
 /* ---------------- Meet Jitendra Khimlani ---------------- */
+/**
+ * owner 2026-11-21: Jitendra Khimlani's card is where clients book from Home: a clear "Book appointment"
+ * (first consultation or follow-up, with the fee underneath) and "More about him" (opens his story).
+ */
 function MeetCard({ open, onOpen }: { open: boolean; onOpen: () => void }) {
+  const follow = useApp((s) => !!s.blend || s.appointments.length > 0)
+  const c = CONSULTATIONS.find((x) => x.id === (follow ? 'followup' : 'first'))!
   return (
-    <button onClick={onOpen} aria-label="Meet Jitendra Khimlani, your consultant" aria-haspopup="dialog"
-      className="relative flex w-full items-center gap-4 overflow-hidden rounded-[28px] bg-sky-100 p-3 pr-4 text-left transition-transform active:scale-[0.99]">
-      <span className="relative h-[116px] w-[92px] shrink-0">
-        {!open && <JituPortrait className="h-full w-full ring-[3px] ring-white" radius="999px 999px 18px 18px" />}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="eyebrow text-navy">Your consultant</span>
-        <span className="mt-1 block font-display text-[22px] font-semibold leading-7 text-ink">Meet Jitendra Khimlani</span>
-        <span className="mt-0.5 block text-[14px] leading-5 text-ink-2">{CONSULTANT.title} · 12+ years</span>
-        <span className="mt-2 inline-flex items-center gap-1 text-[14px] font-semibold text-navy">Hear his story <ArrowRight className="size-4" /></span>
-      </span>
-      <Sparkle size={22} className="absolute left-[94px] top-3" />
-    </button>
+    <section className="relative overflow-hidden rounded-[28px] bg-sky-100 p-4" aria-labelledby="meet-h">
+      <span className="pointer-events-none absolute -right-10 -top-12 size-40 rounded-full bg-white/45" aria-hidden />
+      <div className="relative flex items-center gap-4">
+        <button onClick={onOpen} aria-label="Open Jitendra Khimlani's story" aria-haspopup="dialog" className="relative h-[116px] w-[92px] shrink-0 transition-transform active:scale-[0.97]">
+          {!open && <JituPortrait className="h-full w-full ring-[3px] ring-white" radius="999px 999px 18px 18px" />}
+        </button>
+        <div className="min-w-0 flex-1">
+          <p className="eyebrow text-navy">Your consultant</p>
+          <h2 id="meet-h" className="mt-1 font-display text-[21px] font-semibold leading-[26px] text-ink">Jitendra Khimlani</h2>
+          <p className="mt-0.5 text-[14px] leading-5 text-ink-2">{CONSULTANT.title}</p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {['12+ years', 'Online or in person'].map((t) => (
+              <span key={t} className="rounded-full bg-white/80 px-2.5 py-1 text-[12px] font-semibold text-navy">{t}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="relative mt-4 space-y-2">
+        <Link href={`/app/book${follow ? '?type=followup' : ''}`} onClick={() => buzz()}
+          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-navy px-4 font-display text-[16px] font-semibold text-white shadow-[var(--shadow-cta)] transition-transform active:scale-[0.98]">
+          <CalendarHeart className="size-[18px]" /> Book appointment
+        </Link>
+        <button onClick={onOpen} aria-haspopup="dialog"
+          className="flex h-12 w-full items-center justify-center gap-1 rounded-full bg-white text-[15px] font-semibold text-navy transition-transform active:scale-[0.98]">
+          More about him <ChevronRight className="size-4" />
+        </button>
+      </div>
+      <p className="relative mt-2.5 text-center text-[12px] text-ink-2">{follow ? 'Follow-up' : 'First consultation'} · <span className="tnum">{formatINR(c.feePaise)}</span> · remedy blend included</p>
+      <Sparkle size={22} className="absolute left-[100px] top-3" />
+    </section>
   )
 }
 

@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-21 · Consultant card on Home books
+- Home "Your consultant" card redesigned: arch portrait, Jitendra Khimlani, title, chips (12+ years, Online or in person), then a full-width "Book appointment" (first consultation or follow-up) and "More about him" (opens his story), with the fee line underneath. This replaces the removed floating Book button as Home's way to book.
+
 ## 2026-11-21 · Home: floating Book button removed
 - Removed the big floating "Book your consultation · ₹1,000" / "Book a follow-up" pill from Home (owner). Booking stays in My care ("Book your first consultation" / "Book a new session"), the offer card, and the pay/continue cards on Home when a booking is in progress.
 
