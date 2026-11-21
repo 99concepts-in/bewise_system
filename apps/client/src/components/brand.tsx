@@ -34,13 +34,13 @@ export function LogoStacked({ white, height = 96, className }: { white?: boolean
 
 export type Pose = 'wave' | 'bottle' | 'read' | 'sleep'
 const poseSize: Record<Pose, [number, number]> = { wave: [294, 640], bottle: [226, 640], read: [261, 640], sleep: [351, 640] }
-export function Mascot({ pose = 'wave', height = 160, float = true, className, priority, style }: { pose?: Pose; height?: number; float?: boolean; className?: string; priority?: boolean; style?: CSSProperties }) {
+export function Mascot({ pose = 'wave', height = 160, float = true, className, priority, style, shadow = true }: { pose?: Pose; height?: number; float?: boolean; className?: string; priority?: boolean; style?: CSSProperties; shadow?: boolean }) {
   const [w, h] = poseSize[pose]
   return (
     <div className={cx('relative', float && 'animate-floaty', className)} style={{ height, width: (w / h) * height, ...style }}>
       <img src={`${BP}/img/owl-${pose}.webp`} alt="" aria-hidden width={w} height={h} draggable={false}
         loading={priority ? 'eager' : 'lazy'} decoding="async" fetchPriority={priority ? 'high' : 'low'}
-        className="h-full w-full object-contain drop-shadow-[0_14px_18px_rgba(23,33,74,.18)]" />
+        className={cx('h-full w-full object-contain', shadow && 'drop-shadow-[0_14px_18px_rgba(23,33,74,.18)]')} />
     </div>
   )
 }

@@ -27,8 +27,16 @@ export default function Done() {
           {profile?.photo ? <Avatar photo={profile.photo} name={profile.name} size={176} ring /> : <Mascot pose="wave" height={200} priority />}
         </motion.div>
         {profile?.photo && (
+          // owner 2026-11-21: the owl says hi. No CSS drop-shadow here: iOS Safari drew it as a grey box inside the animated wrapper.
           <motion.div className="absolute -bottom-2 -right-3" initial={{ scale: 0, rotate: 20 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.7 }}>
-            <Mascot pose="wave" height={96} float={false} />
+            <span className="absolute bottom-3 left-1/2 h-2.5 w-12 -translate-x-1/2 rounded-[50%] bg-navy/15 blur-[4px]" aria-hidden />
+            <motion.div style={{ originX: 0.5, originY: 1 }} animate={{ rotate: [0, -7, 6, -4, 0] }} transition={{ duration: 1.1, delay: 1.2, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' }}>
+              <Mascot pose="wave" height={96} float={false} shadow={false} />
+            </motion.div>
+            <motion.span className="absolute -top-6 -right-1 whitespace-nowrap rounded-[16px] rounded-br-[4px] bg-white px-3 py-1.5 text-[15px] font-bold text-navy shadow-[0_6px_16px_rgba(23,33,74,.14)]"
+              initial={{ scale: 0, opacity: 0, originX: 1, originY: 1 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 380, damping: 16, delay: 1.1 }}>
+              Hi! 👋
+            </motion.span>
           </motion.div>
         )}
       </div>

@@ -17,7 +17,7 @@ import { BP } from '@/lib/asset'
 // Copy rule: no cure / medical claims — "gently support emotional balance" (design system §10)
 // owner copy 2026-11-20 for slides 1 and 2
 const SLIDES = [
-  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A gentle, private space to nurture your emotional wellbeing, find inner balance, and feel your best. Guided by Jitendra Khimlani and the natural wisdom of Bach Flower Remedies.' },
+  { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A gentle, private space for your emotional wellbeing, guided by Jitendra Khimlani and Bach Flower Remedies.' },
   { kicker: 'Personal guidance, just for you.', lead: 'Meet', em: 'Jitendra Khimlani', title: 'Your Bach Flower Therapist', sub: 'Get personalised guidance with vibrational remedies for everyday balance and emotional wellbeing. Online or in-person consultation.' },
   { lead: 'Bach flower remedy', em: 'benefits', sub: 'Natural Bach flower remedies that gently support emotional balance, chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'Feel calmer, day by day'] },
 ] as { kicker?: string; lead: string; em: string; title?: string; sub: string; chips?: string[] }[]

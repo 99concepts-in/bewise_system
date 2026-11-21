@@ -2,6 +2,10 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-21 · Shorter welcome, owl says hi
+- Welcome slide 1 text shortened: "A gentle, private space for your emotional wellbeing, guided by Jitendra Khimlani and Bach Flower Remedies."
+- "You're in" screen: the owl beside the photo waves on a loop with a "Hi! 👋" bubble. Removed the CSS drop-shadow on that owl (iOS Safari drew it as a grey box inside the animated wrapper); Mascot has a `shadow` prop for this.
+
 ## 2026-11-21 · Splash: golden line back
 - Owner prefers the earlier splash: owl mark in a white disc with a thin golden ring that draws itself, "BeWise" rising in letter by letter, "HOLISTIC WELLNESS" below. Replaces the v5 stacked-logo splash (welcome/page.tsx).
 
