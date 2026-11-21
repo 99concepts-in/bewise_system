@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-21 · Offer banner placement
+- The introductory offer banner is no longer at the top of Home. It now sits below the feelings card on Home, and in My care (the booking tab) under the sessions card. Same banner, same offer flow; hidden when the offer ends or a plan is bought.
+
 ## 2026-11-21 · Shorter welcome, owl says hi
 - Welcome slide 1 text shortened: "A gentle, private space for your emotional wellbeing, guided by Jitendra Khimlani and Bach Flower Remedies."
 - "You're in" screen: the owl beside the photo waves on a loop with a "Hi! 👋" bubble. Removed the CSS drop-shadow on that owl (iOS Safari drew it as a grey box inside the animated wrapper); Mascot has a `shadow` prop for this.

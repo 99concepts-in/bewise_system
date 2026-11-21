@@ -8,6 +8,7 @@
  *   Flower art now uses the real Bach vectors (FlowerArt), with a soft fallback while a file is missing.
  */
 import { motion } from 'motion/react'
+import { LaunchBanner } from '@/components/launch-offer'
 import { Bell, CalendarHeart, ChevronRight, Lightbulb } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -49,6 +50,7 @@ export default function Remedies() {
       <Reveal className="space-y-6">
         <Item><h1 className="h-duo pt-1">My <em>care</em></h1></Item>
         <Item><Upcoming /></Item>
+        <Item className="empty:hidden"><LaunchBanner /></Item>
         <Item>
           <div className="card flex flex-col items-center p-7 text-center">
             <Mascot pose="sleep" height={132} />
@@ -75,6 +77,7 @@ export default function Remedies() {
       <Reveal className="space-y-4">
         <Item><h1 className="h-duo pt-1">My <em>care</em></h1></Item>
         <Item><Upcoming /></Item>
+        <Item className="empty:hidden"><LaunchBanner /></Item>
         <Item>
           <section className="card p-5" aria-labelledby="blend-h">
             <div className="flex items-start justify-between gap-3">

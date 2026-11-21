@@ -45,7 +45,6 @@ export default function Home() {
     <main className="home-wash -mx-0 min-h-dvh px-5 pb-[calc(env(safe-area-inset-bottom)+176px)]">
       <AppHeader />
       <Reveal className="space-y-6">
-        <Item className="pt-1"><LaunchBanner /></Item>
         <Item>
           <p className="text-[16px] font-medium text-ink-2">{greet(new Date(now).getHours())}, {firstName(profile?.name)}</p>
           <h1 className="h-display mt-1">How are you feeling today?</h1>
@@ -54,6 +53,9 @@ export default function Home() {
         <Item><FeelingCircles /></Item>
 
         <ContextCard />
+
+        {/* owner 2026-11-21: the offer sits below the feelings, not at the top */}
+        <Item className="empty:hidden"><LaunchBanner /></Item>
 
         <Item><MeetCard open={story} onOpen={() => { buzz(8); setStory(true) }} /></Item>
 
