@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-21 · Offer banner only on Home
+- Removed the introductory offer banner from My care (owner). It now shows only on Home, below the feelings. The plan choice on the booking screen is unchanged.
+
 ## 2026-11-21 · One kind of appointment (no first / follow-up choice)
 - Owner: ~500 clients already met Jitendra Khimlani, so booking no longer asks "First consultation or Follow-up". "Book an appointment" → plan or One appointment → 2-minute check-in (for everyone) → online / in person → preferred time → Send request.
 - One appointment: nothing to pay at booking. Jitendra Khimlani or Haresh bhai set type, fee and time; the booking then shows "Complete your booking · Pay ₹X". Plans (6 months / Yearly) are still paid at booking, and also offered in the offer banner.
