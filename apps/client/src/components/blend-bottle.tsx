@@ -70,7 +70,7 @@ export function BlendBottleCard() {
           </div>
           <p className="mt-1 text-[30px] font-extrabold leading-none tracking-[-0.02em] text-navy tnum">{sup.daysLeft}<span className="ml-1 text-[15px] font-bold text-muted">{sup.daysLeft === 1 ? 'day' : 'days'} left</span></p>
           <p className="mt-1.5 text-[13px] leading-[18px] text-muted">
-            {sup.next ? <>Lasts until your session · <b className="text-navy">{fmtDay(sup.next.startsAt)}</b></> : sup.low ? <b className="text-[#9a5b12]">Running low. Request your follow-up</b> : <>Runs low around <b className="text-navy">{fmtDay(sup.runOut)}</b></>}
+            {sup.next ? <>Lasts until your session · <b className="text-navy">{fmtDay(sup.next.startsAt)}</b></> : sup.low ? <b className="text-[#9a5b12]">Running low. Book your next session</b> : <>Runs low around <b className="text-navy">{fmtDay(sup.runOut)}</b></>}
           </p>
           <p className="mt-2 text-[12px] text-muted">{blend.drops} drops, {blend.timesPerDay}× a day</p>
         </div>
@@ -83,7 +83,7 @@ export function BlendBottleCard() {
         {req ? (
           <div className="flex items-center gap-3">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#fbf3dc] text-[#8a6a2c]"><CalendarPlus className="size-5" /></span>
-            <div className="min-w-0 flex-1"><p className="text-[12px] font-semibold text-muted">Follow-up requested</p><p className="truncate text-[14px] font-bold text-navy">We’ll confirm the time</p></div>
+            <div className="min-w-0 flex-1"><p className="text-[12px] font-semibold text-muted">Session requested</p><p className="truncate text-[14px] font-bold text-navy">We’ll confirm the time</p></div>
             <BtnLink href={`/app/sessions/view?id=${req.id}`} size="sm" variant="white">View</BtnLink>
           </div>
         ) : sup.next ? (
@@ -97,13 +97,13 @@ export function BlendBottleCard() {
             <div className="flex items-center gap-3">
               <span className={cx('grid size-10 shrink-0 place-items-center rounded-full', sup.low ? 'bg-[#fbe3c0] text-[#9a5b12]' : 'bg-peri-50 text-navy')}><CalendarPlus className="size-5" /></span>
               <div className="min-w-0 flex-1">
-                <p className="text-[12px] font-semibold text-muted">Request your follow-up</p>
+                <p className="text-[12px] font-semibold text-muted">Book your next session</p>
                 <p className="text-[15px] font-bold text-navy">Suggested · {fmtDay(sup.suggest)}</p>
               </div>
             </div>
             <div className="mt-3 flex gap-2">
-              <BtnLink href="/app/book?type=followup" size="sm" variant="white" className="flex-1 whitespace-nowrap">Other date</BtnLink>
-              <BtnLink href={`/app/book?type=followup&date=${isoDay(sup.suggest)}`} size="sm" variant={sup.low ? 'gradient' : 'primary'} className="flex-1">Request</BtnLink>
+              <BtnLink href="/app/book" size="sm" variant="white" className="flex-1 whitespace-nowrap">Other date</BtnLink>
+              <BtnLink href={`/app/book?date=${isoDay(sup.suggest)}`} size="sm" variant={sup.low ? 'gradient' : 'primary'} className="flex-1">Request</BtnLink>
             </div>
           </>
         )}

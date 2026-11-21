@@ -10,7 +10,7 @@ import { BtnLink, Segmented, ease } from '@/components/ui'
 import { CONSULTATIONS } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { fmtDate, fmtTime } from '@/lib/format'
-import { isUpcoming, tbc } from '@/lib/appt'
+import { apptName, isUpcoming, tbc } from '@/lib/appt'
 
 export default function Sessions() {
   const appts = useApp((s) => s.appointments)
@@ -41,7 +41,7 @@ export default function Sessions() {
                   {tbc(a) ? <span className="text-[13px] font-extrabold leading-tight">Time<br />TBC</span> : <><span className="text-[22px] font-extrabold leading-none">{d.getDate()}</span><span className="text-[12px] font-semibold uppercase opacity-80">{d.toLocaleDateString('en-IN', { month: 'short' })}</span></>}
                 </span>
                 <span className="flex-1">
-                  <span className="block text-[16px] font-bold text-navy">{CONSULTATIONS.find((c) => c.id === a.type)!.name}</span>
+                  <span className="block text-[16px] font-bold text-navy">{apptName(a)}</span>
                   <span className="flex items-center gap-1.5 text-[13px] text-muted">{a.mode === 'online' ? <Laptop className="size-3.5" /> : <MapPin className="size-3.5" />}{tbc(a) ? 'Time to be confirmed' : `${fmtDate(d)} · ${fmtTime(d)}`} · {a.mode === 'online' ? 'Online' : 'In person'}</span>
                   {a.status === 'awaiting_payment' && <span className="mt-1 inline-block rounded-full bg-[#fbe3c0] px-2 py-0.5 text-[11px] font-bold text-[#7a4a10]">Awaiting payment</span>}
                   {tbc(a) && <span className="mt-1 inline-block rounded-full bg-[#fbf3dc] px-2 py-0.5 text-[11px] font-bold text-[#7a5a1c]">Requested · time to be confirmed</span>}

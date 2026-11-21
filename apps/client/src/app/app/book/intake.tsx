@@ -469,7 +469,7 @@ export type Checkin = { now?: Emotion; changes: Record<string, 'Better' | 'Same'
 export function CheckinNow({ c, set }: { c: Checkin; set: (p: Partial<Checkin>) => void }) {
   return (
     <div>
-      <StepTitle lead="How are you" em="now?" sub="A 2-minute check-in before your follow-up." />
+      <StepTitle lead="How are you" em="now?" sub="A 2-minute check-in before your appointment. Everything is optional." />
       <div className="card grid grid-cols-4 gap-y-3 p-4">
         {(['calm', 'joyful', 'grateful', 'hopeful', 'tired', 'anxious', 'sad', 'irritated'] as Emotion[]).map((m) => (
           <motion.button key={m} whileTap={{ scale: 0.88 }} aria-pressed={c.now === m} onClick={() => set({ now: m })} className={cx('flex flex-col items-center gap-1 rounded-[18px] p-1.5', c.now === m && 'ring-2 ring-navy')}>
@@ -484,7 +484,7 @@ export function CheckinChanges({ c, set, feelings }: { c: Checkin; set: (p: Part
   const list = feelings.length ? feelings : ['Worry', 'Sleep', 'Energy']
   return (
     <div className="space-y-3">
-      <StepTitle lead="Since we last" em="met" />
+      <StepTitle lead="How have things" em="been lately?" sub="Skip anything that doesn’t fit." />
       {list.map((f) => (
         <div key={f} className="card p-4">
           <p className="mb-3 text-[16px] font-bold text-navy">{f}</p>
@@ -494,16 +494,16 @@ export function CheckinChanges({ c, set, feelings }: { c: Checkin; set: (p: Part
     </div>
   )
 }
-export function CheckinNews({ c, set }: { c: Checkin; set: (p: Partial<Checkin>) => void }) {
+export function CheckinNews({ c, set, showDrops = true }: { c: Checkin; set: (p: Partial<Checkin>) => void; showDrops?: boolean }) {
   return (
     <div className="space-y-4">
       <StepTitle lead="Anything" em="new?" />
       <textarea value={c.news} onChange={(e) => set({ news: e.target.value.slice(0, 800) })} rows={4} placeholder="Optional. Anything you’d like Jitendra Khimlani to know" aria-label="Anything new"
         className="card w-full resize-none p-5 text-[15px] outline-none placeholder:text-muted focus:ring-2 focus:ring-blue" />
-      <div className="card p-5">
+      {showDrops && <div className="card p-5">
         <Label>I took my drops</Label>
         <div className="grid grid-cols-2 gap-2">{['Every day', 'Most days', 'Sometimes', 'Rarely'].map((d) => <Chip key={d} on={c.drops === d} onClick={() => set({ drops: d })} className="justify-center">{d}</Chip>)}</div>
-      </div>
+      </div>}
     </div>
   )
 }

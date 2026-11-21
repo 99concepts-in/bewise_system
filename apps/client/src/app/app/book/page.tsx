@@ -22,6 +22,7 @@ import { AppHeader, useUi } from '@/components/shell'
 import { Btn, Chip, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, useStableCallback } from '@/components/ui'
 import { CONSULTANT, CONSULTATIONS, NUANCE, STUDIO, TESTIMONIALS, TESTIMONIALS_SOURCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
 import { InPersonArt, OnlineArt } from '@/components/mode-art'
+import { apptMinutes, apptName } from '@/lib/appt'
 import { emptyIntake, planLeft, useApp, type Appointment, type IntakeAnswers, type Plan } from '@/lib/store'
 import { HELPLINE, PLANS, offerLive, planFull, planPrice, planSaving, type PlanId } from '@/lib/offer'
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
@@ -54,7 +55,8 @@ function Book() {
   const [askName] = useState(() => !profileName.trim())
   const [nameDraft, setNameDraft] = useState(profileName)
 
-  const [type, setType] = useState<ConsultationId | null>(() => (params.get('type') as ConsultationId) || (hasHistory ? null : 'first')) // new clients: first consultation pre-selected (owner 2026-11-18)
+  const hasBlend = useApp((s) => !!s.blend)
+  const submitCheckin = useApp((s) => s.submitCheckin)
   const [step, setStep] = useState<Step>('choose')
   const [dir, setDir] = useState(1)
   const [answers, setAnswers] = useState<IntakeAnswers>(() => intake?.answers ?? emptyIntake())
@@ -70,23 +72,11 @@ function Book() {
   // owner 2026-11-18: after the first consultation, offer 6 months (recommended), yearly (best value) or one time
   const [planPick, setPlanPick] = useState<PlanPick>('half')
 
-  // decided once per visit: submitting the intake mid-flow must not remove the steps we're standing on
-  const [needIntake] = useState(() => !intake?.submittedAt)
-  // owner 2026-11-18: no follow-up questions for the chosen feelings (or none chosen) → skip "Tell us a little more"
-  const skipNuance = !answers.feelings.some((f) => NUANCE[f])
-  const flow: Step[] = useMemo(() => {
-    // owner 2026-11-18: payment first, then a preferred time (confirmed by Jitendra Khimlani or Haresh bhai)
-    // owner 2026-11-20: clients only request; the Manager or Jitendra Khimlani set the time afterwards
-    if (type === 'followup') return ['choose', ...CHECKIN, 'mode', 'prefs', 'pay', 'done']
-    const intakeSteps: Step[] = needIntake ? INTAKE.filter((x) => x !== 'nuance' || !skipNuance) : []
-    if (needIntake && askName) intakeSteps.splice(1, 0, 'name') // after the breath, before feelings
-    return ['choose', ...intakeSteps, 'mode', 'prefs', 'pay', 'done'] as Step[]
-  }, [type, needIntake, skipNuance, askName])
+  // owner 2026-11-21: no first / follow-up choice any more (most clients met Jitendra Khimlani before the app).
+  // Everyone books "an appointment": 2-minute check-in → online or in person → preferred time → send. The team sets type, fee and time.
+  const flow: Step[] = useMemo(() => ['choose', ...(askName ? ['name' as Step] : []), ...CHECKIN, 'mode', 'prefs', 'pay', 'done'], [askName])
 
   useEffect(() => { setNavHidden(step !== 'choose'); return () => setNavHidden(false) }, [step, setNavHidden])
-  useEffect(() => {
-    if (params.get('resume') && intake && !intake.submittedAt && intake.step > 0) { setType('first'); setStep(INTAKE[Math.min(intake.step, INTAKE.length - 1)]) }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) }, [step])
 
   const go = (s: Step, d = 1) => { setDir(d); setStep(s) }
@@ -102,27 +92,27 @@ function Book() {
   const skipIntake = () => { saveIntake(answers, Math.max(1, INTAKE.indexOf(step as never))); setSkipAsk(false); go('mode') }
   const back = () => (idx <= 0 ? router.back() : go(flow[idx - 1], -1))
   const setA = (p: Partial<IntakeAnswers>) => setAnswers((a) => ({ ...a, ...p }))
-  const c = CONSULTATIONS.find((x) => x.id === (type ?? 'first'))!
-  const inPlan = type === 'followup' && planLeft(plan) > 0
-  // owner 2026-11-21: choosing Follow-up always shows the plans (6 months, yearly, one time)
-  const pick: PlanPick = type === 'followup' && !inPlan ? planPick : 'once'
-  const fee = inPlan ? 0 : pick === 'once' ? c.feePaise : planPrice(pick)
-  const feeLabel = inPlan ? 'Included in your plan' : pick === 'once' ? c.name : `${PLANS[pick].name} · launch offer`
+  const inPlan = planLeft(plan) > 0
+  const pick: PlanPick = inPlan ? 'once' : planPick
+  // one appointment: nothing to pay now (the team sets the fee with the time); a plan is paid now at the launch price
+  const fee = pick === 'once' ? 0 : planPrice(pick)
+  const feeLabel = pick === 'once' ? 'Appointment' : `${PLANS[pick].name} · launch offer`
 
   // owner 2026-11-18: every intake / check-in question is optional — only mode and time are needed to book
   const can: Partial<Record<Step, boolean>> = { mode: !!mode }
-  const steps = [...(needIntake && askName ? ['name'] : []), ...COUNTED.filter((x) => x !== 'nuance' || !skipNuance)]
-  const counted = steps.indexOf(step as string)
-  const isIntake = (INTAKE.includes(step as never) || step === 'name') && step !== 'saved'
+  const steps: string[] = []
+  const counted = -1
+  const isIntake = false
 
-  // paid (or chose to pay later / covered by a plan): the request goes to the team, who set the time
-  const confirmPaid = (later = false) => {
+  // the request goes to the team, who set the time (and, for a single appointment, first visit or follow-up and the fee)
+  const confirmPaid = () => {
     if (!mode) return
-    if (pick !== 'once' && !inPlan && !later) buyPlan(pick, fee)
-    const usePlan = inPlan || (pick !== 'once' && !later)
+    if (pick !== 'once') buyPlan(pick, fee)
+    const usePlan = inPlan || pick !== 'once'
     const clean = { ...prefs, note: prefs.note?.trim() || undefined }
-    const a = book({ type: c.id, mode, startsAt: new Date(Date.now() + 7 * 864e5).toISOString(), amountPaise: usePlan ? 0 : fee, timeTbc: true, timeRequested: true, prefs: clean,
-      ...(later ? { payLater: true } : { paidAt: new Date().toISOString() }), ...(usePlan ? { planId: pick === 'once' ? plan?.id : pick } : {}) })
+    const a = book({ type: hasHistory ? 'followup' : 'first', kindTbc: true, mode, startsAt: new Date(Date.now() + 7 * 864e5).toISOString(), amountPaise: 0, timeTbc: true, timeRequested: true, prefs: clean,
+      ...(usePlan ? { planId: pick === 'once' ? plan?.id : pick, paidAt: new Date().toISOString() } : {}) })
+    if (checkin.now || checkin.news.trim() || checkin.drops || Object.keys(checkin.changes).length) submitCheckin(a.id, checkin)
     setPaying(false); setBooked(a); markFirstBooking(); go('done')
   }
 
@@ -151,7 +141,7 @@ function Book() {
       <div className={cx('relative flex-1 pt-2', step === 'choose' ? 'pb-48' : 'pb-36')}>
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div key={step} custom={dir} initial={{ opacity: 0, x: dir * 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -40 }} transition={{ duration: 0.32, ease }}>
-            {step === 'choose' && <Choose type={type} setType={setType} canFollow={hasHistory} plan={plan} planPick={planPick} setPlanPick={setPlanPick} onMeet={() => setMeet(true)} meetOpen={meet} onStories={() => setStories(true)} />}
+            {step === 'choose' && <Choose plan={plan} planPick={planPick} setPlanPick={setPlanPick} onMeet={() => setMeet(true)} meetOpen={meet} onStories={() => setStories(true)} />}
             {step === 'intro' && <I.IntakeIntro />}
             {step === 'name' && <I.StepName value={nameDraft} onChange={setNameDraft} onEnter={next} />}
             {step === 'who' && <I.StepWho a={answers} set={setA} />}
@@ -166,28 +156,28 @@ function Book() {
             {step === 'saved' && <Saved />}
             {step === 'ck-now' && <I.CheckinNow c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} />}
             {step === 'ck-changes' && <I.CheckinChanges c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} feelings={intake?.answers.feelings ?? []} />}
-            {step === 'ck-news' && <I.CheckinNews c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} />}
+            {step === 'ck-news' && <I.CheckinNews c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} showDrops={hasBlend} />}
             {step === 'mode' && <Mode mode={mode} setMode={setMode} />}
             {step === 'prefs' && <Prefs prefs={prefs} setPrefs={setPrefs} />}
-            {step === 'pay' && mode && <Review c={c} mode={mode} fee={fee} feeLabel={feeLabel} inPlan={inPlan} canLater={pick === 'once' && !inPlan} payWhen={payWhen} setPayWhen={setPayWhen} />}
+            {step === 'pay' && mode && <Review mode={mode} fee={fee} pick={pick} inPlan={inPlan} />}
           </motion.div>
         </AnimatePresence>
       </div>
 
       <div className={cx('fixed inset-x-0 z-30 mx-auto max-w-[480px] px-5', step === 'choose' ? 'bottom-[calc(max(env(safe-area-inset-bottom),12px)+76px)] pb-2' : 'bottom-0 bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent pb-3 pt-8 safe-b')}>
         {step === 'choose' ? (
-          <Btn full variant="gradient" disabled={!type} onClick={next}>{type === 'followup' ? 'Start 2-minute check-in' : 'Continue'}</Btn>
+          <Btn full variant="gradient" onClick={next}>Start 2-minute check-in</Btn>
         ) : step === 'pay' ? (
           <>
             {inPlan ? <>
               <Btn full variant="gradient" onClick={() => confirmPaid()}><CalendarCheck2 className="size-5" /> Send request</Btn>
               <p className="mt-2 text-center text-[12px] text-muted">{planLeft(plan)} sessions left in your plan</p>
-            </> : payWhen === 'now' || pick !== 'once' ? <>
+            </> : pick !== 'once' ? <>
               <Btn full variant="gradient" onClick={() => setPaying(true)}><span aria-hidden>🔒</span> Pay {formatINR(fee)} & send request</Btn>
               <p className="mt-2 text-center text-[12px] text-muted">Secured by Razorpay · the team confirms your time</p>
             </> : <>
-              <Btn full variant="gradient" onClick={() => confirmPaid(true)}><CalendarCheck2 className="size-5" /> Send request</Btn>
-              <p className="mt-2 text-center text-[12px] text-muted">Pay {formatINR(fee)} after your session</p>
+              <Btn full variant="gradient" onClick={() => confirmPaid()}><CalendarCheck2 className="size-5" /> Send request</Btn>
+              <p className="mt-2 text-center text-[12px] text-muted">Nothing to pay now · you’ll pay in the app once your time is set</p>
             </>}
           </>
         ) : (
@@ -221,12 +211,12 @@ function PlanPicker({ pick, setPick }: { pick: PlanPick; setPick: (p: PlanPick) 
   const opts: { k: PlanPick; t: string; tag?: string; price: number; full?: number; note: string; emoji: string }[] = [
     { k: 'half', t: '6 months', tag: 'Recommended', price: planPrice('half'), full: live ? planFull('half') : undefined, note: live ? '1 month free' : '6 consultations', emoji: '🌱' },
     { k: 'yearly', t: 'Yearly', tag: 'Best value', price: planPrice('yearly'), full: live ? planFull('yearly') : undefined, note: live ? `2 months free · save ${formatINR(planSaving('yearly'))}` : '12 consultations', emoji: '🌳' },
-    { k: 'once', t: 'One time', price: CONSULTATIONS.find((x) => x.id === 'followup')!.feePaise, note: 'Just this session', emoji: '🌼' },
+    { k: 'once', t: 'One appointment', price: 0, note: 'Pay once the team sets your fee', emoji: '🌼' },
   ]
   return (
     <section aria-labelledby="plan-h">
-      <h2 id="plan-h" className="scroll-mt-24 px-1 text-[15px] font-bold text-navy">How would you like to continue?</h2>
-      <p className="px-1 text-[13px] text-muted">A consultation every month keeps your blend fresh.</p>
+      <h2 id="plan-h" className="scroll-mt-24 px-1 text-[15px] font-bold text-navy">How would you like to book?</h2>
+      <p className="px-1 text-[13px] text-muted">A session every month keeps your blend fresh. Plans include one session a month.</p>
       <div className="mt-3 space-y-2.5" role="radiogroup" aria-label="Plan">
         {opts.map((o, i) => {
           const on = pick === o.k
@@ -242,7 +232,7 @@ function PlanPicker({ pick, setPick }: { pick: PlanPick; setPick: (p: PlanPick) 
               </span>
               <span className="text-right">
                 {o.full && <span className="block text-[12px] text-muted line-through tnum">{formatINR(o.full)}</span>}
-                <span className="block text-[17px] font-extrabold text-navy tnum">{formatINR(o.price)}</span>
+                {o.k === 'once' ? <span className="block text-[14px] font-bold text-navy">Pay later</span> : <span className="block text-[17px] font-extrabold text-navy tnum">{formatINR(o.price)}</span>}
               </span>
               <span className={cx('grid size-6 shrink-0 place-items-center rounded-full border-2', on ? 'border-navy bg-navy text-white' : 'border-sky-200')}>{on && <Check className="size-3.5" strokeWidth={3} />}</span>
             </motion.button>
@@ -270,48 +260,40 @@ function Stepper({ at }: { at: number }) {
   )
 }
 
-function Choose({ type, setType, canFollow, plan, planPick, setPlanPick, onMeet, meetOpen, onStories }: { type: ConsultationId | null; setType: (t: ConsultationId) => void; canFollow: boolean; plan: Plan | null; planPick: PlanPick; setPlanPick: (p: PlanPick) => void; onMeet: () => void; meetOpen: boolean; onStories: () => void }) {
-  // returning clients who met Jitendra Khimlani before the app have no history here — offer follow-up quietly (owner 2026-11-18)
-  const [showFollow, setShowFollow] = useState(type === 'followup')
-  const follow = canFollow || showFollow
+/** owner 2026-11-21: one way in for everyone — "Book an appointment". The team decides first visit or follow-up and the fee. */
+function Choose({ plan, planPick, setPlanPick, onMeet, meetOpen, onStories }: { plan: Plan | null; planPick: PlanPick; setPlanPick: (p: PlanPick) => void; onMeet: () => void; meetOpen: boolean; onStories: () => void }) {
+  const first = CONSULTATIONS.find((x) => x.id === 'first')!.feePaise, follow = CONSULTATIONS.find((x) => x.id === 'followup')!.feePaise
   return (
     <div className="space-y-4">
-      <h1 className="h-duo pt-2">Book a <em>session</em></h1>
-      {CONSULTATIONS.filter((c) => c.id === 'first' || follow).map((c, i) => {
-        const on = type === c.id
-        return (
-          <motion.button key={c.id} onClick={() => { buzz(); setType(c.id); if (c.id === 'followup') setTimeout(() => document.getElementById('plan-h')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 250) }} aria-pressed={on} whileTap={{ scale: 0.98 }}
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.08, ease, duration: 0.5 }}
-            className={cx('relative w-full overflow-hidden rounded-[24px] p-5 text-left transition-shadow', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white shadow-[var(--shadow-card)]')}>
-            {c.id === 'first' && <span className={cx('absolute right-4 top-4 rounded-full px-2.5 py-1 text-[11px] font-bold', on ? 'bg-white/15 text-white' : 'bg-marigold-100 text-ink')}>Start here</span>}
-            <p className={cx('text-[13px] font-semibold', on ? 'text-white/70' : 'text-peri')}>Online or in person</p>
-            <p className="mt-1 text-[22px] font-extrabold tracking-[-0.02em]">{c.name}</p>
-            <p className={cx('mt-1 max-w-[80%] text-[14px] leading-5', on ? 'text-white/80' : 'text-muted')}>{c.blurb}</p>
-            <div className="mt-4 flex items-end justify-between">
-              <span className={cx('inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold', on ? 'bg-white/15' : 'bg-teal-100 text-sage-text')}><Sparkles className="size-3.5" /> Remedy blend included</span>
-              <span className="text-[26px] font-extrabold tnum">{formatINR(c.feePaise)}</span>
-            </div>
-            <AnimatePresence>{on && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring} className="absolute bottom-[74px] right-5 grid size-7 place-items-center rounded-full bg-white text-navy"><Check className="size-4" strokeWidth={3} /></motion.span>}</AnimatePresence>
-          </motion.button>
-        )
-      })}
-      {type === 'followup' && (planLeft(plan) > 0 ? (
+      <h1 className="h-duo pt-2">Book an <em>appointment</em></h1>
+      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease }} className="card overflow-hidden">
+        <button onClick={onMeet} aria-haspopup="dialog" aria-label="Meet Jitendra Khimlani" className="flex w-full items-end gap-4 bg-sky-100 px-5 pt-4 text-left">
+          {!meetOpen ? <JituPortrait className="h-[118px] w-[94px] shrink-0 ring-[3px] ring-white" radius="999px 999px 16px 16px" /> : <span className="h-[118px] w-[94px] shrink-0" />}
+          <span className="min-w-0 flex-1 pb-4">
+            <span className="block font-display text-[20px] font-semibold leading-6 text-ink">Jitendra Khimlani</span>
+            <span className="block text-[13px] text-ink-2">{CONSULTANT.title}</span>
+            <span className="mt-1.5 inline-flex items-center gap-0.5 text-[13px] font-semibold text-navy">More about him <ChevronRight className="size-4" /></span>
+          </span>
+        </button>
+        <ul className="divide-y divide-line px-5">
+          {[
+            { i: <Video className="size-5" />, t: 'One to one, online or in person', d: `Video call, or at ${STUDIO.name}` },
+            { i: <Sparkles className="size-5" />, t: 'Your remedy blend is included', d: 'Prepared for you after the session' },
+            { i: <Clock className="size-5" />, t: 'Our team confirms your time and fee', d: `${formatINR(first)} first visit · ${formatINR(follow)} after that` },
+          ].map((r) => (
+            <li key={r.t} className="flex items-center gap-3 py-3.5">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-peri-50 text-navy">{r.i}</span>
+              <span className="min-w-0"><span className="block text-[15px] font-semibold text-ink">{r.t}</span><span className="block text-[12px] text-muted">{r.d}</span></span>
+            </li>
+          ))}
+        </ul>
+      </motion.section>
+      {planLeft(plan) > 0 ? (
         <div className="flex items-center gap-3 rounded-[20px] bg-teal-100 p-4 text-[14px] text-sage-text">
           <span className="text-[22px]" aria-hidden>{PLANS[plan!.id].emoji}</span>
           <span className="flex-1"><b>{PLANS[plan!.id].name}</b> · {planLeft(plan)} sessions left. This one is included.</span>
         </div>
-      ) : <PlanPicker pick={planPick} setPick={setPlanPick} />)}
-      {!follow && (
-        <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} onClick={() => { buzz(); setShowFollow(true); setType('followup'); setTimeout(() => document.getElementById('plan-h')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300) }}
-          className="mx-auto -mt-1 block rounded-full px-4 py-2 text-[14px] text-muted">
-          <span className="font-semibold text-navy underline underline-offset-4">Book a follow-up · ₹800</span>
-        </motion.button>
-      )}
-      <motion.button onClick={onMeet} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="card flex w-full items-center gap-4 p-4 text-left">
-        {!meetOpen && <JituPortrait className="size-16 shrink-0" radius="20px" />}{meetOpen && <span className="size-16 shrink-0" />}
-        <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Meet Jitendra Khimlani</span><span className="text-[13px] text-muted">{CONSULTANT.title} · {CONSULTANT.stats[0]}</span></span>
-        <ChevronRight className="size-5 text-soft" />
-      </motion.button>
+      ) : <PlanPicker pick={planPick} setPick={setPlanPick} />}
       <motion.button onClick={onStories} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.36 }} className="card flex w-full items-center gap-4 p-4 text-left">
         <span className="relative grid size-14 shrink-0 place-items-center rounded-full bg-rose-100 ring-4 ring-sky-100">
           <Quote className="size-6 fill-rose-500 text-rose-500" aria-hidden />
@@ -319,7 +301,7 @@ function Choose({ type, setType, canFollow, plan, planPick, setPlanPick, onMeet,
         <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Client stories</span><span className="text-[13px] text-muted">{TESTIMONIALS.length ? `View ${TESTIMONIALS.length} testimonials` : 'View testimonials'}</span></span>
         <ChevronRight className="size-5 text-soft" />
       </motion.button>
-      <p className="px-2 text-center text-[13px] text-muted">Online or in person, you choose next. Sessions are non-refundable, but you can reschedule.</p>
+      <p className="px-2 text-center text-[13px] text-muted">Sessions are non-refundable, but you can reschedule.</p>
     </div>
   )
 }
@@ -447,17 +429,18 @@ function Prefs({ prefs, setPrefs }: { prefs: NonNullable<Appointment['prefs']>; 
   )
 }
 
-function Review({ c, mode, fee, feeLabel, inPlan, canLater, payWhen, setPayWhen }: { c: (typeof CONSULTATIONS)[number]; mode: 'online' | 'in_person'; fee: number; feeLabel: string; inPlan: boolean; canLater: boolean; payWhen: 'now' | 'later'; setPayWhen: (v: 'now' | 'later') => void }) {
+function Review({ mode, fee, pick, inPlan }: { mode: 'online' | 'in_person'; fee: number; pick: PlanPick; inPlan: boolean }) {
+  const first = CONSULTATIONS.find((x) => x.id === 'first')!.feePaise, follow = CONSULTATIONS.find((x) => x.id === 'followup')!.feePaise
   return (
     <div className="space-y-4">
-      <h1 className="h-duo">Review & <em>book</em></h1>
+      <h1 className="h-duo">Review & <em>send</em></h1>
       <div className="card p-5">
         <div className="-mx-5 -mt-5 mb-1 flex items-end gap-4 overflow-hidden rounded-t-[28px] border-b border-line bg-sky-100 px-5 pt-4">
           <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="h-[140px] w-auto shrink-0 object-contain" />
           <div className="pb-5"><p className="font-display text-[20px] font-semibold text-ink">Jitendra Khimlani</p><p className="text-[13px] text-muted">{CONSULTANT.title}</p></div>
         </div>
         {[
-          { i: <Sparkles className="size-5" />, t: feeLabel === c.name ? c.name : `${c.name} · ${feeLabel}` },
+          { i: <Sparkles className="size-5" />, t: inPlan ? 'Appointment · in your plan' : pick === 'once' ? 'Appointment' : `Appointment · ${PLANS[pick].name}` },
           { i: mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: mode === 'online' ? 'Online · video call' : `In person · ${STUDIO.short}` },
           { i: <Clock className="size-5" />, t: 'Time: confirmed by the team after your request' },
         ].map((r, k) => (
@@ -470,29 +453,16 @@ function Review({ c, mode, fee, feeLabel, inPlan, canLater, payWhen, setPayWhen 
       <div className="flex items-start gap-3 rounded-[20px] bg-teal-100 p-4 text-[14px] leading-5 text-sage-text">
         <Info className="mt-0.5 size-5 shrink-0" /><p>Sessions are non-refundable, but you can reschedule free up to 24 h before.</p>
       </div>
-      {canLater && (
-        <div role="radiogroup" aria-label="When would you like to pay?" className="grid grid-cols-2 gap-2.5">
-          {([
-            { k: 'now', e: '💳', t: 'Pay now', d: 'UPI, cards, netbanking' },
-            { k: 'later', e: '🤝', t: 'Pay after session', d: 'UPI, card or at the center' },
-          ] as const).map((o) => {
-            const on = payWhen === o.k
-            return (
-              <motion.button key={o.k} type="button" role="radio" aria-checked={on} whileTap={{ scale: 0.97 }} onClick={() => { buzz(6); setPayWhen(o.k) }}
-                className={cx('relative rounded-[20px] p-4 text-left transition-colors', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
-                <span className="text-[22px]" aria-hidden>{o.e}</span>
-                <span className="mt-1.5 block text-[15px] font-bold">{o.t}</span>
-                <span className={cx('block text-[12px] leading-4', on ? 'text-white/75' : 'text-muted')}>{o.d}</span>
-                <AnimatePresence>{on && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring} className="absolute right-3 top-3 grid size-6 place-items-center rounded-full bg-white text-navy"><Check className="size-3.5" strokeWidth={3} /></motion.span>}</AnimatePresence>
-              </motion.button>
-            )
-          })}
+      {inPlan ? (
+        <div className="card flex items-center justify-between p-5"><span className="text-[20px] font-extrabold text-navy">In your plan</span><span className="text-[30px] font-extrabold tracking-[-0.02em] text-navy tnum">{formatINR(0)}</span></div>
+      ) : pick !== 'once' ? (
+        <div className="card flex items-center justify-between p-5"><span className="text-[20px] font-extrabold text-navy">Total</span><span className="text-[30px] font-extrabold tracking-[-0.02em] text-navy tnum">{formatINR(fee)}</span></div>
+      ) : (
+        <div className="card p-5">
+          <div className="flex items-center justify-between"><span className="text-[20px] font-extrabold text-navy">To pay now</span><span className="text-[30px] font-extrabold tracking-[-0.02em] text-navy tnum">{formatINR(0)}</span></div>
+          <p className="mt-2 text-[13px] leading-5 text-muted">Jitendra Khimlani or our team will set your time and fee ({formatINR(first)} first visit, {formatINR(follow)} after that). You then pay in the app by UPI or card, or at the center.</p>
         </div>
       )}
-      <div className="card flex items-center justify-between p-5">
-        <span className="text-[20px] font-extrabold text-navy">{inPlan ? 'In your plan' : payWhen === 'later' && canLater ? 'Due after session' : 'Total'}</span>
-        <span className="text-[30px] font-extrabold tracking-[-0.02em] text-navy tnum">{formatINR(fee)}</span>
-      </div>
     </div>
   )
 }
@@ -500,7 +470,7 @@ function Review({ c, mode, fee, feeLabel, inPlan, canLater, payWhen, setPayWhen 
 function Booked({ a }: { a: Appointment }) {
   const router = useRouter()
   const [cal, setCal] = useState(false)
-  const c = CONSULTATIONS.find((x) => x.id === a.type)!
+  const c = { name: apptName(a), minutes: apptMinutes(a) }
   const ev = { id: a.id, title: 'BeWise session with Jitendra Khimlani', start: a.startsAt, minutes: c.minutes, location: a.mode === 'online' ? 'Online (link in the BeWise app)' : `${STUDIO.name}, ${STUDIO.full}`, description: `${c.name} (${a.code}). Find a quiet spot and keep water nearby.` }
   return (
     <main className="flex min-h-dvh flex-col px-5 safe-t">
@@ -518,11 +488,11 @@ function Booked({ a }: { a: Appointment }) {
       </motion.div>
       {a.timeRequested && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }} className="mt-3 rounded-[20px] bg-marigold-100 p-4 text-[14px] leading-5 text-ink">
-          <p><b>What happens next:</b> Jitendra Khimlani or our team will set a time for you and confirm it on WhatsApp. If anything is unclear, we’ll call you.</p>
+          <p><b>What happens next:</b> Jitendra Khimlani or our team will set a time for you and confirm it on WhatsApp.{a.kindTbc && !a.planId ? ' You’ll then see your fee here and can pay in the app.' : ''} If anything is unclear, we’ll call you.</p>
           <a href={`tel:${HELPLINE.tel}`} className="mt-2 inline-flex items-center gap-1.5 font-semibold text-navy underline underline-offset-4"><Phone className="size-4" /> Helpline {HELPLINE.label} ({HELPLINE.name})</a>
         </motion.div>
       )}
-      <p className="mt-3 text-center text-[13px] text-muted">{a.payLater ? `Booking ${a.code}. You can pay ${formatINR(a.amountPaise)} after your session.` : `Receipt ${a.code} is in Payments.`} Jitendra Khimlani will read your answers before you meet.</p>
+      <p className="mt-3 text-center text-[13px] text-muted">{a.kindTbc && !a.paidAt ? `Request ${a.code}. Nothing to pay yet.` : a.payLater ? `Booking ${a.code}. You can pay ${formatINR(a.amountPaise)} after your session.` : `Receipt ${a.code} is in Payments.`} Jitendra Khimlani will read your answers before you meet.</p>
       <div className="mt-auto space-y-3 pb-3 pt-6 safe-b">
         <Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View appointment</Btn>
         {!a.timeTbc && <Btn full variant="white" onClick={() => (isAndroid() ? addToCalendar(ev) : setCal(true))}><CalendarPlus className="size-5" /> Add to calendar</Btn>}

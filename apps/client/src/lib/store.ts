@@ -11,10 +11,10 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { ConsultationId, Emotion } from './data'
-import { PRODUCTS, REORDER_PRICE_PAISE, STUDIO, istDate, productTitle, variantById } from './data'
+import { CONSULTATIONS, PRODUCTS, REORDER_PRICE_PAISE, STUDIO, istDate, productTitle, variantById } from './data'
 import { isoDay } from './supply'
 import { COUPON_DAYS, COUPON_PCT, PLANS, type PlanId } from './offer'
-import { uid, dayKey } from './format'
+import { uid, dayKey, formatINR } from './format'
 
 export type Profile = {
   name: string; phone: string; dob: string; city: string; gender?: string
@@ -39,6 +39,9 @@ export type Appointment = {
   timeRequested?: boolean
   /** covered by a consultation plan */
   planId?: PlanId
+  /** owner 2026-11-21: the client just books an appointment; Jitendra Khimlani or Haresh bhai decide first visit or
+   *  follow-up and the fee (most clients already met him before the app), then the client pays in the app */
+  kindTbc?: boolean
   /** owner 2026-11-20: clients only request; the Manager or Jitendra Khimlani set the time. True until they do. */
   timeTbc?: boolean
   /** the client's optional hints for the team */
@@ -274,14 +277,26 @@ export const useApp = create<State>()(
       },
       setOffer: (o) => set((s) => ({ offer: { ...s.offer, ...o } })),
       confirmTime: (id) => {
-        // preview of the staff side: the team sets a time (next day, 11:00 IST, or the client's preferred date)
+        // preview of the staff side: the team sets a time (next day, 11:00 IST, or the client's preferred date) and, for a plain
+        // appointment request, the type and fee (owner 2026-11-21) — then the client pays in the app ("Complete your booking")
+        const before = get().appointments.find((x) => x.id === id)
+        const returning = !!get().blend || get().appointments.some((x) => x.id !== id && x.status === 'completed')
         set((s) => ({ appointments: s.appointments.map((x) => {
           if (x.id !== id) return x
-          if (!x.timeTbc) return { ...x, timeRequested: false }
-          const day = x.prefs?.date ? new Date(`${x.prefs.date}T00:00:00+05:30`) : new Date(Date.now() + 864e5)
-          return { ...x, timeTbc: false, timeRequested: false, startsAt: istDate(day, '11:00').toISOString() }
+          let y: Appointment = x.timeTbc
+            ? { ...x, timeTbc: false, timeRequested: false, startsAt: istDate(x.prefs?.date ? new Date(`${x.prefs.date}T00:00:00+05:30`) : new Date(Date.now() + 864e5), '11:00').toISOString() }
+            : { ...x, timeRequested: false }
+          if (y.kindTbc) {
+            const t = returning ? 'followup' : 'first'
+            const fee = CONSULTATIONS.find((c) => c.id === t)!.feePaise
+            y = { ...y, kindTbc: false, type: t, ...(y.planId ? { amountPaise: 0 } : { amountPaise: fee, status: 'awaiting_payment', source: 'manager' }) }
+          }
+          return y
         }) }))
-        get().notify({ title: 'Your time is confirmed', body: 'Jitendra Khimlani will see you then.', href: `/app/sessions/view?id=${id}` })
+        const after = get().appointments.find((x) => x.id === id)
+        if (before?.kindTbc && after?.status === 'awaiting_payment')
+          get().notify({ title: 'Your appointment is set', body: `Pay ${formatINR(after.amountPaise)} in the app to confirm it.`, href: `/app/pay?appointment=${id}` })
+        else get().notify({ title: 'Your time is confirmed', body: 'Jitendra Khimlani will see you then.', href: `/app/sessions/view?id=${id}` })
       },
       subscribeOrder: (id, keys) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, subscribed: keys } : o)) })),
       reviewOrder: (id, rating, text) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, review: { rating, text, at: new Date().toISOString() } } : o)) })),

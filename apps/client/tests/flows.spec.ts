@@ -37,15 +37,15 @@ test('feedback: face, quick tag, optional comment', async ({ page }) => {
   expect(fb).toMatchObject({ rating: 5, tags: ['Felt heard'], notes: 'Thank you' })
 })
 
-test('public booking link: new visitor → landing → sign-in; signed-in → booking with type', async ({ page }) => {
+test('public booking link: new visitor → landing → sign-in; signed-in → booking', async ({ page }) => {
   await seed(page, { onboarded: false })
   await page.goto('/book/jitendra-khimlani?type=followup')
   await expect(page.getByRole('heading', { name: /Book with Jitendra Khimlani/ })).toBeVisible()
   await page.getByRole('button', { name: 'Book an appointment' }).click()
   await page.waitForURL('**/sign-in')
-  expect(await page.evaluate(() => sessionStorage.getItem('bw-next'))).toBe('/app/book?type=followup')
+  expect(await page.evaluate(() => sessionStorage.getItem('bw-next'))).toBe('/app/book')
   await seed(page)
-  await page.goto('/book/jitendra-khimlani?type=followup'); await page.waitForURL('**/app/book?type=followup')
+  await page.goto('/book/jitendra-khimlani?type=followup'); await page.waitForURL('**/app/book')
 })
 
 test('staff-made booking: pay without picking a slot; late payment → the team confirms a new time', async ({ page }) => {
@@ -116,9 +116,9 @@ test('launch offer: yearly reveal → are you sure → 6-month offer → pay →
   await page.goto('/app/bag'); await expect(page.getByText(/WELCOME15/)).toBeVisible()
 })
 
-test('follow-up with a plan: request only (optional preferences, typed date), the team sets the time', async ({ page }) => {
+test('appointment with a plan: request only (optional preferences, typed date), the team sets the time', async ({ page }) => {
   await seed(page)
-  await page.goto('/app/book?type=followup')
+  await page.goto('/app/book')
   await expect(page.getByRole('radio', { name: /6 months/ })).toHaveAttribute('aria-checked', 'true')
   await page.getByRole('radio', { name: /Yearly/ }).click()
   await page.getByRole('button', { name: 'Start 2-minute check-in' }).click()
@@ -174,7 +174,7 @@ test('My remedies shows the booked session when there is no blend yet', async ({
   await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('bewise-client-v1')!); r.state.blend = null; localStorage.setItem('bewise-client-v1', JSON.stringify(r)) })
   await page.goto('/app/remedies')
   await expect(page.getByRole('heading', { name: 'Upcoming sessions' })).toBeVisible()
-  await expect(page.getByRole('link', { name: /Book a new session/ })).toBeVisible()
+  await expect(page.getByRole('link', { name: /Book an appointment/ })).toBeVisible()
 })
 
 test('shop shows a checkout bar once the cart has items', async ({ page }) => {
@@ -219,4 +219,31 @@ test('session page: 2-minute check-in Start opens the check-in', async ({ page }
   await page.getByRole('link', { name: /2-minute check-in/ }).click()
   await page.waitForURL('**/app/checkin**appointment=a2')
   await expect(page.getByText('2-minute check-in · 1 of 3')).toBeVisible()
+})
+
+test('one appointment: no first/follow-up choice, nothing to pay now; the team sets type, fee and time, then the client pays', async ({ page }) => {
+  await seed(page)
+  await page.evaluate(() => { const k = 'bewise-client-v1'; const s = JSON.parse(localStorage.getItem(k)!); s.state.plan = null; s.state.appointments = s.state.appointments.filter((a: { status: string }) => a.status === 'completed'); localStorage.setItem(k, JSON.stringify(s)) })
+  await page.goto('/app/book')
+  await expect(page.getByRole('heading', { name: /Book an appointment/ })).toBeVisible()
+  await expect(page.getByText('First consultation', { exact: true })).toHaveCount(0)
+  await page.getByRole('radio', { name: /One appointment/ }).click()
+  await page.getByRole('button', { name: 'Start 2-minute check-in' }).click()
+  await page.getByRole('button', { name: 'calm' }).click()
+  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue', exact: true }).click()
+  await page.getByRole('radio', { name: /^In person/ }).click()
+  await page.getByRole('button', { name: 'Continue', exact: true }).click()
+  await page.getByRole('button', { name: 'Continue', exact: true }).click()
+  await expect(page.getByText('To pay now')).toBeVisible()
+  await page.getByRole('button', { name: 'Send request' }).click()
+  await expect(page.getByRole('heading', { name: /Request sent/ })).toBeVisible()
+  let s = await state(page)
+  const a = s.appointments[s.appointments.length - 1]
+  expect(a).toMatchObject({ kindTbc: true, amountPaise: 0, timeTbc: true }); expect(a.paidAt).toBeUndefined()
+  expect(s.checkins[a.id].answers.now).toBe('calm')
+  // the team sets it (preview tool): returning client → follow-up ₹800, awaiting payment
+  await page.goto('/app/me'); await page.getByRole('button', { name: 'Team confirms my time' }).click()
+  s = await state(page)
+  expect(s.appointments.find((x: { id: string }) => x.id === a.id)).toMatchObject({ kindTbc: false, type: 'followup', amountPaise: 80000, status: 'awaiting_payment' })
+  await page.goto('/app'); await expect(page.getByText('Complete your booking')).toBeVisible()
 })

@@ -49,7 +49,7 @@ export default function Ask() {
     buzz(8)
     if (id.startsWith('q:')) return send(id.slice(2))
     if (id.startsWith('remind-')) { const t = id.slice(7); toast(`We’ll remind you at ${t}`); s.pushChat({ role: 'bot', text: `Done! A gentle nudge at ${t}. 🌿` }); return }
-    if (id === 'book-followup') return goSafe(router, '/app/book?type=followup')
+    if (id === 'book-followup') return goSafe(router, '/app/book')
     if (id === 'book-first') return goSafe(router, '/app/book')
     if (id === 'open-remedies') return goSafe(router, '/app/remedies')
     if (id === 'open-journal') return goSafe(router, '/app/journal')

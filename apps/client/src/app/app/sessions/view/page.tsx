@@ -18,7 +18,7 @@ import { HELPLINE } from '@/lib/offer'
 import { useApp } from '@/lib/store'
 import { addDays, fmtDay, fmtLongDay, fmtTime, formatINR, startOfDay, fmtIso } from '@/lib/format'
 import { addToCalendar } from '@/lib/ics'
-import { tbc } from '@/lib/appt'
+import { apptMinutes, apptName, tbc } from '@/lib/appt'
 import { BP } from '@/lib/asset'
 
 export default function Page() { return <Suspense><Detail /></Suspense> }
@@ -33,7 +33,7 @@ function Detail() {
   const [move, setMove] = useState(false)
   const [fb, setFb] = useState(params.get('feedback') === '1')
   if (!a) return <main className="px-5"><AppHeader back /><p className="mt-10 text-center text-muted">We couldn’t find that session.</p></main>
-  const c = CONSULTATIONS.find((x) => x.id === a.type)!
+  const c = { name: apptName(a), minutes: apptMinutes(a) }
   const start = +new Date(a.startsAt)
   const mins = Math.round((start - now) / 60_000)
   const isTbc = tbc(a)
@@ -75,7 +75,7 @@ function Detail() {
         <div className="card divide-y divide-line px-5">
           <Row icon={<img src={`${BP}/img/jitu.webp`} alt="" className="size-14 shrink-0 rounded-[18px] bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)] object-cover object-top" />} t="Jitendra Khimlani" d="Bach Flower Remedy Therapist" />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{a.mode === 'online' ? <Laptop className="size-5" /> : <MapPin className="size-5" />}</span>} t={c.name} d={a.mode === 'online' ? 'Online video call' : STUDIO.full} />
-          <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><FileText className="size-5" /></span>} t={a.payLater && !a.paidAt ? `${formatINR(a.amountPaise)} due after your session` : `Paid ${formatINR(a.amountPaise)}`} d={a.payLater && !a.paidAt ? 'Pay by UPI, card or at the center' : 'Remedy blend included · receipt in Payments'} />
+          <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><FileText className="size-5" /></span>} t={a.planId ? 'In your plan' : a.kindTbc ? 'Fee set by our team' : a.payLater && !a.paidAt ? `${formatINR(a.amountPaise)} due after your session` : a.status === 'awaiting_payment' ? `${formatINR(a.amountPaise)} to pay` : `Paid ${formatINR(a.amountPaise)}`} d={a.kindTbc && !a.planId ? 'You’ll pay in the app once your time is set · remedy blend included' : a.payLater && !a.paidAt ? 'Pay by UPI, card or at the center' : 'Remedy blend included · receipt in Payments'} />
           {a.payLater && !a.paidAt && <Btn size="md" variant={past ? 'gradient' : 'white'} className="mt-3" onClick={() => goSafe(router, `/app/pay?appointment=${a.id}`)}>Pay {formatINR(a.amountPaise)} now</Btn>}
         </div>
 

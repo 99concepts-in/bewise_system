@@ -68,7 +68,7 @@ function Story({ onClose }: { onClose: () => void }) {
     if (pull.get() > 110) { buzz(6); onClose() } else animate(pull, 0, { duration: 0.28, ease })
   }
 
-  const book = () => { buzz(); onClose(); goSafe(router, '/app/book?type=first') }
+  const book = () => { buzz(); onClose(); goSafe(router, '/app/book') }
 
   return (
     <motion.div role="dialog" aria-modal="true" aria-label="Meet Jitendra Khimlani" className="fixed inset-0 z-[60] mx-auto max-w-[480px]"

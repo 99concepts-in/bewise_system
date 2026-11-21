@@ -2,7 +2,7 @@
 /**
  * @module   booking
  * @owner    CLIENT
- * @screens  Public booking link (owner 2026-11-18; consultant request §3) — /book/jitendra-khimlani?type=first|followup
+ * @screens  Public booking link (owner 2026-11-18; consultant request §3) — /book/jitendra-khimlani (owner 2026-11-21: one kind of appointment)
  *           Shared by Jitendra Khimlani and Haresh on WhatsApp and as a QR code. Signed-in clients go straight to booking;
  *           new visitors see a short welcome, then sign-in → onboarding → booking (type kept).
  * v5 (HUB 2026-11-20): official logo kit in the header (no typed wordmark), arch portrait, Blue Bloom chips.
@@ -26,11 +26,10 @@ export default function Page() { return <Suspense><BookingLink /></Suspense> }
 function BookingLink() {
   const router = useRouter()
   const params = useSearchParams()
-  // owner 2026-11-20: both options are selectable here (the link's ?type= only sets the starting choice)
-  const [type, setType] = useState<'first' | 'followup'>(params.get('type') === 'followup' ? 'followup' : 'first')
+  // owner 2026-11-21: no first / follow-up choice; everyone books an appointment and the team sets the type and fee (?type= is ignored)
   const hydrated = useApp((s) => s.hydrated)
   const onboarded = useApp((s) => !!s.profile?.onboardedAt)
-  const dest = `/app/book?type=${type}`
+  const dest = '/app/book'
   useEffect(() => { if (hydrated && onboarded) router.replace(dest) }, [hydrated, onboarded, dest, router])
   const go = () => { setNextStep(dest); goSafe(router, '/sign-in') }
   if (!hydrated || onboarded) return <div className="grid min-h-dvh place-items-center"><LogoMark size={64} label="BeWise" /></div>
@@ -48,19 +47,9 @@ function BookingLink() {
         <p className="mt-3 max-w-[330px] text-[16px] leading-6 text-ink-2">{CONSULTANT.approach.replace(/^Jitendra Khimlani listens first\./, 'He listens first.')}</p>
       </motion.div>
 
-      <div className="mt-6 space-y-3" role="radiogroup" aria-label="Choose your session">
-        {CONSULTATIONS.map((c, i) => {
-          const on = c.id === type
-          return (
-            <motion.button key={c.id} type="button" role="radio" aria-checked={on} onClick={() => setType(c.id)} whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.08 }}
-              className={cx('flex w-full items-center gap-3 rounded-[24px] p-4 text-left transition-colors duration-200', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
-              <span className={cx('grid size-10 shrink-0 place-items-center rounded-full', on ? 'bg-white/15' : 'bg-sky-100')}>{on ? <Check className="size-5" strokeWidth={3} /> : <Sparkles className="size-5" />}</span>
-              <span className="flex-1"><span className="block text-[16px] font-bold">{c.name}</span><span className={cx('text-[13px]', on ? 'text-white/75' : 'text-muted')}>Remedy blend included</span></span>
-              <span className="text-[20px] font-extrabold tnum">{formatINR(c.feePaise)}</span>
-            </motion.button>
-          )
-        })}
+      <div className="mt-6 rounded-[24px] bg-white p-4 text-center shadow-[var(--shadow-card)]">
+        <p className="text-[16px] font-bold text-navy">One to one with Jitendra Khimlani</p>
+        <p className="mt-1 text-[13px] leading-5 text-muted">{formatINR(CONSULTATIONS[0].feePaise)} first visit · {formatINR(CONSULTATIONS[1].feePaise)} after that. Our team confirms your time and fee, then you pay in the app.</p>
       </div>
       <div className="mt-4 flex flex-wrap justify-center gap-2 text-[12px] font-semibold text-navy">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-sky-200"><Video className="size-3.5" /> Online</span>

@@ -21,7 +21,7 @@ import { Btn, BtnLink, Item, Reveal, Sheet, ease, toast } from '@/components/ui'
 import { BACH_REMEDIES, CONSULTATIONS, moodOf, type ConsultationId } from '@/lib/data'
 import type { Appointment } from '@/lib/store'
 import { useApp } from '@/lib/store'
-import { isUpcoming, tbc, whenShort } from '@/lib/appt'
+import { apptName, isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { dayKey, fmtDay, fmtTime } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
 import { DoseTracker } from '@/components/dose-tracker'
@@ -256,7 +256,7 @@ function Upcoming() {
               <Link href={a.status === 'awaiting_payment' ? `/app/pay?appointment=${a.id}` : `/app/sessions/view?id=${a.id}`} className="flex items-center gap-3 rounded-[20px] bg-peri-50/70 p-3.5">
                 <span className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-navy text-white"><CalendarHeart className="size-6" /></span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[12px] font-semibold text-peri">{a.status === 'awaiting_payment' ? 'Awaiting payment' : tbc(a) ? 'Requested · we’ll confirm the time' : a.type === 'first' ? 'First consultation' : 'Follow-up'}</span>
+                  <span className="block text-[12px] font-semibold text-peri">{a.status === 'awaiting_payment' ? 'Awaiting payment' : tbc(a) ? 'Requested · we’ll confirm the time' : apptName(a)}</span>
                   <span className="block text-[16px] font-bold text-navy">{whenShort(a)}</span>
                   <span className="block text-[12px] text-muted">{a.mode === 'online' ? 'Online' : 'In person'} with Jitendra Khimlani</span>
                 </span>
@@ -266,8 +266,8 @@ function Upcoming() {
           ))}
         </ul>
       ) : <p className="mt-1 text-[14px] text-muted">Nothing booked right now.</p>}
-      <BtnLink href={hasHistory ? '/app/book?type=followup' : '/app/book'} size="md" variant={up.length ? 'white' : 'gradient'} className="mt-4 w-full">
-        <CalendarHeart className="size-4" /> {hasHistory ? 'Book a new session' : 'Book your first consultation'}
+      <BtnLink href="/app/book" size="md" variant={up.length ? 'white' : 'gradient'} className="mt-4 w-full">
+        <CalendarHeart className="size-4" /> Book an appointment
       </BtnLink>
     </section>
   )
@@ -286,7 +286,7 @@ function PastSessions() {
         {past.map((a) => (
           <li key={a.id}>
             <Link href={`/app/sessions/view?id=${a.id}`} className="flex items-center gap-3 py-3">
-              <span className="min-w-0 flex-1"><span className="block text-[15px] font-semibold text-navy">{a.type === 'first' ? 'First consultation' : 'Follow-up'}</span>
+              <span className="min-w-0 flex-1"><span className="block text-[15px] font-semibold text-navy">{apptName(a)}</span>
                 <span className="text-[13px] text-muted">{fmtDay(a.startsAt)} · {a.mode === 'online' ? 'Online' : 'In person'}</span></span>
               {!a.feedback && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose">Add feedback</span>}
               <ChevronRight className="size-4 text-soft" />

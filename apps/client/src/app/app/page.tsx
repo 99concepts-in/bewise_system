@@ -23,7 +23,7 @@ import { ProductCard } from '@/components/product-card'
 import { BtnLink, Item, Reveal, buzz, cx, ease, toast, useChrome, useNow } from '@/components/ui'
 import { CONSULTATIONS, CONSULTANT, PRODUCTS, moodOf, type Emotion } from '@/lib/data'
 import { ACCENTS, HOME_FEELINGS, type HomeFeeling } from '@/lib/feelings'
-import { isUpcoming, tbc, whenShort } from '@/lib/appt'
+import { apptName, isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { GoalCheck } from '@/components/goal-check'
 import { doneToday, kindOf, streak } from '@/lib/goals'
 import { DoseDots } from '@/components/dose-tracker'
@@ -199,11 +199,9 @@ function PetalBurst({ color, big }: { color: string; big?: boolean }) {
 /* ---------------- Meet Jitendra Khimlani ---------------- */
 /**
  * owner 2026-11-21: Jitendra Khimlani's card is where clients book from Home: a clear "Book appointment"
- * (first consultation or follow-up, with the fee underneath) and "More about him" (opens his story).
+ * (owner 2026-11-21: one kind of appointment; the team sets first visit or follow-up and the fee) and "More about him".
  */
 function MeetCard({ open, onOpen }: { open: boolean; onOpen: () => void }) {
-  const follow = useApp((s) => !!s.blend || s.appointments.length > 0)
-  const c = CONSULTATIONS.find((x) => x.id === (follow ? 'followup' : 'first'))!
   return (
     <section className="relative overflow-hidden rounded-[28px] bg-sky-100 p-4" aria-labelledby="meet-h">
       <span className="pointer-events-none absolute -right-10 -top-12 size-40 rounded-full bg-white/45" aria-hidden />
@@ -223,7 +221,7 @@ function MeetCard({ open, onOpen }: { open: boolean; onOpen: () => void }) {
         </div>
       </div>
       <div className="relative mt-4 space-y-2">
-        <Link href={`/app/book${follow ? '?type=followup' : ''}`} onClick={() => buzz()}
+        <Link href="/app/book" onClick={() => buzz()}
           className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-navy px-4 font-display text-[16px] font-semibold text-white shadow-[var(--shadow-cta)] transition-transform active:scale-[0.98]">
           <CalendarHeart className="size-[18px]" /> Book appointment
         </Link>
@@ -232,7 +230,7 @@ function MeetCard({ open, onOpen }: { open: boolean; onOpen: () => void }) {
           More about him <ChevronRight className="size-4" />
         </button>
       </div>
-      <p className="relative mt-2.5 text-center text-[12px] text-ink-2">{follow ? 'Follow-up' : 'First consultation'} · <span className="tnum">{formatINR(c.feePaise)}</span> · remedy blend included</p>
+      <p className="relative mt-2.5 text-center text-[12px] text-ink-2">Remedy blend included · nothing to pay until your time is set</p>
       <Sparkle size={22} className="absolute left-[100px] top-3" />
     </section>
   )
@@ -288,7 +286,7 @@ function Ctx({ tone, kicker, title, body, cta, href, icon, art }: { tone: keyof 
 }
 
 function NextSession({ a }: { a: Appointment }) {
-  const c = CONSULTATIONS.find((x) => x.id === a.type)!
+  const c = { name: apptName(a) }
   return (
     <Link href={`/app/sessions/view?id=${a.id}`} className="card flex items-center gap-4 p-4">
       <SessionDateArt startsAt={a.startsAt} mode={a.mode} />

@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-21 · One kind of appointment (no first / follow-up choice)
+- Owner: ~500 clients already met Jitendra Khimlani, so booking no longer asks "First consultation or Follow-up". "Book an appointment" → plan or One appointment → 2-minute check-in (for everyone) → online / in person → preferred time → Send request.
+- One appointment: nothing to pay at booking. Jitendra Khimlani or Haresh bhai set type, fee and time; the booking then shows "Complete your booking · Pay ₹X". Plans (6 months / Yearly) are still paid at booking, and also offered in the offer banner.
+- `Appointment.kindTbc`; `apptName()` shows "Appointment" until the team sets the type. Check-in answers given while booking are now saved with the request (they were dropped before).
+- Copy updated across Home (consultant card), My care, onboarding, help FAQ, Ask BeWise, public booking link (no choice cards). Splash subtitle darker (axe caught it mid-fade).
+- Request filed: requests/20261121-client-to-manager-consultant-hub-one-appointment-type.md (staff set type + fee; API support). 53 tests.
+
 ## 2026-11-21 · Drops: 4 per dose, gentle haptics, no duplicate tracker
 - Each dose circle now shows 4 little drops (one dose = 4 drops) that fall in together when ticked (Home and the 25-day calendar).
 - Gentle haptics: `buzz()` uses the Vibration API on Android and, on iPhone (no vibrate in Safari), a hidden native switch tap that gives the light system haptic on iOS 18+.

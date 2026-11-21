@@ -63,7 +63,7 @@ export default function Welcome() {
                   <motion.span key={k} initial={{ y: 48, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease, delay: 0.55 + k * 0.05 }}>{c}</motion.span>
                 ))}
               </div>
-              <motion.p className="mt-1 text-[15px] font-medium tracking-[0.18em] text-muted uppercase" initial={{ opacity: 0, letterSpacing: '0.4em' }} animate={{ opacity: 1, letterSpacing: '0.18em' }} transition={{ duration: 0.9, delay: 1 }}>
+              <motion.p className="mt-1 text-[15px] font-medium tracking-[0.18em] text-ink-2 uppercase" initial={{ opacity: 0, letterSpacing: '0.4em' }} animate={{ opacity: 1, letterSpacing: '0.18em' }} transition={{ duration: 0.9, delay: 1 }}>
                 Holistic Wellness
               </motion.p>
             </div>

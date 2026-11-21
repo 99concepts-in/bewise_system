@@ -236,7 +236,7 @@ function Congrats({ onDone }: { onDone: () => void }) {
 
       <div className="mt-auto w-full space-y-2.5 pt-7 safe-b">
         <Link href="/app/shop" onClick={onDone} className="flex h-14 w-full items-center justify-center rounded-full bg-marigold text-[16px] font-extrabold text-navy">Shop with {coupon?.pct ?? COUPON_PCT}% off</Link>
-        <Link href="/app/book?type=followup" onClick={onDone} className="flex h-12 w-full items-center justify-center rounded-full bg-white/12 text-[15px] font-semibold text-white ring-1 ring-white/20">Book my session</Link>
+        <Link href="/app/book" onClick={onDone} className="flex h-12 w-full items-center justify-center rounded-full bg-white/12 text-[15px] font-semibold text-white ring-1 ring-white/20">Book my session</Link>
       </div>
     </motion.div>
   )
