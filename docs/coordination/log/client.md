@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-21 · Home: floating Book button removed
+- Removed the big floating "Book your consultation · ₹1,000" / "Book a follow-up" pill from Home (owner). Booking stays in My care ("Book your first consultation" / "Book a new session"), the offer card, and the pay/continue cards on Home when a booking is in progress.
+
 ## 2026-11-21 · Offer banner placement
 - The introductory offer banner is no longer at the top of Home. It now sits below the feelings card on Home, and in My care (the booking tab) under the sessions card. Same banner, same offer flow; hidden when the offer ends or a plan is bought.
 

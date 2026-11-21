@@ -15,7 +15,7 @@ import { ArrowRight, BookHeart, Check, ChevronRight, MessageCircleHeart, Target,
 import { useMemo, useState } from 'react'
 import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
-import { AppHeader, useNavShown } from '@/components/shell'
+import { AppHeader } from '@/components/shell'
 import { SessionDateArt } from '@/components/session-art'
 import { FeelingIcon } from '@/components/flower'
 import { JituPortrait, JituStory, Sparkle } from '@/components/jitu-story'
@@ -42,7 +42,7 @@ export default function Home() {
   const now = useNow(60_000)
 
   return (
-    <main className="home-wash -mx-0 min-h-dvh px-5 pb-[calc(env(safe-area-inset-bottom)+176px)]">
+    <main className="home-wash -mx-0 min-h-dvh px-5 pb-[calc(env(safe-area-inset-bottom)+104px)]">
       <AppHeader />
       <Reveal className="space-y-6">
         <Item>
@@ -68,7 +68,6 @@ export default function Home() {
         <Item><YourSpace /></Item>
       </Reveal>
 
-      <BookPill />
       <JituStory open={story} onClose={() => setStory(false)} />
     </main>
   )
@@ -405,27 +404,3 @@ function YourSpace() {
   )
 }
 
-/* ---------------- floating Book pill ---------------- */
-function BookPill() {
-  const shown = useNavShown()
-  const appts = useApp((s) => s.appointments)
-  const hasBlend = useApp((s) => !!s.blend)
-  const now = useNow()
-  const busy = appts.some((a) => isUpcoming(a, now))
-  if (busy) return null
-  const follow = hasBlend || appts.length > 0
-  const c = CONSULTATIONS.find((x) => x.id === (follow ? 'followup' : 'first'))!
-  return (
-    <AnimatePresence>
-      {shown && (
-        <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: 0.28, ease, delay: 0.3 }}
-          className="pointer-events-none fixed inset-x-0 z-30 mx-auto max-w-[480px] px-5" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 76px)' }}>
-          <Link href={`/app/book${follow ? '?type=followup' : ''}`} onClick={() => buzz()}
-            className="pointer-events-auto flex h-[60px] items-center justify-center gap-2 rounded-full bg-navy px-6 font-display text-[17px] font-semibold text-white shadow-[var(--shadow-float)] transition-colors hover:bg-navy-2">
-            {follow ? 'Book a follow-up' : 'Book your consultation'} <span className="text-white/60" aria-hidden>·</span> <span className="font-sans text-[16px] font-semibold tnum">{formatINR(c.feePaise)}</span> <ArrowRight className="size-5" />
-          </Link>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
-}
