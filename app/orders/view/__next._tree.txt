@@ -1,0 +1,7 @@
+:HL["/bewise_system/_next/static/chunks/16yf9vssti31n.css","style"]
+:HC["/",""]
+4:[["children",{"s":"__PAGE__","h":160}]]
+3:[["children",{"s":"view","h":96,"c":"$Q4"}]]
+2:[["children",{"s":"orders","h":96,"c":"$Q3"}]]
+1:[["children",{"s":"app","h":100,"c":"$Q2"}]]
+0:{"b":"SoAZ6yKwtD5q9mco10K4s","t":{"t":{"s":"","h":88,"c":"$Q1"}}}
