@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-21 · Splash: golden line back
+- Owner prefers the earlier splash: owl mark in a white disc with a thin golden ring that draws itself, "BeWise" rising in letter by letter, "HOLISTIC WELLNESS" below. Replaces the v5 stacked-logo splash (welcome/page.tsx).
+
 ## 2026-11-20 · Realistic remedy bottle on Home
 - Replaced the drawn bottle with a photo-real slim clear-glass dropper bottle (Higgsfield render, public/img/bottle-slim.webp). Amber liquid is a CSS layer clipped to the inside of the glass by public/img/bottle-slim-mask.png, with the bottle multiplied on top, so the level still drops day by day and dips on each dose (surface ripple). Small BeWise "Flower Remedy" label on the upper body keeps the level visible.
 

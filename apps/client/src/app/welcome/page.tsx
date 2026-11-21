@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 import { preload } from 'react-dom'
 import { AnimatePresence, motion, type PanInfo } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
-import { LogoMark, LogoStacked, Mascot, MoodImg } from '@/components/brand'
+import { LogoMark, Mascot, MoodImg } from '@/components/brand'
 import { FlowerArt } from '@/components/flower'
 import { Btn, ease, cx } from '@/components/ui'
 import { BP } from '@/lib/asset'
@@ -23,7 +23,7 @@ const SLIDES = [
 ] as { kicker?: string; lead: string; em: string; title?: string; sub: string; chips?: string[] }[]
 
 // owner 2026-11-18: slide images felt slow; fetch them all up front (during the 1.9 s splash) at high priority
-const WELCOME_IMAGES = ['img/owl-wave.webp', 'img/jitu-portrait.webp', 'img/brand/bewise-logo-stacked.svg', 'img/flowers/wild-rose.svg', 'img/flowers/mimulus.svg']
+const WELCOME_IMAGES = ['img/owl-wave.webp', 'img/jitu-portrait.webp', 'img/flowers/wild-rose.svg', 'img/flowers/mimulus.svg']
 
 export default function Welcome() {
   for (const src of WELCOME_IMAGES) preload(`${BP}/${src}`, { as: 'image', fetchPriority: 'high' })
@@ -45,13 +45,26 @@ export default function Welcome() {
       <AnimatePresence mode="wait">
         {phase === 'splash' ? (
           <motion.div key="splash" className="grid flex-1 place-items-center" exit={{ opacity: 0, scale: 1.04, filter: 'blur(6px)' }} transition={{ duration: 0.45, ease }}>
+            {/* owner 2026-11-21: back to the golden line splash (ring draws around the owl, name rises in) */}
             <div className="flex flex-col items-center">
-              <div className="relative grid place-items-center p-10">
-                <motion.span className="absolute inset-0 rounded-full bg-white" initial={{ scale: 0.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.9, ease }} />
-                <motion.div className="relative" initial={{ scale: 0.86, opacity: 0, filter: 'blur(8px)' }} animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }} transition={{ duration: 0.9, ease, delay: 0.15 }}>
-                  <LogoStacked height={168} />
+              <div className="relative grid size-[150px] place-items-center">
+                <motion.span className="absolute inset-0 rounded-full bg-white/70" initial={{ scale: 0.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.9, ease }} />
+                <svg className="absolute inset-0 -rotate-90" viewBox="0 0 150 150" aria-hidden>
+                  <motion.circle cx="75" cy="75" r="72" fill="none" stroke="#b89b64" strokeWidth="1.5" strokeLinecap="round"
+                    initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }} transition={{ duration: 1.2, ease, delay: 0.25 }} />
+                </svg>
+                <motion.div initial={{ scale: 0.6, opacity: 0, filter: 'blur(8px)' }} animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }} transition={{ duration: 0.8, ease, delay: 0.1 }}>
+                  <LogoMark size={110} />
                 </motion.div>
               </div>
+              <div className="mt-6 flex overflow-hidden text-[40px] font-extrabold tracking-[-0.03em] text-navy" role="img" aria-label="BeWise">
+                {'BeWise'.split('').map((c, k) => (
+                  <motion.span key={k} initial={{ y: 48, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease, delay: 0.55 + k * 0.05 }}>{c}</motion.span>
+                ))}
+              </div>
+              <motion.p className="mt-1 text-[15px] font-medium tracking-[0.18em] text-muted uppercase" initial={{ opacity: 0, letterSpacing: '0.4em' }} animate={{ opacity: 1, letterSpacing: '0.18em' }} transition={{ duration: 0.9, delay: 1 }}>
+                Holistic Wellness
+              </motion.p>
             </div>
           </motion.div>
         ) : (
