@@ -2,6 +2,11 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-21 · Drops: 4 per dose, gentle haptics, no duplicate tracker
+- Each dose circle now shows 4 little drops (one dose = 4 drops) that fall in together when ticked (Home and the 25-day calendar).
+- Gentle haptics: `buzz()` uses the Vibration API on Android and, on iPhone (no vibrate in Safari), a hidden native switch tap that gives the light system haptic on iOS 18+.
+- My care: removed the repeated "today's drops" dots and "Took a dose" button (they live on Home). The section is now "Your progress": day of bottle, % taken, streak, the 25-day calendar and the reminder times.
+
 ## 2026-11-21 · "Start" check-in did nothing (fixed)
 - On the live host, a tap could be lost while the app was still loading routes in the background, so the session page's "2-minute check-in · Start" did nothing. It is now a real link (works even before the page finishes loading), and every in-app `router.push` now goes through `goSafe` (falls back to a normal page load if the screen hasn't changed after 1.5 s; it now compares path + query). New test: session page Start opens the check-in (52 tests).
 

@@ -17,7 +17,26 @@ export const spring = { type: 'spring', stiffness: 420, damping: 34, mass: 0.8 }
 export const soft = { type: 'spring', stiffness: 260, damping: 30 } as const
 export const ease = [0.22, 1, 0.36, 1] as const
 
-export const buzz = (ms = 8) => { try { navigator.vibrate?.(ms) } catch { /* not supported */ } }
+/**
+ * Gentle haptic tap. Android: Vibration API. iPhone (Safari has no vibrate): tapping a hidden native switch
+ * gives the system's light haptic on iOS 18+ (owner 2026-11-21: "add some haptic feedback, gentle"). Must run in a tap handler.
+ */
+let hapticLabel: HTMLLabelElement | null = null
+const iosTick = () => {
+  if (!hapticLabel) {
+    const l = document.createElement('label'); l.setAttribute('aria-hidden', 'true')
+    l.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none'
+    const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1
+    l.appendChild(i); document.body.appendChild(l); hapticLabel = l
+  }
+  hapticLabel.click()
+}
+export const buzz = (ms = 8) => {
+  try {
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') navigator.vibrate(ms)
+    else if (typeof document !== 'undefined') iosTick()
+  } catch { /* not supported */ }
+}
 
 const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(' ')
 export { cx }

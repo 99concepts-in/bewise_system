@@ -7,12 +7,28 @@
  *           and a 25-day calendar (the life of a bottle) where past days can be checked in too. Never shaming.
  */
 import { AnimatePresence, motion } from 'motion/react'
-import { CalendarDays, Droplet, Flame, Plus, Undo2 } from 'lucide-react'
+import { CalendarDays, Flame, Plus, Undo2 } from 'lucide-react'
 import { useState } from 'react'
 import { Btn, Sheet, buzz, cx, spring, toast } from './ui'
 import { useApp } from '@/lib/store'
 import { dayKey, fmtDay } from '@/lib/format'
 import { blendDays, doseStats, dosesOn, perDay } from '@/lib/doses'
+
+/** owner 2026-11-21: one dose = 4 drops, so each dose shows 4 little drops that fall in together when ticked. */
+const DROP = 'M0 -4.6C2.2 -1.6 3.2 0.3 3.2 1.7A3.2 3.2 0 0 1 -3.2 1.7C-3.2 0.3 -2.2 -1.6 0 -4.6Z'
+const SPOTS = [[12, 5.6], [6, 12.2], [18, 12.2], [12, 18.6]]
+function FourDrops({ on, animate }: { on: boolean; animate: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[62%]" aria-hidden>
+      {SPOTS.map(([x, y], k) => (
+        <g key={k} transform={`translate(${x} ${y})`}>
+          <motion.path d={DROP} fill={on ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={on ? 0 : 1.3} strokeLinejoin="round"
+            initial={animate ? { y: -7, opacity: 0 } : false} animate={{ y: 0, opacity: 1 }} transition={{ delay: animate ? k * 0.07 : 0, type: 'spring', stiffness: 420, damping: 16 }} />
+        </g>
+      ))}
+    </svg>
+  )
+}
 
 function Dots({ n, of, size = 'lg', onTap, label, fluid }: { n: number; of: number; size?: 'lg' | 'sm' | 'xs'; onTap?: (i: number) => void; label?: string; fluid?: boolean }) {
   const px = size === 'lg' ? 'size-12' : size === 'sm' ? 'size-9' : 'size-[7px]'
@@ -22,9 +38,9 @@ function Dots({ n, of, size = 'lg', onTap, label, fluid }: { n: number; of: numb
         const on = i < n
         if (size === 'xs') return <span key={i} className={cx('rounded-full', px, on ? 'bg-navy' : 'bg-[#d8dcea]')} />
         const body = (
-          <motion.span key={on ? 'on' : 'off'} initial={on ? { scale: 0.5 } : false} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500, damping: 14 }}
-            className={cx('relative grid place-items-center rounded-full transition-colors', px, on ? 'bg-[radial-gradient(circle_at_35%_30%,#f6de8d,#d9a94a)] text-white shadow-[0_6px_14px_rgba(181,138,60,.4)]' : 'bg-white text-[#c9cfe0] ring-1 ring-[#e3e6ef]')}>
-            <Droplet className={size === 'lg' ? 'size-5' : 'size-4'} strokeWidth={2.4} fill={on ? 'currentColor' : 'none'} />
+          <motion.span key={on ? 'on' : 'off'} initial={on ? { scale: 0.7 } : false} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500, damping: 14 }}
+            className={cx('relative grid place-items-center rounded-full transition-colors', px, on ? 'bg-[radial-gradient(circle_at_35%_30%,#f6de8d,#d9a94a)] text-white shadow-[0_6px_14px_rgba(181,138,60,.4)]' : 'bg-white text-[#c3cadd] ring-1 ring-[#e3e6ef]')}>
+            <FourDrops on={on} animate={on} />
             {on && size === 'lg' && <motion.span className="absolute inset-0 rounded-full ring-2 ring-[#f6de8d]" initial={{ scale: 1, opacity: 0.9 }} animate={{ scale: 1.6, opacity: 0 }} transition={{ duration: 0.7 }} />}
           </motion.span>
         )
@@ -37,7 +53,7 @@ function Dots({ n, of, size = 'lg', onTap, label, fluid }: { n: number; of: numb
 }
 
 /** Today's 4 dots + check-in button + streak + stats; opens the 25-day calendar. */
-export function DoseTracker({ full = false }: { full?: boolean }) {
+export function DoseTracker({ full = false, compact = false }: { full?: boolean; compact?: boolean }) {
   const s = useApp()
   const [cal, setCal] = useState(false)
   if (!s.blend) return null
@@ -50,6 +66,7 @@ export function DoseTracker({ full = false }: { full?: boolean }) {
   }
   return (
     <div>
+      {!compact && <>
       <div className="flex items-center justify-between">
         <p className="text-[14px] font-bold text-navy">Today’s drops <span className="font-semibold text-muted">· {n} of {of}</span></p>
         <span className={cx('inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold', st.streak ? 'bg-[#fbe9d6] text-[#9a4f12]' : 'bg-peri-50 text-muted')}>
@@ -63,7 +80,8 @@ export function DoseTracker({ full = false }: { full?: boolean }) {
         className={cx('mt-3 flex h-12 w-full items-center justify-center gap-1.5 rounded-full text-[15px] font-bold', n >= of ? 'bg-sage-100 text-sage-text' : 'bg-navy text-white shadow-[var(--shadow-cta)]')}>
         {n >= of ? 'All done' : <><Plus className="size-4" strokeWidth={3} /> Took a dose</>}
       </motion.button>
-      <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+      </>}
+      <div className={cx('grid grid-cols-3 gap-2 text-center', !compact && 'mt-4')}>
         {[
           { v: `${st.day}/${st.of}`, l: 'Day of bottle' },
           { v: `${st.pct}%`, l: 'Doses taken' },

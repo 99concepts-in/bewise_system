@@ -120,10 +120,11 @@ export default function Remedies() {
 
             <div className="mt-5 border-t border-line pt-5">
               <div className="mb-3 flex items-center justify-between gap-3">
-                <h3 id="drops-h" className="font-display text-[18px] font-semibold text-ink">Your daily drops</h3>
+                <h3 id="drops-h" className="font-display text-[18px] font-semibold text-ink">Your progress</h3>
                 <button onClick={() => setTimes(true)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-sky-50 px-3.5 text-[13px] font-semibold text-navy ring-1 ring-sky-200"><Bell className="size-4" /> {blend.reminderTimes.length} times</button>
               </div>
-              <DoseTracker full />
+              {/* owner 2026-11-21: today's drops are checked in on Home; here only progress, the 25-day calendar and reminders */}
+              <DoseTracker full compact />
             </div>
           </section>
         </Item>
