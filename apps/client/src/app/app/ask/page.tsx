@@ -5,6 +5,7 @@
  * @screens  CL-55 Ask BeWise — mascot, streaming-style replies, product suggestions with Add to bag, confirm-before-action,
  *           crisis card, clear history. Caption: "Not medical advice · for your blend, ask Jitendra Khimlani"
  */
+import { goSafe } from '@/lib/nav'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
 import { ArrowUp, CalendarDays, ChevronLeft, MoreHorizontal, ShoppingBag, Trash2 } from 'lucide-react'
@@ -48,16 +49,16 @@ export default function Ask() {
     buzz(8)
     if (id.startsWith('q:')) return send(id.slice(2))
     if (id.startsWith('remind-')) { const t = id.slice(7); toast(`We’ll remind you at ${t}`); s.pushChat({ role: 'bot', text: `Done! A gentle nudge at ${t}. 🌿` }); return }
-    if (id === 'book-followup') return router.push('/app/book?type=followup')
-    if (id === 'book-first') return router.push('/app/book')
-    if (id === 'open-remedies') return router.push('/app/remedies')
-    if (id === 'open-journal') return router.push('/app/journal')
-    if (id === 'open-shop') return router.push('/app/shop')
+    if (id === 'book-followup') return goSafe(router, '/app/book?type=followup')
+    if (id === 'book-first') return goSafe(router, '/app/book')
+    if (id === 'open-remedies') return goSafe(router, '/app/remedies')
+    if (id === 'open-journal') return goSafe(router, '/app/journal')
+    if (id === 'open-shop') return goSafe(router, '/app/shop')
     if (id === 'log') return openLog()
-    if (id.startsWith('open-session-')) return router.push(`/app/sessions/view?id=${id.slice(13)}`)
-    if (id.startsWith('open-order-')) return router.push(`/app/orders/view?id=${id.slice(11)}`)
+    if (id.startsWith('open-session-')) return goSafe(router, `/app/sessions/view?id=${id.slice(13)}`)
+    if (id.startsWith('open-order-')) return goSafe(router, `/app/orders/view?id=${id.slice(11)}`)
     if (/whatsapp/i.test(label)) return toast('WhatsApp opens here once the business number is added')
-    if (/book/i.test(label)) return router.push('/app/book')
+    if (/book/i.test(label)) return goSafe(router, '/app/book')
   }
 
   return (

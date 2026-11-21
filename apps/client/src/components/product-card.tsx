@@ -1,5 +1,6 @@
 'use client'
 /** @module commerce-ux @owner CLIENT @screens CL-32/33/34/36 product tiles with quick add + fly-to-bag */
+import { goSafe } from '@/lib/nav'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
@@ -25,7 +26,7 @@ export function useAddProduct() {
   const router = useRouter()
   return (p: Product, variantId: string, qty = 1, from?: DOMRect) => {
     if (p.soldOut) { toast('Sold out for now. We’ll restock soon'); return }
-    if (p.personal && !hasBlend) { toast('Your personal blend is made after a consultation'); router.push('/app/book'); return }
+    if (p.personal && !hasBlend) { toast('Your personal blend is made after a consultation'); goSafe(router, '/app/book'); return }
     const key = p.personal ? (p.personal === 'spray' ? 'remedy-reorder-spray' : 'remedy-reorder') : variantId
     add(key, p.personal ? 1 : qty); buzz(12)
     if (from) flyToBag(from, `${BP}/img/${p.art}.webp`)

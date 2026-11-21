@@ -4,6 +4,8 @@
  * @owner    CLIENT
  * @screens  (route /app/sessions/view?id=…) CL-19 Appointment detail · CL-20 Waiting room · CL-21/22 Can't make it? (reschedule only, D-08/D-16) · CL-23 Feedback · CL-58 calendar
  */
+import { goSafe } from '@/lib/nav'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
 import { CalendarPlus, Check, Clock, Plus, Droplets, FileText, Headphones, Laptop, MapPin, Sun, Video, Phone } from 'lucide-react'
@@ -74,18 +76,19 @@ function Detail() {
           <Row icon={<img src={`${BP}/img/jitu.webp`} alt="" className="size-14 shrink-0 rounded-[18px] bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)] object-cover object-top" />} t="Jitendra Khimlani" d="Bach Flower Remedy Therapist" />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{a.mode === 'online' ? <Laptop className="size-5" /> : <MapPin className="size-5" />}</span>} t={c.name} d={a.mode === 'online' ? 'Online video call' : STUDIO.full} />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><FileText className="size-5" /></span>} t={a.payLater && !a.paidAt ? `${formatINR(a.amountPaise)} due after your session` : `Paid ${formatINR(a.amountPaise)}`} d={a.payLater && !a.paidAt ? 'Pay by UPI, card or at the center' : 'Remedy blend included · receipt in Payments'} />
-          {a.payLater && !a.paidAt && <Btn size="md" variant={past ? 'gradient' : 'white'} className="mt-3" onClick={() => router.push(`/app/pay?appointment=${a.id}`)}>Pay {formatINR(a.amountPaise)} now</Btn>}
+          {a.payLater && !a.paidAt && <Btn size="md" variant={past ? 'gradient' : 'white'} className="mt-3" onClick={() => goSafe(router, `/app/pay?appointment=${a.id}`)}>Pay {formatINR(a.amountPaise)} now</Btn>}
         </div>
 
         {!past && (
           checkin ? (
-            <div className="flex items-center gap-3 rounded-[20px] bg-sage-100/80 p-4 text-[14px] text-sage-text"><Check className="size-5" strokeWidth={3} /><span className="flex-1"><b>Check-in shared</b> · Jitendra Khimlani will read it before you meet</span><button onClick={() => router.push(`/app/checkin?appointment=${a.id}`)} className="font-semibold underline underline-offset-2">Edit</button></div>
+            <div className="flex items-center gap-3 rounded-[20px] bg-sage-100/80 p-4 text-[14px] text-sage-text"><Check className="size-5" strokeWidth={3} /><span className="flex-1"><b>Check-in shared</b> · Jitendra Khimlani will read it before you meet</span><button onClick={() => goSafe(router, `/app/checkin?appointment=${a.id}`)} className="font-semibold underline underline-offset-2">Edit</button></div>
           ) : (
-            <button onClick={() => router.push(`/app/checkin?appointment=${a.id}`)} className="card flex w-full items-center gap-3 p-4 text-left">
+            // a real link: works even if tapped while the page is still loading (owner 2026-11-21: "Start" did nothing)
+            <Link href={`/app/checkin?appointment=${a.id}`} className="card flex w-full items-center gap-3 p-4 text-left">
               <span className="grid size-11 shrink-0 place-items-center rounded-full bg-peri-50 text-[18px]" aria-hidden>📝</span>
               <span className="flex-1"><span className="block text-[15px] font-bold text-navy">2-minute check-in</span><span className="text-[13px] text-muted">Tell Jitendra Khimlani how you’ve been since last time</span></span>
               <span className="text-[13px] font-semibold text-navy">Start</span>
-            </button>
+            </Link>
           )
         )}
         {!past && (

@@ -9,6 +9,7 @@
  *   Close with ⨯, Esc or a swipe down from the top. prefers-reduced-motion → fades only.
  * Copy rule: no cure / medical claims.
  */
+import { goSafe } from '@/lib/nav'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, animate, motion, useInView, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import { ArrowRight, ChevronLeft, ChevronRight, Droplets, Ear, ExternalLink, HeartHandshake, Quote, X } from 'lucide-react'
@@ -67,7 +68,7 @@ function Story({ onClose }: { onClose: () => void }) {
     if (pull.get() > 110) { buzz(6); onClose() } else animate(pull, 0, { duration: 0.28, ease })
   }
 
-  const book = () => { buzz(); onClose(); router.push('/app/book?type=first') }
+  const book = () => { buzz(); onClose(); goSafe(router, '/app/book?type=first') }
 
   return (
     <motion.div role="dialog" aria-modal="true" aria-label="Meet Jitendra Khimlani" className="fixed inset-0 z-[60] mx-auto max-w-[480px]"

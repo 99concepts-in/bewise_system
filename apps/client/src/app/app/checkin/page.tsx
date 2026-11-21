@@ -4,6 +4,7 @@
  * @owner    CLIENT builds UI · CONSULTANT owns intake.getCheckinForm / submitCheckin
  * @screens  IN-12 follow-up check-in as a deep link — /app/checkin?appointment=<id> (consultant "Ask" WhatsApp; request §5)
  */
+import { goSafe } from '@/lib/nav'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
 import { ChevronLeft } from 'lucide-react'
@@ -33,7 +34,7 @@ function CheckinLink() {
     <main className="flex min-h-dvh flex-col px-5 safe-t">
       {step < 3 && (
         <header className="sticky top-0 z-30 -mx-5 flex items-center gap-3 bg-sky-50/95 backdrop-blur-xl px-5 pb-5 pt-2">
-          <IconBtn label="Back" onClick={() => (step ? setStep(step - 1) : router.push('/app'))}><ChevronLeft className="size-5" /></IconBtn>
+          <IconBtn label="Back" onClick={() => (step ? setStep(step - 1) : goSafe(router, '/app'))}><ChevronLeft className="size-5" /></IconBtn>
           <div className="min-w-0 flex-1">
             <p className="text-[13px] font-semibold text-navy">2-minute check-in · {step + 1} of 3</p>
             <ProgressBar value={(step + 1) / 3} className="mt-1.5" />

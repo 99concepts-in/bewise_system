@@ -211,3 +211,12 @@ test('home shows the 4-dose remedy check-in when there is a blend', async ({ pag
   await page.goto('/app')
   await expect(page.getByRole('group', { name: /Today: \d of 4 doses/ })).toBeVisible()
 })
+
+test('session page: 2-minute check-in Start opens the check-in', async ({ page }) => {
+  await seed(page)
+  await page.evaluate(() => { const k = 'bewise-client-v1'; const s = JSON.parse(localStorage.getItem(k)!); s.state.checkins = {}; localStorage.setItem(k, JSON.stringify(s)) })
+  await page.goto('/app/sessions/view?id=a2')
+  await page.getByRole('link', { name: /2-minute check-in/ }).click()
+  await page.waitForURL('**/app/checkin**appointment=a2')
+  await expect(page.getByText('2-minute check-in · 1 of 3')).toBeVisible()
+})

@@ -8,11 +8,13 @@ import { BP } from './asset'
 type R = { push: (h: string) => void; replace: (h: string) => void }
 const norm = (p: string) => p.replace(/\/+$/, '') || '/'
 
+const here = () => norm(window.location.pathname) + window.location.search
+
 export function goSafe(router: R, href: string, mode: 'push' | 'replace' = 'push') {
-  const from = norm(window.location.pathname)
+  const from = here()
   router[mode](href)
   window.setTimeout(() => {
-    if (norm(window.location.pathname) !== from) return
+    if (here() !== from) return
     const url = `${BP}${href}`
     if (mode === 'replace') window.location.replace(url); else window.location.assign(url)
   }, 1500)

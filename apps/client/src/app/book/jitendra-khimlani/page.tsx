@@ -7,6 +7,7 @@
  *           new visitors see a short welcome, then sign-in → onboarding → booking (type kept).
  * v5 (HUB 2026-11-20): official logo kit in the header (no typed wordmark), arch portrait, Blue Bloom chips.
  */
+import { goSafe } from '@/lib/nav'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'motion/react'
 import { Check, MapPin, Sparkles, Video } from 'lucide-react'
@@ -31,7 +32,7 @@ function BookingLink() {
   const onboarded = useApp((s) => !!s.profile?.onboardedAt)
   const dest = `/app/book?type=${type}`
   useEffect(() => { if (hydrated && onboarded) router.replace(dest) }, [hydrated, onboarded, dest, router])
-  const go = () => { setNextStep(dest); router.push('/sign-in') }
+  const go = () => { setNextStep(dest); goSafe(router, '/sign-in') }
   if (!hydrated || onboarded) return <div className="grid min-h-dvh place-items-center"><LogoMark size={64} label="BeWise" /></div>
 
   return (

@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-21 · "Start" check-in did nothing (fixed)
+- On the live host, a tap could be lost while the app was still loading routes in the background, so the session page's "2-minute check-in · Start" did nothing. It is now a real link (works even before the page finishes loading), and every in-app `router.push` now goes through `goSafe` (falls back to a normal page load if the screen hasn't changed after 1.5 s; it now compares path + query). New test: session page Start opens the check-in (52 tests).
+
 ## 2026-11-21 · Follow-up shows the plans
 - Book a session: choosing Follow-up now always shows "How would you like to continue?" (6 months Recommended, Yearly Best value, One time), also for clients with no history in the app (e.g. via "Book a follow-up · ₹800"). The page scrolls to the plans when Follow-up is tapped. Clients with an active plan still see "This one is included".
 

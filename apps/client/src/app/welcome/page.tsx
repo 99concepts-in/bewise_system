@@ -5,6 +5,7 @@
  * @screens  CL-01 Splash · CL-02 Welcome story — owner copy 2026-11-18: welcome · book with Jitendra Khimlani · Bach flower benefits
  * v5 (HUB 2026-11-20): splash shows the official stacked logo (no typed wordmark); headings in Fraunces; flower vectors.
  */
+import { goSafe } from '@/lib/nav'
 import { useRouter } from 'next/navigation'
 import { preload } from 'react-dom'
 import { AnimatePresence, motion, type PanInfo } from 'motion/react'
@@ -73,7 +74,7 @@ export default function Welcome() {
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, ease }}>
                 <LogoMark size={40} label="BeWise" />
               </motion.div>
-              <button onClick={() => router.push('/sign-in')} className={cx('rounded-full px-4 py-2 text-[14px] font-semibold text-navy transition-opacity', i === 2 && 'pointer-events-none opacity-0')}>Skip</button>
+              <button onClick={() => goSafe(router, '/sign-in')} className={cx('rounded-full px-4 py-2 text-[14px] font-semibold text-navy transition-opacity', i === 2 && 'pointer-events-none opacity-0')}>Skip</button>
             </header>
 
             <motion.div className="relative flex flex-1 touch-pan-y flex-col" drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.18} onDragEnd={onDragEnd}>
@@ -118,8 +119,8 @@ export default function Welcome() {
                   </button>
                 ))}
               </div>
-              <Btn variant="gradient" full onClick={() => (i < 2 ? go(i + 1) : router.push('/sign-in'))}>{i === 0 ? 'Get Started' : i < 2 ? 'Next' : 'Let’s begin'}</Btn>
-              <Btn variant="ghost" full size="md" onClick={() => router.push('/sign-in?returning=1')}>I already have an account</Btn>
+              <Btn variant="gradient" full onClick={() => (i < 2 ? go(i + 1) : goSafe(router, '/sign-in'))}>{i === 0 ? 'Get Started' : i < 2 ? 'Next' : 'Let’s begin'}</Btn>
+              <Btn variant="ghost" full size="md" onClick={() => goSafe(router, '/sign-in?returning=1')}>I already have an account</Btn>
             </footer>
           </motion.div>
         )}

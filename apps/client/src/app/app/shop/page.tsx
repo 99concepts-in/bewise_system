@@ -6,6 +6,7 @@
  * Catalogue: the owner's product range (2026-11-18): roll-on oils, aura sprays, Bach remedies, bath salts, hair & beauty.
  * v5 (HUB 2026-11-20): flat accent tints instead of gradients, real flower vectors on the ritual slides, navy checkout pill.
  */
+import { goSafe } from '@/lib/nav'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
@@ -45,7 +46,7 @@ export default function Shop() {
   const toGrid = () => requestAnimationFrame(() => document.getElementById('grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
   const pickCat = (key: Category | 'consult') => {
     buzz(6)
-    if (key === 'consult') return router.push('/app/book')
+    if (key === 'consult') return goSafe(router, '/app/book')
     setCat(key); setIntent(null); setSaved(false); toGrid()
   }
   const pickIntent = (key: Intent) => { buzz(6); setIntent(key); setCat('all'); setSaved(false); toGrid() }
@@ -240,7 +241,7 @@ function CheckoutBar() {
       {count > 0 && (
         <motion.div key="bar" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }} transition={spring}
           className="fixed inset-x-0 bottom-[calc(max(env(safe-area-inset-bottom),12px)+80px)] z-30 mx-auto max-w-[480px] px-5">
-          <button aria-label={`Checkout, ${count} item${count > 1 ? 's' : ''}, ${formatINR(total)}`} onClick={() => { buzz(10); router.push('/app/checkout') }}
+          <button aria-label={`Checkout, ${count} item${count > 1 ? 's' : ''}, ${formatINR(total)}`} onClick={() => { buzz(10); goSafe(router, '/app/checkout') }}
             className="flex h-[60px] w-full items-center gap-3 rounded-full bg-navy pl-2.5 pr-5 text-left text-white shadow-[var(--shadow-float)]">
             <span className="relative grid size-10 place-items-center rounded-full bg-white/15 text-white"><ShoppingBag className="size-5" />
               <motion.span key={count} initial={{ scale: 0.4 }} animate={{ scale: 1 }} className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-marigold text-[11px] font-bold text-ink tnum">{count}</motion.span></span>

@@ -1,5 +1,6 @@
 'use client'
 /** @module commerce-ux @owner CLIENT @screens CL-37 Your bag — remedy reorder + products together, server-style totals */
+import { goSafe } from '@/lib/nav'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
 import { AlertTriangle, Minus, Plus, X } from 'lucide-react'
@@ -68,7 +69,7 @@ export default function Bag() {
             <div className="flex justify-between border-t border-line pt-3"><span className="text-[20px] font-extrabold text-navy">Total</span><span className="text-[26px] font-extrabold text-navy tnum">{formatINR(total)}</span></div>
           </section>
           <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
-            <Btn full variant="gradient" onClick={() => router.push('/app/checkout')}>Checkout · {formatINR(total)}</Btn>
+            <Btn full variant="gradient" onClick={() => goSafe(router, '/app/checkout')}>Checkout · {formatINR(total)}</Btn>
           </div>
         </>
       )}

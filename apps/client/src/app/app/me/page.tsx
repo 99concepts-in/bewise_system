@@ -7,6 +7,7 @@
  * v5 (HUB 2026-11-20): Reminders now has "Reminders on this phone" (notification permission, asked only on Yes; on iPhone
  *   only once BeWise is on the home screen) — the same switch the post-booking prompt sets.
  */
+import { goSafe } from '@/lib/nav'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
@@ -69,14 +70,14 @@ export default function Me() {
         <Item className="card flex items-center gap-3 p-4">
           <span className="grid size-10 place-items-center rounded-full bg-marigold-100 text-ink"><FlaskConical className="size-5" /></span>
           <div className="flex-1"><p className="text-[15px] font-semibold text-navy">Explore with sample data</p><p className="text-[12px] text-muted">Preview a returning client: blend, sessions, journal, orders</p></div>
-          <Btn size="sm" variant="sage" onClick={() => { s.loadDemo(); toast('Sample journey loaded'); router.push('/app') }}>Load</Btn>
+          <Btn size="sm" variant="sage" onClick={() => { s.loadDemo(); toast('Sample journey loaded'); goSafe(router, '/app') }}>Load</Btn>
         </Item>
         <Item className="card p-4">
           <p className="text-[13px] font-bold uppercase tracking-[0.1em] text-muted">Preview tools</p>
           <p className="mt-1 text-[12px] text-muted">See what a client receives when Jitendra Khimlani or Haresh books for them.</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(); router.push(`/app/pay?appointment=${a.id}`) }}>Booking from Jitendra Khimlani</Btn>
-            <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(true); router.push(`/app/pay?appointment=${a.id}`) }}>…paid after hold expired</Btn>
+            <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(); goSafe(router, `/app/pay?appointment=${a.id}`) }}>Booking from Jitendra Khimlani</Btn>
+            <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(true); goSafe(router, `/app/pay?appointment=${a.id}`) }}>…paid after hold expired</Btn>
             <Btn size="sm" variant="white" onClick={() => { const a = s.appointments.find((x) => x.timeRequested); if (a) { s.confirmTime(a.id); toast('Time confirmed by the team') } else toast('No time waiting for confirmation') }}>Team confirms my time</Btn>
           </div>
         </Item>

@@ -6,6 +6,7 @@
  * v5 (HUB 2026-11-20): white tab bar with labels + navy dot (DESIGN-SYSTEM §5); 2nd tab renamed "Care" (route stays
  *   /app/remedies); header carries the official horizontal logo (32 px); hosts the install / reminder prompts.
  */
+import { goSafe } from '@/lib/nav'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
@@ -247,7 +248,7 @@ function NoticeSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
         <ul className="mt-4 space-y-2">
           {notices.map((n, i) => (
             <motion.li key={n.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
-              <button onClick={() => { onClose(); if (n.href) router.push(n.href) }} className="flex w-full items-start gap-3 rounded-[20px] bg-sky-50 p-4 text-left">
+              <button onClick={() => { onClose(); if (n.href) goSafe(router, n.href) }} className="flex w-full items-start gap-3 rounded-[20px] bg-sky-50 p-4 text-left">
                 <span className={`mt-1.5 size-2.5 shrink-0 rounded-full ${n.read ? 'bg-transparent' : 'bg-coral'}`} />
                 <span className="flex-1"><span className="block font-display text-[16px] font-semibold text-ink">{n.title}</span><span className="block text-[13px] text-muted">{n.body}</span></span>
                 <span className="text-[12px] text-muted">{fmtDay(n.at)}</span>
