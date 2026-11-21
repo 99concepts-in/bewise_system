@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-21 · Follow-up shows the plans
+- Book a session: choosing Follow-up now always shows "How would you like to continue?" (6 months Recommended, Yearly Best value, One time), also for clients with no history in the app (e.g. via "Book a follow-up · ₹800"). The page scrolls to the plans when Follow-up is tapped. Clients with an active plan still see "This one is included".
+
 ## 2026-11-21 · Consultant card on Home books
 - Home "Your consultant" card redesigned: arch portrait, Jitendra Khimlani, title, chips (12+ years, Online or in person), then a full-width "Book appointment" (first consultation or follow-up) and "More about him" (opens his story), with the fee line underneath. This replaces the removed floating Book button as Home's way to book.
 

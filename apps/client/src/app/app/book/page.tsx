@@ -104,7 +104,8 @@ function Book() {
   const setA = (p: Partial<IntakeAnswers>) => setAnswers((a) => ({ ...a, ...p }))
   const c = CONSULTATIONS.find((x) => x.id === (type ?? 'first'))!
   const inPlan = type === 'followup' && planLeft(plan) > 0
-  const pick: PlanPick = type === 'followup' && hasHistory && !inPlan ? planPick : 'once'
+  // owner 2026-11-21: choosing Follow-up always shows the plans (6 months, yearly, one time)
+  const pick: PlanPick = type === 'followup' && !inPlan ? planPick : 'once'
   const fee = inPlan ? 0 : pick === 'once' ? c.feePaise : planPrice(pick)
   const feeLabel = inPlan ? 'Included in your plan' : pick === 'once' ? c.name : `${PLANS[pick].name} · launch offer`
 
@@ -224,7 +225,7 @@ function PlanPicker({ pick, setPick }: { pick: PlanPick; setPick: (p: PlanPick) 
   ]
   return (
     <section aria-labelledby="plan-h">
-      <h2 id="plan-h" className="px-1 text-[15px] font-bold text-navy">How would you like to continue?</h2>
+      <h2 id="plan-h" className="scroll-mt-24 px-1 text-[15px] font-bold text-navy">How would you like to continue?</h2>
       <p className="px-1 text-[13px] text-muted">A consultation every month keeps your blend fresh.</p>
       <div className="mt-3 space-y-2.5" role="radiogroup" aria-label="Plan">
         {opts.map((o, i) => {
@@ -279,7 +280,7 @@ function Choose({ type, setType, canFollow, plan, planPick, setPlanPick, onMeet,
       {CONSULTATIONS.filter((c) => c.id === 'first' || follow).map((c, i) => {
         const on = type === c.id
         return (
-          <motion.button key={c.id} onClick={() => { buzz(); setType(c.id) }} aria-pressed={on} whileTap={{ scale: 0.98 }}
+          <motion.button key={c.id} onClick={() => { buzz(); setType(c.id); if (c.id === 'followup') setTimeout(() => document.getElementById('plan-h')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 250) }} aria-pressed={on} whileTap={{ scale: 0.98 }}
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.08, ease, duration: 0.5 }}
             className={cx('relative w-full overflow-hidden rounded-[24px] p-5 text-left transition-shadow', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white shadow-[var(--shadow-card)]')}>
             {c.id === 'first' && <span className={cx('absolute right-4 top-4 rounded-full px-2.5 py-1 text-[11px] font-bold', on ? 'bg-white/15 text-white' : 'bg-marigold-100 text-ink')}>Start here</span>}
@@ -294,14 +295,14 @@ function Choose({ type, setType, canFollow, plan, planPick, setPlanPick, onMeet,
           </motion.button>
         )
       })}
-      {type === 'followup' && canFollow && (planLeft(plan) > 0 ? (
+      {type === 'followup' && (planLeft(plan) > 0 ? (
         <div className="flex items-center gap-3 rounded-[20px] bg-teal-100 p-4 text-[14px] text-sage-text">
           <span className="text-[22px]" aria-hidden>{PLANS[plan!.id].emoji}</span>
           <span className="flex-1"><b>{PLANS[plan!.id].name}</b> · {planLeft(plan)} sessions left. This one is included.</span>
         </div>
       ) : <PlanPicker pick={planPick} setPick={setPlanPick} />)}
       {!follow && (
-        <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} onClick={() => { buzz(); setShowFollow(true); setType('followup') }}
+        <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} onClick={() => { buzz(); setShowFollow(true); setType('followup'); setTimeout(() => document.getElementById('plan-h')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300) }}
           className="mx-auto -mt-1 block rounded-full px-4 py-2 text-[14px] text-muted">
           <span className="font-semibold text-navy underline underline-offset-4">Book a follow-up · ₹800</span>
         </motion.button>
