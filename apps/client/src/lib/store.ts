@@ -104,7 +104,8 @@ type State = {
   coupon: Coupon | null
   offer: { skippedAt?: string; downsellAt?: string }
   /** owner 2026-11-23: first-time reminder popup, reminders on, and the day a morning nudge was last shown */
-  reminders: { askedAt?: string; on?: boolean; nudgedOn?: string }
+  /** owner 2026-11-23: firstAt = time of the first dose (WhatsApp reminder); next reminders 4 h after each dose, then every 45 min until logged */
+  reminders: { askedAt?: string; on?: boolean; nudgedOn?: string; firstAt?: string; lastDoseAt?: string; lastNudgeAt?: string }
   seq: number
   // actions
   setProfile: (p: Partial<Profile>) => void
@@ -217,7 +218,10 @@ export const useApp = create<State>()(
       logDrops: (date, taken) => set((s) => ({ drops: { ...s.drops, [date]: taken }, doses: { ...s.doses, [date]: taken ? (s.blend?.timesPerDay ?? 4) : 0 } })),
       logDoses: (date, n) => set((s) => {
         const max = s.blend?.timesPerDay ?? 4, v = Math.max(0, Math.min(max, n))
-        return { doses: { ...s.doses, [date]: v }, drops: { ...s.drops, [date]: v > 0 } }
+        // a new dose today restarts the 4-hour reminder clock
+        const now = new Date(), today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+        const more = date === today && v > (s.doses[date] ?? 0)
+        return { doses: { ...s.doses, [date]: v }, drops: { ...s.drops, [date]: v > 0 }, ...(more ? { reminders: { ...(s.reminders ?? {}), lastDoseAt: now.toISOString() } } : {}) }
       }),
       payAppointment: (id) => {
         const a = get().appointments.find((x) => x.id === id)

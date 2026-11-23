@@ -34,3 +34,14 @@ Owner: members set reminder times the first time they get a blend; until they ch
 - Needed for real background reminders (FOUNDATION/HUB): web push (service worker + VAPID) or a WhatsApp template
   `remedy_reminder`, sent by cron at the member's reminder times; the morning one repeats only until the first dose of the day is
   logged (`remedies.logDrops` with doses > 0).
+
+## Remedy reminders, revised schedule (2026-11-23, owner)
+Replaces the reminder section above.
+- The member sets only the time of their first dose (`reminders.firstAt`, also as `blend.reminderTimes[0]`).
+- **WhatsApp, server cron:** every day at `firstAt`, send template `remedy_morning` ("Good morning, time for your first drops 🌿"
+  + link to the app) unless today's first dose is already logged.
+- **After each logged dose:** next reminder 4 hours later (`remedies.logDrops` time + 4 h) as a push notification.
+- **Not logged:** repeat every 45 minutes until the dose is logged; stop after the day's 4th dose or at 23:00. Members are not told
+  about the repeats.
+- Needs web push (service worker + VAPID keys + `push_subscriptions` table) for reminders while the app is closed. The client app
+  already does the same schedule while it is open or comes back on screen (components/reminder-setup.tsx).

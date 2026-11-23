@@ -319,3 +319,27 @@ test('welcome: 4 slides end with the app’s benefits; You’re in has no bookin
   await expect(page.getByRole('button', { name: /Take me home/ })).toBeVisible()
   await expect(page.getByRole('button', { name: /Book a session/ })).toHaveCount(0)
 })
+
+test('dose reminders: app follows up 45 min after the first (WhatsApp) one, then 4 h after each dose, repeating every 45 min', async ({ page }) => {
+  await seed(page)
+  const set = (fn: string) => page.evaluate((f) => { const k = 'bewise-client-v1'; const r = JSON.parse(localStorage.getItem(k)!); new Function('s', f)(r.state); localStorage.setItem(k, JSON.stringify(r)) }, fn)
+  const today = await page.evaluate(() => { const x = new Date(); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}` })
+  const hhmm = await page.evaluate(() => { const d = new Date(Date.now() - 2 * 3600e3); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` })
+  const notices = async () => (await state(page)).notices.map((n: { title: string }) => n.title)
+  // first dose due 2 h ago, nothing logged → follow-up
+  await set(`s.reminders = { askedAt: new Date().toISOString(), on: true, firstAt: '${hhmm}' }; s.doses = s.doses || {}; s.doses['${today}'] = 0; s.drops = {}; s.notices = []`)
+  await page.goto('/app'); await page.waitForTimeout(800)
+  expect((await notices())[0]).toMatch(/first drops/)
+  // nudged 10 min ago → no repeat yet
+  const before = (await notices()).length
+  await page.reload(); await page.waitForTimeout(800)
+  expect((await notices()).length).toBe(before)
+  // one dose taken 5 h ago → next reminder due → nudge for dose 2
+  await set(`s.doses['${today}'] = 1; s.reminders.lastDoseAt = new Date(Date.now() - 5 * 3600e3).toISOString(); s.reminders.lastNudgeAt = undefined; s.notices = []`)
+  await page.reload(); await page.waitForTimeout(800)
+  expect((await notices())[0]).toMatch(/2 of 4/)
+  // still not logged 50 min later → repeat
+  await set(`s.reminders.lastNudgeAt = new Date(Date.now() - 50 * 60e3).toISOString(); s.notices = []`)
+  await page.reload(); await page.waitForTimeout(800)
+  expect((await notices())[0]).toMatch(/2 of 4/)
+})

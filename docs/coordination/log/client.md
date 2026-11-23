@@ -2,6 +2,11 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-23 · Reminders: one time to set, then 4 h after each dose
+- Popup asks only for the time of the first drops ("Your first reminder each day comes on WhatsApp"). The day's 4 times are derived 4 h apart for My care.
+- In-app schedule (open or back on screen): first dose: WhatsApp sends the on-time reminder, the app follows up after 45 min; later doses: reminder 4 h after the last checked-in dose; not logged: repeat every 45 min (not mentioned to members); stops after the 4th dose or 23:00. `reminders.lastDoseAt` set on each new dose today.
+- Server request updated (WhatsApp `remedy_morning` cron + web push for the 4 h / 45 min schedule). Test added (61).
+
 ## 2026-11-23 · Mood logger redesigned (immersive, morphing shapes)
 - components/mood-shape.tsx: three translucent nested shapes with glossy outlines that morph continuously with the slider: spiky star (very unpleasant) → wavy → softer ripples → circle (neutral) → soft five-lobe → rounded star → five-petal flower (very pleasant); purple → blue → icy blue → green → gold → orange; slow spin and breathing (still for reduced motion).
 - Logger is now a dark, colour-tinted full sheet (owner shared reference screens): big level label with a soft blur change, grey track with a white thumb, Next button in the mood colour (dark text on light colours). Step 2: pick up to 3 feelings as chips (or search), optional note. Step 3: summary card ("Peaceful, Grateful · A very pleasant day"), then Done. Entries store extra feelings in `also`.
