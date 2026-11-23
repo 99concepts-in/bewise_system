@@ -26,3 +26,11 @@ Owner: most people book through the booking link first, or Jitendra Khimlani / t
   reference optional), so the member finds them filled in.
 - The client app already shows these filled in and editable on "A little about you", with a "Welcome back" note
   (preview: on-device directory in `apps/client/src/lib/members.ts`; demo staff-made member 98989 89898).
+
+## Remedy reminders and morning nudge (added 2026-11-23)
+Owner: members set reminder times the first time they get a blend; until they check in their first dose, nudge them each morning.
+- Client app (done): first-time popup to set the 4 reminder times (`blend.reminderTimes`, `reminders.on`); a morning notice in the
+  bell plus a system notification while the app is open or comes back on screen.
+- Needed for real background reminders (FOUNDATION/HUB): web push (service worker + VAPID) or a WhatsApp template
+  `remedy_reminder`, sent by cron at the member's reminder times; the morning one repeats only until the first dose of the day is
+  logged (`remedies.logDrops` with doses > 0).

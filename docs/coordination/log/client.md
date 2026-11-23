@@ -2,6 +2,15 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-23 · Home: remedy first, new mood logger, real bottle, reminders, Learn card
+- Home order: greeting → remedy card (first) → "Log how you feel right now" → next session / pay → offer → consultant card → Learn card → goals → shop → your space. The feelings grid is removed.
+- New mood logger (components/mood-logger.tsx): bottom sheet with X; "Right now" or "Today overall"; slider very unpleasant → very pleasant with a flower that opens, warms and pulses on each step (purple to orange), haptic tick per step; then matching feelings or search any feeling, optional note. Journal entries now carry `valence` (1 to 7) and `kind`.
+- After logging, Home shows "You felt X · time" for 4 hours, then asks again. From 7 PM: "How was your day overall?" until the day is logged.
+- Remedy bottle: label-free replica of our own 30 ml frosted dropper bottle (Higgsfield, from the product photo), liquid clipped inside (bottle-remedy.webp + mask).
+- First-time reminders popup (4 times, editable) + morning nudge until the first dose is checked in (bell notice, system notification when allowed). Real background push needs the server (request updated).
+- Colourful animated "Learn how Bach flowers can help you" card on Home and in My care. "How our remedies are made" now only in My care (removed from Learn).
+- Tests: 60.
+
 ## 2026-11-23 · Onboarding for existing members + details filled in
 - Welcome: 4 slides. Added "Stay connected to your wellness journey" (daily drops, blend journey, mood journal, sessions). Slide 2 says "Certified Bach Flower Therapist".
 - "You're in": no booking prompt any more (members book inside the app). Buttons: Take me home, Read a Bach flower story. Only the public booking link still continues to its booking.

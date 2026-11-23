@@ -22,7 +22,7 @@ export function seedState(opts: { onboarded?: boolean } = {}) {
       checkins: {}, cart: [{ key: 'sleep-roll-on-15', qty: 1 }], wishlist: ['aura-spray'],
       addresses: [{ id: 'ad1', name: 'Priya Shah', phone: '9876543210', line1: '12, Shanti Kunj', line2: 'Alkapuri', city: 'Vadodara', state: 'Gujarat', pin: '390007' }],
       orders: [{ id: 'o1', code: 'BW-00040', lines: [{ key: 'remedy', name: 'Personal blend v1', label: '30 ml', qty: 1, pricePaise: 0, kind: 'remedy' }], totalPaise: 0, address: { id: 'ad1', name: 'Priya Shah', phone: '9876543210', line1: '12, Shanti Kunj', line2: 'Alkapuri', city: 'Vadodara', state: 'Gujarat', pin: '390007' }, placedAt: iso(now - 12 * D), stage: 3 }],
-      chat: [], notices: [], seq: 42,
+      chat: [], notices: [], seq: 42, reminders: { askedAt: iso(now - D), on: false },
     },
     version: 0,
   }

@@ -3,23 +3,23 @@
  * @module   remedies-ux
  * @owner    CLIENT
  * @screens  CL-08 Home blend card
- * Purpose:  Owner 2026-11-20: a realistic slim glass dropper bottle that empties little by little.
- *           Layers: amber liquid (clipped to the inside of the glass by bottle-slim-mask.png) under the
+ * Purpose:  Owner 2026-11-23: a replica of our own 30 ml remedy bottle (frosted glass, white dropper), without the label, that empties little by little.
+ *           Layers: amber liquid (clipped to the inside of the glass by bottle-remedy-mask.png) under the
  *           photo-real bottle, which is multiplied on top so the glass, pipette and reflections show through.
  *           `level` is 0..1 (what is left).
  */
 import { motion, useReducedMotion } from 'motion/react'
 import { BP } from '@/lib/asset'
 
-// inside of the glass, as % of the image height (measured from bottle-slim.webp, 113×440)
-const FULL = 37, EMPTY = 91.3
-const RATIO = 113 / 440
+// inside of the glass, as % of the image height (measured from bottle-remedy.webp, 159×440: our 30 ml bottle, no label)
+const FULL = 41.7, EMPTY = 93.4
+const RATIO = 159 / 440
 
-export function RemedyBottle({ level, height = 168, pulse = 0 }: { level: number; height?: number; pulse?: number }) {
+export function RemedyBottle({ level, height = 140, pulse = 0 }: { level: number; height?: number; pulse?: number }) {
   const still = useReducedMotion()
   const l = Math.max(0, Math.min(1, level))
   const top = l <= 0 ? 100 : EMPTY - Math.max(0.04, l) * (EMPTY - FULL)
-  const mask = `url(${BP}/img/bottle-slim-mask.png)`
+  const mask = `url(${BP}/img/bottle-remedy-mask.png)`
   return (
     <div className="relative" style={{ height, width: height * RATIO }} role="img" aria-label={`Remedy bottle, about ${Math.round(l * 100)}% left`}>
       {/* liquid, clipped to the inside of the glass */}
@@ -39,12 +39,7 @@ export function RemedyBottle({ level, height = 168, pulse = 0 }: { level: number
         </motion.div>
       </div>
       {/* the bottle photo, multiplied so its white background disappears and the glass sits over the liquid */}
-      <img src={`${BP}/img/bottle-slim.webp`} alt="" className="absolute inset-0 h-full w-full mix-blend-multiply" draggable={false} />
-      {/* label on the upper body, so the level stays visible below it */}
-      <div className="absolute inset-x-[15%] top-[43%] flex flex-col items-center rounded-[2px] bg-[linear-gradient(90deg,#e9ecf3_0%,#fff_28%,#fff_70%,#e4e7ef_100%)] py-[6%]" aria-hidden>
-        <img src={`${BP}/img/brand/bewise-mark.svg`} alt="" className="w-[36%]" />
-        <span className="mt-[2px] text-center text-[5.5px] font-bold uppercase leading-[1.25] tracking-[0.06em] text-navy">Flower<br />Remedy</span>
-      </div>
+      <img src={`${BP}/img/bottle-remedy.webp`} alt="" className="absolute inset-0 h-full w-full mix-blend-multiply" draggable={false} />
     </div>
   )
 }

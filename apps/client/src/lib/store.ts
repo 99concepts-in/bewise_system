@@ -26,7 +26,8 @@ export type Profile = {
   allergies: string[]; onboardedAt?: string
 }
 // @decision(D-19) owner 2026-11-18: journal entries may carry an optional note (was emotion + time only)
-export type JournalEntry = { id: string; emotion: Emotion; at: string; note?: string }
+/** owner 2026-11-23: `valence` 1 (very unpleasant) to 7 (very pleasant) from the slider; `kind` right now vs the day overall */
+export type JournalEntry = { id: string; emotion: Emotion; at: string; note?: string; valence?: number; kind?: 'moment' | 'day' }
 /** owner 2026-11-18: daily goals get a check-in each day; long-term goals are checked off once. `progress` is legacy. */
 export type Goal = { id: string; title: string; progress: number; done: boolean; kind?: 'daily' | 'once'; days?: string[]; doneAt?: string }
 export type Feedback = { rating: number; tags: string[]; notes: string; benefits?: string[] } // benefits: 'How do you feel after the session?' (client's words, owner 2026-11-18)
@@ -102,10 +103,13 @@ type State = {
   plan: Plan | null
   coupon: Coupon | null
   offer: { skippedAt?: string; downsellAt?: string }
+  /** owner 2026-11-23: first-time reminder popup, reminders on, and the day a morning nudge was last shown */
+  reminders: { askedAt?: string; on?: boolean; nudgedOn?: string }
   seq: number
   // actions
   setProfile: (p: Partial<Profile>) => void
-  logMood: (e: Emotion, at?: Date, note?: string) => JournalEntry   // journal.createEntry
+  logMood: (e: Emotion, at?: Date, note?: string, extra?: Pick<JournalEntry, 'valence' | 'kind'>) => JournalEntry   // journal.createEntry
+  setReminders: (r: Partial<State['reminders']>) => void
   updateMood: (id: string, patch: Partial<Pick<JournalEntry, 'emotion' | 'note'>>) => void
   removeMood: (id: string) => void
   addGoal: (title: string, kind?: 'daily' | 'once') => void
@@ -145,7 +149,7 @@ type State = {
 
 const initial = {
   profile: null, journal: [], goals: [], appointments: [], intake: null, blend: null, drops: {}, doses: {}, checkins: {}, cart: [], wishlist: [],
-  addresses: [], orders: [], chat: [], notices: [], plan: null, coupon: null, offer: {}, seq: 41,
+  addresses: [], orders: [], chat: [], notices: [], plan: null, coupon: null, offer: {}, reminders: {}, seq: 41,
 }
 
 /** a valid, unused coupon (owner 2026-11-18: 15% off every product on the first shop order, 7 days) */
@@ -168,8 +172,8 @@ export const useApp = create<State>()(
       hydrated: false,
       ...initial,
       setProfile: (p) => set((s) => ({ profile: { ...(s.profile ?? { name: '', phone: '', dob: '', city: '', consents: { wellbeing: false, whatsapp: false, offers: false }, allergies: [] }), ...p } })),
-      logMood: (emotion, at = new Date(), note) => {
-        const e: JournalEntry = { id: uid(), emotion, at: at.toISOString(), ...(note?.trim() ? { note: note.trim().slice(0, 500) } : {}) }
+      logMood: (emotion, at = new Date(), note, extra) => {
+        const e: JournalEntry = { id: uid(), emotion, at: at.toISOString(), ...(note?.trim() ? { note: note.trim().slice(0, 500) } : {}), ...(extra?.valence ? { valence: extra.valence } : {}), ...(extra?.kind ? { kind: extra.kind } : {}) }
         set((s) => ({ journal: [e, ...s.journal] }))
         return e
       },
@@ -280,6 +284,7 @@ export const useApp = create<State>()(
         return plan
       },
       setOffer: (o) => set((s) => ({ offer: { ...s.offer, ...o } })),
+      setReminders: (r) => set((s) => ({ reminders: { ...(s.reminders ?? {}), ...r } })),
       confirmTime: (id) => {
         // preview of the staff side: the team sets a time (next day, 11:00 IST, or the client's preferred date) and, for a plain
         // appointment request, the type and fee (owner 2026-11-21) — then the client pays in the app ("Complete your booking")

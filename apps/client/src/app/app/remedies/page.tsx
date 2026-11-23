@@ -26,6 +26,7 @@ import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
 import { DoseTracker } from '@/components/dose-tracker'
 import { HowToTake } from '@/components/how-to-take'
 import { MadeWithCare } from '@/components/made-with-care'
+import { LearnCard } from '@/components/learn-card'
 import { blendSupply } from '@/lib/supply'
 import { BP } from '@/lib/asset'
 
@@ -131,6 +132,8 @@ export default function Remedies() {
         <Item><HowToTake /></Item>
 
         <Item><MadeWithCare /></Item>
+
+        <Item><LearnCard /></Item>
 
         <Item><FaqCard /></Item>
 

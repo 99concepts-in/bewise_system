@@ -11,7 +11,7 @@ import { ChevronRight, ExternalLink, Quote, Search, Star, X } from 'lucide-react
 import { useMemo, useState } from 'react'
 import { AppHeader } from '@/components/shell'
 import { FlowerArt } from '@/components/flower'
-import { MadeWithCare, SessionOnly } from '@/components/made-with-care'
+import { SessionOnly } from '@/components/made-with-care'
 import { cx, ease } from '@/components/ui'
 import { STORIES } from '@/lib/stories'
 import { findConcerns } from '@/lib/remedy-finder'
@@ -97,8 +97,6 @@ export default function Learn() {
 
       {!t && (
         <>
-          <MadeWithCare className="mt-7" />
-
           <section className="mt-7">
             <h2 className="h-section">Coming soon</h2>
             <div className="mt-3 flex flex-wrap gap-2">{SOON.map((s) => <span key={s} className="rounded-full bg-white px-3.5 py-2 text-[13px] font-semibold text-ink-2 ring-1 ring-[#e3e6ef]">{s}</span>)}</div>

@@ -15,6 +15,9 @@ import { ArrowRight, BookHeart, CalendarHeart, Check, ChevronRight, MessageCircl
 import { useMemo, useState } from 'react'
 import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
+import { MoodLogger } from '@/components/mood-logger'
+import { LearnCard } from '@/components/learn-card'
+import { ReminderSetup, useMorningNudge } from '@/components/reminder-setup'
 import { AppHeader } from '@/components/shell'
 import { SessionDateArt } from '@/components/session-art'
 import { FeelingIcon } from '@/components/flower'
@@ -39,27 +42,31 @@ export default function Home() {
   const profile = useApp((s) => s.profile)
   const blend = useApp((s) => s.blend)
   const [story, setStory] = useState(false)
+  const [logger, setLogger] = useState<'moment' | 'day' | null>(null)
   const now = useNow(60_000)
+  useMorningNudge()
 
   return (
     <main className="home-wash -mx-0 min-h-dvh px-5 pb-[calc(env(safe-area-inset-bottom)+104px)]">
       <AppHeader />
       <Reveal className="space-y-6">
         <Item>
-          <p className="text-[16px] font-medium text-ink-2">{greet(new Date(now).getHours())}, {firstName(profile?.name)}</p>
-          <h1 className="h-display mt-1">How are you feeling today?</h1>
+          <p className="text-[16px] font-medium text-ink-2">{greet(new Date(now).getHours())},</p>
+          <h1 className="h-display mt-0.5">{firstName(profile?.name)}</h1>
         </Item>
 
-        <Item><FeelingCircles /></Item>
+        {/* owner 2026-11-23: the remedy first, then "log how you feel" right under it (the feelings grid is gone) */}
+        {blend && <Item><TodaysBlend /></Item>}
+
+        <Item><MoodPrompt onLog={(k) => setLogger(k)} /></Item>
 
         <ContextCard />
 
-        {/* owner 2026-11-21: the offer sits below the feelings, not at the top */}
         <Item className="empty:hidden"><LaunchBanner /></Item>
 
         <Item><MeetCard open={story} onOpen={() => { buzz(8); setStory(true) }} /></Item>
 
-        {blend && <Item><TodaysBlend /></Item>}
+        <Item><LearnCard /></Item>
 
         <GoalsCard />
 
@@ -68,12 +75,57 @@ export default function Home() {
         <Item><YourSpace /></Item>
       </Reveal>
 
+      <MoodLogger open={!!logger} kind={logger ?? 'moment'} onClose={() => setLogger(null)} />
+      <ReminderSetup />
       <JituStory open={story} onClose={() => setStory(false)} />
     </main>
   )
 }
 
-/* ---------------- feelings ---------------- */
+/* ---------------- log how you feel (owner 2026-11-23) ---------------- */
+/** After logging, the card shows that feeling for 4 hours, then asks again. From 7 PM it also asks about the day overall. */
+function MoodPrompt({ onLog }: { onLog: (k: 'moment' | 'day') => void }) {
+  const journal = useApp((s) => s.journal)
+  const now = useNow(60_000)
+  const last = journal.find((e) => e.kind !== 'day')
+  const recent = last && now - +new Date(last.at) < 4 * 3600_000 ? last : null
+  const evening = new Date(now).getHours() >= 19
+  const dayDone = journal.some((e) => e.kind === 'day' && dayKey(e.at) === dayKey(new Date(now)))
+  return (
+    <section className="space-y-2.5" aria-label="Log how you feel">
+      {recent ? (
+        <div className="card flex items-center gap-3 p-4">
+          <MoodImg mood={recent.emotion} size={48} />
+          <div className="min-w-0 flex-1">
+            <p className="text-[12px] font-semibold text-muted">You felt</p>
+            <p className="font-display text-[19px] font-semibold leading-6 text-ink">{moodOf(recent.emotion).label} <span className="font-sans text-[13px] font-medium text-muted">· {fmtTime(recent.at)}</span></p>
+          </div>
+          <button onClick={() => { buzz(8); onLog('moment') }} className="rounded-full bg-peri-50 px-3.5 py-2 text-[13px] font-semibold text-navy">Log again</button>
+        </div>
+      ) : (
+        <motion.button onClick={() => { buzz(8); onLog('moment') }} whileTap={{ scale: 0.98 }} className="card relative flex w-full items-center gap-3 overflow-hidden p-4 text-left">
+          <span aria-hidden className="relative grid size-12 shrink-0 place-items-center">
+            {[0, 1, 2, 3, 4, 5].map((k) => <motion.span key={k} className="absolute h-5 w-3 rounded-full" style={{ background: ['#7B63D6', '#7FB2DA', '#7CC4A4', '#F2B33B', '#F08A3C', '#E06A8E'][k], rotate: k * 60, transformOrigin: '50% 100%', top: 4 }}
+              animate={{ scaleY: [0.8, 1.1, 0.8] }} transition={{ duration: 3, delay: k * 0.2, repeat: Infinity, ease: 'easeInOut' }} />)}
+            <span className="relative size-3 rounded-full bg-white" />
+          </span>
+          <span className="min-w-0 flex-1"><span className="block text-[16px] font-bold text-navy">Log how you feel right now</span><span className="text-[13px] text-muted">Takes 5 seconds</span></span>
+          <ChevronRight className="size-5 text-navy" />
+        </motion.button>
+      )}
+      {evening && !dayDone && (
+        <motion.button onClick={() => { buzz(8); onLog('day') }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} whileTap={{ scale: 0.98 }}
+          className="flex w-full items-center gap-3 rounded-[24px] bg-[linear-gradient(120deg,#2b2f6b,#5b3fb8)] p-4 text-left text-white shadow-[var(--shadow-float)]">
+          <span className="text-[26px]" aria-hidden>🌙</span>
+          <span className="min-w-0 flex-1"><span className="block text-[16px] font-bold">How was your day overall?</span><span className="text-[13px] text-white/80">A quick evening check-in</span></span>
+          <ChevronRight className="size-5" />
+        </motion.button>
+      )}
+    </section>
+  )
+}
+
+/* ---------------- feelings (retired from Home 2026-11-23; kept for reference) ---------------- */
 /** owner 2026-11-20: after picking, a short celebration plays, then the grid collapses into a card made for that feeling. */
 function FeelingCircles() {
   const journal = useApp((s) => s.journal)
@@ -325,7 +377,7 @@ function TodaysBlend() {
       <div className="flex items-center gap-4">
         <div className="relative flex w-[78px] shrink-0 justify-center">
           <span className="absolute bottom-0 h-3 w-14 rounded-[50%] bg-navy/15 blur-[5px]" aria-hidden />
-          <RemedyBottle level={level} pulse={pulse} height={150} />
+          <RemedyBottle level={level} pulse={pulse} height={132} />
         </div>
         <div className="min-w-0 flex-1">
           <p className="eyebrow text-sage-text">Your remedy</p>

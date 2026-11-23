@@ -192,18 +192,37 @@ test('launch offer: yearly screen links straight to the 6-month option', async (
   await expect(page.getByText('Recommended minimum')).toBeVisible()
 })
 
-test('home feelings: pick → celebration → collapsed card for that feeling; Change reopens the grid', async ({ page }) => {
+test('home: log how you feel (slider → feeling → note), shown for 4 hours; evening asks about the day', async ({ page }) => {
   await seed(page)
   await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('bewise-client-v1')!); r.state.journal = []; localStorage.setItem('bewise-client-v1', JSON.stringify(r)) })
   await page.goto('/app')
-  await page.getByRole('button', { name: 'Anxious', exact: true }).click()
-  await expect(page.getByText('Anxious, noted')).toBeVisible()
-  await expect(page.getByText('Today you’re feeling')).toBeVisible({ timeout: 4000 })
-  await expect(page.getByRole('button', { name: 'Add a note' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'My journal' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Calm', exact: true })).toHaveCount(0)
-  await page.getByRole('button', { name: 'Change' }).click()
-  await expect(page.getByRole('button', { name: 'Calm', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: /Log how you feel right now/ }).click()
+  const slider = page.getByRole('slider', { name: 'How pleasant or unpleasant' })
+  await slider.fill('6')
+  await expect(page.getByText('Very pleasant', { exact: true }).first()).toBeVisible()
+  await page.getByRole('button', { name: 'Next' }).click()
+  await page.getByRole('textbox', { name: 'Search any feeling' }).fill('calm')
+  await page.getByRole('button', { name: 'Calm', exact: true }).click()
+  await page.getByRole('textbox', { name: 'Add a note' }).fill('after a walk')
+  await page.getByRole('button', { name: /Log “Calm”/ }).click()
+  await expect(page.getByText('You felt')).toBeVisible()
+  const s = await state(page)
+  expect(s.journal[0]).toMatchObject({ emotion: 'calm', valence: 7, kind: 'moment', note: 'after a walk' })
+  // 4 hours later the prompt is back
+  await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('bewise-client-v1')!); r.state.journal[0].at = new Date(Date.now() - 5 * 3600e3).toISOString(); localStorage.setItem('bewise-client-v1', JSON.stringify(r)) })
+  await page.reload()
+  await expect(page.getByRole('button', { name: /Log how you feel right now/ })).toBeVisible()
+})
+
+test('first time with a blend: reminders popup', async ({ page }) => {
+  await seed(page)
+  await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('bewise-client-v1')!); r.state.reminders = {}; localStorage.setItem('bewise-client-v1', JSON.stringify(r)) })
+  await page.goto('/app')
+  await expect(page.getByRole('heading', { name: /Never miss your drops/ })).toBeVisible({ timeout: 5000 })
+  await page.getByRole('button', { name: 'Not now' }).click()
+  expect((await state(page)).reminders.askedAt).toBeTruthy()
+  await page.reload(); await page.waitForTimeout(1600)
+  await expect(page.getByRole('heading', { name: /Never miss your drops/ })).toHaveCount(0)
 })
 
 test('home shows the 4-dose remedy check-in when there is a blend', async ({ page }) => {
