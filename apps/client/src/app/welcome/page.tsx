@@ -19,7 +19,7 @@ import { BP } from '@/lib/asset'
 // owner copy 2026-11-20 for slides 1 and 2
 const SLIDES = [
   { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A gentle, private space for your emotional wellbeing, guided by Jitendra Khimlani and Bach Flower Remedies.' },
-  { kicker: 'Personal guidance, just for you.', lead: 'Meet', em: 'Jitendra Khimlani', title: 'Your Bach Flower Therapist', sub: 'Get personalised guidance with vibrational remedies for everyday balance and emotional wellbeing. Online or in-person consultation.' },
+  { kicker: 'Personal guidance, just for you.', lead: 'Meet', em: 'Jitendra Khimlani', title: 'Certified Bach Flower Therapist', sub: 'Get personalised guidance with vibrational remedies for everyday balance and emotional wellbeing. Online or in-person wellness sessions.' },
   { lead: 'Bach flower remedy', em: 'benefits', sub: 'Natural Bach flower remedies that gently support emotional balance, chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'Feel calmer, day by day'] },
 ] as { kicker?: string; lead: string; em: string; title?: string; sub: string; chips?: string[] }[]
 

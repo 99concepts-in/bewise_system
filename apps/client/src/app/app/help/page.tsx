@@ -8,8 +8,8 @@ import { HELPLINE, waLink } from '@/lib/offer'
 import { SafetyCard } from '../book/intake'
 
 const FAQ = [
-  ['What happens in a consultation?', 'A calm, private conversation with Jitendra Khimlani about how you’ve been feeling. Afterwards he prepares your personal blend of Bach flower remedies, included in the fee.'],
-  ['How much does it cost?', '₹1,000 for a first visit and ₹800 after that, both with your remedy blend. Just book an appointment: our team confirms which applies when they set your time, and you pay in the app. Reorders of the same blend are charged separately.'],
+  ['What happens in a wellness session?', 'A calm, private conversation with Jitendra Khimlani about how you’ve been feeling. Afterwards he prepares your personal blend of Bach flower remedies, included in the fee.'],
+  ['How much does it cost?', '₹1,000 for a first visit and ₹800 after that, both with your remedy blend. Just book a session: our team confirms which applies when they set your time, and you pay in the app. Reorders of the same blend are charged separately.'],
   ['Can I cancel?', 'Sessions are non-refundable, but you can reschedule, free up to 24 hours before; within 24 hours you can move it once. A missed session can’t be moved.'],
   ['My product arrived damaged', 'We’re sorry! Go to My orders → Request a replacement and add a photo. We don’t offer returns for change of mind.'],
   ['Is my information private?', 'Yes. Only Jitendra Khimlani sees your answers and journal. Our office team sees only what’s needed to prepare and ship your order. You can download or delete your data anytime in Me → Privacy & data.'],
@@ -41,9 +41,9 @@ export default function Help() {
         ))}
       </div>
       <div className="mt-5 grid grid-cols-2 gap-2.5">
-        <a href={waLink('Hi BeWise, I need help with my appointment')} target="_blank" rel="noopener noreferrer" className="card flex flex-col items-start gap-1 p-4">
+        <a href={waLink('Hi BeWise, I need help with my session booking')} target="_blank" rel="noopener noreferrer" className="card flex flex-col items-start gap-1 p-4">
           <span className="grid size-10 place-items-center rounded-full bg-sage-100 text-sage-text"><MessageCircle className="size-5" /></span>
-          <span className="mt-1 text-[15px] font-bold text-navy">WhatsApp</span><span className="text-[12px] text-muted">Appointments · 90542 20952</span>
+          <span className="mt-1 text-[15px] font-bold text-navy">WhatsApp</span><span className="text-[12px] text-muted">Session bookings · 90542 20952</span>
         </a>
         <a href={`tel:${HELPLINE.tel}`} className="card flex flex-col items-start gap-1 p-4">
           <span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><Phone className="size-5" /></span>

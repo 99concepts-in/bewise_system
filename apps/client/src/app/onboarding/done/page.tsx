@@ -46,7 +46,7 @@ export default function Done() {
       </motion.div>
       <motion.div variants={stagger} initial="hidden" animate="show" transition={{ delayChildren: 0.5 }} className="mt-auto space-y-3 pb-3 pt-8 safe-b">
         {[
-          { icon: <CalendarHeart className="size-6" />, t: next ? 'Continue to your booking' : 'Book an appointment', d: 'Remedy blend included · nothing to pay until your time is set', href: next ?? '/app/book', primary: true },
+          { icon: <CalendarHeart className="size-6" />, t: next ? 'Continue to your booking' : 'Book a session', d: 'Remedy blend included · nothing to pay until your time is set', href: next ?? '/app/book', primary: true },
           { icon: <ShoppingBag className="size-6" />, t: 'Explore the shop', d: 'Oils, mists and bath rituals', href: '/app/shop' },
         ].map((o) => (
           <motion.button variants={rise} whileTap={{ scale: 0.98 }} key={o.t} onClick={() => { if (o.primary) takeNextStep(); goSafe(router, o.href, 'replace') }}

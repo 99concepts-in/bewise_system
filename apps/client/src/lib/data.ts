@@ -103,9 +103,9 @@ export const searchMoods = (q: string) => {
 // @decision(D-09) @decision(D-02) fees include the remedy blend
 export const CONSULTATIONS = [
   // minutes = calendar-block length only (never shown — owner 2026-11-18)
-  { id: 'first', name: 'First consultation', minutes: 60, feePaise: 100000,
+  { id: 'first', name: 'First wellness session', minutes: 60, feePaise: 100000,
     blurb: 'A gentle, unhurried conversation about how you’ve been feeling.' },
-  { id: 'followup', name: 'Follow-up', minutes: 30, feePaise: 80000,
+  { id: 'followup', name: 'Follow-up session', minutes: 30, feePaise: 80000,
     blurb: 'See how you’re doing and refresh your blend.' },
 ] as const
 export type ConsultationId = (typeof CONSULTATIONS)[number]['id']
@@ -143,7 +143,7 @@ export const STUDIO = {
 export const CONSULTANT = {
   name: 'Jitendra Khimlani',
   fullName: 'Jitendra Khimlani',
-  title: 'Bach Flower Remedy Therapist',
+  title: 'Certified Bach Flower Remedy Therapist',
   approach: 'Jitendra Khimlani listens first. Then he prepares a blend of Bach flower remedies chosen for how you feel.',
   stats: ['12+ years of workshops', '2,00,000+ people guided'],
   website: 'https://www.jitendrakhimlani.com',
@@ -260,7 +260,7 @@ export const PRODUCTS: Product[] = [
   { slug: 'bach-remedy-dropper', name: 'Bach Flower Remedy', tagline: 'Your personal blend, dropper', format: 'Dropper', category: 'remedies', intents: ['calm'],
     art: 'products/bach-remedy-dropper', color: '#5E8F6A', tint: ['#e5efe2', '#f1f6ec'], personal: 'dropper',
     variants: [{ id: 'bach-remedy-dropper-30', label: '30 ml', pricePaise: 80000 }], allergens: [],
-    about: 'A personalised blend of Bach flower remedies, chosen by Jitendra Khimlani for how you feel. Your first blend comes with your consultation; reorder the same blend here anytime.',
+    about: 'A personalised blend of Bach flower remedies, chosen by Jitendra Khimlani for how you feel. Your first blend comes with your wellness session; reorder the same blend here anytime.',
     feel: ['Made for you', 'Gentle', 'Natural'], ingredients: 'Bach flower remedies chosen for you by Jitendra Khimlani.',
     howTo: 'Take 4 drops, 4 times a day, directly or in any drink you like, or as your Bach expert suggests. A bottle lasts up to 25 days when taken regularly.',
     safety: 'An individual, customised remedy for personal use only. Store at room temperature, away from direct sunlight, and keep away from children. Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor.' },
@@ -313,7 +313,7 @@ export const CATEGORIES: { key: Category | 'consult'; label: string; sub: string
   { key: 'remedies', label: 'Bach remedies', sub: 'Made for you', tint: '#DDF4F1', art: ['products/bach-remedy-dropper', 'products/rescue-remedy-spray'] },
   { key: 'bath', label: 'Bath salts', sub: '3 rituals', tint: '#FDE3EB', art: ['products/aura-bath-salt', 'products/abundance-bath-salt'] },
   { key: 'care', label: 'Hair & beauty', sub: 'Oil & mist', tint: '#FFF1D9', art: ['products/hair-oil', 'products/beauty-spray'] },
-  { key: 'consult', label: 'Consultation', sub: 'With Jitendra Khimlani', tint: '#DFF0FF', art: [] },
+  { key: 'consult', label: 'Wellness session', sub: 'With Jitendra Khimlani', tint: '#DFF0FF', art: [] },
 ]
 export const INTENTS: { key: Intent; label: string; emoji: string; tint: string; line: string }[] = [
   { key: 'sleep', label: 'Sleep', emoji: '🌙', tint: '#EEE8FF', line: 'Wind down gently' },

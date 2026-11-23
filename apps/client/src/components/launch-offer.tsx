@@ -25,7 +25,7 @@ export function Countdown({ dark, compact }: { dark?: boolean; compact?: boolean
   const c = countdown(+OFFER_ENDS, now)
   if (compact) return <span className="tnum">{c.d}d {pad(c.h)}h {pad(c.m)}m</span>
   return (
-    <div className="flex items-center justify-center gap-2" role="timer" aria-label={`Offer ends in ${c.d} days ${c.h} hours`}>
+    <div className="flex items-center justify-center gap-2" role="timer" aria-label={`Plan prices end in ${c.d} days ${c.h} hours`}>
       {[[c.d, 'days'], [c.h, 'hrs'], [c.m, 'min'], [c.s, 'sec']].map(([v, l]) => (
         <div key={l} className={cx('w-[58px] rounded-[16px] py-2 text-center', dark ? 'bg-white/12' : 'bg-white shadow-[var(--shadow-card)]')}>
           <AnimatePresence mode="popLayout" initial={false}>
@@ -49,13 +49,13 @@ export function LaunchBanner() {
     <>
       {show && <motion.button onClick={() => { buzz(10); setOpen(true) }} whileTap={{ scale: 0.98 }} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
         className="relative flex w-full items-center gap-3 overflow-hidden rounded-[24px] bg-navy p-3.5 pr-4 text-left text-white shadow-[var(--shadow-float)]"
-        aria-label="Reveal your introductory offer">
+        aria-label="Reveal your wellness journey plan">
         <motion.span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-white/20 blur-md"
           animate={{ x: ['0%', '480%'] }} transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' }} />
         <motion.span className="grid size-11 shrink-0 place-items-center rounded-full bg-white/15 text-[22px]" animate={{ rotate: [0, -10, 10, -6, 0] }} transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2.5 }} aria-hidden>🎁</motion.span>
         <span className="min-w-0 flex-1">
           <span className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#F2A93B]">Just for you</span>
-          <span className="block text-[15px] font-bold leading-tight">A new introductory offer for you</span>
+          <span className="block text-[15px] font-bold leading-tight">Your wellness journey plan</span>
           <span className="block text-[12px] text-white/75">Valid till 1 December · <Countdown compact /> left</span>
         </span>
         <span className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[12px] font-bold text-navy">Reveal</span>
@@ -95,7 +95,7 @@ export function LaunchOffer({ open, onClose, start = 'yearly' }: { open: boolean
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
             <Sparkle />
             {stage !== 'congrats' && (
-              <button onClick={close} aria-label="Close offer" className="absolute right-4 top-4 z-10 grid size-10 place-items-center rounded-full bg-white/12 safe-t"><X className="size-5" /></button>
+              <button onClick={close} aria-label="Close plan" className="absolute right-4 top-4 z-10 grid size-10 place-items-center rounded-full bg-white/12 safe-t"><X className="size-5" /></button>
             )}
             <AnimatePresence mode="wait">
               {stage === 'yearly' && <OfferBody key="y" id="yearly" onClaim={() => setPaying('yearly')} onSmaller={() => { setOffer({ downsellAt: new Date().toISOString() }); setStage('half') }} />}
@@ -116,7 +116,7 @@ export function LaunchOffer({ open, onClose, start = 'yearly' }: { open: boolean
               <h2 id="sure-h" className="mt-3 text-[22px] font-extrabold tracking-[-0.02em] text-navy">Are you sure?</h2>
               <p className="mt-1.5 text-[15px] leading-6 text-muted">You’ll miss <b className="text-navy">2 months free</b> and a saving of {formatINR(planSaving('yearly'))}. This price won’t come back after 1 December.</p>
               <div className="mt-5 space-y-2">
-                <Btn full variant="gradient" onClick={() => setStage('yearly')}>Keep my offer</Btn>
+                <Btn full variant="gradient" onClick={() => setStage('yearly')}>Keep my plan</Btn>
                 <Btn full variant="white" onClick={() => { setOffer({ downsellAt: new Date().toISOString() }); setStage('half') }}>Yes, I’m sure</Btn>
               </div>
             </motion.div>
@@ -153,13 +153,13 @@ function OfferBody({ id, onClaim, onSkip, onSmaller }: { id: PlanId; onClaim: ()
       </div>
 
       <motion.p className="mt-4 text-center text-[12px] font-bold uppercase tracking-[0.3em] text-[#F2A93B]" initial={{ opacity: 0, letterSpacing: '0.6em' }} animate={{ opacity: 1, letterSpacing: '0.3em' }} transition={{ delay: 0.2, duration: 0.7 }}>
-        {half ? 'Recommended minimum' : 'Launch offer'}
+        {half ? 'Recommended minimum' : 'Wellness journey plan'}
       </motion.p>
       <motion.h2 className="mt-2 text-center text-[30px] font-extrabold leading-tight tracking-[-0.03em]" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
         {p.name}
       </motion.h2>
       <motion.p className="mx-auto mt-1 max-w-[300px] text-center text-[14px] leading-5 text-white/75" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
-        {half ? <><b className="font-semibold text-white">Scared of a big commitment? Try 6 months first.</b><br />The minimum we recommend to feel the change: a consultation with Jitendra Khimlani every month, your remedy blend included each time.</> : <>A consultation with Jitendra Khimlani every month for {p.months} months, your remedy blend included each time.</>}
+        {half ? <><b className="font-semibold text-white">Scared of a big commitment? Try 6 months first.</b><br />The minimum we recommend to feel the change: a wellness session with Jitendra Khimlani every month, your remedy blend included each time.</> : <>A wellness session with Jitendra Khimlani every month for {p.months} months, your remedy blend included each time.</>}
       </motion.p>
 
       <motion.div className="relative mx-auto mt-6 w-full max-w-[340px] rounded-[32px] bg-white/10 p-5 text-center ring-1 ring-white/15 backdrop-blur" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5, type: 'spring', stiffness: 220, damping: 20 }}>
@@ -189,15 +189,15 @@ function OfferBody({ id, onClaim, onSkip, onSmaller }: { id: PlanId; onClaim: ()
       <div className="mt-auto space-y-2.5 pt-6 safe-b">
         <motion.div className="rounded-full" animate={{ boxShadow: ['0 0 0 0 rgba(246,222,141,.55)', '0 0 0 14px rgba(246,222,141,0)'] }} transition={{ duration: 1.8, repeat: Infinity, delay: 2.2 }}>
           <button onClick={() => { buzz(14); onClaim() }} className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-marigold text-[16px] font-extrabold text-navy shadow-[0_12px_30px_rgba(246,222,141,.35)]">
-            <span aria-hidden>🔒</span> Claim offer · Pay {formatINR(price)}
+            <span aria-hidden>🔒</span> Start my plan · Pay {formatINR(price)}
           </button>
         </motion.div>
-        <a href={waLink(half ? 'I want to avail the 6-month offer' : 'I want to avail the yearly offer')} target="_blank" rel="noopener noreferrer"
+        <a href={waLink(half ? 'I want to start the 6-month wellness journey plan' : 'I want to start the 1-year wellness journey plan')} target="_blank" rel="noopener noreferrer"
           className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white/12 text-[15px] font-semibold text-white ring-1 ring-white/20">
           <MessageCircle className="size-5" /> Ask on WhatsApp
         </a>
         {onSmaller && <button onClick={onSmaller} className="block w-full py-2 text-center text-[14px] font-semibold text-white/80">Not ready for a whole year? <span className="text-[#F2A93B] underline underline-offset-4">Try 6 months</span></button>}
-        {onSkip && <button onClick={onSkip} className="block w-full py-2 text-center text-[14px] font-semibold text-white/70 underline underline-offset-4">Skip offer</button>}
+        {onSkip && <button onClick={onSkip} className="block w-full py-2 text-center text-[14px] font-semibold text-white/70 underline underline-offset-4">Not now</button>}
       </div>
     </motion.div>
   )

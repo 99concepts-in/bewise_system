@@ -223,7 +223,7 @@ function MeetCard({ open, onOpen }: { open: boolean; onOpen: () => void }) {
       <div className="relative mt-4 space-y-2">
         <Link href="/app/book" onClick={() => buzz()}
           className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-navy px-4 font-display text-[16px] font-semibold text-white shadow-[var(--shadow-cta)] transition-transform active:scale-[0.98]">
-          <CalendarHeart className="size-[18px]" /> Book appointment
+          <CalendarHeart className="size-[18px]" /> Book a session
         </Link>
         <button onClick={onOpen} aria-haspopup="dialog"
           className="flex h-12 w-full items-center justify-center gap-1 rounded-full bg-white text-[15px] font-semibold text-navy transition-transform active:scale-[0.98]">

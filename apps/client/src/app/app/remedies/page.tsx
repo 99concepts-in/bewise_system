@@ -53,7 +53,7 @@ export default function Remedies() {
           <div className="card flex flex-col items-center p-7 text-center">
             <Mascot pose="sleep" height={132} />
             <p className="mt-4 font-display text-[20px] font-semibold text-ink">Your blend will bloom here</p>
-            <p className="mt-1 max-w-[290px] text-[14px] leading-5 text-ink-2">After your first session, Jitendra Khimlani prepares a personal blend of flower remedies, included in your consultation.</p>
+            <p className="mt-1 max-w-[290px] text-[14px] leading-5 text-ink-2">After your first session, Jitendra Khimlani prepares a personal blend of flower remedies, included in your wellness session.</p>
           </div>
         </Item>
         <Item><PastSessions /></Item>
@@ -157,7 +157,7 @@ export default function Remedies() {
         <Item><PastSessions /></Item>
         <Item>
           <section className="card p-5">
-            <h2 className="h-section">Past blends</h2>
+            <h2 className="h-section">Blend journey</h2>
             {/* owner 2026-11-20: tidy row; badge never squeezes, every remedy is shown (wraps, no clipping) */}
             <div className="mt-3 rounded-[20px] bg-sky-50 p-4">
               <div className="flex items-center gap-3">
@@ -264,7 +264,7 @@ function Upcoming() {
         </ul>
       ) : <p className="mt-1 text-[14px] text-muted">Nothing booked right now.</p>}
       <BtnLink href="/app/book" size="md" variant={up.length ? 'white' : 'gradient'} className="mt-4 w-full">
-        <CalendarHeart className="size-4" /> Book an appointment
+        <CalendarHeart className="size-4" /> Book a session
       </BtnLink>
     </section>
   )

@@ -469,7 +469,7 @@ export type Checkin = { now?: Emotion; changes: Record<string, 'Better' | 'Same'
 export function CheckinNow({ c, set }: { c: Checkin; set: (p: Partial<Checkin>) => void }) {
   return (
     <div>
-      <StepTitle lead="How are you" em="now?" sub="A 2-minute check-in before your appointment. Everything is optional." />
+      <StepTitle lead="How are you" em="now?" sub="A 2-minute check-in before your session. Everything is optional." />
       <div className="card grid grid-cols-4 gap-y-3 p-4">
         {(['calm', 'joyful', 'grateful', 'hopeful', 'tired', 'anxious', 'sad', 'irritated'] as Emotion[]).map((m) => (
           <motion.button key={m} whileTap={{ scale: 0.88 }} aria-pressed={c.now === m} onClick={() => set({ now: m })} className={cx('flex flex-col items-center gap-1 rounded-[18px] p-1.5', c.now === m && 'ring-2 ring-navy')}>

@@ -26,7 +26,7 @@ export function useAddProduct() {
   const router = useRouter()
   return (p: Product, variantId: string, qty = 1, from?: DOMRect) => {
     if (p.soldOut) { toast('Sold out for now. We’ll restock soon'); return }
-    if (p.personal && !hasBlend) { toast('Your personal blend is made after a consultation'); goSafe(router, '/app/book'); return }
+    if (p.personal && !hasBlend) { toast('Your personal blend is made after a wellness session'); goSafe(router, '/app/book'); return }
     const key = p.personal ? (p.personal === 'spray' ? 'remedy-reorder-spray' : 'remedy-reorder') : variantId
     add(key, p.personal ? 1 : qty); buzz(12)
     if (from) flyToBag(from, `${BP}/img/${p.art}.webp`)
@@ -74,7 +74,7 @@ export function ProductCard({ p, i = 0, wide }: { p: Product; i?: number; wide?:
               </motion.div>
             ) : (
               <motion.button key="add" whileTap={{ scale: 0.95 }} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.18 }}
-                aria-label={bookFirst ? `Book a consultation for ${title}` : inCart ? `${title} is in your cart` : `Add ${title} to cart`}
+                aria-label={bookFirst ? `Book a session for ${title}` : inCart ? `${title} is in your cart` : `Add ${title} to cart`}
                 onClick={() => (inCart ? undefined : addProduct(p, v.id, 1, ref.current?.getBoundingClientRect()))}
                 className={`flex h-11 w-full items-center justify-center gap-1.5 rounded-[14px] font-display text-[15px] font-semibold ${inCart ? 'bg-teal-100 text-sage-text' : 'bg-navy text-white'}`}>
                 {bookFirst ? <><CalendarHeart className="size-4" /> Book first</> : inCart ? <><Check className="size-4" strokeWidth={3} /> In cart</> : <><ShoppingBag className="size-4" /> Add to cart</>}

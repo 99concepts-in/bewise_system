@@ -118,7 +118,7 @@ function Story({ onClose }: { onClose: () => void }) {
             <ol className="mt-4 space-y-3">
               <Step n={1} tint="bg-sky-100" icon={<Ear />} title="Listen" body="A safe, unhurried space to share how you really feel." />
               <Step n={2} tint="bg-rose-100" icon={<HeartHandshake />} title="Understand" body="He gently finds the feelings underneath, at your pace." />
-              <Step n={3} tint="bg-teal-100" icon={<Droplets />} title="Your personal blend" body="A blend of Bach flower remedies chosen for you, included in your consultation." />
+              <Step n={3} tint="bg-teal-100" icon={<Droplets />} title="Your personal blend" body="A blend of Bach flower remedies chosen for you, included in your wellness session." />
             </ol>
           </section>
 
@@ -225,7 +225,7 @@ function Testimonials() {
           <button aria-label="Next story" onClick={() => go(1)} className="grid size-11 place-items-center rounded-full bg-white text-navy shadow-[var(--shadow-card)]"><ChevronRight className="size-5" /></button>
         </div>
       )}
-      <p className="mt-3 text-center text-[12px] text-muted">Real words from clients, shared with permission.</p>
+      <p className="mt-3 text-center text-[12px] text-muted">Real words from members, shared with permission.</p>
     </section>
   )
 }

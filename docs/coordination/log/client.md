@@ -2,6 +2,11 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-23 · Owner brief (onboarding, Bach flower stories, journeys, SD) · step 1 shipped: wording
+- Plan (priority order): 1) wording + "Certified" title ✅ · 2) member onboarding for existing members (3-4 inspiring screens on Bach flowers, Jitendra Khimlani's expertise and the app's benefits; no booking prompt) + reference field · 3) after-first-session flow: star feedback → consistency → wellness journey plans → pay → sessions left (no charge for plan sessions) · 4) "Bach flower can help" tab: Insta-story style stories (5-9 slides, tap right for next), 3 to start (sleep, anxiety, relationships), Higgsfield covers, search by concern · 5) public booking link as its own flow: 3 intro screens → WhatsApp sign-in → profile if missing → concerns (Family, Big life event, Relationship, Health, Finance or business, Other) → questionnaire, every section skippable → session bookings screen (+ WhatsApp confirmation, server) · 6) member journeys: occasional / regular / drifting nudges · 7) staff side (SD role etc.): request filed.
+- Step 1: Client→Member, Consultation→Wellness session, Appointment→Session booking, Past blends→Blend journey, Offers→Wellness journey plans, "Certified Bach Flower Remedy Therapist". Real testimonial quotes left as written.
+- Request filed: requests/20261123-client-to-hub-manager-consultant-sd-appointment-admin.md.
+
 ## 2026-11-21 · Offer banner only on Home
 - Removed the introductory offer banner from My care (owner). It now shows only on Home, below the feelings. The plan choice on the booking screen is unchanged.
 

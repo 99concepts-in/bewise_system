@@ -65,7 +65,7 @@ function Pay() {
       <h1 className="h-duo mt-12 text-[36px]">{a.payLater ? <>Thank <em>you</em></> : <>You’re <em>booked</em></>}</h1>
       <motion.div className="mx-auto mt-4" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 13 }}><Mascot pose="wave" height={230} priority /></motion.div>
       <p className="mt-3 text-center text-[15px] text-muted">{whenLong(a)}</p>
-      <div className="mt-auto pb-3 pt-6 safe-b"><Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View appointment</Btn></div>
+      <div className="mt-auto pb-3 pt-6 safe-b"><Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View session booking</Btn></div>
     </main>
   )
 

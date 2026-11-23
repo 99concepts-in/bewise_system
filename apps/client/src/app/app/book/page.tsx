@@ -96,7 +96,7 @@ function Book() {
   const pick: PlanPick = inPlan ? 'once' : planPick
   // one appointment: nothing to pay now (the team sets the fee with the time); a plan is paid now at the launch price
   const fee = pick === 'once' ? 0 : planPrice(pick)
-  const feeLabel = pick === 'once' ? 'Appointment' : `${PLANS[pick].name} · launch offer`
+  const feeLabel = pick === 'once' ? 'Wellness session' : `${PLANS[pick].name} · wellness journey plan`
 
   // owner 2026-11-18: every intake / check-in question is optional — only mode and time are needed to book
   const can: Partial<Record<Step, boolean>> = { mode: !!mode }
@@ -209,9 +209,9 @@ function Book() {
 function PlanPicker({ pick, setPick }: { pick: PlanPick; setPick: (p: PlanPick) => void }) {
   const live = offerLive()
   const opts: { k: PlanPick; t: string; tag?: string; price: number; full?: number; note: string; emoji: string }[] = [
-    { k: 'half', t: '6 months', tag: 'Recommended', price: planPrice('half'), full: live ? planFull('half') : undefined, note: live ? '1 month free' : '6 consultations', emoji: '🌱' },
-    { k: 'yearly', t: 'Yearly', tag: 'Best value', price: planPrice('yearly'), full: live ? planFull('yearly') : undefined, note: live ? `2 months free · save ${formatINR(planSaving('yearly'))}` : '12 consultations', emoji: '🌳' },
-    { k: 'once', t: 'One appointment', price: 0, note: 'Pay once the team sets your fee', emoji: '🌼' },
+    { k: 'half', t: '6 months', tag: 'Recommended', price: planPrice('half'), full: live ? planFull('half') : undefined, note: live ? '1 month free' : '6 wellness sessions', emoji: '🌱' },
+    { k: 'yearly', t: 'Yearly', tag: 'Best value', price: planPrice('yearly'), full: live ? planFull('yearly') : undefined, note: live ? `2 months free · save ${formatINR(planSaving('yearly'))}` : '12 wellness sessions', emoji: '🌳' },
+    { k: 'once', t: 'One session', price: 0, note: 'Pay once the team sets your fee', emoji: '🌼' },
   ]
   return (
     <section aria-labelledby="plan-h">
@@ -265,7 +265,7 @@ function Choose({ plan, planPick, setPlanPick, onMeet, meetOpen, onStories }: { 
   const first = CONSULTATIONS.find((x) => x.id === 'first')!.feePaise, follow = CONSULTATIONS.find((x) => x.id === 'followup')!.feePaise
   return (
     <div className="space-y-4">
-      <h1 className="h-duo pt-2">Book an <em>appointment</em></h1>
+      <h1 className="h-duo pt-2">Book a <em>wellness session</em></h1>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease }} className="card overflow-hidden">
         <button onClick={onMeet} aria-haspopup="dialog" aria-label="Meet Jitendra Khimlani" className="flex w-full items-end gap-4 bg-sky-100 px-5 pt-4 text-left">
           {!meetOpen ? <JituPortrait className="h-[118px] w-[94px] shrink-0 ring-[3px] ring-white" radius="999px 999px 16px 16px" /> : <span className="h-[118px] w-[94px] shrink-0" />}
@@ -298,7 +298,7 @@ function Choose({ plan, planPick, setPlanPick, onMeet, meetOpen, onStories }: { 
         <span className="relative grid size-14 shrink-0 place-items-center rounded-full bg-rose-100 ring-4 ring-sky-100">
           <Quote className="size-6 fill-rose-500 text-rose-500" aria-hidden />
         </span>
-        <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Client stories</span><span className="text-[13px] text-muted">{TESTIMONIALS.length ? `View ${TESTIMONIALS.length} testimonials` : 'View testimonials'}</span></span>
+        <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Member stories</span><span className="text-[13px] text-muted">{TESTIMONIALS.length ? `View ${TESTIMONIALS.length} testimonials` : 'View testimonials'}</span></span>
         <ChevronRight className="size-5 text-soft" />
       </motion.button>
       <p className="px-2 text-center text-[13px] text-muted">Sessions are non-refundable, but you can reschedule.</p>
@@ -313,8 +313,8 @@ function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void })
   const n = TESTIMONIALS.length
   const t = TESTIMONIALS[k]
   return (
-    <Sheet open={open} onClose={onClose} title="Client stories">
-      <h2 className="h-duo text-[26px]">Client <em>stories</em></h2>
+    <Sheet open={open} onClose={onClose} title="Member stories">
+      <h2 className="h-duo text-[26px]">Member <em>stories</em></h2>
       <p className="mt-1 text-[14px] text-muted">In their own words, shared with permission.</p>
       {n ? (
         <>
@@ -342,7 +342,7 @@ function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void })
         <div className="mt-5 rounded-[24px] bg-marigold-100 p-6 text-center">
           <Quote className="mx-auto size-8 text-gold" aria-hidden />
           <p className="mt-3 text-[16px] font-bold text-navy">Stories are on their way</p>
-          <p className="mt-1 text-[14px] leading-5 text-muted">We’re gathering words from clients who’ve kindly agreed to share their experience.</p>
+          <p className="mt-1 text-[14px] leading-5 text-muted">We’re gathering words from members who’ve kindly agreed to share their experience.</p>
           <a href={TESTIMONIALS_SOURCE} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-navy underline underline-offset-4">Read stories on Jitendra Khimlani’s website <ExternalLink className="size-4" /></a>
         </div>
       )}
@@ -440,7 +440,7 @@ function Review({ mode, fee, pick, inPlan }: { mode: 'online' | 'in_person'; fee
           <div className="pb-5"><p className="font-display text-[20px] font-semibold text-ink">Jitendra Khimlani</p><p className="text-[13px] text-muted">{CONSULTANT.title}</p></div>
         </div>
         {[
-          { i: <Sparkles className="size-5" />, t: inPlan ? 'Appointment · in your plan' : pick === 'once' ? 'Appointment' : `Appointment · ${PLANS[pick].name}` },
+          { i: <Sparkles className="size-5" />, t: inPlan ? 'Wellness session · in your plan' : pick === 'once' ? 'Wellness session' : `Wellness session · ${PLANS[pick].name}` },
           { i: mode === 'online' ? <Video className="size-5" /> : <MapPin className="size-5" />, t: mode === 'online' ? 'Online · video call' : `In person · ${STUDIO.short}` },
           { i: <Clock className="size-5" />, t: 'Time: confirmed by the team after your request' },
         ].map((r, k) => (
@@ -494,7 +494,7 @@ function Booked({ a }: { a: Appointment }) {
       )}
       <p className="mt-3 text-center text-[13px] text-muted">{a.kindTbc && !a.paidAt ? `Request ${a.code}. Nothing to pay yet.` : a.payLater ? `Booking ${a.code}. You can pay ${formatINR(a.amountPaise)} after your session.` : `Receipt ${a.code} is in Payments.`} Jitendra Khimlani will read your answers before you meet.</p>
       <div className="mt-auto space-y-3 pb-3 pt-6 safe-b">
-        <Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View appointment</Btn>
+        <Btn full onClick={() => router.replace(`/app/sessions/view?id=${a.id}`)}>View session booking</Btn>
         {!a.timeTbc && <Btn full variant="white" onClick={() => (isAndroid() ? addToCalendar(ev) : setCal(true))}><CalendarPlus className="size-5" /> Add to calendar</Btn>}
       </div>
       <Sheet open={cal} onClose={() => setCal(false)} title="Add to calendar">

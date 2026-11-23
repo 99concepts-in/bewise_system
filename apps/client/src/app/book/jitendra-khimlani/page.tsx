@@ -58,7 +58,7 @@ function BookingLink() {
       </div>
 
       <div className="mt-auto space-y-2 pt-8 safe-b">
-        <Btn full variant="gradient" onClick={go}>Book an appointment</Btn>
+        <Btn full variant="gradient" onClick={go}>Book a session</Btn>
         <p className="text-center text-[12px] text-muted">Takes about 3 minutes · sessions are non-refundable, but you can reschedule</p>
       </div>
     </main>

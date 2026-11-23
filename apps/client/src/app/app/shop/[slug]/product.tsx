@@ -75,7 +75,7 @@ export default function ProductPage() {
       {p.personal && (
         <p className="mt-4 flex items-start gap-2.5 rounded-[20px] bg-sage-100/70 p-4 text-[14px] leading-5 text-sage-text">
           <span aria-hidden className="text-[18px] leading-5">🌼</span>
-          <span>{hasBlend ? 'We’ll prepare the same blend Jitendra Khimlani chose for you.' : 'Your first blend is made for you after a consultation, and it’s included in the fee.'}</span>
+          <span>{hasBlend ? 'We’ll prepare the same blend Jitendra Khimlani chose for you.' : 'Your first blend is made for you after a wellness session, and it’s included in the fee.'}</span>
         </p>
       )}
 
@@ -112,7 +112,7 @@ export default function ProductPage() {
               <BtnLink full href="/app/bag" variant="gradient"><ShoppingBag className="size-5" /> Go to cart</BtnLink>
             </>
           ) : inCart > 0 ? <BtnLink full href="/app/bag" variant="gradient"><Check className="size-5" /> In cart · Go to cart</BtnLink>
-          : <Btn full variant="gradient" onClick={() => (hit ? setConfirm(true) : doAdd())}>{bookFirst ? 'Book a consultation' : p.personal ? 'Reorder my blend' : <><ShoppingBag className="size-5" /> Add to cart</>}</Btn>}
+          : <Btn full variant="gradient" onClick={() => (hit ? setConfirm(true) : doAdd())}>{bookFirst ? 'Book a session' : p.personal ? 'Reorder my blend' : <><ShoppingBag className="size-5" /> Add to cart</>}</Btn>}
       </div>
 
       <Sheet open={confirm} onClose={() => setConfirm(false)} title="Add anyway?">

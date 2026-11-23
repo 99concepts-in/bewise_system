@@ -11,5 +11,5 @@ export const isUpcoming = (a: Appointment, now = Date.now()) =>
   (a.status === 'confirmed' || a.status === 'awaiting_payment' || !!a.needsNewTime) && (tbc(a) || +new Date(a.startsAt) + 3600_000 > now)
 
 /** owner 2026-11-21: one "Appointment" for everyone; the team decides first visit or follow-up */
-export const apptName = (a: Pick<Appointment, 'type' | 'kindTbc'>) => (a.kindTbc ? 'Appointment' : CONSULTATIONS.find((c) => c.id === a.type)?.name ?? 'Appointment')
+export const apptName = (a: Pick<Appointment, 'type' | 'kindTbc'>) => (a.kindTbc ? 'Wellness session' : CONSULTATIONS.find((c) => c.id === a.type)?.name ?? 'Wellness session')
 export const apptMinutes = (a: Pick<Appointment, 'type' | 'kindTbc'>) => (a.kindTbc ? 60 : CONSULTATIONS.find((c) => c.id === a.type)?.minutes ?? 60)

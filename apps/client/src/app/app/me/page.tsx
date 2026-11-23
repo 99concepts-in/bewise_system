@@ -69,12 +69,12 @@ export default function Me() {
         </Item>
         <Item className="card flex items-center gap-3 p-4">
           <span className="grid size-10 place-items-center rounded-full bg-marigold-100 text-ink"><FlaskConical className="size-5" /></span>
-          <div className="flex-1"><p className="text-[15px] font-semibold text-navy">Explore with sample data</p><p className="text-[12px] text-muted">Preview a returning client: blend, sessions, journal, orders</p></div>
+          <div className="flex-1"><p className="text-[15px] font-semibold text-navy">Explore with sample data</p><p className="text-[12px] text-muted">Preview a returning member: blend, sessions, journal, orders</p></div>
           <Btn size="sm" variant="sage" onClick={() => { s.loadDemo(); toast('Sample journey loaded'); goSafe(router, '/app') }}>Load</Btn>
         </Item>
         <Item className="card p-4">
           <p className="text-[13px] font-bold uppercase tracking-[0.1em] text-muted">Preview tools</p>
-          <p className="mt-1 text-[12px] text-muted">See what a client receives when Jitendra Khimlani or Haresh books for them.</p>
+          <p className="mt-1 text-[12px] text-muted">See what a member receives when Jitendra Khimlani or Haresh books for them.</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(); goSafe(router, `/app/pay?appointment=${a.id}`) }}>Booking from Jitendra Khimlani</Btn>
             <Btn size="sm" variant="white" onClick={() => { const a = s.simulateStaffBooking(true); goSafe(router, `/app/pay?appointment=${a.id}`) }}>…paid after hold expired</Btn>
