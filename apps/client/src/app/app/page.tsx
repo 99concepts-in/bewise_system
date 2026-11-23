@@ -262,9 +262,8 @@ function MeetCard({ open, onOpen }: { open: boolean; onOpen: () => void }) {
           {!open && <JituPortrait className="h-full w-full ring-[3px] ring-white" radius="999px 999px 18px 18px" />}
         </button>
         <div className="min-w-0 flex-1">
-          <p className="eyebrow text-navy">Your consultant</p>
+          <p className="eyebrow text-navy">Certified Bach Flower Therapist</p>
           <h2 id="meet-h" className="mt-1 font-display text-[21px] font-semibold leading-[26px] text-ink">Jitendra Khimlani</h2>
-          <p className="mt-0.5 text-[14px] leading-5 text-ink-2">{CONSULTANT.title}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {['12+ years', 'Online or in person'].map((t) => (
               <span key={t} className="rounded-full bg-white/80 px-2.5 py-1 text-[12px] font-semibold text-navy">{t}</span>

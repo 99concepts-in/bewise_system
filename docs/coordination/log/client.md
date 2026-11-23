@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-23 · "Your consultant" → "Certified Bach Flower Therapist" + "12+ years"
+- Jitendra Khimlani's story sheet: the "Your consultant" tag is now "Certified Bach Flower Therapist" with a "12+ years" tag beside it. Home consultant card eyebrow renamed the same (duplicate title line removed).
+
 ## 2026-11-23 · Home: remedy first, new mood logger, real bottle, reminders, Learn card
 - Home order: greeting → remedy card (first) → "Log how you feel right now" → next session / pay → offer → consultant card → Learn card → goals → shop → your space. The feelings grid is removed.
 - New mood logger (components/mood-logger.tsx): bottom sheet with X; "Right now" or "Today overall"; slider very unpleasant → very pleasant with a flower that opens, warms and pulses on each step (purple to orange), haptic tick per step; then matching feelings or search any feeling, optional note. Journal entries now carry `valence` (1 to 7) and `kind`.

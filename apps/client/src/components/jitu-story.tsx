@@ -101,7 +101,10 @@ function Story({ onClose }: { onClose: () => void }) {
         {/* ---------- story ---------- */}
         <motion.article className="relative -mt-8 rounded-t-[32px] bg-sky-50 px-5 pb-40 pt-7"
           initial={{ y: reduce ? 0 : 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, ease, delay: 0.2 }}>
-          <span className="inline-flex items-center rounded-full bg-marigold-100 px-3 py-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-ink">Your consultant</span>
+          <span className="inline-flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center whitespace-nowrap rounded-full bg-marigold-100 px-3 py-1.5 text-[13px] font-semibold text-ink">Certified Bach Flower Therapist</span>
+            <span className="inline-flex items-center whitespace-nowrap rounded-full bg-sky-100 px-3 py-1.5 text-[13px] font-semibold text-navy">12+ years</span>
+          </span>
           <Words className="h-display mt-4" text="Jitendra Khimlani listens first." delay={0.35} />
           <motion.p className="mt-3 text-[16px] leading-6 text-ink-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}>
             {CONSULTANT.fullName}, {CONSULTANT.title}. For more than 12 years he has guided people, gently and without judgement, with the wisdom of Bach flower remedies.
