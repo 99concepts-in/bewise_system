@@ -1,7 +1,7 @@
-:HL["/bewise_system/preview/client/_next/static/chunks/0s8ft3f728sq7.css","style"]
+:HL["/bewise_system/preview/client/_next/static/chunks/0lyo3vgisi7ez.css","style"]
 :HC["/",""]
 4:[["children",{"s":"__PAGE__","h":160}]]
 3:[["children",{"s":{"n":"slug","t":"d","k":"detox-roll-on","s":[]},"h":65632,"c":"$Q4"}]]
 2:[["children",{"s":"shop","h":131168,"c":"$Q3"}]]
 1:[["children",{"s":"app","h":131172,"c":"$Q2"}]]
-0:{"b":"9p_DbgY0JV5X_eAOmNMDy","t":{"t":{"s":"","h":131160,"c":"$Q1"}}}
+0:{"b":"Nyt5RcVkLL7Qr80e8qVG7","t":{"t":{"s":"","h":131160,"c":"$Q1"}}}

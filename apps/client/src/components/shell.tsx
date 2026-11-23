@@ -10,7 +10,7 @@ import { goSafe } from '@/lib/nav'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { Bell, ChevronLeft, House, Search, ShoppingBag, Sprout, User, X } from 'lucide-react'
+import { Bell, ChevronLeft, House, Search, ShoppingBag, Sprout, User, X, BookOpen } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { create } from 'zustand'
 import { Avatar, Logo, MoodButton, MoodImg, LogoMark } from './brand'
@@ -27,10 +27,12 @@ const NAV = [
   { href: '/app', label: 'Home', icon: House, match: (p: string) => p === '/app' || p.startsWith('/app/journal') || p.startsWith('/app/goals') || p.startsWith('/app/ask') },
   // owner 2026-11-18: no separate Book tab; remedies, sessions and booking live together under My care
   { href: '/app/remedies', label: 'My care', icon: Sprout, match: (p: string) => p.startsWith('/app/remedies') || p.startsWith('/app/book') || p.startsWith('/app/sessions') },
+  // owner 2026-11-23: "Know how Bach flower therapy can help you" stories
+  { href: '/app/learn', label: 'Learn', icon: BookOpen, match: (p: string) => p.startsWith('/app/learn') },
   { href: '/app/shop', label: 'Shop', icon: ShoppingBag, match: (p: string) => p.startsWith('/app/shop') || p.startsWith('/app/bag') || p.startsWith('/app/checkout') || p.startsWith('/app/orders') },
   { href: '/app/me', label: 'Me', icon: User, match: (p: string) => p.startsWith('/app/me') || p.startsWith('/app/help') },
 ]
-const NAV_ROOTS = new Set(['/app', '/app/remedies', '/app/book', '/app/shop', '/app/me', '/app/journal', '/app/sessions', '/app/orders', '/app/goals'])
+const NAV_ROOTS = new Set(['/app', '/app/learn', '/app/remedies', '/app/book', '/app/shop', '/app/me', '/app/journal', '/app/sessions', '/app/orders', '/app/goals'])
 
 /** Static hosting serves /app/ (trailing slash) — compare routes without it. */
 export const usePath = () => { const p = usePathname() || '/'; return p.length > 1 ? p.replace(/\/+$/, '') : p }

@@ -124,6 +124,8 @@ export const TESTIMONIALS: { name: string; city?: string; quote: string; rating?
 /** BeWise contact from the brochure and remedy label. */
 export const CONTACT = { whatsapp: '919054220952', whatsappLabel: '90542 20952', social: '@bewiseglobal' }
 export const TESTIMONIALS_SOURCE = 'https://www.jitendrakhimlani.com'
+/** owner 2026-11-23: Jitendra Khimlani's Google reviews (opens the reviews panel on Google). */
+export const GOOGLE_REVIEWS_URL = 'https://www.google.com/search?q=jitendra+khimlani#lrd=0x395fc92b1f8e982f:0xc631ae8e4262d7c9,1,,,,'
 
 /** In-person center (owner 2026-11-18; CONTENT-CHECKLIST #7). */
 const STUDIO_FULL = '102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007'

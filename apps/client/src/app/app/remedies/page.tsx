@@ -24,6 +24,8 @@ import { apptName, isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { dayKey, fmtDay, fmtTime } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
 import { DoseTracker } from '@/components/dose-tracker'
+import { HowToTake } from '@/components/how-to-take'
+import { MadeWithCare } from '@/components/made-with-care'
 import { blendSupply } from '@/lib/supply'
 import { BP } from '@/lib/asset'
 
@@ -125,6 +127,10 @@ export default function Remedies() {
             </div>
           </section>
         </Item>
+
+        <Item><HowToTake /></Item>
+
+        <Item><MadeWithCare /></Item>
 
         <Item><FaqCard /></Item>
 

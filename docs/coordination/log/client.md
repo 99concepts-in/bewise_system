@@ -2,6 +2,15 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-23 · Learn tab: Bach flower stories · remedy instructions · made with care
+- New Learn tab ("Know how Bach flower therapy can help you"): search by concern, 3 Insta-style stories (sleep, anxiety, relationships), 8 slides each with cover, text, flower cards, steps, "Did you know", a real member quote and an end slide with a care note. Covers made in Higgsfield (public/img/stories). Tap right = next, left = back, hold = pause, auto-advance after a reading pause. Original writing informed by the owner's books (Bach 1931/1936; Non Shaw 1998).
+- Owner: members must not self-pick remedies. Every place that names remedies shows "Take Bach remedies only after a session with Jitendra Khimlani…".
+- "How our remedies are made" card (My care + Learn): vibrationally charged with mantras, curated by a certified expert, best quality flower blends.
+- My care: "How to take your remedy" from the owner's WhatsApp instructions (4 drops 4 times a day or 16 drops in a litre of water, any drink or food, any time, 25 days, book the next session near the end, keep from children, cool dry place, share how you feel on WhatsApp 98980 20939). Softened: no "no side effects", first-days changes described as emotional only.
+- Google reviews could not be read automatically (Google blocks it). Added "Read all reviews on Google" links (Learn, Member stories sheet). Owner asked to paste the reviews to show.
+- Remedy finder: lib/remedy-finder.ts + docs/knowledge/remedy-finder.json (41 concerns); request filed for the Consultant app.
+- Tests: 57.
+
 ## 2026-11-23 · Owner brief (onboarding, Bach flower stories, journeys, SD) · step 1 shipped: wording
 - Plan (priority order): 1) wording + "Certified" title ✅ · 2) member onboarding for existing members (3-4 inspiring screens on Bach flowers, Jitendra Khimlani's expertise and the app's benefits; no booking prompt) + reference field · 3) after-first-session flow: star feedback → consistency → wellness journey plans → pay → sessions left (no charge for plan sessions) · 4) "Bach flower can help" tab: Insta-story style stories (5-9 slides, tap right for next), 3 to start (sleep, anxiety, relationships), Higgsfield covers, search by concern · 5) public booking link as its own flow: 3 intro screens → WhatsApp sign-in → profile if missing → concerns (Family, Big life event, Relationship, Health, Finance or business, Other) → questionnaire, every section skippable → session bookings screen (+ WhatsApp confirmation, server) · 6) member journeys: occasional / regular / drifting nudges · 7) staff side (SD role etc.): request filed.
 - Step 1: Client→Member, Consultation→Wellness session, Appointment→Session booking, Past blends→Blend journey, Offers→Wellness journey plans, "Certified Bach Flower Remedy Therapist". Real testimonial quotes left as written.

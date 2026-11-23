@@ -20,7 +20,7 @@ import { PaySheet } from '@/components/pay-sheet'
 import { DateInput } from '@/components/date-input'
 import { AppHeader, useUi } from '@/components/shell'
 import { Btn, Chip, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, useStableCallback } from '@/components/ui'
-import { CONSULTANT, CONSULTATIONS, NUANCE, STUDIO, TESTIMONIALS, TESTIMONIALS_SOURCE, istDate, slotsFor, type ConsultationId } from '@/lib/data'
+import { CONSULTANT, CONSULTATIONS, NUANCE, STUDIO, TESTIMONIALS, TESTIMONIALS_SOURCE, GOOGLE_REVIEWS_URL, istDate, slotsFor, type ConsultationId } from '@/lib/data'
 import { InPersonArt, OnlineArt } from '@/components/mode-art'
 import { apptMinutes, apptName } from '@/lib/appt'
 import { emptyIntake, planLeft, useApp, type Appointment, type IntakeAnswers, type Plan } from '@/lib/store'
@@ -346,6 +346,7 @@ function StoriesSheet({ open, onClose }: { open: boolean; onClose: () => void })
           <a href={TESTIMONIALS_SOURCE} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-navy underline underline-offset-4">Read stories on Jitendra Khimlani’s website <ExternalLink className="size-4" /></a>
         </div>
       )}
+      <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="mt-5 flex h-12 items-center justify-center gap-1.5 rounded-full bg-sky-50 text-[14px] font-semibold text-navy">Read all reviews on Google <ExternalLink className="size-4" /></a>
     </Sheet>
   )
 }

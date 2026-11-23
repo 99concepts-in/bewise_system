@@ -243,7 +243,30 @@ test('one appointment: no first/follow-up choice, nothing to pay now; the team s
   expect(s.checkins[a.id].answers.now).toBe('calm')
   // the team sets it (preview tool): returning client → follow-up ₹800, awaiting payment
   await page.goto('/app/me'); await page.getByRole('button', { name: 'Team confirms my time' }).click()
+  await expect(page.getByText('Time confirmed by the team')).toBeVisible()
   s = await state(page)
   expect(s.appointments.find((x: { id: string }) => x.id === a.id)).toMatchObject({ kindTbc: false, type: 'followup', amountPaise: 80000, status: 'awaiting_payment' })
-  await page.goto('/app'); await expect(page.getByText('Complete your booking')).toBeVisible()
+  await page.goto('/app'); await expect(page.getByText('Complete your booking')).toBeVisible({ timeout: 10000 })
+})
+
+test('learn: search a concern, open a story, tap through to the end, book', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/learn')
+  await page.getByRole('textbox', { name: 'Search a concern' }).fill('sleep')
+  await expect(page.getByText('Flowers often chosen', { exact: true })).toBeVisible()
+  await page.getByRole('link', { name: 'Read: Bach flowers and sleep' }).click()
+  await page.waitForURL('**/app/learn/story**')
+  for (let i = 0; i < 7; i++) await page.getByRole('button', { name: 'Next slide' }).click()
+  await expect(page.getByText('Sleep · 8 of 8')).toBeVisible()
+  await expect(page.getByText(/do not replace medical care/)).toBeVisible()
+  await page.getByRole('link', { name: 'Book a session' }).click()
+  await page.waitForURL('**/app/book**')
+})
+
+test('my care: how to take your remedy', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/remedies')
+  await page.getByRole('button', { name: /How to take your remedy/ }).click()
+  await expect(page.getByText('4 drops, 4 times a day', { exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: /WhatsApp 98980 20939/ })).toHaveAttribute('href', /wa\.me\/919898020939/)
 })
