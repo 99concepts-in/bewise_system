@@ -4,14 +4,15 @@
  */
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { m } from 'motion/react'
-import { Archive, ArchiveRestore, ArrowLeft, CalendarPlus, ChevronRight, Leaf, MapPin, NotebookPen, Plus, MessageCircle, MessageSquare, Phone, Sparkles, Star, Video } from 'lucide-react'
+import { Archive, ArchiveRestore, ArrowLeft, CalendarPlus, Leaf, MapPin, NotebookPen, Plus, MessageCircle, MessageSquare, Phone, Sparkles, Star, Video } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
 import { Avatar, MoodFace, Empty, go, softSpring, spring, useToast } from '../ui/kit'
 import { TypeBadge } from '../ui/bits'
-import { LoShuGrid, LoShuPanel } from '../ui/loshu'
+import { LoShuPanel } from '../ui/loshu'
+import { BlendJourney, ConcernsCard, JourneyTag, JourneyTimeline, LastSeen, LoShuCard, WellnessSummaryCard } from '../ui/console'
 import { useSheets, STATUS_LABEL, typeLabel, waLink } from './Sheets'
 import { personView, scanNotes, scanSummary, sinceLastRemedy, type PersonView } from '../lib/derive'
-import { ageOn, loShu, parseDob } from '../lib/loshu'
+import { ageOn, parseDob } from '../lib/loshu'
 import { AdherenceCard } from '../ui/care'
 import { dayLabel, fmtLong, fmtShort, fmtTime, fmtWeekday, relative } from '../lib/time'
 import { DAY, MIN, startOfDay } from '../data/seed'
@@ -61,7 +62,8 @@ export default function Profile({ id, tab: initialTab }: { id: string; tab?: str
         <m.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...softSpring, delay: 0.08 }}>
           <h1>{p.name}</h1>
           <p className="muted">{p.city}{ageOn(p.dob, now) != null ? `, ${ageOn(p.dob, now)}` : ''}, with you since {fmtLong(p.joinedAt)}</p>
-          <span className="pf-badges"><TypeBadge service={v.service} />{p.archived && <span className="tag">Archived</span>}</span>
+          <span className="pf-badges"><TypeBadge service={v.service} /><JourneyTag v={v} now={now} />{p.archived && <span className="tag">Archived</span>}</span>
+          <LastSeen v={v} now={now} />
         </m.div>
       </div>
       <div className="pf-actions">
@@ -102,16 +104,12 @@ export default function Profile({ id, tab: initialTab }: { id: string; tab?: str
   )
 }
 
-/** Overview: the few things he needs before a session, each linking to its tab. */
+/** Overview = the consultant console: AI wellness summary, then Lo Shu, wellness journey, concerns and blend journey. */
 function Overview({ p, v, now, open }: { p: Person; v: PersonView; now: number; open: (t: Tab) => void }) {
-  const lines = sinceLastRemedy(v, now)
+  const sheets = useSheets()
   const today = startOfDay(now)
   const week = Array.from({ length: 7 }, (_, i) => today - (6 - i) * DAY).map((d) => ({ d, mood: p.moods.find((x) => x.day === d)?.mood }))
-  const her = pron(p).poss
   const doneCount = v.past.filter((a) => a.status === 'completed').length
-  const scanning = v.service === 'scanning'
-  const sum = scanning ? scanSummary(v.sessions, p.notes) : null
-  const ls = loShu(p.dob)
   return (
     <>
       <div className="pf-stats">
@@ -119,33 +117,11 @@ function Overview({ p, v, now, open }: { p: Person; v: PersonView; now: number; 
         <div>{v.avgRating ? <b>{v.avgRating.toFixed(1)}</b> : <b className="dim">None yet</b>}<span>avg rating</span></div>
         <div>{v.next ? <b>{dayLabel(v.next.start, now)}</b> : v.dueOn ? <b>{v.dueOn < now ? 'Due now' : fmtShort(v.dueOn)}</b> : <b className="dim">Not set</b>}<span>{v.next ? 'next session' : 'follow-up'}</span></div>
       </div>
-
-      {scanning ? (
-        <section className="card pf-card scan-sum">
-          <h2><Sparkles size={16} /> Summary of all notes</h2>
-          {sum ? <ul className="three"><li>Last note ({fmtShort(sum.last.start)}): {sum.lastLine}</li>{sum.advice && <li>To follow up: {sum.advice}</li>}</ul>
-            : <p className="muted small">No notes yet. Add one after the session.</p>}
-          <button type="button" className="pf-more" onClick={() => open('care')}>All notes<ChevronRight size={16} /></button>
-        </section>
-      ) : (
-        <section className="card pf-card">
-          <h2>{v.blend ? `Since ${her} last remedy` : 'Progress'}</h2>
-          {lines ? <ul className="three">{lines.map((l, i) => <m.li key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.06 }}>{l}</m.li>)}</ul>
-            : <p className="muted small">{v.blend ? 'Not enough check-ins yet to show progress.' : `Progress shows here after ${p.first}'s first remedy.`}</p>}
-          <button type="button" className="pf-more" onClick={() => open('care')}>Remedy, drops and blend<ChevronRight size={16} /></button>
-        </section>
-      )}
-
-      <button type="button" className="card pf-card ls-teaser" onClick={() => open('loshu')}>
-        {ls ? <LoShuGrid ls={ls} small /> : <span className="ls-teaser-empty" aria-hidden>?</span>}
-        <span className="ls-teaser-text">
-          <b>Lo Shu grid</b>
-          {ls ? <small>Driver {ls.driver}, conductor {ls.conductor}. {ls.missing.length ? `Missing ${ls.missing.join(', ')}.` : 'No missing numbers.'}</small>
-            : <small>No date of birth yet. Ask {p.first} or add it.</small>}
-        </span>
-        <ChevronRight size={18} className="ls-teaser-go" />
-      </button>
-
+      <WellnessSummaryCard v={v} now={now} />
+      <LoShuCard v={v} open={() => open('loshu')} />
+      <JourneyTimeline v={v} onOpen={(id) => sheets.session(id)} showAll={() => open('sessions')} />
+      <ConcernsCard v={v} />
+      <BlendJourney v={v} />
       <section className="card pf-card">
         <h2>{p.first}'s week</h2>
         <div className="mood-week">
@@ -164,9 +140,8 @@ function Overview({ p, v, now, open }: { p: Person; v: PersonView; now: number; 
 
 /** Bach flower clients: drops, blend and what troubled them across sessions. */
 function RemedyTab({ p, v, now }: { p: Person; v: PersonView; now: number }) {
-  const troublingHistory = v.past.filter((a) => a.troubling).slice(-5)
-  const allConcerns = [...new Set(troublingHistory.flatMap((a) => a.troubling!))]
-  const them = pron(p).obj
+  const lines = sinceLastRemedy(v, now)
+  const her = pron(p).poss
   return (
     <>
       <AdherenceCard p={p} now={now} />
@@ -183,21 +158,13 @@ function RemedyTab({ p, v, now }: { p: Person; v: PersonView; now: number }) {
           </ol>
         </section>
       ) : <section className="card pf-card"><h2><Leaf size={16} /> Remedy</h2><p className="muted small">No remedy given yet.</p></section>}
-      {allConcerns.length > 0 && (
-        <section className="card pf-card">
-          <h2>What troubled {them} across sessions</h2>
-          <div className="concern-grid" style={{ gridTemplateColumns: `minmax(92px, 1fr) repeat(${troublingHistory.length}, minmax(0, 46px))` }}>
-            <span />
-            {troublingHistory.map((a) => <small key={a.id} className="cg-h">{fmtShort(a.start)}</small>)}
-            {allConcerns.map((c) => (
-              <div key={c} className="cg-row" style={{ display: 'contents' }}>
-                <span className="cg-name">{c}</span>
-                {troublingHistory.map((a) => <span key={a.id} role="img" className={'cg-cell' + (a.troubling!.includes(c) ? ' on' : '')} aria-label={a.troubling!.includes(c) ? `${c} on ${fmtShort(a.start)}` : `No ${c.toLowerCase()} on ${fmtShort(a.start)}`} />)}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      <section className="card pf-card">
+        <h2>{v.blend ? `Since ${her} last remedy` : 'Progress'}</h2>
+        {lines ? <ul className="three">{lines.map((l) => <li key={l}>{l}</li>)}</ul>
+          : <p className="muted small">{v.blend ? 'Not enough check-ins yet to show progress.' : `Progress shows here after ${p.first}'s first remedy.`}</p>}
+        <p className="tagline">Auto summary from {her} check-ins. Verify with {p.first}.</p>
+      </section>
+      <BlendJourney v={v} />
     </>
   )
 }

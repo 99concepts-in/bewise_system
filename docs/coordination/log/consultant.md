@@ -71,3 +71,10 @@
 - Lo Shu tab: driver, conductor, grid, missing, repeated, planes; no DOB → ask on WhatsApp or add it. DOB optional in Add a person.
 - Request filed: `requests/20261123-consultant-to-client-lo-shu-grid.md`. Spec: `specs/consultant/02-LO-SHU-GRID.md`.
 - Tests: 50 unit, 113 browser passed (3 skipped).
+
+## 2026-11-23 — Consultant console (owner request)
+**Status:** Done in the prototype
+- Member card: last session + "x days ago" with a green / amber / soft-red dot; journey tag Regular / Occasional / Drifting (board, list, profile header).
+- Overview tab is now the console: AI wellness summary (blend routine flag, feelings noted, last blend, journey, 1–2 lines of suggested focus), then Lo Shu card, wellness journey timeline, concerns across sessions, blend journey, week of feelings.
+- Wording: descriptive only; `NOT_SAID` word list + test over every demo member. Spec: `specs/consultant/03-CONSULTANT-CONSOLE.md`.
+- Tests: 58 unit, 113 browser passed (3 skipped).

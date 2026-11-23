@@ -232,7 +232,7 @@ test.describe('@flows', () => {
     const s = await state(page)
     const withDob = s.people.find((p: { dob?: string; archived?: boolean }) => p.dob && !p.archived)
     await page.goto('./#/people/' + withDob.id)
-    await page.getByRole('button', { name: /Lo Shu grid/ }).click()
+    await page.getByRole('button', { name: /Full reading/ }).click()
     await expect(page.getByRole('tab', { name: 'Lo Shu' })).toHaveAttribute('aria-selected', 'true')
     await expect(page.locator('.ls-main .ls-cell')).toHaveCount(9)
     await expect(page.getByRole('heading', { name: /Missing numbers/ })).toBeVisible()

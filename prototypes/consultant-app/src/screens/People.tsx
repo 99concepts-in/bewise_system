@@ -8,9 +8,10 @@ import { CalendarPlus, LayoutGrid, List, Search, UserPlus, X } from 'lucide-reac
 import { useIndex, useStore } from '../state/store'
 import { Avatar, Chip, Empty, MoodFace, go } from '../ui/kit'
 import { TypeBadge } from '../ui/bits'
+import { JourneyTag, LastSeen } from '../ui/console'
 import { useSheets } from './Sheets'
 import { adherence, personView, type Bucket, type PersonView } from '../lib/derive'
-import { dayLabel, relative } from '../lib/time'
+import { dayLabel } from '../lib/time'
 
 const BUCKETS: { v: Bucket; label: string; attn?: boolean }[] = [
   { v: 'missing', label: 'Missed remedy', attn: true }, { v: 'ending7', label: 'Ends this week', attn: true }, { v: 'ending14', label: 'Ends in 1–2 weeks' },
@@ -25,7 +26,7 @@ function statusLine(v: PersonView, now: number): { text: string; tone: 'warn' | 
   if (v.daysLeft !== undefined && v.daysLeft >= 0 && v.daysLeft <= 14) return { text: v.daysLeft === 0 ? 'Remedy ends today' : `Remedy ends in ${v.daysLeft} ${v.daysLeft === 1 ? 'day' : 'days'}`, tone: 'gold' }
   if (v.buckets.includes('remedy')) return { text: 'Taking the remedy', tone: 'ok' }
   if (v.next) return { text: `Next: ${dayLabel(v.next.start, now)}`, tone: '' }
-  if (v.last) return { text: `Seen ${relative(v.last.start, now)}`, tone: '' }
+  if (v.last) return { text: 'No session booked', tone: '' }
   return { text: 'New', tone: '' }
 }
 const URGENCY = (v: PersonView) => (v.buckets.includes('missing') ? 0 : v.buckets.includes('ending7') ? 1 : v.buckets.includes('ending14') ? 2 : 3)
@@ -95,6 +96,7 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
                   <b>{v.p.name}</b>
                   <TypeBadge service={v.service} />
                   <small className={`bc-status ${st.tone}`}>{st.text}</small>
+                  <span className="bc-foot"><LastSeen v={v} now={now} short /><JourneyTag v={v} now={now} /></span>
                 </button>
               </m.li>
             )
@@ -108,8 +110,8 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
               <li key={v.p.id}>
                 <button className="row" onClick={() => go(`/people/${v.p.id}${tabFor(bucket)}`)}>
                   <Avatar name={v.p.name} size={44} mood={v.latestMood} layoutId={`av-${v.p.id}`} />
-                  <span className="row-main"><b>{v.p.name}</b><small className={st.tone === 'warn' ? 'warn' : ''}>{v.p.city}, {st.text.toLowerCase()}</small></span>
-                  <span className="row-end"><TypeBadge service={v.service} /></span>
+                  <span className="row-main"><b>{v.p.name}</b><small className={st.tone === 'warn' ? 'warn' : ''}>{v.p.city}, {st.text.toLowerCase()}</small><LastSeen v={v} now={now} short /></span>
+                  <span className="row-end people-end"><TypeBadge service={v.service} /><JourneyTag v={v} now={now} /></span>
                 </button>
               </li>
             )

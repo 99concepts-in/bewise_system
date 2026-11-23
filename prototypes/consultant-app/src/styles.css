@@ -1050,3 +1050,79 @@ input, textarea, select { font-size: 16px !important; }
   .pf-tablist { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
   .pf-tablist:has(.pf-tab:last-child.is-on) { -webkit-mask-image: none; mask-image: none; }
 }
+
+/* --- consultant console: last visit colour, journey tag */
+.last-seen { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 650; color: var(--ink-2); margin-top: 6px; }
+.last-seen i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.last-seen.recent i { background: #5E9A62; box-shadow: 0 0 0 3px #DDEEDB; }
+.last-seen.while i { background: #C9962E; box-shadow: 0 0 0 3px #F6E8C8; }
+.last-seen.long i { background: #C56A60; box-shadow: 0 0 0 3px #F8DEDA; }
+.last-seen.none { color: var(--muted); }
+.last-seen .ls-sep { margin: 0 2px; color: var(--muted); }
+.journey { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 750; letter-spacing: .01em; }
+.j-regular { background: #DDEEDB; color: #3F6B43; }
+.j-occasional { background: var(--mist-2); color: var(--peri-ink); }
+.j-drifting { background: #F8DEDA; color: #93413A; }
+.pf-badges { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pf-head .last-seen { display: flex; }
+.bc-foot { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin-top: 2px; }
+.bc-foot .last-seen { margin-top: 0; font-size: 12px; }
+.bc-foot .journey { height: 20px; padding: 0 8px; font-size: 11px; }
+.rows.people .row-main .last-seen { margin-top: 3px; font-size: 12px; }
+.people-end { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
+/* --- AI wellness summary */
+.wsum { background: linear-gradient(170deg, #fff 55%, #F1F3FB); }
+.wsum-flag { display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 12px; padding: 10px 12px; border-radius: 16px; background: var(--rose-soft); color: #7E352F; font-size: 14px; }
+.wsum-flag svg { flex: none; margin-top: 2px; }
+.wsum-flag b { display: block; font-weight: 800; color: var(--rose); }
+.wsum-list { margin: 0; display: grid; gap: 12px; }
+.wsum-list > div { display: grid; gap: 4px; }
+.wsum-list dt { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 750; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.wsum-list dd { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--ink); display: grid; gap: 6px; }
+.tag-mist { background: var(--mist); color: var(--ink); padding: 4px 10px; font-size: 12.5px; }
+.tag-new { background: #FFF; color: var(--sage-ink); box-shadow: inset 0 0 0 1.5px var(--sage); font-weight: 750; }
+.wsum-focus { margin-top: 14px; padding: 12px 14px; border-radius: 18px; background: var(--ink); color: #fff; }
+.wsum-focus b { font-size: 13px; font-weight: 750; color: #C9D2EC; }
+.wsum-focus ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: 14.5px; line-height: 1.45; }
+
+/* --- Lo Shu card on the console */
+.ls-card-body { display: flex; gap: 16px; align-items: center; }
+.ls-card .loshu-sm { width: 112px; }
+.ls-card-facts { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+.ls-card-facts > span { display: flex; flex-direction: column; align-items: center; min-width: 74px; padding: 6px 10px; border-radius: 14px; background: var(--ink); }
+.ls-card-facts > span small { color: #C9D2EC; font-size: 11px; font-weight: 600; }
+.ls-card-facts > span b { color: #fff; font-size: 20px; font-weight: 800; line-height: 1.1; }
+.ls-card-facts p { flex-basis: 100%; margin: 0; color: var(--ink-2); }
+.pf-card .block-head { margin-bottom: 8px; }
+.pf-card .block-head h2 { margin: 0; }
+.pf-card .block-head .pf-more { margin-top: 0; }
+
+/* --- wellness journey timeline */
+.jt { list-style: none; margin: 0; padding: 0 0 0 18px; position: relative; }
+.jt::before { content: ''; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 2px; background: var(--line); border-radius: 2px; }
+.jt li { position: relative; padding-bottom: 6px; }
+.jt-dot { position: absolute; left: -18px; top: 13px; width: 12px; height: 12px; border-radius: 50%; background: var(--sage); box-shadow: 0 0 0 3px #fff; }
+.jt-dot.scanning { background: #7B61B8; }
+.jt-body { width: 100%; text-align: left; display: grid; gap: 2px; padding: 8px 10px; border-radius: 14px; transition: background .15s; }
+.jt-body:hover { background: var(--mist-2); }
+.jt-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+.jt-top b { font-weight: 800; }
+.jt-top span:not(.mini-rating) { color: var(--ink-2); font-weight: 600; }
+.jt-body small { color: var(--muted); font-size: 13px; line-height: 1.4; }
+.jt-body small.jt-felt { color: var(--sage-ink); font-weight: 600; }
+.jt-body small.jt-note { font-style: italic; }
+.jt-gap { display: block; margin: 0 0 4px 10px; font-size: 11.5px; color: var(--muted); font-weight: 600; }
+
+/* --- blend journey */
+.bj { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.bj li { display: grid; grid-template-columns: 70px 1fr; gap: 10px; align-items: start; }
+.bj-date { display: flex; flex-direction: column; font-size: 14px; }
+.bj-date small { color: var(--sage-ink); font-weight: 700; font-size: 11.5px; }
+.bj-flowers { display: grid; gap: 4px; min-width: 0; }
+.bj-flowers small { color: var(--muted); font-size: 12.5px; }
+.bj .tag { padding: 4px 10px; font-size: 12.5px; }
+@media (max-width: 360px) {
+  .ls-card-body { flex-direction: column; align-items: flex-start; }
+  .bj li { grid-template-columns: 1fr; gap: 4px; }
+}
