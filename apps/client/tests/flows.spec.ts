@@ -204,8 +204,10 @@ test('home: log how you feel (slider → feeling → note), shown for 4 hours; e
   await page.getByRole('textbox', { name: 'Search any feeling' }).fill('calm')
   await page.getByRole('button', { name: 'Calm', exact: true }).click()
   await page.getByRole('textbox', { name: 'Add a note' }).fill('after a walk')
-  await page.getByRole('button', { name: /Log “Calm”/ }).click()
-  await expect(page.getByText('You felt')).toBeVisible()
+  await page.getByRole('button', { name: 'Log it' }).click()
+  await expect(page.getByText('Daily mood').or(page.getByText('Right now', { exact: true }))).toBeVisible()
+  await page.getByRole('button', { name: 'Done' }).click()
+  await expect(page.getByText(/You felt/)).toBeVisible()
   const s = await state(page)
   expect(s.journal[0]).toMatchObject({ emotion: 'calm', valence: 7, kind: 'moment', note: 'after a walk' })
   // 4 hours later the prompt is back

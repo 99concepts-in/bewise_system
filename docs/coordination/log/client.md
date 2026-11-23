@@ -2,6 +2,11 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-23 · Mood logger redesigned (immersive, morphing shapes)
+- components/mood-shape.tsx: three translucent nested shapes with glossy outlines that morph continuously with the slider: spiky star (very unpleasant) → wavy → softer ripples → circle (neutral) → soft five-lobe → rounded star → five-petal flower (very pleasant); purple → blue → icy blue → green → gold → orange; slow spin and breathing (still for reduced motion).
+- Logger is now a dark, colour-tinted full sheet (owner shared reference screens): big level label with a soft blur change, grey track with a white thumb, Next button in the mood colour (dark text on light colours). Step 2: pick up to 3 feelings as chips (or search), optional note. Step 3: summary card ("Peaceful, Grateful · A very pleasant day"), then Done. Entries store extra feelings in `also`.
+- Home "You felt" card shows the mood shape and all feelings picked.
+
 ## 2026-11-23 · Verified badge for Jitendra Khimlani
 - components/verified.tsx: blue scalloped rosette with a white tick and an occasional shine (still for reduced motion), labelled "Verified: Certified Bach Flower Therapist". Shown next to his name on the Home card, booking screen, review step, public booking link, session page, and inside the "Certified Bach Flower Therapist" tag of his story.
 

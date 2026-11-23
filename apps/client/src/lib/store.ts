@@ -27,7 +27,7 @@ export type Profile = {
 }
 // @decision(D-19) owner 2026-11-18: journal entries may carry an optional note (was emotion + time only)
 /** owner 2026-11-23: `valence` 1 (very unpleasant) to 7 (very pleasant) from the slider; `kind` right now vs the day overall */
-export type JournalEntry = { id: string; emotion: Emotion; at: string; note?: string; valence?: number; kind?: 'moment' | 'day' }
+export type JournalEntry = { id: string; emotion: Emotion; at: string; note?: string; valence?: number; kind?: 'moment' | 'day'; also?: Emotion[] }
 /** owner 2026-11-18: daily goals get a check-in each day; long-term goals are checked off once. `progress` is legacy. */
 export type Goal = { id: string; title: string; progress: number; done: boolean; kind?: 'daily' | 'once'; days?: string[]; doneAt?: string }
 export type Feedback = { rating: number; tags: string[]; notes: string; benefits?: string[] } // benefits: 'How do you feel after the session?' (client's words, owner 2026-11-18)
@@ -108,7 +108,7 @@ type State = {
   seq: number
   // actions
   setProfile: (p: Partial<Profile>) => void
-  logMood: (e: Emotion, at?: Date, note?: string, extra?: Pick<JournalEntry, 'valence' | 'kind'>) => JournalEntry   // journal.createEntry
+  logMood: (e: Emotion, at?: Date, note?: string, extra?: Pick<JournalEntry, 'valence' | 'kind' | 'also'>) => JournalEntry   // journal.createEntry
   setReminders: (r: Partial<State['reminders']>) => void
   updateMood: (id: string, patch: Partial<Pick<JournalEntry, 'emotion' | 'note'>>) => void
   removeMood: (id: string) => void
@@ -173,7 +173,7 @@ export const useApp = create<State>()(
       ...initial,
       setProfile: (p) => set((s) => ({ profile: { ...(s.profile ?? { name: '', phone: '', dob: '', city: '', consents: { wellbeing: false, whatsapp: false, offers: false }, allergies: [] }), ...p } })),
       logMood: (emotion, at = new Date(), note, extra) => {
-        const e: JournalEntry = { id: uid(), emotion, at: at.toISOString(), ...(note?.trim() ? { note: note.trim().slice(0, 500) } : {}), ...(extra?.valence ? { valence: extra.valence } : {}), ...(extra?.kind ? { kind: extra.kind } : {}) }
+        const e: JournalEntry = { id: uid(), emotion, at: at.toISOString(), ...(note?.trim() ? { note: note.trim().slice(0, 500) } : {}), ...(extra?.valence ? { valence: extra.valence } : {}), ...(extra?.kind ? { kind: extra.kind } : {}), ...(extra?.also?.length ? { also: extra.also } : {}) }
         set((s) => ({ journal: [e, ...s.journal] }))
         return e
       },

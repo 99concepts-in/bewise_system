@@ -16,6 +16,7 @@ import { useMemo, useState } from 'react'
 import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
 import { MoodLogger } from '@/components/mood-logger'
+import { MOOD_LEVELS, MoodShape } from '@/components/mood-shape'
 import { LearnCard } from '@/components/learn-card'
 import { ReminderSetup, useMorningNudge } from '@/components/reminder-setup'
 import { AppHeader } from '@/components/shell'
@@ -96,10 +97,10 @@ function MoodPrompt({ onLog }: { onLog: (k: 'moment' | 'day') => void }) {
     <section className="space-y-2.5" aria-label="Log how you feel">
       {recent ? (
         <div className="card flex items-center gap-3 p-4">
-          <MoodImg mood={recent.emotion} size={48} />
+          {recent.valence ? <span className="grid size-14 shrink-0 place-items-center rounded-[18px] bg-[#1f2128]"><MoodShape v={recent.valence - 1} size={48} spin={false} /></span> : <MoodImg mood={recent.emotion} size={48} />}
           <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-semibold text-muted">You felt</p>
-            <p className="font-display text-[19px] font-semibold leading-6 text-ink">{moodOf(recent.emotion).label} <span className="font-sans text-[13px] font-medium text-muted">· {fmtTime(recent.at)}</span></p>
+            <p className="text-[12px] font-semibold text-muted">You felt{recent.valence ? ` · ${MOOD_LEVELS[recent.valence - 1].toLowerCase()}` : ''}</p>
+            <p className="font-display text-[19px] font-semibold leading-6 text-ink">{[recent.emotion, ...(recent.also ?? [])].map((e) => moodOf(e).label).join(', ')} <span className="font-sans text-[13px] font-medium text-muted">· {fmtTime(recent.at)}</span></p>
           </div>
           <button onClick={() => { buzz(8); onLog('moment') }} className="rounded-full bg-peri-50 px-3.5 py-2 text-[13px] font-semibold text-navy">Log again</button>
         </div>
