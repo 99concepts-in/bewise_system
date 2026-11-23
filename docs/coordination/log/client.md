@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-23 · Verified badge for Jitendra Khimlani
+- components/verified.tsx: blue scalloped rosette with a white tick and an occasional shine (still for reduced motion), labelled "Verified: Certified Bach Flower Therapist". Shown next to his name on the Home card, booking screen, review step, public booking link, session page, and inside the "Certified Bach Flower Therapist" tag of his story.
+
 ## 2026-11-23 · "Your consultant" → "Certified Bach Flower Therapist" + "12+ years"
 - Jitendra Khimlani's story sheet: the "Your consultant" tag is now "Certified Bach Flower Therapist" with a "12+ years" tag beside it. Home consultant card eyebrow renamed the same (duplicate title line removed).
 

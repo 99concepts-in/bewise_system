@@ -20,6 +20,7 @@ import { formatINR } from '@/lib/format'
 import { setNextStep } from '@/lib/next-step'
 import { BP } from '@/lib/asset'
 import { useApp } from '@/lib/store'
+import { Verified } from '@/components/verified'
 
 export default function Page() { return <Suspense><BookingLink /></Suspense> }
 
@@ -42,7 +43,7 @@ function BookingLink() {
           <img src={`${BP}/img/jitu-portrait.webp`} alt="Jitendra Khimlani" className="relative h-[190px] w-[152px] rounded-[999px_999px_24px_24px] object-cover object-[50%_30%] ring-4 ring-white shadow-[var(--shadow-float)]" />
           <Sparkle size={26} className="absolute -right-4 top-6" />
         </div>
-        <h1 className="h-duo mt-6 text-[30px]">Book with <em>Jitendra Khimlani</em></h1>
+        <h1 className="h-duo mt-6 text-[30px]">Book with <em>Jitendra Khimlani</em> <Verified size={24} /></h1>
         <p className="mt-1 text-[14px] font-semibold text-navy">{CONSULTANT.title} · {CONSULTANT.stats[0]}</p>
         <p className="mt-3 max-w-[330px] text-[16px] leading-6 text-ink-2">{CONSULTANT.approach.replace(/^Jitendra Khimlani listens first\./, 'He listens first.')}</p>
       </motion.div>

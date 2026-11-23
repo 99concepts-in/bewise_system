@@ -20,6 +20,7 @@ import { addDays, fmtDay, fmtLongDay, fmtTime, formatINR, startOfDay, fmtIso } f
 import { addToCalendar } from '@/lib/ics'
 import { apptMinutes, apptName, tbc } from '@/lib/appt'
 import { BP } from '@/lib/asset'
+import { Verified } from '@/components/verified'
 
 export default function Page() { return <Suspense><Detail /></Suspense> }
 
@@ -73,7 +74,7 @@ function Detail() {
           </div>
         )}
         <div className="card divide-y divide-line px-5">
-          <Row icon={<img src={`${BP}/img/jitu.webp`} alt="" className="size-14 shrink-0 rounded-[18px] bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)] object-cover object-top" />} t="Jitendra Khimlani" d="Bach Flower Remedy Therapist" />
+          <Row icon={<img src={`${BP}/img/jitu.webp`} alt="" className="size-14 shrink-0 rounded-[18px] bg-[linear-gradient(160deg,#e7ecfa,#f6efe4)] object-cover object-top" />} t="Jitendra Khimlani" verified d="Bach Flower Remedy Therapist" />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy">{a.mode === 'online' ? <Laptop className="size-5" /> : <MapPin className="size-5" />}</span>} t={c.name} d={a.mode === 'online' ? 'Online video call' : STUDIO.full} />
           <Row icon={<span className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><FileText className="size-5" /></span>} t={a.planId ? 'In your plan' : a.kindTbc ? 'Fee set by our team' : a.payLater && !a.paidAt ? `${formatINR(a.amountPaise)} due after your session` : a.status === 'awaiting_payment' ? `${formatINR(a.amountPaise)} to pay` : `Paid ${formatINR(a.amountPaise)}`} d={a.kindTbc && !a.planId ? 'You’ll pay in the app once your time is set · remedy blend included' : a.payLater && !a.paidAt ? 'Pay by UPI, card or at the center' : 'Remedy blend included · receipt in Payments'} />
           {a.payLater && !a.paidAt && <Btn size="md" variant={past ? 'gradient' : 'white'} className="mt-3" onClick={() => goSafe(router, `/app/pay?appointment=${a.id}`)}>Pay {formatINR(a.amountPaise)} now</Btn>}
@@ -134,8 +135,8 @@ function Detail() {
   )
 }
 
-function Row({ icon, t, d }: { icon: React.ReactNode; t: string; d: string }) {
-  return <div className="flex items-center gap-3 py-3.5">{icon}<div><p className="text-[15px] font-bold text-navy">{t}</p><p className="text-[13px] text-muted">{d}</p></div></div>
+function Row({ icon, t, d, verified }: { icon: React.ReactNode; t: string; d: string; verified?: boolean }) {
+  return <div className="flex items-center gap-3 py-3.5">{icon}<div><p className="text-[15px] font-bold text-navy">{t}{verified && <> <Verified size={16} /></>}</p><p className="text-[13px] text-muted">{d}</p></div></div>
 }
 
 /** owner 2026-11-20: clients can't pick times; they ask, and the team sets the new time. */

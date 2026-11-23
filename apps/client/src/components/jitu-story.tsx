@@ -19,6 +19,7 @@ import { FlowerArt } from './flower'
 import { buzz, cx, ease } from './ui'
 import { CONSULTANT, TESTIMONIALS } from '@/lib/data'
 import { BP } from '@/lib/asset'
+import { Verified } from '@/components/verified'
 
 export const JITU_LAYOUT_ID = 'jitu-portrait'
 const HERO_EASE = [0.22, 1, 0.36, 1] as const
@@ -102,7 +103,7 @@ function Story({ onClose }: { onClose: () => void }) {
         <motion.article className="relative -mt-8 rounded-t-[32px] bg-sky-50 px-5 pb-40 pt-7"
           initial={{ y: reduce ? 0 : 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, ease, delay: 0.2 }}>
           <span className="inline-flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center whitespace-nowrap rounded-full bg-marigold-100 px-3 py-1.5 text-[13px] font-semibold text-ink">Certified Bach Flower Therapist</span>
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-marigold-100 py-1.5 pl-2 pr-3 text-[13px] font-semibold text-ink"><Verified size={17} />Certified Bach Flower Therapist</span>
             <span className="inline-flex items-center whitespace-nowrap rounded-full bg-sky-100 px-3 py-1.5 text-[13px] font-semibold text-navy">12+ years</span>
           </span>
           <Words className="h-display mt-4" text="Jitendra Khimlani listens first." delay={0.35} />

@@ -30,6 +30,7 @@ import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@
 import { addToCalendar, downloadIcs, googleCalUrl, isAndroid, sessionIcs } from '@/lib/ics'
 import * as I from './intake'
 import { BP } from '@/lib/asset'
+import { Verified } from '@/components/verified'
 
 // owner 2026-11-18: breathe first → feelings → … → personal message later ('who' = the share/voice-note step)
 const INTAKE = ['intro', 'feelings', 'nuance', 'body', 'sleep', 'life', 'who', 'safety', 'gentle', 'review', 'saved'] as const // owner 2026-11-18: "How would you like to feel?" removed
@@ -274,7 +275,7 @@ function Choose({ plan, planPick, setPlanPick, onMeet, meetOpen, onStories }: { 
         <button onClick={onMeet} aria-haspopup="dialog" aria-label="Meet Jitendra Khimlani" className="flex w-full items-end gap-4 bg-sky-100 px-5 pt-4 text-left">
           {!meetOpen ? <JituPortrait className="h-[118px] w-[94px] shrink-0 ring-[3px] ring-white" radius="999px 999px 16px 16px" /> : <span className="h-[118px] w-[94px] shrink-0" />}
           <span className="min-w-0 flex-1 pb-4">
-            <span className="block font-display text-[20px] font-semibold leading-6 text-ink">Jitendra Khimlani</span>
+            <span className="block font-display text-[20px] font-semibold leading-6 text-ink">Jitendra Khimlani <Verified size={18} /></span>
             <span className="block text-[13px] text-ink-2">{CONSULTANT.title}</span>
             <span className="mt-1.5 inline-flex items-center gap-0.5 text-[13px] font-semibold text-navy">More about him <ChevronRight className="size-4" /></span>
           </span>
@@ -442,7 +443,7 @@ function Review({ mode, fee, pick, inPlan }: { mode: 'online' | 'in_person'; fee
       <div className="card p-5">
         <div className="-mx-5 -mt-5 mb-1 flex items-end gap-4 overflow-hidden rounded-t-[28px] border-b border-line bg-sky-100 px-5 pt-4">
           <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="h-[140px] w-auto shrink-0 object-contain" />
-          <div className="pb-5"><p className="font-display text-[20px] font-semibold text-ink">Jitendra Khimlani</p><p className="text-[13px] text-muted">{CONSULTANT.title}</p></div>
+          <div className="pb-5"><p className="font-display text-[20px] font-semibold text-ink">Jitendra Khimlani <Verified size={18} /></p><p className="text-[13px] text-muted">{CONSULTANT.title}</p></div>
         </div>
         {[
           { i: <Sparkles className="size-5" />, t: inPlan ? 'Wellness session · in your plan' : pick === 'once' ? 'Wellness session' : `Wellness session · ${PLANS[pick].name}` },

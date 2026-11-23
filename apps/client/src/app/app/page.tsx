@@ -35,6 +35,7 @@ import { doseStats, dosesOn, perDay } from '@/lib/doses'
 import { useApp, type Appointment } from '@/lib/store'
 import { dayKey, firstName, fmtDay, fmtTime, formatINR } from '@/lib/format'
 import { blendSupply } from '@/lib/supply'
+import { Verified } from '@/components/verified'
 
 const greet = (h: number) => (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening')
 
@@ -263,7 +264,7 @@ function MeetCard({ open, onOpen }: { open: boolean; onOpen: () => void }) {
         </button>
         <div className="min-w-0 flex-1">
           <p className="eyebrow text-navy">Certified Bach Flower Therapist</p>
-          <h2 id="meet-h" className="mt-1 font-display text-[21px] font-semibold leading-[26px] text-ink">Jitendra Khimlani</h2>
+          <h2 id="meet-h" className="mt-1 font-display text-[21px] font-semibold leading-[26px] text-ink">Jitendra Khimlani <Verified size={19} /></h2>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {['12+ years', 'Online or in person'].map((t) => (
               <span key={t} className="rounded-full bg-white/80 px-2.5 py-1 text-[12px] font-semibold text-navy">{t}</span>
