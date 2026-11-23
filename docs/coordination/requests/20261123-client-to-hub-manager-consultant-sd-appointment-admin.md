@@ -17,3 +17,12 @@ Approve / deny → **Confirm / decline**. Title: **Certified Bach Flower Remedy 
 
 ## Sign-up fields (API `crm` / auth)
 Member profile now carries: WhatsApp number, name, date of birth, gender, photo, city, **reference** (how they heard of us / who referred them).
+
+## Prefill on sign-in (added 2026-11-23)
+Owner: most people book through the booking link first, or Jitendra Khimlani / the team books for them; they sign in to the app later.
+- API: after the WhatsApp code is verified, return the member we already have for that number (`crm.findMemberByPhone` or inside
+  `auth.verifyOtp`): name, date of birth, gender, city, reference, photo if any, and who created it (`booking-link` | `staff`).
+- Staff "book on a member's behalf" (Manager, Consultant, SD) must capture at least name + WhatsApp number (DOB, gender, city,
+  reference optional), so the member finds them filled in.
+- The client app already shows these filled in and editable on "A little about you", with a "Welcome back" note
+  (preview: on-device directory in `apps/client/src/lib/members.ts`; demo staff-made member 98989 89898).

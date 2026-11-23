@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-23 · Onboarding for existing members + details filled in
+- Welcome: 4 slides. Added "Stay connected to your wellness journey" (daily drops, blend journey, mood journal, sessions). Slide 2 says "Certified Bach Flower Therapist".
+- "You're in": no booking prompt any more (members book inside the app). Buttons: Take me home, Read a Bach flower story. Only the public booking link still continues to its booking.
+- Sign-up adds "How did you hear about us?" (Jitendra Khimlani, Someone I know + name, Instagram, Google, A workshop, Other) → `profile.reference`.
+- Prefill: on sign-in we look the number up (lib/members.ts; live: crm.findMemberByPhone, requested). Details from the booking link or from a booking made by Jitendra Khimlani / the team arrive filled in on "A little about you" with a "Welcome back" note, all editable. Booking requests remember the member's details. Demo staff-made member: 98989 89898 (code 2468).
+- Tests: 59.
+
 ## 2026-11-23 · Learn tab: Bach flower stories · remedy instructions · made with care
 - New Learn tab ("Know how Bach flower therapy can help you"): search by concern, 3 Insta-style stories (sleep, anxiety, relationships), 8 slides each with cover, text, flower cards, steps, "Did you know", a real member quote and an end slide with a care note. Covers made in Higgsfield (public/img/stories). Tap right = next, left = back, hold = pause, auto-advance after a reading pause. Original writing informed by the owner's books (Bach 1931/1936; Non Shaw 1998).
 - Owner: members must not self-pick remedies. Every place that names remedies shows "Take Bach remedies only after a session with Jitendra Khimlani…".

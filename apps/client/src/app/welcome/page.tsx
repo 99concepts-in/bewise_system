@@ -21,6 +21,8 @@ const SLIDES = [
   { lead: 'Welcome to', em: 'BeWise Wellness', sub: 'A gentle, private space for your emotional wellbeing, guided by Jitendra Khimlani and Bach Flower Remedies.' },
   { kicker: 'Personal guidance, just for you.', lead: 'Meet', em: 'Jitendra Khimlani', title: 'Certified Bach Flower Therapist', sub: 'Get personalised guidance with vibrational remedies for everyday balance and emotional wellbeing. Online or in-person wellness sessions.' },
   { lead: 'Bach flower remedy', em: 'benefits', sub: 'Natural Bach flower remedies that gently support emotional balance, chosen for how you feel.', chips: ['Gentle & natural', 'Made just for you', 'Feel calmer, day by day'] },
+  // owner 2026-11-23: the app is for members who already see Jitendra Khimlani; inspire them to stay connected
+  { lead: 'Stay connected to', em: 'your wellness journey', sub: 'Your blend, your daily drops, how you feel and your sessions with Jitendra Khimlani, all in one calm place.' },
 ] as { kicker?: string; lead: string; em: string; title?: string; sub: string; chips?: string[] }[]
 
 // owner 2026-11-18: slide images felt slow; fetch them all up front (during the 1.9 s splash) at high priority
@@ -35,7 +37,8 @@ export default function Welcome() {
   useEffect(() => { const t = setTimeout(() => setPhase('story'), 1900); return () => clearTimeout(t) }, [])
   useEffect(() => { router.prefetch('/sign-in') }, [router])
 
-  const go = (n: number) => { if (n < 0 || n > 2) return; setDir(n > i ? 1 : -1); setI(n) }
+  const LAST = SLIDES.length - 1
+  const go = (n: number) => { if (n < 0 || n > LAST) return; setDir(n > i ? 1 : -1); setI(n) }
   const onDragEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.x < -60 || info.velocity.x < -400) go(i + 1)
     else if (info.offset.x > 60 || info.velocity.x > 400) go(i - 1)
@@ -74,7 +77,7 @@ export default function Welcome() {
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, ease }}>
                 <LogoMark size={40} label="BeWise" />
               </motion.div>
-              <button onClick={() => goSafe(router, '/sign-in')} className={cx('rounded-full px-4 py-2 text-[14px] font-semibold text-navy transition-opacity', i === 2 && 'pointer-events-none opacity-0')}>Skip</button>
+              <button onClick={() => goSafe(router, '/sign-in')} className={cx('rounded-full px-4 py-2 text-[14px] font-semibold text-navy transition-opacity', i === LAST && 'pointer-events-none opacity-0')}>Skip</button>
             </header>
 
             <motion.div className="relative flex flex-1 touch-pan-y flex-col" drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.18} onDragEnd={onDragEnd}>
@@ -83,7 +86,7 @@ export default function Welcome() {
                 <AnimatePresence mode="popLayout" custom={dir} initial={false}>
                   <motion.div key={i} custom={dir} className="absolute inset-0"
                     initial={{ opacity: 0, x: dir * 70 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -70 }} transition={{ duration: 0.5, ease }}>
-                    {i === 0 ? <ArtWelcome /> : i === 1 ? <ArtBook /> : <ArtEssence />}
+                    {i === 0 ? <ArtWelcome /> : i === 1 ? <ArtBook /> : i === 2 ? <ArtEssence /> : <ArtJourney />}
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -119,7 +122,7 @@ export default function Welcome() {
                   </button>
                 ))}
               </div>
-              <Btn variant="gradient" full onClick={() => (i < 2 ? go(i + 1) : goSafe(router, '/sign-in'))}>{i === 0 ? 'Get Started' : i < 2 ? 'Next' : 'Let’s begin'}</Btn>
+              <Btn variant="gradient" full onClick={() => (i < LAST ? go(i + 1) : goSafe(router, '/sign-in'))}>{i === 0 ? 'Get Started' : i < LAST ? 'Next' : 'Let’s begin'}</Btn>
               <Btn variant="ghost" full size="md" onClick={() => goSafe(router, '/sign-in?returning=1')}>I already have an account</Btn>
             </footer>
           </motion.div>
@@ -283,4 +286,29 @@ function FadeImg({ className, ...p }: React.ImgHTMLAttributes<HTMLImageElement>)
   const [ok, setOk] = useState(false)
   return <img {...p} decoding="async" fetchPriority="high" onLoad={() => setOk(true)} ref={(el) => { if (el?.complete) setOk(true) }}
     className={cx(className, 'transition-opacity duration-300', ok ? 'opacity-100' : 'opacity-0')} />
+}
+
+/** Slide 4: what members get in the app, as gently floating cards */
+function ArtJourney() {
+  const cards = [
+    { e: '💧', t: 'Daily drops', d: 'Reminders and a streak', x: '5%', y: '3%', r: -3 },
+    { e: '🌸', t: 'Your blend journey', d: 'Every remedy and why', x: '45%', y: '26%', r: 2 },
+    { e: '📔', t: 'How you feel', d: 'A gentle mood journal', x: '5%', y: '49%', r: 2 },
+    { e: '🗓️', t: 'Sessions', d: 'Book in a tap', x: '45%', y: '72%', r: -2 },
+  ]
+  return (
+    <div className="relative h-full">
+      <Halo inner={0.7} />
+      {cards.map((c, k) => (
+        <motion.div key={c.t} className="absolute w-[50%] max-w-[210px]" style={{ left: c.x, top: c.y }}
+          initial={{ opacity: 0, y: 24, rotate: 0 }} animate={{ opacity: 1, y: [0, -6, 0], rotate: c.r }}
+          transition={{ opacity: { delay: 0.1 + k * 0.12 }, rotate: { delay: 0.1 + k * 0.12, type: 'spring', stiffness: 120 }, y: { delay: 0.6 + k * 0.2, duration: 4, repeat: Infinity, ease: 'easeInOut' } }}>
+          <div className="flex items-center gap-2.5 rounded-[20px] bg-white p-3 shadow-[var(--shadow-float)]">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-peri-50 text-[20px]" aria-hidden>{c.e}</span>
+            <span className="min-w-0"><span className="block text-[14px] font-bold leading-4 text-navy">{c.t}</span><span className="block text-[11px] leading-4 text-ink-2">{c.d}</span></span>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  )
 }

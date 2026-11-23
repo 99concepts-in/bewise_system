@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { goSafe } from '@/lib/nav'
 import { motion } from 'motion/react'
-import { CalendarHeart, ShoppingBag, ChevronRight } from 'lucide-react'
+import { BookOpen, CalendarHeart, ChevronRight, House } from 'lucide-react'
 import { Avatar, Mascot, Petals } from '@/components/brand'
 import { ease, rise, stagger } from '@/components/ui'
 import { useApp } from '@/lib/store'
@@ -42,13 +42,17 @@ export default function Done() {
       </div>
       <motion.div variants={stagger} initial="hidden" animate="show" className="mt-10 text-center">
         <motion.h1 variants={rise} className="h-duo text-[34px]">You’re in, <em>{firstName(profile?.name)}</em></motion.h1>
-        <motion.p variants={rise} className="mx-auto mt-3 max-w-[300px] text-[15px] leading-6 text-muted">Your calm little corner is ready. Where would you like to begin?</motion.p>
+        <motion.p variants={rise} className="mx-auto mt-3 max-w-[300px] text-[15px] leading-6 text-muted">Your calm little corner is ready. Everything for your wellness journey with Jitendra Khimlani is here.</motion.p>
       </motion.div>
       <motion.div variants={stagger} initial="hidden" animate="show" transition={{ delayChildren: 0.5 }} className="mt-auto space-y-3 pb-3 pt-8 safe-b">
-        {[
-          { icon: <CalendarHeart className="size-6" />, t: next ? 'Continue to your booking' : 'Book a session', d: 'Remedy blend included · nothing to pay until your time is set', href: next ?? '/app/book', primary: true },
-          { icon: <ShoppingBag className="size-6" />, t: 'Explore the shop', d: 'Oils, mists and bath rituals', href: '/app/shop' },
-        ].map((o) => (
+        {/* owner 2026-11-23: no booking prompt in onboarding (members book inside the app); only the booking link continues to its booking */}
+        {(next ? [
+          { icon: <CalendarHeart className="size-6" />, t: 'Continue to your booking', d: 'Remedy blend included · nothing to pay until your time is set', href: next, primary: true },
+          { icon: <BookOpen className="size-6" />, t: 'Read a Bach flower story', d: 'Sleep, anxiety, relationships · 3 min each', href: '/app/learn' },
+        ] : [
+          { icon: <House className="size-6" />, t: 'Take me home', d: 'Your blend, drops and how you feel', href: '/app', primary: true },
+          { icon: <BookOpen className="size-6" />, t: 'Read a Bach flower story', d: 'Sleep, anxiety, relationships · 3 min each', href: '/app/learn' },
+        ]).map((o) => (
           <motion.button variants={rise} whileTap={{ scale: 0.98 }} key={o.t} onClick={() => { if (o.primary) takeNextStep(); goSafe(router, o.href, 'replace') }}
             className={`flex w-full items-center gap-4 rounded-[26px] p-4 text-left shadow-[var(--shadow-card)] ${o.primary ? 'bg-navy text-white' : 'bg-white text-navy'}`}>
             <span className={`grid size-12 place-items-center rounded-full ${o.primary ? 'bg-white/15' : 'bg-peri-50'}`}>{o.icon}</span>
@@ -56,7 +60,7 @@ export default function Done() {
             <ChevronRight className="size-5 opacity-70" />
           </motion.button>
         ))}
-        <button onClick={() => goSafe(router, '/app', 'replace')} className="w-full py-2 text-[14px] font-semibold text-navy">Take me home</button>
+        {next && <button onClick={() => goSafe(router, '/app', 'replace')} className="w-full py-2 text-[14px] font-semibold text-navy">Take me home</button>}
       </motion.div>
     </main>
   )

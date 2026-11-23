@@ -18,6 +18,10 @@ import { uid, dayKey, formatINR } from './format'
 
 export type Profile = {
   name: string; phone: string; dob: string; city: string; gender?: string
+  /** owner 2026-11-23: how they heard of us / who referred them */
+  reference?: string
+  /** details we already had (booking link or a booking made by Jitendra Khimlani / the team), shown for checking */
+  prefilledFrom?: 'booking-link' | 'staff'
   photo?: string; consents: { wellbeing: boolean; whatsapp: boolean; offers: boolean }
   allergies: string[]; onboardedAt?: string
 }

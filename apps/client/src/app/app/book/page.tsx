@@ -23,6 +23,7 @@ import { Btn, Chip, IconBtn, ProgressBar, Sheet, buzz, cx, ease, spring, toast, 
 import { CONSULTANT, CONSULTATIONS, NUANCE, STUDIO, TESTIMONIALS, TESTIMONIALS_SOURCE, GOOGLE_REVIEWS_URL, istDate, slotsFor, type ConsultationId } from '@/lib/data'
 import { InPersonArt, OnlineArt } from '@/components/mode-art'
 import { apptMinutes, apptName } from '@/lib/appt'
+import { rememberMember } from '@/lib/members'
 import { emptyIntake, planLeft, useApp, type Appointment, type IntakeAnswers, type Plan } from '@/lib/store'
 import { HELPLINE, PLANS, offerLive, planFull, planPrice, planSaving, type PlanId } from '@/lib/offer'
 import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
@@ -113,6 +114,9 @@ function Book() {
     const a = book({ type: hasHistory ? 'followup' : 'first', kindTbc: true, mode, startsAt: new Date(Date.now() + 7 * 864e5).toISOString(), amountPaise: 0, timeTbc: true, timeRequested: true, prefs: clean,
       ...(usePlan ? { planId: pick === 'once' ? plan?.id : pick, paidAt: new Date().toISOString() } : {}) })
     if (checkin.now || checkin.news.trim() || checkin.drops || Object.keys(checkin.changes).length) submitCheckin(a.id, checkin)
+    // owner 2026-11-23: what the member told us while booking is ready for them when they sign in to the app later
+    const p = useApp.getState().profile
+    if (p?.phone && p.name) rememberMember({ phone: p.phone, name: p.name, dob: p.dob, city: p.city, gender: p.gender, reference: p.reference, source: 'booking-link' })
     setPaying(false); setBooked(a); markFirstBooking(); go('done')
   }
 

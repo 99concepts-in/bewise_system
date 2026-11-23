@@ -7,6 +7,7 @@
  */
 import { useRouter, useSearchParams } from 'next/navigation'
 import { goSafe } from '@/lib/nav'
+import { lookupMember } from '@/lib/members'
 import { AnimatePresence, motion, useAnimate } from 'motion/react'
 import { ChevronLeft, ShieldCheck } from 'lucide-react'
 import { Suspense, useEffect, useRef, useState } from 'react'
@@ -62,7 +63,9 @@ function SignIn() {
       animate(scope.current, { x: [0, -10, 10, -6, 6, 0] }, { duration: 0.4 })
       setCode(''); codeRef.current?.focus(); return
     }
-    setProfile({ phone })
+    // owner 2026-11-23: fill in what we already know (booking link, or a booking Jitendra Khimlani / the team made); editable next
+    const known = profile?.phone === phone && profile?.name ? null : lookupMember(phone)
+    setProfile(known ? { phone, name: known.name, dob: known.dob, city: known.city, gender: known.gender, reference: known.reference, ...(known.photo ? { photo: known.photo } : {}), prefilledFrom: known.source } : { phone })
     if (profile?.onboardedAt && (returning || profile.phone === phone)) goSafe(router, takeNextStep() ?? '/app', 'replace')
     else goSafe(router, '/onboarding/about')
   }
