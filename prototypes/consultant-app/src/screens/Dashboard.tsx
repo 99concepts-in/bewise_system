@@ -66,7 +66,7 @@ export default function Dashboard() {
             return (
               <li key={v.p.id}>
                 <div className="row row-split">
-                  <button className="row-hit" onClick={() => go(`/people/${v.p.id}`)}>
+                  <button className="row-hit" onClick={() => go(`/people/${v.p.id}?care`)}>
                     <Avatar name={v.p.name} size={40} mood={v.latestMood} />
                     <span className="row-main"><b>{v.p.name}</b><small className={tab === 'missing' ? 'warn' : ''}>{line}</small></span>
                   </button>

@@ -348,5 +348,13 @@ export function makeSeed(now: number): Seed {
   const assigned = appts.find((a) => a.start > now && a.assignedBy === 'Shivani di')
   if (assigned) nx(70, 'booked', `Shivani di assigned ${nameOf(assigned.personId)} a time: ${new Date(assigned.start).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}`, assigned.personId)
   notices.sort((a, b) => b.at - a.at)
+  // date of birth: entered by the member in the client app (CL-05); a few haven't added it yet
+  const rdob = mulberry32(1955)
+  const thisYear = new Date(now).getFullYear()
+  people.forEach((p, i) => {
+    const y = thisYear - 22 - Math.floor(rdob() * 46), m = 1 + Math.floor(rdob() * 12), d = 1 + Math.floor(rdob() * 28)
+    if (i % 11 !== 7) p.dob = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+  })
+
   return { people, appts: appts as Appt[], notices, requests, threads }
 }

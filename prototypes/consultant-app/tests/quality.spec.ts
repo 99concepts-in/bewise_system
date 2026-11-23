@@ -36,7 +36,7 @@ async function routes(page: Page) {
 async function overflow(page: Page) {
   return page.evaluate(() => {
     const W = document.documentElement.clientWidth
-    const scrollers = '.chips-scroll, .daystrip, .felt-chips, .mood-strip, .quick-replies'
+    const scrollers = '.chips-scroll, .daystrip, .felt-chips, .mood-strip, .quick-replies, .pf-tablist'
     const bad: string[] = []
     if (document.documentElement.scrollWidth > W + 1) bad.push(`page scrolls sideways: ${document.documentElement.scrollWidth} > ${W}`)
     for (const el of document.querySelectorAll<HTMLElement>('main *, nav *')) {

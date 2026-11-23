@@ -63,3 +63,11 @@
 - Today: Calendar / New buttons aligned to the end of the header.
 - Tests: 45 unit, 109 browser passed (3 skipped).
 - Backend note: profile notes need `scheduling`/CRM storage when wiring (HUB P0) — e.g. `client_notes (id, client_id, body, created_at)` consultant-only.
+
+## 2026-11-23 — Lo Shu grid + profile in tabs (owner request)
+**Status:** Done in the prototype · client view requested
+- `src/lib/loshu.ts`: grid from DOB (non-zero digits, driver/Mulank, conductor/Bhagyank, added numbers per common Indian practice — owner to confirm), missing/repeated numbers, 8 planes; 5 unit tests.
+- Profile is now: header + actions, then a sticky, scrollable tab strip (Overview · Remedy|Notes · Lo Shu · Sessions · About), remembered in the URL, arrow-key navigation. Remedy-list entry points open Remedy; ending a scanning session opens Notes.
+- Lo Shu tab: driver, conductor, grid, missing, repeated, planes; no DOB → ask on WhatsApp or add it. DOB optional in Add a person.
+- Request filed: `requests/20261123-consultant-to-client-lo-shu-grid.md`. Spec: `specs/consultant/02-LO-SHU-GRID.md`.
+- Tests: 50 unit, 113 browser passed (3 skipped).

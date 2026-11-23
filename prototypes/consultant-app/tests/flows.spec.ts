@@ -119,11 +119,16 @@ test.describe('@flows', () => {
     await expect(card.locator('.bc-status')).toContainText(/Missed \d of 7 days/)
     const name = (await card.locator('b').textContent())!
     await card.click()
+    await expect(page.getByRole('tab', { name: 'Remedy' })).toHaveAttribute('aria-selected', 'true')
     await expect(page.locator('.adh-pill')).toContainText(/Missed \d of last 7 days/)
+    // every part of the profile is one tap away
+    for (const t of ['Overview', 'Lo Shu', 'Sessions']) { await page.getByRole('tab', { name: new RegExp('^' + t) }).click(); await expect(page.getByRole('tab', { name: new RegExp('^' + t) })).toHaveAttribute('aria-selected', 'true') }
+    await page.getByRole('tab', { name: 'About' }).click()
     await page.getByRole('button', { name: new RegExp(`Archive ${name.split(' ')[0]}`) }).click()
     await page.goto('./#/people?archived')
     await expect(page.locator('.board-card', { hasText: name })).toBeVisible()
     await page.locator('.board-card', { hasText: name }).click()
+    await page.getByRole('tab', { name: 'About' }).click()
     await page.getByRole('button', { name: /Bring back/ }).click()
     expect((await state(page)).people.find((p: { name: string }) => p.name === name).archived).toBe(false)
   })
@@ -220,5 +225,27 @@ test.describe('@flows', () => {
     await expect(page.getByRole('dialog', { name: 'Calendar' })).toBeHidden()
     await page.keyboard.press('Tab')
     expect(await page.evaluate(() => getComputedStyle(document.activeElement!).outlineStyle)).not.toBe('none')
+  })
+
+  test('Lo Shu: grid from the date of birth, missing date can be added, tab is remembered', async ({ page }) => {
+    await fresh(page)
+    const s = await state(page)
+    const withDob = s.people.find((p: { dob?: string; archived?: boolean }) => p.dob && !p.archived)
+    await page.goto('./#/people/' + withDob.id)
+    await page.getByRole('button', { name: /Lo Shu grid/ }).click()
+    await expect(page.getByRole('tab', { name: 'Lo Shu' })).toHaveAttribute('aria-selected', 'true')
+    await expect(page.locator('.ls-main .ls-cell')).toHaveCount(9)
+    await expect(page.getByRole('heading', { name: /Missing numbers/ })).toBeVisible()
+    await page.reload()
+    await expect(page.getByRole('tab', { name: 'Lo Shu' })).toHaveAttribute('aria-selected', 'true')
+
+    const noDob = s.people.find((p: { dob?: string; archived?: boolean }) => !p.dob && !p.archived)
+    await page.goto(`./#/people/${noDob.id}?loshu`)
+    await expect(page.getByRole('heading', { name: 'No date of birth yet' })).toBeVisible()
+    await page.getByLabel('Date of birth').fill('1987-08-15')
+    await page.getByRole('button', { name: 'Show grid' }).click()
+    await expect(page.locator('.ls-key').first()).toContainText('6') // driver
+    await expect(page.locator('.ls-key').nth(1)).toContainText('3') // conductor
+    expect((await state(page)).people.find((p: { id: string }) => p.id === noDob.id).dob).toBe('1987-08-15')
   })
 })

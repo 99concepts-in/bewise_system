@@ -21,6 +21,7 @@ export interface Person {
   city: string
   phone: string
   joinedAt: number
+  dob?: string // 'YYYY-MM-DD', entered by the member in the client app (CL-05) → Lo Shu grid
   moods: { day: number; mood: Mood }[] // journal entries (shared with him), newest last
   checkin?: { at: number; better: string[]; same: string[]; harder: string[] }
   drops?: { day: number; taken: boolean }[] // client ticks "took my drops" in their app (CL-26); missing day = not logged

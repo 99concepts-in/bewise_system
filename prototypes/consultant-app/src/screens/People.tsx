@@ -90,7 +90,7 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
             const st = statusLine(v, now)
             return (
               <m.li key={v.p.id} layout="position" initial={i < 12 ? { opacity: 0, scale: 0.94 } : false} animate={{ opacity: 1, scale: 1 }} transition={{ delay: Math.min(i, 12) * 0.025, duration: 0.22 }}>
-                <button className={'board-card' + (st.tone ? ` tone-${st.tone}` : '')} onClick={() => go(`/people/${v.p.id}`)}>
+                <button className={'board-card' + (st.tone ? ` tone-${st.tone}` : '')} onClick={() => go(`/people/${v.p.id}${tabFor(bucket)}`)}>
                   <span className="bc-face">{v.latestMood ? <MoodFace mood={v.latestMood} size={64} /> : <Avatar name={v.p.name} size={56} layoutId={`av-${v.p.id}`} />}</span>
                   <b>{v.p.name}</b>
                   <TypeBadge service={v.service} />
@@ -106,7 +106,7 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
             const st = statusLine(v, now)
             return (
               <li key={v.p.id}>
-                <button className="row" onClick={() => go(`/people/${v.p.id}`)}>
+                <button className="row" onClick={() => go(`/people/${v.p.id}${tabFor(bucket)}`)}>
                   <Avatar name={v.p.name} size={44} mood={v.latestMood} layoutId={`av-${v.p.id}`} />
                   <span className="row-main"><b>{v.p.name}</b><small className={st.tone === 'warn' ? 'warn' : ''}>{v.p.city}, {st.text.toLowerCase()}</small></span>
                   <span className="row-end"><TypeBadge service={v.service} /></span>
@@ -120,3 +120,6 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
     </div>
   )
 }
+
+/** From a remedy group (missed, ending, on a remedy) open the person's Remedy tab; everywhere else the Overview. */
+function tabFor(b: Bucket) { return b === 'missing' || b === 'ending7' || b === 'ending14' || b === 'remedy' ? '?care' : '' }

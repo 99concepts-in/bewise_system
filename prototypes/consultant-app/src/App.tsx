@@ -63,7 +63,7 @@ function Shell() {
   let screen
   if (top === 'session' && parts[1]) screen = <Live id={parts[1]} />
   else if (top === 'sessions') screen = <Sessions />
-  else if (top === 'people' && parts[1]) screen = <Profile id={parts[1]} />
+  else if (top === 'people' && parts[1]) screen = <Profile key={parts[1]} id={parts[1]} tab={q || undefined} />
   else if (top === 'people') screen = <People initialBucket={(q || undefined) as Bucket | undefined} />
   else if (top === 'growth') screen = <Growth />
   else if (top === 'messages') screen = <Messages pid={parts[1]} />

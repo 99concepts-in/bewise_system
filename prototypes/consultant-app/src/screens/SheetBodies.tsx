@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
 import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, MessageSquare, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat, Inbox, NotebookPen, Brain, Flower2 } from 'lucide-react'
 import { durationOf, useIndex, useStore } from '../state/store'
+import { parseDob } from '../lib/loshu'
 import { Avatar, Chip, Segmented, go, softSpring, spring, useToast } from '../ui/kit'
 import { dayLabel, fmtDay, fmtShort, fmtTime, relative, inr } from '../lib/time'
 import { freeTimes, nextDays, nextFreeAny } from '../lib/slots'
@@ -253,19 +254,21 @@ function AddPersonBody({ then, close, api }: { then: 'profile' | 'express'; clos
   const [phone, setPhone] = useState('')
   const [city, setCity] = useState('Vadodara')
   const [pronoun, setPronoun] = useState<Person['pronoun']>('they')
+  const [dob, setDob] = useState('')
   const [touched, setTouched] = useState(false)
   const digits = phone.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '')
   const nameErr = name.trim().length < 2 ? 'Enter their name.' : null
   const phoneErr = !/^[6-9]\d{9}$/.test(digits) ? 'Enter a 10-digit mobile number.' : null
   const dup = !phoneErr ? s.people.find((p) => p.phone.replace(/\D/g, '').endsWith(digits)) : undefined
+  const dobErr = dob && (!parseDob(dob) || dob > new Date().toISOString().slice(0, 10)) ? 'Check the date of birth.' : null
 
   const save = (next: 'profile' | 'express') => {
     setTouched(true)
-    if (nameErr || phoneErr || dup) return
+    if (nameErr || phoneErr || dup || dobErr) return
     const clean = name.trim().replace(/\s+/g, ' ')
     const person: Person = {
       id: `n${Date.now()}`, name: clean.replace(/\b\w/g, (c) => c.toUpperCase()), first: clean.split(' ')[0].replace(/^\w/, (c) => c.toUpperCase()),
-      pronoun, city: city.trim() || 'Vadodara', phone: `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`, joinedAt: Date.now(), moods: [],
+      pronoun, city: city.trim() || 'Vadodara', phone: `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`, joinedAt: Date.now(), moods: [], ...(dob ? { dob } : {}),
     }
     dispatch({ type: 'addPerson', person })
     if (next === 'express') { api.express(person.id) } else { toast(`${person.first} added`); close(); go(`/people/${person.id}`) }
@@ -288,6 +291,10 @@ function AddPersonBody({ then, close, api }: { then: 'profile' | 'express'; clos
         <div className="chips-wrap tight">{CITY_OPTIONS.map((c) => <Chip key={c} active={city === c} onClick={() => setCity(c)}>{c}</Chip>)}</div>
         <input value={CITY_OPTIONS.includes(city) ? '' : city} onChange={(e) => setCity(e.target.value)} placeholder="Another city" aria-label="Another city" />
       </div>
+      <label className="field"><span>Date of birth <small className="muted">(optional, for the Lo Shu grid)</small></span>
+        <input type="date" value={dob} max={new Date().toISOString().slice(0, 10)} min="1920-01-01" onChange={(e) => setDob(e.target.value)} aria-invalid={!!dobErr} />
+        {dobErr && <small className="err">{dobErr}</small>}
+      </label>
       <div className="field"><span>How to refer to them</span>
         <Segmented id="pronoun" value={pronoun} onChange={setPronoun} options={[{ value: 'she', label: 'She' }, { value: 'he', label: 'He' }, { value: 'they', label: 'They' }]} />
       </div>
