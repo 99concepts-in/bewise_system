@@ -107,7 +107,7 @@ export default function Learn() {
               <h2 id="say-h" className="h-section">What members say</h2>
               <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[13px] font-semibold text-navy">Google reviews <ExternalLink className="size-3.5" /></a>
             </div>
-            <div className="no-scrollbar -mx-5 mt-3 flex snap-x gap-3 overflow-x-auto px-5 pb-2" tabIndex={0} role="region" aria-label="Member words">
+            <div className="no-scrollbar -mx-5 mt-3 flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-2" tabIndex={0} role="region" aria-label="Member words">
               {TESTIMONIALS.map((r) => (
                 <figure key={r.name} className="w-[78%] shrink-0 snap-start rounded-[22px] bg-rose-100 p-5">
                   <Quote className="size-6 fill-rose-500 text-rose-500" aria-hidden />
@@ -115,6 +115,7 @@ export default function Learn() {
                   <figcaption className="mt-3 text-[13px] font-semibold text-ink-2">{r.name}</figcaption>
                 </figure>
               ))}
+              <span className="w-2 shrink-0" aria-hidden />
             </div>
             <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="card mt-2 flex items-center gap-3 p-4">
               <span className="grid size-11 shrink-0 place-items-center rounded-full bg-marigold-100 text-[#b8860b]"><Star className="size-5 fill-current" /></span>

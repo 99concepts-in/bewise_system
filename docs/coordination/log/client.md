@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-23 · Learn: member quotes no longer stick to the screen edge
+- The "What members say" carousel snapped cards flush to the left edge (no scroll padding). Now `snap-mandatory scroll-px-5` + an end spacer: every card rests 20 px from the edge, like the rest of the page.
+
 ## 2026-11-23 · Reminders: one time to set, then 4 h after each dose
 - Popup asks only for the time of the first drops ("Your first reminder each day comes on WhatsApp"). The day's 4 times are derived 4 h apart for My care.
 - In-app schedule (open or back on screen): first dose: WhatsApp sends the on-time reminder, the app follows up after 45 min; later doses: reminder 4 h after the last checked-in dose; not logged: repeat every 45 min (not mentioned to members); stops after the 4th dose or 23:00. `reminders.lastDoseAt` set on each new dose today.
