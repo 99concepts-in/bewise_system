@@ -1,18 +1,16 @@
 /**
  * @module   learn
  * @owner    CLIENT
- * Purpose:  Relaxing loop music for stories (owner 2026-11-24). 5 soundscapes, a random one on each open, mutable.
+ * Purpose:  Relaxing loop music for stories (owner 2026-11-24). 2 soundscapes (Calm, Chimes; owner removed Rain, Ocean and
+ *           Binaural the same day), a random one on each open, mutable.
  *           Each is rendered once with an OfflineAudioContext into a seamless ~32 s loop (equal-power crossfade at the seam),
  *           encoded as WAV and played through an <audio> element. Media playback is not silenced by the iPhone ringer switch
  *           (live Web Audio was), and it starts reliably from a tap. No audio files, nothing to license.
  */
-export type AmbientKind = 'calm' | 'rain' | 'chimes' | 'ocean' | 'binaural'
+export type AmbientKind = 'calm' | 'chimes'
 export const AMBIENT: { id: AmbientKind; label: string; emoji: string; hint?: string }[] = [
   { id: 'calm', label: 'Calm', emoji: '🌙' },
-  { id: 'rain', label: 'Rain', emoji: '🌧️' },
   { id: 'chimes', label: 'Chimes', emoji: '🎐' },
-  { id: 'ocean', label: 'Ocean', emoji: '🌊' },
-  { id: 'binaural', label: 'Binaural', emoji: '🎧', hint: 'Theta 6 Hz · best with headphones' },
 ]
 export const randomAmbient = (not?: AmbientKind) => { const pool = AMBIENT.filter((a) => a.id !== not); return pool[Math.floor(Math.random() * pool.length)].id }
 
@@ -31,12 +29,6 @@ function reverb(ctx: BaseAudioContext, out: AudioNode, wetLevel = 0.5) {
 function bus(ctx: BaseAudioContext, out: AudioNode, verb: AudioNode, dry = 0.7, send = 0.6) {
   const b = ctx.createGain(), d = ctx.createGain(), s = ctx.createGain(); d.gain.value = dry; s.gain.value = send
   b.connect(d); d.connect(out); b.connect(s); s.connect(verb); return b
-}
-function noise(ctx: BaseAudioContext, seconds: number, brown = true) {
-  const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * seconds), ctx.sampleRate), d = buf.getChannelData(0), r = rng(11)
-  let last = 0
-  for (let i = 0; i < d.length; i++) { const w = r() * 2 - 1; if (brown) { last = (last + 0.04 * w) / 1.04; d[i] = last * 3.2 + w * 0.1 } else d[i] = w }
-  const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; return src
 }
 function drone(ctx: BaseAudioContext, to: AudioNode, f: number, level: number, end: number) {
   const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 600; lp.connect(to)
@@ -60,17 +52,6 @@ async function render(kind: AmbientKind): Promise<AudioBuffer> {
   const verb = reverb(ctx, master)
   const r = rng(kind.length * 97 + 3)
   if (kind === 'calm') { pads(ctx, bus(ctx, master, verb, 0.6), total); drone(ctx, bus(ctx, master, verb, 0.8), 55, 0.05, total) }
-  if (kind === 'rain') {
-    const b = bus(ctx, master, verb, 0.9, 0.3), src = noise(ctx, 6), hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), g = ctx.createGain()
-    hp.type = 'highpass'; hp.frequency.value = 250; lp.type = 'lowpass'; lp.frequency.value = 2600; g.gain.value = 0.5
-    src.connect(hp); hp.connect(lp); lp.connect(g); g.connect(b); src.start(0)
-    for (let t = 0; t < total; t += 4) { g.gain.linearRampToValueAtTime(0.38 + r() * 0.25, t + 4) }
-    for (let t = 0.1; t < total; t += 0.12 + r() * 0.5) {
-      const o = ctx.createOscillator(), og = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(1400 + r() * 1600, t); o.frequency.exponentialRampToValueAtTime(400, t + 0.08)
-      og.gain.setValueAtTime(0.02, t); og.gain.exponentialRampToValueAtTime(0.0001, t + 0.12); o.connect(og); og.connect(b); o.start(t); o.stop(t + 0.15)
-    }
-    drone(ctx, bus(ctx, master, verb, 0.8), 65.4, 0.035, total)
-  }
   if (kind === 'chimes') {
     const b = bus(ctx, master, verb, 0.5, 0.8), scale = [523.3, 587.3, 659.3, 784, 880, 1046.5, 1174.7]
     for (let t = 0.2; t < total; t += 0.7 + r() * 1.9) {
@@ -81,25 +62,6 @@ async function render(kind: AmbientKind): Promise<AudioBuffer> {
       })
     }
     drone(ctx, bus(ctx, master, verb, 0.8), 87.3, 0.04, total)
-  }
-  if (kind === 'ocean') {
-    // slow waves: brown noise whose level and brightness swell and fall every ~9 s
-    const b = bus(ctx, master, verb, 0.9, 0.35), src = noise(ctx, 8), lp = ctx.createBiquadFilter(), g = ctx.createGain()
-    lp.type = 'lowpass'; lp.frequency.value = 500; g.gain.value = 0.15
-    src.connect(lp); lp.connect(g); g.connect(b); src.start(0)
-    for (let t = 0; t < total; t += 9) {
-      g.gain.setValueAtTime(0.12, t); g.gain.linearRampToValueAtTime(0.75, t + 3.2); g.gain.linearRampToValueAtTime(0.12, t + 9)
-      lp.frequency.setValueAtTime(400, t); lp.frequency.linearRampToValueAtTime(1600, t + 3.4); lp.frequency.linearRampToValueAtTime(400, t + 9)
-    }
-    pads(ctx, bus(ctx, master, verb, 0.5), total, 0.025)
-  }
-  if (kind === 'binaural') {
-    // 200 Hz left, 206 Hz right → a 6 Hz theta beat heard with headphones; soft pads and a hush of noise around it
-    const merge = ctx.createChannelMerger(2), bg = ctx.createGain(); bg.gain.value = 0.11; merge.connect(bg); bg.connect(master)
-    ;[[200, 0], [206, 1]].forEach(([f, ch]) => { const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f; o.connect(merge, 0, ch); o.start(0); o.stop(total) })
-    pads(ctx, bus(ctx, master, verb, 0.5), total, 0.03)
-    const src = noise(ctx, 6), lp = ctx.createBiquadFilter(), g = ctx.createGain(); lp.type = 'lowpass'; lp.frequency.value = 700; g.gain.value = 0.06
-    src.connect(lp); lp.connect(g); g.connect(master); src.start(0)
   }
   const out = await ctx.startRendering()
   // seamless loop: fold the tail into the head with an equal-power crossfade, then normalise

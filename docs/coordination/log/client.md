@@ -2,6 +2,12 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Story music: Calm and Chimes only
+
+- Owner: remove the Ocean, Binaural and Rain sounds and keep the rest. `lib/ambient.ts` now has 2 soundscapes, **Calm** and **Chimes**: a random one on each open, tap to switch, mute remembered.
+- The Rain, Ocean and Binaural render code and the noise helper were removed. The binaural headphones hint is gone with it.
+- 86/86 pass.
+
 ## 2026-11-24 · Gift (wellness journey plan) only after a first session
 
 - Owner: the gift card is only for people who have had at least one appointment with us.
