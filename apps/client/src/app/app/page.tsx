@@ -18,7 +18,8 @@ import { LaunchBanner } from '@/components/launch-offer'
 import { MoodLogger } from '@/components/mood-logger'
 import { Tour } from '@/components/tour'
 import { BlendPreparing } from '@/components/blend-preparing'
-import { Breathe } from '@/components/breathe'
+import { MoodGarden } from '@/components/mood-garden'
+import { NoteCard } from '@/components/note-card'
 import { MOOD_LEVELS, MoodShape } from '@/components/mood-shape'
 import { LearnCard } from '@/components/learn-card'
 import { ReminderSetup, useMorningNudge } from '@/components/reminder-setup'
@@ -33,7 +34,7 @@ import { ACCENTS, HOME_FEELINGS, type HomeFeeling } from '@/lib/feelings'
 import { apptName, isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { GoalCheck } from '@/components/goal-check'
 import { doneToday, kindOf, streak } from '@/lib/goals'
-import { DoseDots } from '@/components/dose-tracker'
+import { DoseBlooms, careDays } from '@/components/dose-tracker'
 import { RemedyBottle } from '@/components/remedy-bottle'
 import { doseStats, dosesOn, perDay } from '@/lib/doses'
 import { useApp, type Appointment } from '@/lib/store'
@@ -48,8 +49,6 @@ export default function Home() {
   const blend = useApp((s) => s.blend)
   const [story, setStory] = useState(false)
   const [logger, setLogger] = useState<'moment' | 'day' | null>(null)
-  // owner 2026-11-24: the day's last dose → breathe in, breathe out → mood slider
-  const [breathe, setBreathe] = useState(false)
   const now = useNow(60_000)
   useMorningNudge()
 
@@ -63,13 +62,17 @@ export default function Home() {
         </Item>
 
         {/* owner 2026-11-23: the remedy first, then "log how you feel" right under it (the feelings grid is gone) */}
-        {blend ? <Item data-tour="remedy"><TodaysBlend onAllDone={() => setBreathe(true)} /></Item> : <BlendPreparing />}
+        {/* owner 2026-11-24: the day's last dose opens the mood logger straight away (the breathe screen is off for now) */}
+        {blend ? <Item data-tour="remedy"><TodaysBlend onAllDone={() => setLogger('moment')} /></Item> : <BlendPreparing />}
 
         <Item data-tour="mood"><MoodPrompt onLog={(k) => setLogger(k)} /></Item>
 
         <ContextCard />
 
-        <Item className="empty:hidden"><LaunchBanner /></Item>
+        {/* owner 2026-11-24: the mood graph lives on Home; it blooms after 10 check-ins */}
+        <Item><MoodGarden onLog={() => setLogger('moment')} /></Item>
+
+        <Item><NoteCard /></Item>
 
         {/* owner 2026-11-24: "How Bach flowers can help" sits above the book-a-session card */}
         <Item data-tour="learn"><LearnCard /></Item>
@@ -78,12 +81,14 @@ export default function Home() {
 
         <GoalsCard />
 
+        {/* owner 2026-11-24: the offer sits near the bottom, just above the rituals */}
+        <Item className="empty:hidden"><LaunchBanner /></Item>
+
         <Item><ShopRow /></Item>
 
         <Item data-tour="ask"><YourSpace /></Item>
       </Reveal>
 
-      <Breathe open={breathe} onDone={() => { setBreathe(false); setLogger('moment') }} />
       <MoodLogger open={!!logger} kind={logger ?? 'moment'} onClose={() => setLogger(null)} />
       <ReminderSetup />
       <Tour />
@@ -386,36 +391,49 @@ function TodaysBlend({ onAllDone }: { onAllDone?: () => void }) {
   const tap = (i: number) => {
     const next = i < n ? i : i + 1
     s.logDoses(today, next); buzz(next > n ? 14 : 8)
-    if (next > n) { setPulse(Date.now()); if (next === of) { toast(`All ${of} done today 🔥 Your streak grows`); setTimeout(() => onAllDone?.(), 700) } }
+    if (next > n) { setPulse(Date.now()); if (next === of) { toast(`All ${of} done today 🌸 Another day of self-care`); setTimeout(() => onAllDone?.(), 700) } }
   }
   const caption = n >= of ? 'All done for today 🌿' : n === 0 ? 'Tap a drop each time you take your dose' : `${of - n} more to go today`
   return (
-    <section className="card overflow-hidden p-5" aria-labelledby="blend-h">
-      <div className="flex items-center gap-4">
-        <div className="relative flex w-[78px] shrink-0 justify-center">
-          <span className="absolute bottom-0 h-3 w-14 rounded-[50%] bg-navy/15 blur-[5px]" aria-hidden />
+    // owner 2026-11-24: "too bland": a warm sunrise wash, the bottle on a glowing halo, the bottle's 25 days as a petal row,
+    // and today's doses as buds on a vine that bloom when checked in
+    <section className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(165deg,#FFFFFF_0%,#FFF6E8_48%,#FDEBF2_100%)] p-5 shadow-[var(--shadow-card)]" aria-labelledby="blend-h">
+      <svg className="pointer-events-none absolute -right-10 -top-10 size-44 opacity-[0.22]" viewBox="-50 -50 100 100" aria-hidden>
+        {[0, 60, 120, 180, 240, 300].map((a) => <ellipse key={a} cx={0} cy={-24} rx={14} ry={22} fill="#F4A3B4" transform={`rotate(${a})`} />)}
+        <circle r={12} fill="#F7C548" />
+      </svg>
+      <div className="relative flex items-center gap-4">
+        <div className="relative flex w-[84px] shrink-0 justify-center">
+          <span className="absolute left-1/2 top-1/2 size-[104px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#FFE6B8_0%,rgba(255,230,184,.45)_45%,transparent_70%)]" aria-hidden />
+          <span className="absolute bottom-0 h-3 w-14 rounded-[50%] bg-[#b07a3a]/20 blur-[5px]" aria-hidden />
           <RemedyBottle level={level} pulse={pulse} height={132} />
         </div>
         <div className="min-w-0 flex-1">
           <p className="eyebrow text-sage-text">Your remedy</p>
           <h2 id="blend-h" className="h-section mt-0.5 tnum">Day {st.day} <span className="text-muted">of {st.of}</span></h2>
-          <p className="mt-0.5 text-[13px] text-ink-2">{left ? `${left} day${left > 1 ? 's' : ''} left` : 'Last day of this bottle'}</p>
-          <span className={cx('mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold', st.streak ? 'bg-[#fbe9d6] text-[#9a4f12]' : 'bg-peri-50 text-muted')}>
-            🔥 {st.streak}-day streak
+          <p className="mt-0.5 text-[13px] text-ink-2">{left ? `${left} day${left > 1 ? 's' : ''} left in this bottle` : 'Last day of this bottle'}</p>
+          {/* the bottle's days as a row of petals */}
+          <div className="mt-2 flex gap-[2px]" role="img" aria-label={`Day ${st.day} of ${st.of}`}>
+            {Array.from({ length: st.of }, (_, i) => (
+              <span key={i} className={cx('h-2 flex-1 rounded-full', i < st.day - 1 ? 'bg-[linear-gradient(180deg,#F7C873,#E9A23B)]' : i === st.day - 1 ? 'bg-[#F4A3B4]' : 'bg-[#ece7f3]')} />
+            ))}
+          </div>
+          <span className={cx('mt-2.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold', st.streak ? 'bg-[#fde3ec] text-[#8a2f52]' : 'bg-white text-muted')}>
+            🌸 {careDays(st.streak)}
           </span>
         </div>
       </div>
 
-      <div className="mt-4 rounded-[22px] bg-peri-50/70 px-4 pb-3 pt-3.5">
-        <div className="flex items-baseline justify-between">
+      <div className="relative mt-4 rounded-[24px] bg-white/75 px-3 pb-3 pt-3.5 ring-1 ring-white">
+        <div className="flex items-baseline justify-between px-1">
           <p className="text-[14px] font-bold text-navy">Today’s doses</p>
           <p className="text-[12px] font-semibold text-muted">{blend.drops} drops, {of}× a day</p>
         </div>
-        <div className="mt-3"><DoseDots n={n} of={of} fluid onTap={tap} label={`Today: ${n} of ${of} doses`} /></div>
+        <div className="mt-3"><DoseBlooms n={n} of={of} times={blend.reminderTimes} onTap={tap} label={`Today: ${n} of ${of} doses`} /></div>
         <p className="mt-2.5 text-center text-[12px] font-semibold text-muted" aria-live="polite">{caption}</p>
       </div>
 
-      <Link href="/app/remedies" className="-mb-2 mt-2 flex h-12 items-center justify-between border-t border-[#eef0f6] px-1 pt-1 text-[15px] font-semibold text-navy">
+      <Link href="/app/remedies" className="relative -mb-2 mt-2 flex h-12 items-center justify-between px-1 pt-1 text-[15px] font-semibold text-navy">
         View my blend & progress<ChevronRight className="size-5" />
       </Link>
     </section>
@@ -445,7 +463,7 @@ function GoalsCard() {
                 <GoalCheck g={g} size="sm" />
                 <span className="min-w-0 flex-1">
                   <span className={`block text-[15px] font-semibold ${once && g.done ? 'text-sage-text line-through decoration-sage/50' : 'text-navy'}`}>{g.title}</span>
-                  <span className="text-[12px] text-muted">{once ? (g.done ? '🎯 Achieved' : '🎯 Long-term') : s ? `☀️ Daily · 🔥 ${s}-day streak` : '☀️ Daily'}</span>
+                  <span className="text-[12px] text-muted">{once ? (g.done ? '🎯 Achieved' : '🎯 Long-term') : s ? `☀️ Daily · 🌸 ${s} day${s === 1 ? '' : 's'} in a row` : '☀️ Daily'}</span>
                 </span>
               </li>
             )

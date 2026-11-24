@@ -8,7 +8,7 @@
  *   Flower art now uses the real Bach vectors (FlowerArt), with a soft fallback while a file is missing.
  */
 import { motion } from 'motion/react'
-import { Bell, CalendarHeart, ChevronRight, Lightbulb } from 'lucide-react'
+import { Bell, CalendarHeart, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Mascot, MoodImg } from '@/components/brand'
@@ -17,12 +17,11 @@ import { FaqCard } from '@/components/faq'
 import { FlowerArt, FlowerTile } from '@/components/flower'
 import { SessionDateArt } from '@/components/session-art'
 import { Btn, BtnLink, Item, Reveal, Sheet, ease, toast } from '@/components/ui'
-import { BACH_REMEDIES, CONSULTATIONS, moodOf, type ConsultationId } from '@/lib/data'
+import { BACH_REMEDIES, CONSULTATIONS, type ConsultationId } from '@/lib/data'
 import type { Appointment } from '@/lib/store'
 import { useApp } from '@/lib/store'
 import { apptName, isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { dayKey, fmtDay, fmtTime } from '@/lib/format'
-import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
 import { DoseTracker } from '@/components/dose-tracker'
 import { HowToTake } from '@/components/how-to-take'
 import { BlendPreparing, usePreparing } from '@/components/blend-preparing'
@@ -44,7 +43,6 @@ export default function Remedies() {
   const blend = useApp((s) => s.blend)
   const preparing = usePreparing()
   const appointments = useApp((s) => s.appointments)
-  const journal = useApp((s) => s.journal)
   const [flower, setFlower] = useState<string | null>(null)
   const [times, setTimes] = useState(false)
 
@@ -71,8 +69,6 @@ export default function Remedies() {
   const dayN = Math.floor((Date.now() - +since) / 86_400_000) + 1
   const sup = blendSupply(blend, appointments)
   const left = sup.daysLeft
-  const lines = progressLines(journal, blend.startedOn)
-  const mix = moodMix(journal)
 
   return (
     <main className="px-5 pb-32">
@@ -139,32 +135,7 @@ export default function Remedies() {
 
         <Item><FaqCard /></Item>
 
-        {lines.length > 0 && (
-          <Item>
-            <section id="progress" className="card p-5">
-              <h2 className="h-section">Since your blend <span className="text-soft">began</span></h2>
-              <p className="text-[13px] text-muted">{fmtDay(blend.startedOn)} → today</p>
-              <div className="mt-3 divide-y divide-line">
-                {lines.map((l, i) => (
-                  <motion.div key={i} className="flex items-center gap-3 py-3" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.1, ease, duration: 0.5 }}>
-                    <MoodImg mood={l.mood} size={46} /><p className="text-[14px] leading-5 text-ink">{l.text}</p>
-                  </motion.div>
-                ))}
-              </div>
-              {mix.length > 0 && (
-                <div className="mt-2 flex items-center gap-5 rounded-[20px] bg-sky-50 p-4">
-                  <Donut mix={mix} />
-                  <ul className="flex-1 space-y-1.5">
-                    {mix.slice(0, 4).map((m) => <li key={m.mood} className="flex items-center gap-2 text-[13px]"><span className="size-3 rounded-full" style={{ background: moodOf(m.mood).color }} /><span className="flex-1 text-ink">{moodOf(m.mood).label}</span><b className="tnum text-navy">{m.pct}%</b></li>)}
-                  </ul>
-                </div>
-              )}
-              <p className="mt-3 flex items-start gap-2 text-[13px] leading-5 text-muted"><Lightbulb className="mt-0.5 size-4 shrink-0 text-gold" />{dailyInsight(journal)}</p>
-              <p className="mt-2 text-[11px] text-muted">From your journal and check-ins · not medical advice</p>
-            </section>
-          </Item>
-        )}
-
+        {/* owner 2026-11-24: "Since your blend began" moved to Home as the mood garden */}
         <Item><PastSessions /></Item>
         <Item>
           <section className="card p-5">
@@ -205,21 +176,6 @@ export default function Remedies() {
   )
 }
 
-function Donut({ mix }: { mix: { mood: Parameters<typeof moodOf>[0]; pct: number }[] }) {
-  const r = 34, c = 2 * Math.PI * r
-  let acc = 0
-  return (
-    <svg width="92" height="92" viewBox="0 0 92 92" className="-rotate-90" role="img" aria-label="Mood mix, last 14 days">
-      {mix.map((m, i) => {
-        const len = (m.pct / 100) * c
-        const el = <motion.circle key={m.mood} cx="46" cy="46" r={r} fill="none" stroke={moodOf(m.mood).color} strokeWidth="14" strokeDasharray={`${len} ${c}`} strokeDashoffset={-acc}
-          initial={{ opacity: 0, pathLength: 0 }} animate={{ opacity: 1, pathLength: 1 }} transition={{ delay: 0.2 + i * 0.1, duration: 0.6 }} />
-        acc += len
-        return el
-      })}
-    </svg>
-  )
-}
 
 function ReminderSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const blend = useApp((s) => s.blend)

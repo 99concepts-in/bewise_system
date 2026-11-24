@@ -13,7 +13,7 @@
 import { AnimatePresence, animate, motion, useMotionValue, useMotionValueEvent, useTransform } from 'motion/react'
 import { Check, ChevronLeft, Search, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { buzz, cx, toast } from './ui'
+import { buzz, cx, toast, useChrome } from './ui'
 import { MoodImg } from './brand'
 import { LiveBackdrop, MOOD_LEVELS, MoodShape, moodColor, moodInk } from './mood-shape'
 import { MOODS, moodOf, type Emotion } from '@/lib/data'
@@ -30,6 +30,7 @@ const dayWord = (l: number) => ['A very unpleasant', 'An unpleasant', 'A slightl
 
 export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: boolean; onClose: () => void; kind?: 'moment' | 'day' }) {
   const logMood = useApp((s) => s.logMood)
+  const { askNote } = useChrome()
   const [kind, setKind] = useState(kind0)
   const [step, setStep] = useState<'feel' | 'pick' | 'done'>('feel')
   const v = useMotionValue(3)
@@ -71,8 +72,12 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
   const save = () => {
     if (!picks.length) return
     logMood(picks[0], new Date(), note, { valence: level + 1, kind, also: picks.slice(1) })
+    logged.current = { mood: picks[0], valence: level + 1 }
     buzz(14); setStep('done')
   }
+  // owner 2026-11-24: once the logger closes after a log (Done, X or backdrop), offer a note to Jitendra Khimlani
+  const logged = useRef<{ mood: Emotion; valence: number } | null>(null)
+  useEffect(() => { if (!open && logged.current) { askNote(logged.current); logged.current = null } }, [open, askNote])
   const names = picks.map((p) => moodOf(p).label).join(', ')
 
   return (

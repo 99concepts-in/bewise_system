@@ -3,11 +3,11 @@
  * @module   remedies-ux
  * @owner    CLIENT (UI) · CONSULTANT owns remedies.logDrops
  * @screens  CL-08 Home blend card · CL-26 My care
- * Purpose:  Owner 2026-11-18: 4 dots that light up with each dose (4 drops, 4× a day), a streak, a few stats,
+ * Purpose:  Owner 2026-11-18: 4 dots that light up with each dose (4 drops, 4× a day), days of self-care, a few stats,
  *           and a 25-day calendar (the life of a bottle) where past days can be checked in too. Never shaming.
  */
 import { AnimatePresence, motion } from 'motion/react'
-import { CalendarDays, Flame, Plus, Undo2 } from 'lucide-react'
+import { CalendarDays, Flower2, Plus, Undo2 } from 'lucide-react'
 import { useState } from 'react'
 import { Btn, Sheet, buzz, cx, spring, toast } from './ui'
 import { useApp } from '@/lib/store'
@@ -62,15 +62,15 @@ export function DoseTracker({ full = false, compact = false }: { full?: boolean;
   const checkIn = () => {
     if (n >= of) return
     s.logDoses(today, n + 1); buzz(16)
-    toast(n + 1 === of ? `All ${of} done today 🔥 Your streak grows` : `Dose ${n + 1} of ${of} checked in 🌿`)
+    toast(n + 1 === of ? `All ${of} done today 🌸 Another day of self-care` : `Dose ${n + 1} of ${of} checked in 🌿`)
   }
   return (
     <div>
       {!compact && <>
       <div className="flex items-center justify-between">
         <p className="text-[14px] font-bold text-navy">Today’s drops <span className="font-semibold text-muted">· {n} of {of}</span></p>
-        <span className={cx('inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold', st.streak ? 'bg-[#fbe9d6] text-[#9a4f12]' : 'bg-peri-50 text-muted')}>
-          <Flame className="size-3.5" fill={st.streak ? 'currentColor' : 'none'} /> {st.streak}-day streak
+        <span className={cx('inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold', st.streak ? 'bg-[#fde3ec] text-[#8a2f52]' : 'bg-peri-50 text-muted')}>
+          <Flower2 className="size-3.5" /> {careDays(st.streak)}
         </span>
       </div>
       <div className="mt-3 flex justify-center">
@@ -85,7 +85,7 @@ export function DoseTracker({ full = false, compact = false }: { full?: boolean;
         {[
           { v: `${st.day}/${st.of}`, l: 'Day of bottle' },
           { v: `${st.pct}%`, l: 'Doses taken' },
-          { v: `${st.streak}🔥`, l: 'Day streak' },
+          { v: `${st.streak}🌸`, l: 'Self-care days' },
         ].map((x) => (
           <div key={x.l} className="rounded-[16px] bg-white/80 px-2 py-2.5 ring-1 ring-[#eef0f6]">
             <p className="text-[18px] font-extrabold leading-none text-navy tnum">{x.v}</p>
@@ -115,7 +115,7 @@ export function DoseCalendar({ open, onClose }: { open: boolean; onClose: () => 
       <p className="mt-1 text-[13px] text-muted">One bottle, {of} doses a day. Tap any past day to check in.</p>
       <div className="mt-3 flex items-center gap-2 text-[12px] font-semibold text-navy">
         <span className="rounded-full bg-peri-50 px-2.5 py-1">{st.taken} of {st.due} doses</span>
-        <span className="rounded-full bg-[#fbe9d6] px-2.5 py-1 text-[#9a4f12]">🔥 {st.streak}-day streak</span>
+        <span className="rounded-full bg-[#fde3ec] px-2.5 py-1 text-[#8a2f52]">🌸 {careDays(st.streak)}</span>
       </div>
       <div className="mt-4 grid grid-cols-7 gap-1.5 text-center" role="grid" aria-label="Doses by day">
         {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((w, i) => <span key={i} className="text-[11px] font-bold text-muted">{w}</span>)}
@@ -157,3 +157,66 @@ export function DoseCalendar({ open, onClose }: { open: boolean; onClose: () => 
 }
 
 export { Dots as DoseDots }
+
+/** owner 2026-11-24: wellness words instead of "streak" */
+export const careDays = (n: number) => `${n} day${n === 1 ? '' : 's'} of self-care`
+
+const BLOOMS = [
+  { petal: '#F7C873', deep: '#E39A2D' }, // morning marigold
+  { petal: '#F4A3B4', deep: '#D9647F' }, // afternoon rose
+  { petal: '#B9A6F2', deep: '#7D63D8' }, // evening lilac
+  { petal: '#8FC9E8', deep: '#3D8CB8' }, // night sky
+]
+const PART = ['Morning', 'Afternoon', 'Evening', 'Night']
+const hm = (t?: string) => {
+  if (!t) return ''
+  const [h, m] = t.split(':').map(Number)
+  return `${h % 12 || 12}${m ? `:${String(m).padStart(2, '0')}` : ''} ${h < 12 ? 'AM' : 'PM'}`
+}
+
+/**
+ * owner 2026-11-24: "the remedy tracker is too bland". Each dose is a bud on a vine; checking it in makes it bloom
+ * (a different flower for morning, afternoon, evening and night), and the vine fills as the day goes.
+ */
+export function DoseBlooms({ n, of, times, onTap, label }: { n: number; of: number; times: string[]; onTap: (i: number) => void; label: string }) {
+  return (
+    <div className="relative" role="group" aria-label={label}>
+      {/* the vine */}
+      <span className="absolute inset-x-[12%] top-[30px] h-[3px] rounded-full bg-[#e4e2f3]" aria-hidden />
+      <motion.span className="absolute left-[12%] top-[30px] h-[3px] rounded-full bg-[linear-gradient(90deg,#9ccf9f,#5fa36a)]" aria-hidden
+        initial={false} animate={{ width: `${(Math.max(0, Math.min(n, of) - 1) / Math.max(1, of - 1)) * 76}%` }} transition={{ type: 'spring', stiffness: 120, damping: 20 }} />
+      <div className="relative flex justify-between">
+        {Array.from({ length: of }, (_, i) => {
+          const on = i < n, b = BLOOMS[i % BLOOMS.length]
+          return (
+            <button key={i} type="button" aria-label={`Dose ${i + 1}${on ? ', taken' : ''}`} aria-pressed={on} onClick={() => onTap(i)}
+              className="group flex w-[22%] flex-col items-center gap-1.5 outline-none">
+              <span className="relative grid size-[62px] place-items-center">
+                <AnimatePresence initial={false} mode="popLayout">
+                  {on ? (
+                    <motion.svg key="on" viewBox="-32 -32 64 64" className="absolute inset-0 size-full drop-shadow-[0_6px_10px_rgba(120,80,40,.22)]"
+                      initial={{ scale: 0.2, rotate: -70, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} exit={{ scale: 0.4, opacity: 0 }} transition={{ type: 'spring', stiffness: 260, damping: 13 }}>
+                      {[0, 60, 120, 180, 240, 300].map((a) => <ellipse key={a} cx={0} cy={-17} rx={11} ry={15} fill={b.petal} stroke={b.deep} strokeOpacity={0.35} strokeWidth={1} transform={`rotate(${a})`} />)}
+                      <circle r={12} fill="#fff" />
+                      <path d="M-5 0.5 -1.5 4 5.5 -3.5" fill="none" stroke={b.deep} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
+                    </motion.svg>
+                  ) : (
+                    <motion.span key="off" initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.6, opacity: 0 }}
+                      className="absolute inset-[7px] grid place-items-center rounded-full bg-white text-[#b9b4dc] shadow-[0_4px_12px_rgba(60,50,120,.08)] border-[1.5px] border-dashed border-[#cfc9ee] transition-transform group-active:scale-95">
+                      <FourDrops on={false} animate={false} />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+                {on && <motion.span key={`r${n}`} className="absolute inset-1 rounded-full" style={{ boxShadow: `0 0 0 2px ${b.petal}` }} initial={{ scale: 1, opacity: 0.9 }} animate={{ scale: 1.5, opacity: 0 }} transition={{ duration: 0.8 }} aria-hidden />}
+              </span>
+              <span className="text-center leading-none">
+                <span className={cx('block text-[11px] font-bold', on ? 'text-navy' : 'text-muted')}>{PART[i] ?? `Dose ${i + 1}`}</span>
+                <span className="mt-0.5 block text-[10px] font-semibold text-muted">{hm(times[i])}</span>
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}

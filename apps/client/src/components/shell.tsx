@@ -20,6 +20,7 @@ import { useApp } from '@/lib/store'
 import { fmtTime, fmtDay } from '@/lib/format'
 import { BP } from '@/lib/asset'
 import { InstallPrompt, usePromptBoot } from './prompts'
+import { NoteAsk } from './note-card'
 
 export const useUi = create<{ navHidden: boolean; setNavHidden: (v: boolean) => void }>((set) => ({ navHidden: false, setNavHidden: (v) => set({ navHidden: v }) }))
 
@@ -140,6 +141,7 @@ export function AppHeader({ back, right, title }: { back?: boolean | string; rig
 /** CL-09 — 8 main feelings + a searchable list of more (owner 2026-11-18: "add happy, more options, searchable"). */
 function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const logMood = useApp((s) => s.logMood)
+  const { askNote } = useChrome()
   const [pick, setPick] = useState<Emotion | null>(null)
   const [burst, setBurst] = useState(0)
   const [q, setQ] = useState('')
@@ -196,7 +198,7 @@ function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
         )}
       </AnimatePresence>
       <div className="sticky bottom-0 -mx-5 mt-4 bg-white px-5 pb-1 pt-3">
-        <Btn full disabled={!pick} onClick={() => { if (!pick) return; logMood(pick, new Date(), note); toast(`Logged · ${moodOf(pick).label}`); onClose() }}>
+        <Btn full disabled={!pick} onClick={() => { if (!pick) return; logMood(pick, new Date(), note); toast(`Logged · ${moodOf(pick).label}`); onClose(); askNote({ mood: pick }) }}>
           {pick ? `Save · ${moodOf(pick).label}` : 'Choose a feeling'}
         </Btn>
       </div>
@@ -308,7 +310,10 @@ export function AppChrome({ children }: { children: ReactNode }) {
   const openLog = useCallback(() => setLog(true), [])
   const openNotices = useCallback(() => setNotes(true), [])
   const flyToBag = useCallback((from: DOMRect, img: string) => setFly({ from, img, id: Date.now() }), [])
-  const ctx = useMemo(() => ({ openLog, openNotices, openEntry, flyToBag }), [openLog, openNotices, openEntry, flyToBag])
+  // owner 2026-11-24: after every mood log, offer to send a note to Jitendra Khimlani (a beat later, once the log closes)
+  const [ask, setAsk] = useState<{ mood: Emotion; valence?: number } | null>(null)
+  const askNote = useCallback((a: { mood: Emotion; valence?: number }) => { window.setTimeout(() => setAsk(a), 450) }, [])
+  const ctx = useMemo(() => ({ openLog, openNotices, openEntry, flyToBag, askNote }), [openLog, openNotices, openEntry, flyToBag, askNote])
   return (
     <Chrome.Provider value={ctx}>
       {children}
@@ -319,6 +324,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
       <NoticeSheet open={notes} onClose={() => setNotes(false)} />
       <EntrySheet id={entry} onClose={() => setEntry(null)} />
       <Flyer fly={fly} onDone={() => setFly(null)} />
+      <NoteAsk ask={ask} onClose={() => setAsk(null)} />
     </Chrome.Provider>
   )
 }

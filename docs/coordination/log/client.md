@@ -2,6 +2,28 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Home: mood garden, blooming dose tracker, gift offer, notes to Jitendra Khimlani
+
+Owner feedback (screenshots from My care and Home), all live:
+- **Mood graph fixed and moved to Home** as "Your mood garden" (`components/mood-garden.tsx`).
+  - The old donut drew every slice as a full ring (motion `pathLength` overrode `strokeDasharray`), so only one colour showed.
+  - New graph: a "bloom" where each petal is a feeling, and a longer petal means it was felt more often. It also has feeling chips with %, a 14-day row of little flowers, two gentle lines and a tip.
+  - Under 10 check-ins, a 10-petal flower fills one petal per check-in, with "N more check-ins to go" and a Log button.
+  - Removed "Since your blend began" from My care.
+- **Remedy tracker redesigned:**
+  - Sunrise wash; the bottle sits on a glowing halo.
+  - The bottle's 25 days are shown as a petal row.
+  - Today's doses are buds on a vine (Morning / Afternoon / Evening / Night with times). Each one blooms into a flower when checked in.
+- **"Streak" is gone everywhere.** Now "N days of self-care" (remedy) and "N days in a row" (goals). Toast: "Another day of self-care".
+- **Last dose of the day opens the mood logger directly.** The breathe screen is off; the component is kept.
+- **Offer card moved** near the bottom, above Gentle rituals. It now shows a gift box on a deep blue circle (gently bobbing, lid lifting, sparkles), and tapping it opens the offer.
+- **Notes to Jitendra Khimlani:**
+  - Home card with How I feel / Say thank you / Something else, plus the last note and its status.
+  - Chat at `/app/chat` with ticks: sent, delivered, read.
+  - After every mood log (logger or quick log sheet), a popup offers to send a note, prefilled with the feeling.
+  - Read receipts are simulated in the preview. Server parts are requested in `requests/20261124-client-to-foundation-consultant-member-notes.md`.
+- Tests: breathe test replaced; added mood garden gate, note send with delivered then read, and the popup after a mood log. Added `/app/chat` to the size and axe routes. 70/70 pass.
+
 ## 2026-11-24 · Learn: Anger story
 
 - Owner: "Add one story on Anger in learn tab". New story `anger` (7 slides) in `apps/client/src/lib/stories.ts`:

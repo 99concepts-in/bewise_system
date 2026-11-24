@@ -234,8 +234,8 @@ export function Toaster() {
 }
 
 // ---------- Simple context for one-sheet-at-a-time app chrome (log feeling, notifications) ----------
-type ChromeCtx = { openLog: () => void; openNotices: () => void; openEntry: (id: string) => void; flyToBag: (from: DOMRect, img: string) => void }
-export const Chrome = createContext<ChromeCtx>({ openLog: () => {}, openNotices: () => {}, openEntry: () => {}, flyToBag: () => {} })
+type ChromeCtx = { openLog: () => void; openNotices: () => void; openEntry: (id: string) => void; flyToBag: (from: DOMRect, img: string) => void; askNote: (a: { mood: import('@/lib/data').Emotion; valence?: number }) => void }
+export const Chrome = createContext<ChromeCtx>({ openLog: () => {}, openNotices: () => {}, openEntry: () => {}, flyToBag: () => {}, askNote: () => {} })
 export const useChrome = () => useContext(Chrome)
 
 export function useNow(intervalMs = 30_000) {

@@ -76,7 +76,7 @@ function GoalRow({ g, onDelete, onParty }: { g: Goal; onDelete: () => void; onPa
         <GoalCheck g={g} onParty={onParty} />
         <div className="min-w-0 flex-1">
           <p className={cx('text-[16px] font-bold', once && g.done ? 'text-sage-text line-through decoration-sage/50' : 'text-navy')}>{g.title}</p>
-          <p className="text-[12px] text-muted">{once ? (g.done ? 'Achieved' : 'Long-term goal · tick it off when you get there') : s ? `🔥 ${s}-day streak` : 'Check in today'}</p>
+          <p className="text-[12px] text-muted">{once ? (g.done ? 'Achieved' : 'Long-term goal · tick it off when you get there') : s ? `🌸 ${s} day${s === 1 ? '' : 's'} in a row` : 'Check in today'}</p>
         </div>
         <button aria-label={`Remove ${g.title}`} onClick={onDelete} className="grid size-9 place-items-center rounded-full text-muted"><Trash2 className="size-4" /></button>
       </div>

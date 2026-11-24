@@ -9,7 +9,7 @@
  *           paid → congratulations + 15% first-purchase coupon (7 days)
  */
 import Link from 'next/link'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Gift, MessageCircle, Sparkles, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { PaySheet } from './pay-sheet'
@@ -47,21 +47,52 @@ export function LaunchBanner() {
   if (!show && !open) return null
   return (
     <>
-      {show && <motion.button onClick={() => { buzz(10); setOpen(true) }} whileTap={{ scale: 0.98 }} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-        className="relative flex w-full items-center gap-3 overflow-hidden rounded-[24px] bg-navy p-3.5 pr-4 text-left text-white shadow-[var(--shadow-float)]"
+      {/* owner 2026-11-24: a gift box on a blue circle with a subtle animation, near the bottom of Home; tap opens the offer */}
+      {show && <motion.button onClick={() => { buzz(10); setOpen(true) }} whileTap={{ scale: 0.98 }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        className="relative flex w-full items-center gap-4 overflow-hidden rounded-[26px] bg-white p-4 text-left shadow-[var(--shadow-card)]"
         aria-label="Reveal your wellness journey plan">
-        <motion.span aria-hidden className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-white/20 blur-md"
-          animate={{ x: ['0%', '480%'] }} transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' }} />
-        <motion.span className="grid size-11 shrink-0 place-items-center rounded-full bg-white/15 text-[22px]" animate={{ rotate: [0, -10, 10, -6, 0] }} transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2.5 }} aria-hidden>🎁</motion.span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#F2A93B]">Just for you</span>
-          <span className="block text-[15px] font-bold leading-tight">Your wellness journey plan</span>
-          <span className="block text-[12px] text-white/75">Valid till 1 December · <Countdown compact /> left</span>
+        <span className="pointer-events-none absolute -right-8 -top-10 size-32 rounded-full bg-sky-100/70" aria-hidden />
+        <GiftBox />
+        <span className="relative min-w-0 flex-1">
+          <span className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#8f5a06]">A gift for you</span>
+          <span className="mt-0.5 block font-display text-[18px] font-semibold leading-6 text-ink">Your wellness journey plan</span>
+          <span className="block text-[12px] text-ink-2">Valid till 1 December · <Countdown compact /> left</span>
         </span>
-        <span className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[12px] font-bold text-navy">Reveal</span>
+        <span className="relative shrink-0 rounded-full bg-navy px-3.5 py-2 text-[12px] font-bold text-white">Open</span>
       </motion.button>}
       <LaunchOffer open={open} onClose={() => setOpen(false)} />
     </>
+  )
+}
+
+/** A gift box on a deep blue circle: it bobs gently, the lid lifts now and then, and two sparkles twinkle. */
+function GiftBox() {
+  const still = useReducedMotion()
+  const loop = (d: number, delay = 0) => (still ? undefined : { duration: d, repeat: Infinity, ease: 'easeInOut' as const, delay })
+  return (
+    <span className="relative grid size-[68px] shrink-0 place-items-center rounded-full bg-[radial-gradient(circle_at_35%_30%,#3d5bc7,#1f2f78)] shadow-[0_10px_22px_rgba(36,61,145,.35)]" aria-hidden>
+      <motion.svg viewBox="-24 -26 48 50" className="size-[44px]" animate={still ? undefined : { y: [0, -2.5, 0] }} transition={loop(2.8)}>
+        {/* box */}
+        <rect x={-15} y={-4} width={30} height={22} rx={3} fill="#F7C548" />
+        <rect x={-15} y={-4} width={30} height={22} rx={3} fill="url(#gshine)" />
+        <rect x={-3} y={-4} width={6} height={22} fill="#E5577A" />
+        {/* lid + bow lift together */}
+        <motion.g animate={still ? undefined : { y: [0, 0, -4, 0, 0], rotate: [0, 0, -6, 0, 0] }} transition={loop(4.5, 0.8)} style={{ originX: '50%', originY: '100%' }}>
+          <rect x={-17} y={-11} width={34} height={8} rx={2.5} fill="#FAD46A" />
+          <rect x={-3} y={-11} width={6} height={8} fill="#F06C8E" />
+          <path d="M0 -11C-4 -19 -13 -19 -11 -14C-10 -11 -4 -11 0 -11Z" fill="#F06C8E" />
+          <path d="M0 -11C4 -19 13 -19 11 -14C10 -11 4 -11 0 -11Z" fill="#E5577A" />
+          <circle cy={-11.5} r={2.6} fill="#D9466C" />
+        </motion.g>
+        <defs><linearGradient id="gshine" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff" stopOpacity=".35" /><stop offset=".6" stopColor="#fff" stopOpacity="0" /></linearGradient></defs>
+      </motion.svg>
+      {[{ x: 8, y: 10, d: 0 }, { x: 50, y: 6, d: 1.1 }, { x: 54, y: 46, d: 2 }].map((p, i) => (
+        <motion.svg key={i} viewBox="-5 -5 10 10" className="absolute size-2.5" style={{ left: p.x, top: p.y }}
+          animate={still ? { opacity: 0.8 } : { scale: [0.3, 1, 0.3], opacity: [0, 1, 0] }} transition={loop(2.2, p.d)}>
+          <path d="M0 -5L1.2 -1.2 5 0 1.2 1.2 0 5 -1.2 1.2 -5 0 -1.2 -1.2Z" fill="#FFE7A3" />
+        </motion.svg>
+      ))}
+    </span>
   )
 }
 

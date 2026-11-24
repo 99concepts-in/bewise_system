@@ -368,16 +368,52 @@ test('dose reminders: app follows up 45 min after the first (WhatsApp) one, then
   expect((await notices())[0]).toMatch(/2 of 4/)
 })
 
-test('last dose of the day → breathe in, breathe out → mood slider', async ({ page }) => {
+test('last dose of the day opens the mood slider straight away (no breathe screen)', async ({ page }) => {
   await seed(page)
   const today = await page.evaluate(() => { const x = new Date(); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}` })
   await page.evaluate((d) => { const k = 'bewise-client-v1'; const r = JSON.parse(localStorage.getItem(k)!); r.state.doses = { ...(r.state.doses || {}), [d]: 3 }; localStorage.setItem(k, JSON.stringify(r)) }, today)
   await page.goto('/app')
   await page.getByRole('button', { name: 'Dose 4', exact: true }).click()
-  await expect(page.getByRole('dialog', { name: 'A moment to breathe' })).toBeVisible()
-  await expect(page.getByText('Breathe in…')).toBeVisible({ timeout: 4000 })
-  await expect(page.getByText('Breathe out…')).toBeVisible({ timeout: 7000 })
-  await expect(page.getByRole('slider', { name: 'How pleasant or unpleasant' })).toBeVisible({ timeout: 9000 })
+  await expect(page.getByRole('slider', { name: 'How pleasant or unpleasant' })).toBeVisible({ timeout: 3000 })
+  await expect(page.getByRole('dialog', { name: 'A moment to breathe' })).toHaveCount(0)
+})
+
+test('mood garden: blooms after 10 check-ins, asks for more before that', async ({ page }) => {
+  await seed(page); await page.goto('/app')
+  await expect(page.getByRole('heading', { name: 'Your mood garden' })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Mood bloom: / })).toBeVisible()
+  await expect(page.getByText('Last 14 days')).toBeVisible()
+  await page.evaluate(() => { const k = 'bewise-client-v1'; const r = JSON.parse(localStorage.getItem(k)!); r.state.journal = r.state.journal.slice(0, 3); localStorage.setItem(k, JSON.stringify(r)) })
+  await page.reload()
+  await expect(page.getByRole('img', { name: '3 of 10 check-ins' })).toBeVisible()
+  await expect(page.getByText('7 more check-ins to go')).toBeVisible()
+})
+
+test('note to Jitendra Khimlani: pick a topic, send, see delivered then read', async ({ page }) => {
+  await seed(page); await page.goto('/app')
+  await page.getByRole('link', { name: /Say thank you/ }).click()
+  await page.waitForURL('**/app/chat?topic=gratitude')
+  const box = page.getByRole('textbox', { name: 'Message Jitendra Khimlani' })
+  await expect(box).toHaveValue(/^Thank you, Jitu bhaiya\./)
+  await box.fill('Thank you, Jitu bhaiya. I slept well this week.')
+  await page.getByRole('button', { name: 'Send' }).click()
+  const msgs = page.getByRole('list', { name: 'Messages' })
+  await expect(msgs.getByText('I slept well this week.', { exact: false })).toBeVisible()
+  await expect(msgs.getByRole('img', { name: 'Delivered' })).toBeVisible({ timeout: 4000 })
+  await expect(page.getByText(/Read by Jitendra Khimlani/)).toBeVisible({ timeout: 16000 })
+})
+
+test('after logging a mood, a popup offers a note to Jitendra Khimlani', async ({ page }) => {
+  await seed(page); await page.goto('/app')
+  await page.getByRole('button', { name: /Log how you feel|Log again/ }).first().click()
+  await page.getByRole('button', { name: 'Next' }).click()
+  await page.getByRole('dialog', { name: 'Log how you feel' }).getByRole('button', { name: 'Calm', exact: true }).click()
+  await page.getByRole('button', { name: 'Log it' }).click()
+  await page.getByRole('button', { name: 'Done' }).click()
+  await expect(page.getByRole('heading', { name: /Send a note to Jitendra Khimlani\?/ })).toBeVisible({ timeout: 3000 })
+  await page.getByRole('button', { name: 'Send a note' }).click()
+  await page.waitForURL('**/app/chat?topic=feeling&mood=calm**')
+  await expect(page.getByRole('textbox', { name: 'Message Jitendra Khimlani' })).toHaveValue(/^Today I’m feeling calm\./)
 })
 
 test('mood slider: tap anywhere on the track and drag with a finger', async ({ page }) => {

@@ -73,6 +73,11 @@ export type CartLine = { key: string; qty: number } // key = variantId | 'remedy
 export type Address = { id: string; name: string; phone: string; line1: string; line2: string; city: string; state: string; pin: string }
 export type OrderLine = { key: string; name: string; label: string; qty: number; pricePaise: number; kind: 'product' | 'remedy' }
 export type Order = { id: string; code: string; lines: OrderLine[]; totalPaise: number; address: Address; placedAt: string; stage: 0 | 1 | 2 | 3; pickup?: boolean; discountPaise?: number; coupon?: string; subscribed?: string[]; review?: { rating: number; text: string; at: string } }
+/**
+ * owner 2026-11-24: a personal chat with Jitendra Khimlani. A note can carry how the member feels, a thank-you, or anything else.
+ * Server (requested from FOUNDATION + CONSULTANT, 20261124-member-notes): messages.send / messages.list, consultant inbox, readAt when he opens it.
+ */
+export type NoteMsg = { id: string; from: 'me' | 'jitendra'; text: string; at: string; topic?: 'feeling' | 'gratitude' | 'other'; mood?: Emotion; valence?: number; deliveredAt?: string; readAt?: string }
 export type ChatMsg = { id: string; role: 'user' | 'bot'; text: string; products?: string[]; actions?: { id: string; label: string }[]; safety?: boolean; at: string }
 export type Notice = { id: string; title: string; body: string; at: string; read: boolean; href?: string }
 
@@ -101,6 +106,7 @@ type State = {
   addresses: Address[]
   orders: Order[]
   chat: ChatMsg[]
+  notes: NoteMsg[]
   notices: Notice[]
   plan: Plan | null
   coupon: Coupon | null
@@ -113,6 +119,8 @@ type State = {
   setProfile: (p: Partial<Profile>) => void
   logMood: (e: Emotion, at?: Date, note?: string, extra?: Pick<JournalEntry, 'valence' | 'kind' | 'also'>) => JournalEntry   // journal.createEntry
   setReminders: (r: Partial<State['reminders']>) => void
+  sendNote: (n: Pick<NoteMsg, 'text' | 'topic' | 'mood' | 'valence'>) => NoteMsg   // messages.send
+  markNote: (id: string, patch: Pick<NoteMsg, 'deliveredAt' | 'readAt'>) => void     // preview only: server sets these
   updateMood: (id: string, patch: Partial<Pick<JournalEntry, 'emotion' | 'note'>>) => void
   removeMood: (id: string) => void
   addGoal: (title: string, kind?: 'daily' | 'once') => void
@@ -152,7 +160,7 @@ type State = {
 
 const initial = {
   profile: null, journal: [], goals: [], appointments: [], intake: null, blend: null, drops: {}, doses: {}, checkins: {}, cart: [], wishlist: [],
-  addresses: [], orders: [], chat: [], notices: [], plan: null, coupon: null, offer: {}, reminders: {}, seq: 41,
+  addresses: [], orders: [], chat: [], notes: [], notices: [], plan: null, coupon: null, offer: {}, reminders: {}, seq: 41,
 }
 
 /** a valid, unused coupon (owner 2026-11-18: 15% off every product on the first shop order, 7 days) */
@@ -291,6 +299,12 @@ export const useApp = create<State>()(
       },
       setOffer: (o) => set((s) => ({ offer: { ...s.offer, ...o } })),
       setReminders: (r) => set((s) => ({ reminders: { ...(s.reminders ?? {}), ...r } })),
+      sendNote: (n) => {
+        const m: NoteMsg = { id: uid(), from: 'me', at: new Date().toISOString(), ...n, text: n.text.trim().slice(0, 1000) }
+        set((s) => ({ notes: [...(s.notes ?? []), m].slice(-200) }))
+        return m
+      },
+      markNote: (id, patch) => set((s) => ({ notes: (s.notes ?? []).map((m) => (m.id === id ? { ...m, ...patch } : m)) })),
       confirmTime: (id) => {
         // preview of the staff side: the team sets a time (next day, 11:00 IST, or the client's preferred date) and, for a plain
         // appointment request, the type and fee (owner 2026-11-21) — then the client pays in the app ("Complete your booking")

@@ -32,5 +32,5 @@ export async function seed(page: Page, opts: { onboarded?: boolean } = {}) {
   await page.evaluate((s) => { localStorage.setItem('bewise-client-v1', JSON.stringify(s)) }, seedState(opts))
 }
 export const ROUTES = ['/app', '/app/learn', '/app/learn/story?id=anxiety', '/app/journal', '/app/goals', '/app/remedies', '/app/book', '/app/sessions', '/app/sessions/view?id=a2', '/app/checkin?appointment=a2',
-  '/app/pay?appointment=a3', '/app/shop', '/app/shop/sleep-roll-on', '/app/bag', '/app/checkout', '/app/orders', '/app/orders/view?id=o1', '/app/ask', '/app/me', '/app/help']
+  '/app/pay?appointment=a3', '/app/shop', '/app/shop/sleep-roll-on', '/app/bag', '/app/checkout', '/app/orders', '/app/orders/view?id=o1', '/app/ask', '/app/chat', '/app/me', '/app/help']
 export const PUBLIC = ['/welcome', '/sign-in', '/book/jitendra-khimlani?type=followup', '/onboarding/name', '/onboarding/dob', '/onboarding/gender']
