@@ -29,7 +29,8 @@ export function seedState(opts: { onboarded?: boolean } = {}) {
 }
 export async function seed(page: Page, opts: { onboarded?: boolean } = {}) {
   await page.goto('/welcome')
-  await page.evaluate((s) => { localStorage.setItem('bewise-client-v1', JSON.stringify(s)) }, seedState(opts))
+  // the after-onboarding setup (home screen + notifications) is covered by its own tests
+  await page.evaluate((s) => { localStorage.setItem('bewise-client-v1', JSON.stringify(s)); localStorage.setItem('bewise-setup', 'done') }, seedState(opts))
 }
 export const ROUTES = ['/app', '/app/learn', '/app/learn/story?id=anxiety', '/app/journal', '/app/goals', '/app/remedies', '/app/book', '/app/sessions', '/app/sessions/view?id=a2', '/app/checkin?appointment=a2',
   '/app/pay?appointment=a3', '/app/shop', '/app/shop/sleep-roll-on', '/app/bag', '/app/checkout', '/app/orders', '/app/orders/view?id=o1', '/app/ask', '/app/chat', '/app/me', '/app/help']

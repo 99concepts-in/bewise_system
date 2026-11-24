@@ -367,6 +367,46 @@ test('my care: how to take your remedy', async ({ page }) => {
   await expect(page.getByRole('link', { name: /WhatsApp 98980 20939/ })).toHaveAttribute('href', /wa\.me\/919898020939/)
 })
 
+test('after onboarding: add to home screen, then "Turn on notifications?" → the phone asks (Android)', async ({ page }) => {
+  // stand-in for the phone's own permission dialog: records that it was asked and answers Allow
+  await page.addInitScript(() => {
+    let perm = 'default'
+    Object.defineProperty(Notification, 'permission', { get: () => perm, configurable: true })
+    Notification.requestPermission = async () => { (window as unknown as { __asked: number }).__asked = 1; perm = 'granted'; return 'granted' as NotificationPermission }
+  })
+  await seed(page)
+  await page.evaluate(() => localStorage.removeItem('bewise-setup'))
+  await page.goto('/app')
+  await expect(page.getByRole('heading', { name: 'Keep BeWise one tap away' })).toBeVisible({ timeout: 4000 })
+  await expect(page.getByText('Open the menu')).toBeVisible()
+  await page.getByRole('button', { name: 'Done' }).click()
+  await expect(page.getByRole('heading', { name: 'Turn on notifications?' })).toBeVisible()
+  await page.getByRole('button', { name: 'Allow notifications' }).click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __asked?: number }).__asked)).toBe(1)
+  await expect(page.getByRole('heading', { name: 'Turn on notifications?' })).toHaveCount(0)
+  expect(await page.evaluate(() => localStorage.getItem('bewise-setup'))).toBe('done')
+  // shown once only
+  await page.reload(); await page.waitForTimeout(1800)
+  await expect(page.getByRole('heading', { name: 'Keep BeWise one tap away' })).toHaveCount(0)
+})
+
+test('after onboarding on iPhone Safari: home screen steps, then we ask for notifications from the home screen app', async ({ browser }) => {
+  const ctx = await browser.newContext({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1', viewport: { width: 390, height: 664 }, hasTouch: true, isMobile: true })
+  const page = await ctx.newPage()
+  // like Safari on iPhone before BeWise is on the home screen: no notifications at all
+  await page.addInitScript(() => { delete (window as unknown as { Notification?: unknown }).Notification })
+  await seed(page)
+  await page.evaluate(() => localStorage.removeItem('bewise-setup'))
+  await page.goto('/app')
+  await expect(page.getByRole('heading', { name: 'Keep BeWise one tap away' })).toBeVisible({ timeout: 4000 })
+  await expect(page.getByText('Tap Share')).toBeVisible()
+  await page.getByRole('button', { name: 'Done' }).click()
+  await expect(page.getByText(/once BeWise is on your home screen/)).toBeVisible()
+  await page.getByRole('button', { name: 'Okay' }).click()
+  expect(await page.evaluate(() => localStorage.getItem('bewise-setup'))).toBe('notify-later')
+  await ctx.close()
+})
+
 test('onboarding: phone → name → birthdate → gender → home; details we know are prefilled and editable', async ({ page }) => {
   await page.goto('/?reset=1'); await page.waitForURL('**/welcome**')
   await page.goto('/sign-in')
@@ -453,7 +493,7 @@ test('last dose of the day opens the mood slider straight away (no breathe scree
 test('mood garden: blooms after 10 check-ins, asks for more before that', async ({ page }) => {
   await seed(page); await page.goto('/app')
   await expect(page.getByRole('heading', { name: 'Your mood garden' })).toBeVisible()
-  await expect(page.getByRole('img', { name: /^Mood bloom: / })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Mood flower: / })).toBeVisible()
   await expect(page.getByText('Last 14 days')).toBeVisible()
   await page.evaluate(() => { const k = 'bewise-client-v1'; const r = JSON.parse(localStorage.getItem(k)!); r.state.journal = r.state.journal.slice(0, 3); localStorage.setItem(k, JSON.stringify(r)) })
   await page.reload()

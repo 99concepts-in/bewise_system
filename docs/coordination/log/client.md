@@ -2,6 +2,20 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · After onboarding: Add to Home Screen, then "Turn on notifications?"; simpler mood flower; real flower photos
+
+- **Setup after onboarding** (`components/prompts.tsx` `SetupFlow`, mounted on Home after the tour; once per device, `bewise-setup`):
+  1. "Keep BeWise one tap away", the Add to Home Screen sheet.
+     - iPhone: 3 steps (Share, or ••• then Share › Add to Home Screen › Add).
+     - Android: Chrome's own install prompt when available, else the menu steps.
+  2. "Turn on notifications?" (drop and session reminders, replies from Jitendra Khimlani). Only "Allow notifications" calls `Notification.requestPermission()`, which shows the phone's own dialog.
+     - iPhone in Safari can't ask yet (Apple allows notifications only for home screen apps). The sheet says so, and we ask again the first time BeWise opens from the home screen (`notify-later`).
+  - Then the first-dose reminder time sheet (it now waits for this setup).
+  - The small install card stays away for 14 days after the setup.
+- **Mood flower:** equal petals, opacity by how often each feeling was felt, no spinning, "N check-ins" in the centre. Line: "Brighter petals: feelings you felt more often".
+- **Real flower photos** (Higgsfield, cut out) replace the drawn corner flowers: `img/deco/{rose,chicory}` on the mood garden, `mimulus` on the remedy card.
+- Tests: Android path (Allow → system prompt asked, shown once) and iPhone Safari path (steps → ask later from the home screen). 81/81 pass.
+
 ## 2026-11-24 · Share stories (public story page) and review cards after 4 or 5 stars
 
 - **Story sharing:**

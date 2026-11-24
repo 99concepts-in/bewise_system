@@ -8,6 +8,7 @@
  *     `beforeinstallprompt`. "Not now" snoozes 14 days. Hidden when already installed (display-mode: standalone).
  *   - Reminders: asked once, in context, after a booking is confirmed. Only "Yes" calls Notification.requestPermission();
  *     on iPhone it's offered only once installed. The choice can be changed in Me → Reminders.
+ * owner 2026-11-24: SetupFlow after onboarding (after the tour): Add to Home Screen sheet, then "Turn on notifications?".
  * Everything here is per-device preference in localStorage (never sensitive data).
  */
 import { AnimatePresence, motion } from 'motion/react'
@@ -15,7 +16,8 @@ import { BellRing, Share, SquarePlus, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { create } from 'zustand'
 import { LogoMark } from './brand'
-import { Btn, buzz, ease, toast } from './ui'
+import { Btn, Sheet, buzz, ease, toast } from './ui'
+import { useApp } from '@/lib/store'
 import { usePath, useNavShown } from './shell'
 
 const K = { visits: 'bewise-visits', counted: 'bewise-visit-counted', snooze: 'bewise-install-snooze', booked: 'bewise-first-booking', asked: 'bewise-notify-asked', reminders: 'bewise-reminders' }
@@ -98,7 +100,7 @@ export function InstallPrompt() {
     const visits = Number(ls.get(K.visits) || 0)
     const snoozed = Number(ls.get(K.snooze) || 0) > Date.now()
     setIos(isIOS())
-    setReady(!isStandalone() && !snoozed && (visits >= 2 || !!ls.get(K.booked)))
+    setReady(!isStandalone() && !snoozed && ls.get(SETUP) !== null && (visits >= 2 || !!ls.get(K.booked)))
   }, [path])
   const platformOk = ios || !!deferred
   useEffect(() => {
@@ -189,5 +191,106 @@ export function NotifyPrompt({ delay = 1400 }: { delay?: number }) {
         </PromptCard>
       )}
     </AnimatePresence>
+  )
+}
+
+// ---------- after onboarding: Add to Home Screen, then notifications (owner 2026-11-24) ----------
+const SETUP = 'bewise-setup' // '' → not started · 'notify-later' (iPhone: ask again once opened from the home screen) · 'done'
+export const setupState = () => ls.get(SETUP) ?? ''
+const isAndroid = () => typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent)
+
+/**
+ * Once the Home tour is over: 1) a friendly Add to Home Screen sheet (iPhone steps, or Android's install prompt),
+ * 2) "Turn on notifications?" and only on "Allow" the phone's own permission dialog. On iPhone in Safari the phone can't
+ * ask yet (Apple allows it only from the home screen app), so we ask again the first time BeWise opens from the home screen.
+ */
+export function SetupFlow() {
+  const tourPending = useApp((s) => !!s.profile?.tourPending)
+  const deferred = usePrompts((s) => s.deferred)
+  const [step, setStep] = useState<'install' | 'notify' | null>(null)
+  const [ios, setIos] = useState(false)
+  useEffect(() => {
+    if (tourPending) return
+    const st = setupState()
+    setIos(isIOS())
+    let next: 'install' | 'notify' | null = null
+    if (st === '') next = !isStandalone() && (isIOS() || isAndroid() || !!usePrompts.getState().deferred) ? 'install' : 'notify'
+    else if (st === 'notify-later' && isStandalone()) next = 'notify'
+    if (next === 'notify' && typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'default') { ls.set(SETUP, 'done'); next = null }
+    if (!next) return
+    const t = setTimeout(() => { setStep(next); usePrompts.getState().set({ notifyOpen: true }) }, 1200)
+    return () => clearTimeout(t)
+  }, [tourPending])
+
+  const toNotify = () => {
+    ls.set(K.snooze, String(Date.now() + SNOOZE_MS)) // the small install card stays away for a while
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'default') return finish()
+    setStep('notify')
+  }
+  const install = async () => {
+    if (!deferred) return toNotify()
+    buzz(); await deferred.prompt()
+    const r = await deferred.userChoice.catch(() => ({ outcome: 'dismissed' as const }))
+    usePrompts.getState().set({ deferred: null })
+    if (r.outcome === 'accepted') toast('BeWise is on your home screen')
+    toNotify()
+  }
+  const finish = (later = false) => { ls.set(SETUP, later ? 'notify-later' : 'done'); ls.set(K.asked, '1'); setStep(null); usePrompts.getState().set({ notifyOpen: false }) }
+  const canAsk = typeof window !== 'undefined' && 'Notification' in window && !(ios && !isStandalone())
+  const allow = async () => {
+    buzz(10)
+    if (!canAsk) return finish(true) // iPhone in Safari: ask again from the home screen
+    ls.set(K.reminders, 'on')
+    let ok = false
+    try { ok = (await Notification.requestPermission()) === 'granted' } catch { /* blocked */ }
+    finish()
+    toast(ok ? 'Notifications on 🌿' : 'Okay. You can allow notifications later in your phone settings')
+  }
+  const notNow = () => { ls.set(K.reminders, 'off'); finish() }
+
+  return (
+    <>
+      <Sheet open={step === 'install'} onClose={toNotify} title="Add BeWise to your home screen">
+        <div className="pb-2 text-center">
+          <span className="mx-auto grid size-[72px] place-items-center rounded-[20px] bg-white shadow-[var(--shadow-float)] ring-1 ring-line"><LogoMark size={50} /></span>
+          <h2 className="h-duo mt-3 text-[26px]">Keep BeWise <em>one tap away</em></h2>
+          <p className="mx-auto mt-1.5 max-w-[300px] text-[14px] leading-5 text-ink-2">Add BeWise to your home screen. It opens like an app, and lets us send you gentle reminders.</p>
+          {ios || !deferred ? (
+            <ol className="mt-5 grid grid-cols-3 gap-2 text-left" aria-label="How to add it">
+              {(ios
+                ? [{ icon: <Share className="size-5" />, t: 'Tap Share', d: 'or ••• then Share' }, { icon: <SquarePlus className="size-5" />, t: 'Add to Home Screen', d: 'scroll down a little' }, { icon: <span className="font-display text-[14px] font-semibold">Add</span>, t: 'Tap Add', d: 'top right' }]
+                : [{ icon: <span className="text-[18px] font-bold leading-none">⋮</span>, t: 'Open the menu', d: 'top right of Chrome' }, { icon: <SquarePlus className="size-5" />, t: 'Add to Home screen', d: 'or Install app' }, { icon: <span className="font-display text-[14px] font-semibold">Add</span>, t: 'Tap Add', d: 'to confirm' }]
+              ).map((x, i) => (
+                <li key={i} className="flex flex-col items-center gap-1.5 rounded-[18px] bg-sky-50 px-1.5 py-3 text-center">
+                  <span className="relative grid size-11 place-items-center rounded-[12px] bg-white text-[#2f7fc4] shadow-[var(--shadow-card)]">
+                    {x.icon}<span className="absolute -left-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-navy text-[11px] font-bold text-white">{i + 1}</span>
+                  </span>
+                  <span className="text-[12px] font-bold leading-4 text-ink">{x.t}</span>
+                  <span className="text-[11px] leading-4 text-muted">{x.d}</span>
+                </li>
+              ))}
+            </ol>
+          ) : null}
+          <div className="mt-5 space-y-2">
+            {!ios && deferred ? <Btn full onClick={install}>Add to home screen</Btn> : <Btn full onClick={toNotify}>Done</Btn>}
+            <Btn full variant="ghost" size="md" onClick={toNotify}>Maybe later</Btn>
+          </div>
+        </div>
+      </Sheet>
+
+      <Sheet open={step === 'notify'} onClose={notNow} title="Turn on notifications">
+        <div className="pb-2 text-center">
+          <motion.span className="mx-auto grid size-[72px] place-items-center rounded-full bg-marigold-100 text-[#9a5b12]"
+            animate={{ rotate: [0, -12, 12, -8, 0] }} transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2.4 }}><BellRing className="size-8" strokeWidth={1.75} /></motion.span>
+          <h2 className="h-duo mt-3 text-[26px]">Turn on <em>notifications?</em></h2>
+          <p className="mx-auto mt-1.5 max-w-[300px] text-[14px] leading-5 text-ink-2">Gentle reminders for your drops and sessions, and a note when Jitendra Khimlani replies. Nothing else.</p>
+          {!canAsk && <p className="mx-auto mt-3 max-w-[300px] rounded-[16px] bg-sky-50 px-3 py-2.5 text-[13px] leading-5 text-ink-2">On iPhone, notifications can be turned on once BeWise is on your home screen. Open it from there and we’ll ask again.</p>}
+          <div className="mt-5 space-y-2">
+            <Btn full onClick={allow}>{canAsk ? 'Allow notifications' : 'Okay'}</Btn>
+            <Btn full variant="ghost" size="md" onClick={notNow}>Not now</Btn>
+          </div>
+        </div>
+      </Sheet>
+    </>
   )
 }

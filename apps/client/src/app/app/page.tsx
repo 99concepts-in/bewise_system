@@ -17,6 +17,7 @@ import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
 import { MoodLogger } from '@/components/mood-logger'
 import { Tour } from '@/components/tour'
+import { SetupFlow } from '@/components/prompts'
 import { BlendPreparing } from '@/components/blend-preparing'
 import { MoodGarden } from '@/components/mood-garden'
 import { NoteCard } from '@/components/note-card'
@@ -41,6 +42,7 @@ import { useApp, type Appointment } from '@/lib/store'
 import { dayKey, firstName, fmtDay, fmtTime, formatINR } from '@/lib/format'
 import { blendSupply } from '@/lib/supply'
 import { Verified } from '@/components/verified'
+import { BP } from '@/lib/asset'
 
 const greet = (h: number) => (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening')
 
@@ -91,8 +93,9 @@ export default function Home() {
       </Reveal>
 
       <MoodLogger open={!!logger} kind={logger ?? 'moment'} onClose={() => setLogger(null)} />
-      <ReminderSetup />
       <Tour />
+      <SetupFlow />
+      <ReminderSetup />
       <JituStory open={story} onClose={() => setStory(false)} />
     </main>
   )
@@ -400,10 +403,8 @@ function TodaysBlend({ onDose }: { onDose?: () => void }) {
     // owner 2026-11-24: "too bland": a warm sunrise wash, the bottle on a glowing halo, the bottle's 25 days as a petal row,
     // and today's doses as buds on a vine that bloom when checked in
     <section className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(165deg,#FFFFFF_0%,#FFF6E8_48%,#FDEBF2_100%)] p-5 shadow-[var(--shadow-card)]" aria-labelledby="blend-h">
-      <svg className="pointer-events-none absolute -right-10 -top-10 size-44 opacity-[0.22]" viewBox="-50 -50 100 100" aria-hidden>
-        {[0, 60, 120, 180, 240, 300].map((a) => <ellipse key={a} cx={0} cy={-24} rx={14} ry={22} fill="#F4A3B4" transform={`rotate(${a})`} />)}
-        <circle r={12} fill="#F7C548" />
-      </svg>
+      {/* owner 2026-11-24: a real flower photo, small, in the corner */}
+      <img src={`${BP}/img/deco/mimulus.webp`} alt="" aria-hidden className="pointer-events-none absolute -right-4 -top-5 w-[78px] rotate-[24deg] select-none drop-shadow-[0_6px_10px_rgba(120,90,20,.18)]" />
       <div className="relative flex items-center gap-4">
         <div className="relative flex w-[84px] shrink-0 justify-center">
           <span className="absolute left-1/2 top-1/2 size-[104px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#FFE6B8_0%,rgba(255,230,184,.45)_45%,transparent_70%)]" aria-hidden />

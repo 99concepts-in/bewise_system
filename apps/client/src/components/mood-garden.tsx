@@ -15,6 +15,7 @@ import { useApp } from '@/lib/store'
 import { moodOf, type Emotion } from '@/lib/data'
 import { dailyInsight, lastNDays, moodMix, progressLines } from '@/lib/insights'
 import { fmtDay } from '@/lib/format'
+import { BP } from '@/lib/asset'
 
 export const GARDEN_MIN = 10
 const WASH = 'linear-gradient(160deg,#FFF3DF 0%,#FDE3EC 42%,#E7E4FF 78%,#DDF0F4 100%)'
@@ -53,8 +54,9 @@ export function MoodGarden({ onLog }: { onLog: () => void }) {
           ))}
         </ul>
       </div>
+      <p className="relative mt-2 text-[12px] font-semibold text-ink-2">Brighter petals: feelings you felt more often</p>
 
-      <div className="relative mt-4 rounded-[22px] bg-white/65 px-3 pb-2.5 pt-3">
+      <div className="relative mt-3 rounded-[22px] bg-white/65 px-3 pb-2.5 pt-3">
         <p className="px-1 text-[12px] font-bold uppercase tracking-[0.1em] text-muted">Last 14 days</p>
         <div className="mt-2 grid grid-cols-7 gap-y-2" role="img" aria-label={`Last 14 days: ${days.filter((d) => d.mood).length} days with a check-in`}>
           {days.map((d, i) => (
@@ -81,29 +83,32 @@ export function MoodGarden({ onLog }: { onLog: () => void }) {
   )
 }
 
-/** The graph: one petal per feeling, length by how often it was felt; it opens like a flower and turns very slowly. */
+/**
+ * The graph (owner 2026-11-24: "keep the flower simple, don't grow the petals"): one petal per feeling, all the same size;
+ * a feeling felt more often has a brighter, fuller petal, a rare one is faint. It doesn't spin; it breathes gently.
+ */
 function Bloom({ mix, total }: { mix: { mood: Emotion; pct: number }[]; total: number }) {
   const still = useReducedMotion()
   const max = Math.max(1, ...mix.map((m) => m.pct))
-  const n = Math.max(mix.length, 3)
-  const w = n <= 4 ? 30 : n <= 5 ? 26 : 22
+  const n = Math.max(mix.length, 5)
   return (
-    <motion.svg viewBox="-100 -100 200 200" className="size-[150px] shrink-0 drop-shadow-[0_8px_16px_rgba(120,80,140,.18)]" role="img"
-      aria-label={`Mood bloom: ${mix.map((m) => `${moodOf(m.mood).label} ${m.pct}%`).join(', ')}`}
-      animate={still ? undefined : { rotate: 360 }} transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}>
-      {mix.map((m, i) => {
-        const L = 42 + 52 * (m.pct / max), c = moodOf(m.mood).color
+    <motion.svg viewBox="-100 -100 200 200" className="size-[150px] shrink-0 overflow-visible" role="img"
+      aria-label={`Mood flower: ${mix.map((m) => `${moodOf(m.mood).label} ${m.pct}%`).join(', ')}. Brighter petals were felt more often.`}
+      animate={still ? undefined : { scale: [1, 1.03, 1] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
+      {Array.from({ length: n }, (_, i) => {
+        const m = mix[i], c = m ? moodOf(m.mood).color : '#E6E2F3'
+        const o = m ? 0.3 + 0.7 * (m.pct / max) : 0.45
         return (
-          <g key={m.mood} transform={`rotate(${(360 / n) * i})`}>
-            <motion.path fill={c} stroke={shade(c)} strokeWidth={1.5} initial={{ d: petal(4, 3) }} animate={{ d: petal(L, w) }}
-              transition={still ? { duration: 0 } : { delay: 0.15 + i * 0.09, type: 'spring', stiffness: 90, damping: 13 }} />
-            <path d={`M0 -10L0 ${-L * 0.72}`} stroke="#fff" strokeOpacity={0.55} strokeWidth={1.4} strokeLinecap="round" />
+          <g key={i} transform={`rotate(${(360 / n) * i})`}>
+            <motion.ellipse cx={0} cy={-50} rx={n > 6 ? 24 : 28} ry={46} fill={c} stroke={m ? shade(c) : '#d6d1ea'} strokeWidth={1.4}
+              initial={{ opacity: 0 }} animate={{ opacity: o }} transition={still ? { duration: 0 } : { delay: 0.15 + i * 0.08, duration: 0.6 }} />
           </g>
         )
       })}
-      <circle r={22} fill="#fff" />
-      <circle r={22} fill="none" stroke="#F2C14E" strokeWidth={3} strokeDasharray="2 4" />
-      <text y={6} textAnchor="middle" className="fill-navy font-display text-[19px] font-bold">{total}</text>
+      <circle r={30} fill="#fff" />
+      <circle r={30} fill="none" stroke="#F2C14E" strokeWidth={3} strokeDasharray="2 4" />
+      <text y={4} textAnchor="middle" className="fill-navy font-display text-[24px] font-bold">{total}</text>
+      <text y={19} textAnchor="middle" className="fill-[#5B6384] text-[9px] font-semibold">check-ins</text>
     </motion.svg>
   )
 }
@@ -153,20 +158,12 @@ function Seedling({ n, colors, onLog }: { n: number; colors: string[]; onLog: ()
   )
 }
 
-/** soft flowers in the corners of the card */
+/** owner 2026-11-24: real flower photos in the corners (wild rose, chicory), small and tucked in, never over the content */
 function Deco() {
-  const F = (x: number, y: number, s: number, c: string, o: number) => (
-    <g transform={`translate(${x} ${y}) scale(${s})`} opacity={o}>
-      {[0, 72, 144, 216, 288].map((a) => <ellipse key={a} cx={0} cy={-11} rx={8} ry={12} fill={c} transform={`rotate(${a})`} />)}
-      <circle r={6} fill="#F7C548" />
-    </g>
-  )
   return (
-    <svg className="pointer-events-none absolute inset-0 h-full w-full" preserveAspectRatio="xMaxYMin slice" viewBox="0 0 360 400" aria-hidden>
-      {F(330, 26, 1.5, '#F5A3B8', 0.35)}
-      {F(296, 70, 0.8, '#B9A7F2', 0.35)}
-      {F(18, 380, 1.3, '#9ED3C2', 0.3)}
-      {F(345, 360, 0.9, '#F7C98B', 0.35)}
-    </svg>
+    <>
+      <img src={`${BP}/img/deco/rose.webp`} alt="" aria-hidden className="pointer-events-none absolute -right-5 -top-6 w-[92px] rotate-[18deg] select-none drop-shadow-[0_6px_10px_rgba(120,60,90,.18)]" />
+      <img src={`${BP}/img/deco/chicory.webp`} alt="" aria-hidden className="pointer-events-none absolute -bottom-4 -right-3 w-[58px] -rotate-[14deg] select-none opacity-90" />
+    </>
   )
 }

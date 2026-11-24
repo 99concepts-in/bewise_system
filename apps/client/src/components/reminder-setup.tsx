@@ -15,6 +15,7 @@ import { Btn, Sheet, buzz, toast } from './ui'
 import { useApp } from '@/lib/store'
 import { dayKey } from '@/lib/format'
 import { dosesOn, perDay } from '@/lib/doses'
+import { setupState } from './prompts'
 
 const canNotify = () => typeof window !== 'undefined' && 'Notification' in window
 const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m }
@@ -25,7 +26,10 @@ export const NEXT_AFTER_MIN = 4 * 60
 export function ReminderSetup() {
   const s = useApp()
   const blend = s.blend
-  const asked = !!s.reminders?.askedAt || !!s.profile?.tourPending // owner 2026-11-24: never on top of the tour
+  // owner 2026-11-24: never on top of the tour, and only after the home screen + notifications setup
+  const [setupDone, setSetupDone] = useState(false)
+  useEffect(() => { const f = () => setSetupDone(['done', 'notify-later'].includes(setupState())); f(); const t = setInterval(f, 1000); return () => clearInterval(t) }, [])
+  const asked = !!s.reminders?.askedAt || !!s.profile?.tourPending || !setupDone
   const [open, setOpen] = useState(false)
   const [first, setFirst] = useState(() => s.reminders?.firstAt ?? blend?.reminderTimes?.[0] ?? '08:00')
   useEffect(() => { if (blend && !asked) { const t = setTimeout(() => setOpen(true), 1200); return () => clearTimeout(t) } }, [blend, asked])
