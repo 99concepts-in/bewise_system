@@ -13,8 +13,8 @@ const STEPS = [
   { id: 'remedy', title: 'Your remedy', body: 'Tap a drop each time you take your 4 drops. The bottle shows the days left in this blend.' },
   { id: 'blend', title: 'Your blend', body: 'After your session, Jitendra Khimlani prepares your blend. You’ll see here when it’s ready.' },
   { id: 'mood', title: 'How you feel', body: 'Log how you feel in a few seconds. Over time you’ll notice your patterns.' },
-  { id: 'meet', title: 'Book a session', body: 'Book your next wellness session with Jitendra Khimlani, right from here.' },
   { id: 'learn', title: 'Learn', body: 'Short Bach flower stories, 3 minutes each. Tap a card to start.' },
+  { id: 'meet', title: 'Book a session', body: 'Book your next wellness session with Jitendra Khimlani, right from here.' },
   { id: 'ask', title: 'Ask BeWise', body: 'Questions about your drops, blend or sessions? Ask anytime.' },
   { id: 'nav', title: 'Everything in one place', body: 'My care has your blend and sessions, Learn all the stories, Shop wellness products, and Me your profile.' },
 ]

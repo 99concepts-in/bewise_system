@@ -71,9 +71,10 @@ export default function Home() {
 
         <Item className="empty:hidden"><LaunchBanner /></Item>
 
-        <Item data-tour="meet"><MeetCard open={story} onOpen={() => { buzz(8); setStory(true) }} /></Item>
-
+        {/* owner 2026-11-24: "How Bach flowers can help" sits above the book-a-session card */}
         <Item data-tour="learn"><LearnCard /></Item>
+
+        <Item data-tour="meet"><MeetCard open={story} onOpen={() => { buzz(8); setStory(true) }} /></Item>
 
         <GoalsCard />
 

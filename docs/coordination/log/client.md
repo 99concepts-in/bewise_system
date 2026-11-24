@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Home order: Bach flower stories above Book a session
+- "How Bach flowers can help" slider now sits directly above Jitendra Khimlani's Book a session card (tour order updated to match).
+
 ## 2026-11-24 · Story music works on iPhone; random; 5 soundscapes incl. binaural
 - Couldn't hear it on iPhone: live Web Audio is silenced by the ringer switch and only starts on a completed tap. Now each soundscape is rendered once (OfflineAudioContext, 32 s, equal-power crossfaded seam, normalised) to a WAV loop and played through an <audio> element as media (navigator.audioSession = playback where supported). Sound starts on the first tap's touch end; all five are prepared in the background so switching starts instantly inside the tap.
 - Random soundscape each time a story opens (mute is remembered). Added Ocean (slow wave swells) and Binaural (200 Hz left / 206 Hz right, 6 Hz theta, soft pads; "best with headphones" shown). Now: Calm, Rain, Chimes, Ocean, Binaural.
