@@ -541,6 +541,11 @@ test('last dose of the day opens the mood slider straight away (no breathe scree
   await expect(page.getByRole('dialog', { name: 'A moment to breathe' })).toHaveCount(0)
 })
 
+test('home: connect with Jitendra Khimlani on Instagram', async ({ page }) => {
+  await seed(page); await page.goto('/app')
+  await expect(page.getByRole('link', { name: /Connect with Jitendra Khimlani on Instagram/ })).toHaveAttribute('href', 'https://www.instagram.com/jitubhaiyajgd/')
+})
+
 test('mood garden: blooms after 10 check-ins, asks for more before that', async ({ page }) => {
   await seed(page); await page.goto('/app')
   await expect(page.getByRole('heading', { name: 'Your mood garden' })).toBeVisible()

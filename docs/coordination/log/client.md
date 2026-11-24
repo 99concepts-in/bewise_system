@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Home: "Connect with me on Instagram"
+
+- Owner: add "connect with me on Instagram" on Home (https://www.instagram.com/jitubhaiyajgd).
+- New `InstagramCard` under the Meet / Book card: Jitendra Khimlani's photo in an Instagram gradient ring, "Connect with me on Instagram", name with the verified badge and @jitubhaiyajgd, and a full-width "Follow on Instagram" button.
+- It opens the profile in a new tab (the Instagram app on phones). The link is stored without the tracking parameter (`JITU_INSTAGRAM` in `lib/data.ts`).
+- Test added. 84/84 pass.
+
 ## 2026-11-24 · Review card: 3 themes, review / tags / both, edit the words
 
 - Owner: 2 or 3 card options and themes to choose from, some with the chip text and some with only the review, and an edit option.

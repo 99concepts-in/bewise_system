@@ -122,6 +122,8 @@ export const TESTIMONIALS: { name: string; city?: string; quote: string; rating?
   { name: 'Khushboo Gurnani', quote: 'Jitendra Khimlani has the best Bach flower & aroma oils therapy. I’ve benefited drastically mentally. It gave me a sense of calm and sound sleep after I took the treatment.' },
 ]
 /** BeWise contact from the brochure and remedy label. */
+/** owner 2026-11-24: Jitendra Khimlani's own Instagram (Home → "Connect with me on Instagram") */
+export const JITU_INSTAGRAM = { handle: '@jitubhaiyajgd', url: 'https://www.instagram.com/jitubhaiyajgd/' }
 export const CONTACT = { whatsapp: '919054220952', whatsappLabel: '90542 20952', social: '@bewiseglobal' }
 export const TESTIMONIALS_SOURCE = 'https://www.jitendrakhimlani.com'
 /** owner 2026-11-23: Jitendra Khimlani's Google reviews (opens the reviews panel on Google). */

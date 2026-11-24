@@ -1,7 +1,7 @@
-:HL["/bewise_system/preview/client/_next/static/chunks/1dtg8degwfq3l.css","style"]
+:HL["/bewise_system/preview/client/_next/static/chunks/0ek5m11hahw-g.css","style"]
 :HC["/",""]
 4:[["children",{"s":"__PAGE__","h":160}]]
 3:[["children",{"s":{"n":"slug","t":"d","k":"abundance-bath-salt","s":[]},"h":65632,"c":"$Q4"}]]
 2:[["children",{"s":"shop","h":131168,"c":"$Q3"}]]
 1:[["children",{"s":"app","h":131172,"c":"$Q2"}]]
-0:{"b":"GbzSqsVVSpdtj2zX1zUhZ","t":{"t":{"s":"","h":131160,"c":"$Q1"}}}
+0:{"b":"tZ54AZc3enT4tFTnHzasA","t":{"t":{"s":"","h":131160,"c":"$Q1"}}}

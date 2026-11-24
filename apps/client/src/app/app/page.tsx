@@ -30,7 +30,7 @@ import { FeelingIcon } from '@/components/flower'
 import { JituPortrait, JituStory, Sparkle } from '@/components/jitu-story'
 import { ProductCard } from '@/components/product-card'
 import { BtnLink, Item, Reveal, buzz, cx, ease, toast, useChrome, useNow } from '@/components/ui'
-import { CONSULTATIONS, CONSULTANT, PRODUCTS, moodOf, type Emotion } from '@/lib/data'
+import { CONSULTATIONS, CONSULTANT, JITU_INSTAGRAM, PRODUCTS, moodOf, type Emotion } from '@/lib/data'
 import { ACCENTS, HOME_FEELINGS, type HomeFeeling } from '@/lib/feelings'
 import { apptName, isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { GoalCheck } from '@/components/goal-check'
@@ -81,6 +81,9 @@ export default function Home() {
         <Item data-tour="learn"><LearnCard /></Item>
 
         <Item data-tour="meet"><MeetCard open={story} onOpen={() => { buzz(8); setStory(true) }} /></Item>
+
+        {/* owner 2026-11-24: connect with Jitendra Khimlani on Instagram */}
+        <Item><InstagramCard /></Item>
 
         <GoalsCard />
 
@@ -311,6 +314,30 @@ function MeetCard({ open, onOpen }: { open: boolean; onOpen: () => void }) {
       <p className="relative mt-2.5 text-center text-[12px] text-ink-2">Remedy blend included · nothing to pay until your time is set</p>
       <Sparkle size={22} className="absolute left-[100px] top-3" />
     </section>
+  )
+}
+
+/* ---------------- Instagram (owner 2026-11-24) ---------------- */
+const IG_GRADIENT = 'linear-gradient(45deg,#FEDA75 0%,#FA7E1E 25%,#D62976 50%,#962FBF 75%,#4F5BD5 100%)'
+function InstagramCard() {
+  return (
+    <a href={JITU_INSTAGRAM.url} target="_blank" rel="noopener noreferrer" onClick={() => buzz(8)} aria-label={`Connect with Jitendra Khimlani on Instagram, ${JITU_INSTAGRAM.handle}`}
+      className="card relative block overflow-hidden p-4 transition-transform active:scale-[0.98]">
+      <span className="pointer-events-none absolute -right-10 -top-12 size-36 rounded-full opacity-[0.12]" style={{ background: IG_GRADIENT }} aria-hidden />
+      <span className="relative flex items-center gap-3.5">
+        <span className="shrink-0 rounded-full p-[3px]" style={{ background: IG_GRADIENT }}>
+          <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="size-[58px] rounded-full object-cover object-[50%_30%] ring-[3px] ring-white" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-[19px] font-semibold leading-6 text-ink">Connect with me on Instagram</span>
+          <span className="mt-0.5 flex items-center gap-1 text-[13px] font-semibold text-ink-2">Jitendra Khimlani <Verified size={14} /> <span className="font-medium text-muted">· {JITU_INSTAGRAM.handle}</span></span>
+        </span>
+      </span>
+      <span className="relative mt-3.5 flex h-12 items-center justify-center gap-2 rounded-full text-[15px] font-bold text-white shadow-[0_8px_18px_rgba(214,41,118,.28)]" style={{ background: IG_GRADIENT }}>
+        <svg viewBox="0 0 24 24" className="size-[18px]" aria-hidden><rect x="3" y="3" width="18" height="18" rx="5.5" fill="none" stroke="#fff" strokeWidth="2" /><circle cx="12" cy="12" r="4.2" fill="none" stroke="#fff" strokeWidth="2" /><circle cx="17.3" cy="6.7" r="1.2" fill="#fff" /></svg>
+        Follow on Instagram
+      </span>
+    </a>
   )
 }
 
