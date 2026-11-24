@@ -2,6 +2,15 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Feedback: reasons that fit an unhappy rating
+
+- Owner: if they're not happy, list reasons that resonate with unhappiness. The quick tags now follow the face:
+  - **1 or 2:** "We’re sorry it didn’t feel right. What happened?" with Didn’t feel heard, Felt rushed, Too short, Guidance wasn’t clear, Hard to connect, Started late, Call or audio issues, Not what I expected. The comment box asks "What could we do better?".
+  - **3:** a mix: Felt heard, Calming, Too short, Want clearer next steps, Started late, Hard to connect.
+  - **4 or 5:** the kind words only, as before.
+- Changing the face drops tags that don't belong to the new set.
+- Test added. 87/87 pass.
+
 ## 2026-11-24 · Story music: Calm and Chimes only
 
 - Owner: remove the Ocean, Binaural and Rain sounds and keep the rest. `lib/ambient.ts` now has 2 soundscapes, **Calm** and **Chimes**: a random one on each open, tap to switch, mute remembered.

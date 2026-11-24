@@ -169,8 +169,12 @@ function RescheduleSheet({ open, onClose, id, startsAt, used }: { open: boolean;
 }
 
 const RATING: Emotion[] = ['sad', 'tired', 'calm', 'grateful', 'joyful']
-const TAGS = ['Felt heard', 'Clear guidance', 'Calming', 'Warm', 'Too short', 'Hard to connect']
-const POSITIVE = new Set(['Felt heard', 'Clear guidance', 'Calming', 'Warm'])
+// owner 2026-11-24: the quick tags follow the face. Happy → kind words; unhappy → reasons that fit; in between → a mix.
+const HAPPY_TAGS = ['Felt heard', 'Clear guidance', 'Calming', 'Warm']
+const UNHAPPY_TAGS = ['Didn’t feel heard', 'Felt rushed', 'Too short', 'Guidance wasn’t clear', 'Hard to connect', 'Started late', 'Call or audio issues', 'Not what I expected']
+const MIXED_TAGS = ['Felt heard', 'Calming', 'Too short', 'Want clearer next steps', 'Started late', 'Hard to connect']
+const POSITIVE = new Set(HAPPY_TAGS)
+const tagsFor = (rating: number) => (rating >= 4 ? HAPPY_TAGS : rating === 3 ? MIXED_TAGS : rating > 0 ? UNHAPPY_TAGS : HAPPY_TAGS)
 /** theme swatches, Review / Tags / Both, and Edit for the words on the card */
 function CardControls({ theme, setTheme, show, setShow, canPick, text, setText, editing, setEditing }: {
   theme: CardTheme; setTheme: (t: CardTheme) => void; show: CardShow; setShow: (s: CardShow) => void; canPick: boolean
@@ -248,19 +252,19 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
             <h2 className="h-duo text-[26px]">How was your <em>session?</em></h2>
             <div className="mt-5 flex justify-between">
               {RATING.map((m, i) => (
-                <motion.button key={m} whileTap={{ scale: 0.85 }} aria-label={`${i + 1} of 5`} aria-pressed={rating === i + 1} onClick={() => { buzz(8); setRating(i + 1); if (i + 1 >= 4) setTags((x) => x.filter((t) => POSITIVE.has(t))) }}
+                <motion.button key={m} whileTap={{ scale: 0.85 }} aria-label={`${i + 1} of 5`} aria-pressed={rating === i + 1} onClick={() => { buzz(8); setRating(i + 1); const ok = new Set(tagsFor(i + 1)); setTags((x) => x.filter((t) => ok.has(t))) }}
                   animate={{ scale: rating === i + 1 ? 1.15 : 0.94, filter: rating === i + 1 ? 'grayscale(0)' : 'grayscale(1)', opacity: rating === i + 1 ? 1 : 0.55 }} transition={spring}>
                   <MoodImg mood={m} size={54} />
                 </motion.button>
               ))}
             </div>
-            {/* owner 2026-11-24: a smiling face (4 or 5) shows only the kind words */}
-            <div className="mt-5 flex flex-wrap gap-2">{TAGS.filter((t) => rating < 4 || POSITIVE.has(t)).map((t) => <Chip key={t} on={tags.includes(t)} onClick={() => setTags(tags.includes(t) ? tags.filter((x) => x !== t) : [...tags, t])}>{t}</Chip>)}</div>
+            {rating > 0 && rating <= 2 && <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="mt-5 text-[15px] font-semibold text-ink">We’re sorry it didn’t feel right. What happened?</motion.p>}
+            <div className={cx('flex flex-wrap gap-2', rating > 0 && rating <= 2 ? 'mt-3' : 'mt-5')}>{tagsFor(rating).map((t) => <Chip key={t} on={tags.includes(t)} onClick={() => setTags(tags.includes(t) ? tags.filter((x) => x !== t) : [...tags, t])}>{t}</Chip>)}</div>
             {/* owner 2026-11-20: faces + quick tags only, then an optional comment */}
             {comment ? (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                 <label className="mt-6 block text-[15px] font-bold text-navy" htmlFor="fbnotes">Your comment</label>
-                <textarea id="fbnotes" rows={3} autoFocus={!notes} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder="Anything you’d like Jitendra Khimlani to know…" className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[16px] outline-none focus:ring-2 focus:ring-blue" />
+                <textarea id="fbnotes" rows={3} autoFocus={!notes} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder={rating > 0 && rating <= 2 ? 'What could we do better?' : 'Anything you’d like Jitendra Khimlani to know…'} className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[16px] outline-none focus:ring-2 focus:ring-blue" />
               </motion.div>
             ) : (
               <button type="button" onClick={() => setComment(true)} className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-peri-50 px-4 py-2.5 text-[14px] font-semibold text-navy"><Plus className="size-4" /> Add a comment</button>

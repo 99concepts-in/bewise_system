@@ -63,6 +63,21 @@ test('feedback: adding a comment keeps the sheet open; only the handle swipes it
   await expect(dlg).toHaveCount(0, { timeout: 3000 })
 })
 
+test('feedback: an unhappy face lists reasons that fit', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/sessions/view?id=a1&feedback=1')
+  await page.getByRole('button', { name: '1 of 5' }).click()
+  await expect(page.getByText('We’re sorry it didn’t feel right. What happened?')).toBeVisible()
+  for (const t of ['Didn’t feel heard', 'Felt rushed', 'Started late']) await expect(page.getByRole('checkbox', { name: t })).toBeVisible()
+  await expect(page.getByRole('checkbox', { name: 'Warm' })).toHaveCount(0)
+  await page.getByRole('checkbox', { name: 'Felt rushed' }).click()
+  await page.getByRole('button', { name: 'Add a comment' }).click()
+  await expect(page.getByLabel('Your comment')).toHaveAttribute('placeholder', 'What could we do better?')
+  await page.getByRole('button', { name: 'Send to Jitendra Khimlani' }).click()
+  const fb = (await state(page)).appointments.find((a: { id: string }) => a.id === 'a1').feedback
+  expect(fb).toMatchObject({ rating: 1, tags: ['Felt rushed'] })
+})
+
 test('feedback: a smiling face hides the negative tags (and drops them if picked)', async ({ page }) => {
   await seed(page)
   await page.goto('/app/sessions/view?id=a1&feedback=1')
