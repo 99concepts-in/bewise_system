@@ -15,7 +15,7 @@ import { Check, ChevronLeft, Search, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { buzz, cx, toast } from './ui'
 import { MoodImg } from './brand'
-import { MOOD_LEVELS, MoodShape, moodColor, moodInk } from './mood-shape'
+import { LiveBackdrop, MOOD_LEVELS, MoodShape, moodColor, moodInk } from './mood-shape'
 import { MOODS, moodOf, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
 
@@ -83,6 +83,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
           <motion.div className="absolute inset-x-0 bottom-0 mx-auto flex h-[94dvh] max-w-[480px] flex-col overflow-hidden rounded-t-[34px] bg-[#17181d] text-white"
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', stiffness: 260, damping: 30 }}>
             <motion.div className="pointer-events-none absolute inset-0" style={{ background: bg }} aria-hidden />
+            <LiveBackdrop v={v} />
 
             {/* header */}
             <div className="relative flex items-center justify-between px-4 pt-4">
@@ -105,7 +106,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
               {step === 'feel' && (
                 <motion.div key="feel" className="relative flex flex-1 flex-col px-6 pb-[max(env(safe-area-inset-bottom),20px)]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }}>
                   <h2 className="mt-7 text-center font-sans text-[26px] font-semibold leading-8 text-white/90">{kind === 'day' ? 'Choose how you’ve felt overall today' : 'Choose how you feel right now'}</h2>
-                  <div className="flex flex-1 items-center justify-center"><MoodShape v={v} size={270} /></div>
+                  <div className="flex flex-1 items-center justify-center"><MoodShape v={v} size={300} /></div>
                   <AnimatePresence mode="wait">
                     <motion.p key={level} initial={{ opacity: 0, y: 8, filter: 'blur(6px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0, y: -8, filter: 'blur(6px)' }} transition={{ duration: 0.2 }}
                       className="text-center text-[32px] font-semibold text-white/90" aria-live="polite">{MOOD_LEVELS[level]}</motion.p>
