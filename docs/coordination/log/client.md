@@ -2,6 +2,16 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Checkout: saved address selected, new-address form closes
+
+- Owner: "Add an option to close this. It is not letting me check out even if I have one address already, and that is selected."
+- **Cause:** checkout read the saved addresses before the app's local storage had loaded. With none found, it opened the empty form and selected nothing. Pay was also locked while the form was open.
+- **Fix** (`app/app/checkout/page.tsx`):
+  - When the addresses arrive, the first one is selected and the empty form closes (unless the member opened it).
+  - The form has a close (X) button whenever a saved address exists.
+  - Pay is only locked when no address is selected.
+- Test added. 71/71 pass.
+
 ## 2026-11-24 · Home: mood garden, blooming dose tracker, gift offer, notes to Jitendra Khimlani
 
 Owner feedback (screenshots from My care and Home), all live:

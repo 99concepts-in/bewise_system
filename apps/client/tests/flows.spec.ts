@@ -140,6 +140,19 @@ test('appointment with a plan: request only (optional preferences, typed date), 
   await page.goto(`/app/sessions/view?id=${a.id}`); await expect(page.getByText('05/12/2026')).toBeVisible()
 })
 
+test('checkout: a saved address is selected on load; the new-address form can be closed', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/checkout')
+  const pay = page.getByRole('button', { name: /Pay ₹/ })
+  await expect(page.getByRole('button', { name: /Priya Shah/ })).toHaveAttribute('aria-pressed', 'true')
+  await expect(pay).toBeEnabled()
+  await page.getByRole('button', { name: 'Add a new address' }).click()
+  await expect(page.getByText('New address', { exact: true })).toBeVisible()
+  await expect(pay).toBeEnabled()
+  await page.getByRole('button', { name: 'Close new address' }).click()
+  await expect(page.getByText('New address', { exact: true })).toHaveCount(0)
+})
+
 test('checkout: pick up from center, pay, then say yes to subscribing', async ({ page }) => {
   await seed(page)
   await page.goto('/app/checkout')
