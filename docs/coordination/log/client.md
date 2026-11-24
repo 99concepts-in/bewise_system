@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Learn header made concise
+- Headline "How Bach flowers help" (one line), description removed, shorter search placeholder ("Search sleep, worry, confidence…"), smaller chips and spacing; stories start higher.
+
 ## 2026-11-24 · Home order: Bach flower stories above Book a session
 - "How Bach flowers can help" slider now sits directly above Jitendra Khimlani's Book a session card (tour order updated to match).
 

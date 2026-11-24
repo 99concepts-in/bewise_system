@@ -1,4 +1,4 @@
 :HL["/bewise_system/preview/client/_next/static/chunks/137zuyx5fozr7.css","style"]
 2:[["children",{"s":"__PAGE__","h":160}]]
 1:[["children",{"s":"/_not-found","h":96,"c":"$Q2"}]]
-0:{"b":"dz2HrXURKkBe_DzDDNCRX","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"XRVJG0z1HFvL7JNz6RSF_","t":{"t":{"s":"","h":80,"c":"$Q1"}}}

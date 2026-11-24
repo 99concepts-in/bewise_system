@@ -29,23 +29,23 @@ export default function Learn() {
   return (
     <main className="px-5 pb-32">
       <AppHeader />
-      <h1 className="h-duo pt-2">Know how <em>Bach flower therapy</em> can help you</h1>
-      <p className="mt-2 text-[14px] leading-5 text-ink-2">Short stories, 3 minutes each. Tap the right side to move on.</p>
+      {/* owner 2026-11-24: shorter headline, no description, tighter top section */}
+      <h1 className="h-duo pt-1">How <em>Bach flowers</em> help</h1>
 
-      <label className="mt-5 flex h-12 items-center gap-2 rounded-full bg-white px-4 shadow-[var(--shadow-card)] focus-within:ring-2 focus-within:ring-navy">
+      <label className="mt-3 flex h-11 items-center gap-2 rounded-full bg-white px-4 shadow-[var(--shadow-card)] focus-within:ring-2 focus-within:ring-navy">
         <Search className="size-5 text-muted" aria-hidden />
-        <input value={q} onChange={(e) => setQ(e.target.value.slice(0, 40))} placeholder="Search a concern, like sleep or worry" aria-label="Search a concern"
+        <input value={q} onChange={(e) => setQ(e.target.value.slice(0, 40))} placeholder="Search sleep, worry, confidence…" aria-label="Search a concern"
           className="h-full min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-[#8a91a8]" />
         {q && <button onClick={() => setQ('')} aria-label="Clear search" className="grid size-8 place-items-center rounded-full text-muted"><X className="size-4" /></button>}
       </label>
       {!t && (
-        <div className="no-scrollbar -mx-5 mt-3 flex gap-2 overflow-x-auto px-5 pb-1">
-          {POPULAR.map((p) => <button key={p} onClick={() => setQ(p)} className="shrink-0 rounded-full bg-peri-50 px-3.5 py-2 text-[13px] font-semibold text-navy">{p}</button>)}
+        <div className="no-scrollbar -mx-5 mt-2.5 flex gap-2 overflow-x-auto px-5 pb-1">
+          {POPULAR.map((p) => <button key={p} onClick={() => setQ(p)} className="shrink-0 rounded-full bg-peri-50 px-3 py-1.5 text-[13px] font-semibold text-navy">{p}</button>)}
         </div>
       )}
 
       {stories.length > 0 && (
-        <section className="mt-6" aria-label="Stories">
+        <section className="mt-4" aria-label="Stories">
           <div className="grid grid-cols-2 gap-3">
             {stories.map((s, i) => (
               <motion.div key={s.id} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06, duration: 0.45, ease }} className={cx(i === 0 && !t && 'col-span-2')}>
