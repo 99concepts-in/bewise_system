@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Gift (wellness journey plan) only after a first session
+
+- Owner: the gift card is only for people who have had at least one appointment with us.
+- New `hadSession()` (`lib/appt.ts`): true when an appointment is completed, or confirmed with a set time that has passed. Requests and unpaid bookings don't count.
+- The Home gift banner now needs `hadSession` (plus the offer running and no plan yet).
+- Test added (no past session → no gift; with one → gift). 86/86 pass.
+
 ## 2026-11-24 · Session page: "Before you begin" only for online sessions
 
 - Owner: no "Before you begin" tips (quiet spot, glass of water, three breaths before you join) on in-person session requests. They now show only when the session is online.

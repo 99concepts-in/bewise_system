@@ -558,6 +558,15 @@ test('last dose of the day opens the mood slider straight away (no breathe scree
   await expect(page.getByRole('dialog', { name: 'A moment to breathe' })).toHaveCount(0)
 })
 
+test('gift (wellness journey plan) only after at least one session', async ({ page }) => {
+  await seed(page)
+  await page.evaluate(() => { const k = 'bewise-client-v1'; const s = JSON.parse(localStorage.getItem(k)!); s.state.appointments = s.state.appointments.filter((a: { status: string }) => a.status !== 'completed'); localStorage.setItem(k, JSON.stringify(s)) })
+  await page.goto('/app'); await page.waitForTimeout(1200)
+  await expect(page.getByRole('button', { name: 'Reveal your wellness journey plan' })).toHaveCount(0)
+  await seed(page); await page.goto('/app') // has a completed session
+  await expect(page.getByRole('button', { name: 'Reveal your wellness journey plan' })).toBeVisible()
+})
+
 test('home: connect with Jitendra Khimlani on Instagram', async ({ page }) => {
   await seed(page); await page.goto('/app')
   await expect(page.getByRole('link', { name: /Connect with Jitendra Khimlani on Instagram/ })).toHaveAttribute('href', 'https://www.instagram.com/jitubhaiyajgd/')

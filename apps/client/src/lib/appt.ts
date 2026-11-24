@@ -13,3 +13,7 @@ export const isUpcoming = (a: Appointment, now = Date.now()) =>
 /** owner 2026-11-21: one "Appointment" for everyone; the team decides first visit or follow-up */
 export const apptName = (a: Pick<Appointment, 'type' | 'kindTbc'>) => (a.kindTbc ? 'Wellness session' : CONSULTATIONS.find((c) => c.id === a.type)?.name ?? 'Wellness session')
 export const apptMinutes = (a: Pick<Appointment, 'type' | 'kindTbc'>) => (a.kindTbc ? 60 : CONSULTATIONS.find((c) => c.id === a.type)?.minutes ?? 60)
+
+/** owner 2026-11-24: the member has had at least one session with us (completed, or a confirmed session whose time has passed) */
+export const hadSession = (appts: Pick<Appointment, 'status' | 'startsAt' | 'timeTbc' | 'needsNewTime'>[], now = Date.now()) =>
+  appts.some((a) => a.status === 'completed' || (a.status === 'confirmed' && !tbc(a) && +new Date(a.startsAt) < now))

@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { PaySheet } from './pay-sheet'
 import { Btn, buzz, cx, useNow } from './ui'
 import { useApp } from '@/lib/store'
+import { hadSession } from '@/lib/appt'
 import { formatINR } from '@/lib/format'
 import { COUPON_DAYS, COUPON_PCT, OFFER_ENDS, PLANS, countdown, offerLive, planFull, planPrice, planSaving, waLink, type PlanId } from '@/lib/offer'
 
@@ -43,7 +44,9 @@ export function Countdown({ dark, compact }: { dark?: boolean; compact?: boolean
 export function LaunchBanner() {
   const [open, setOpen] = useState(false)
   const plan = useApp((s) => s.plan)
-  const show = offerLive() && !plan
+  // owner 2026-11-24: the gift is only for members who have already had at least one session with us
+  const had = useApp((s) => hadSession(s.appointments))
+  const show = offerLive() && !plan && had
   if (!show && !open) return null
   return (
     <>
