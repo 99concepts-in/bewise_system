@@ -2,6 +2,10 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Mood slider fixed ("sometimes not working")
+- Causes: (1) the visible thumb sat over an invisible native range; on iPhone Safari a native range only drags when the finger lands on its own small thumb, so many drags did nothing; (2) the snap-to-level spring kept running and fought a quick second drag; (3) the spring could overshoot past the ends.
+- Fix: the whole track is now a custom pointer slider (touch-action none, pointer capture): tap anywhere to jump, drag from anywhere. Snap animation stops on a new touch, no overshoot, values clamped. A visually hidden range keeps keyboard / screen-reader access. Test added with real touch events (63).
+
 ## 2026-11-24 · Mood logger: our feeling faces
 - Step 2 ("What describes this feeling?") now shows each feeling as a tile with our own face (MoodImg) and label in a 3-column grid; selected tiles turn white with a tick. Search and up-to-3 picks unchanged.
 

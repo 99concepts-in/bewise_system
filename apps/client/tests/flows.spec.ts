@@ -358,3 +358,23 @@ test('last dose of the day → breathe in, breathe out → mood slider', async (
   await expect(page.getByText('Breathe out…')).toBeVisible({ timeout: 7000 })
   await expect(page.getByRole('slider', { name: 'How pleasant or unpleasant' })).toBeVisible({ timeout: 9000 })
 })
+
+test('mood slider: tap anywhere on the track and drag with a finger', async ({ page }) => {
+  await seed(page); await page.goto('/app')
+  await page.getByRole('button', { name: /Log how you feel|Log again/ }).first().click()
+  const slider = page.getByRole('slider', { name: 'How pleasant or unpleasant' })
+  const track = page.getByRole('dialog', { name: 'Log how you feel' }).locator('div.touch-none')
+  await page.waitForTimeout(800) // let the sheet finish sliding up before measuring
+  const b = (await track.boundingBox())!
+  // tap near the right end → very pleasant
+  await page.mouse.click(b.x + b.width - 10, b.y + b.height / 2)
+  await expect(slider).toHaveAttribute('aria-valuetext', 'Very pleasant')
+  // drag from the middle (not on the thumb) to the left end → very unpleasant
+  const cdp = await page.context().newCDPSession(page)
+  const y = b.y + b.height / 2
+  const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] })
+  await touch('touchStart', b.x + b.width / 2)
+  for (const x of [b.x + 150, b.x + 100, b.x + 50, b.x + 10]) await touch('touchMove', x)
+  await touch('touchEnd', b.x + 10)
+  await expect(slider).toHaveAttribute('aria-valuetext', 'Very unpleasant')
+})

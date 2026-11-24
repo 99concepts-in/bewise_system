@@ -12,7 +12,7 @@
  */
 import { AnimatePresence, animate, motion, useMotionValue, useMotionValueEvent, useTransform } from 'motion/react'
 import { Check, ChevronLeft, Search, X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { buzz, cx, toast } from './ui'
 import { MoodImg } from './brand'
 import { MOOD_LEVELS, MoodShape, moodColor, moodInk } from './mood-shape'
@@ -37,7 +37,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
   const [q, setQ] = useState('')
   const [picks, setPicks] = useState<Emotion[]>([])
   const [note, setNote] = useState('')
-  useEffect(() => { if (open) { setKind(kind0); setStep('feel'); v.set(3); setLevel(3); setQ(''); setPicks([]); setNote('') } }, [open, kind0, v])
+  useEffect(() => { if (open) { setKind(kind0); setStep('feel'); v.set(3); setLevel(3); lastLevel.current = 3; setQ(''); setPicks([]); setNote('') } }, [open, kind0, v])
   useEffect(() => {
     if (!open) return
     const prev = document.body.style.overflow; document.body.style.overflow = 'hidden'
@@ -50,9 +50,18 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
   const bg = useTransform(v, (x) => `radial-gradient(130% 75% at 50% 0%, ${moodColor(x, 0.55)}, transparent 70%), linear-gradient(180deg, ${moodColor(x, 0.28)}, #17181d 85%)`)
   const btn = useTransform(v, (x) => moodColor(x))
   const ink = useTransform(v, (x) => moodInk(x))
-  const thumbLeft = useTransform(v, (x) => `calc(${(x / 6) * 100}% + ${20 - (x / 6) * 40}px)`)
-  useMotionValueEvent(v, 'change', (x) => { const l = Math.round(x); if (l !== level) { setLevel(l); buzz(6) } })
-  const settle = () => animate(v, Math.round(v.get()), { type: 'spring', stiffness: 320, damping: 28 })
+  const thumbLeft = useTransform(v, (raw) => { const x = Math.max(0, Math.min(6, raw)); return `calc(${(x / 6) * 100}% + ${20 - (x / 6) * 40}px)` })
+  const lastLevel = useRef(3)
+  useMotionValueEvent(v, 'change', (x) => { const l = Math.max(0, Math.min(6, Math.round(x))); if (l !== lastLevel.current) { lastLevel.current = l; setLevel(l); buzz(6) } })
+  const snap = useRef<ReturnType<typeof animate> | null>(null)
+  const settle = () => { snap.current?.stop(); snap.current = animate(v, Math.max(0, Math.min(6, Math.round(v.get()))), { type: 'spring', bounce: 0, duration: 0.35 }) }
+  const track = useRef<HTMLDivElement>(null)
+  const dragging = useRef(false)
+  // finger x → 0..6, accounting for the thumb's 20 px inset at each end
+  const fromPointer = (clientX: number) => {
+    const r = track.current?.getBoundingClientRect(); if (!r) return
+    v.set(Math.max(0, Math.min(6, ((clientX - r.left - 20) / Math.max(1, r.width - 40)) * 6)))
+  }
 
   const list = useMemo(() => {
     const t = q.trim().toLowerCase()
@@ -102,12 +111,17 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
                       className="text-center text-[32px] font-semibold text-white/90" aria-live="polite">{MOOD_LEVELS[level]}</motion.p>
                   </AnimatePresence>
                   <div className="mt-7">
-                    <div className="relative h-12">
+                    {/* owner 2026-11-24: "the slider sometimes doesn't work" — iOS only drags a native range from its tiny thumb.
+                        The whole track now follows the finger (tap to jump, drag anywhere); a visually hidden range stays for keyboards and screen readers. */}
+                    <div ref={track} className="relative h-12 cursor-pointer touch-none select-none" aria-hidden
+                      onPointerDown={(e) => { snap.current?.stop(); (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); dragging.current = true; fromPointer(e.clientX) }}
+                      onPointerMove={(e) => { if (dragging.current) fromPointer(e.clientX) }}
+                      onPointerUp={() => { dragging.current = false; settle() }} onPointerCancel={() => { dragging.current = false; settle() }}>
                       <div className="absolute inset-x-0 top-1/2 h-12 -translate-y-1/2 rounded-full bg-white/12 ring-1 ring-white/10" />
                       <motion.span className="pointer-events-none absolute top-1/2 size-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_6px_18px_rgba(0,0,0,.35)]" style={{ left: thumbLeft }} />
-                      <input type="range" min={0} max={6} step={0.01} defaultValue={3} onChange={(e) => v.set(Number(e.target.value))} onPointerUp={settle} onKeyUp={settle}
-                        aria-label="How pleasant or unpleasant" aria-valuetext={MOOD_LEVELS[level]} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
                     </div>
+                    <input type="range" min={0} max={6} step={1} value={level} onChange={(e) => { const x = Number(e.target.value); v.set(x); setLevel(x) }}
+                      aria-label="How pleasant or unpleasant" aria-valuetext={MOOD_LEVELS[level]} className="sr-only" />
                     <div className="mt-2 flex justify-between px-1 text-[12px] font-semibold uppercase tracking-[0.05em] text-white/60"><span>Very unpleasant</span><span>Very pleasant</span></div>
                   </div>
                   <motion.button onClick={() => { buzz(8); setStep('pick') }} style={{ background: btn, color: ink }} whileTap={{ scale: 0.98 }}
