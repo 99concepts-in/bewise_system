@@ -217,13 +217,14 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
             <h2 className="h-duo text-[26px]">How was your <em>session?</em></h2>
             <div className="mt-5 flex justify-between">
               {RATING.map((m, i) => (
-                <motion.button key={m} whileTap={{ scale: 0.85 }} aria-label={`${i + 1} of 5`} aria-pressed={rating === i + 1} onClick={() => { buzz(8); setRating(i + 1) }}
+                <motion.button key={m} whileTap={{ scale: 0.85 }} aria-label={`${i + 1} of 5`} aria-pressed={rating === i + 1} onClick={() => { buzz(8); setRating(i + 1); if (i + 1 >= 4) setTags((x) => x.filter((t) => POSITIVE.has(t))) }}
                   animate={{ scale: rating === i + 1 ? 1.15 : 0.94, filter: rating === i + 1 ? 'grayscale(0)' : 'grayscale(1)', opacity: rating === i + 1 ? 1 : 0.55 }} transition={spring}>
                   <MoodImg mood={m} size={54} />
                 </motion.button>
               ))}
             </div>
-            <div className="mt-5 flex flex-wrap gap-2">{TAGS.map((t) => <Chip key={t} on={tags.includes(t)} onClick={() => setTags(tags.includes(t) ? tags.filter((x) => x !== t) : [...tags, t])}>{t}</Chip>)}</div>
+            {/* owner 2026-11-24: a smiling face (4 or 5) shows only the kind words */}
+            <div className="mt-5 flex flex-wrap gap-2">{TAGS.filter((t) => rating < 4 || POSITIVE.has(t)).map((t) => <Chip key={t} on={tags.includes(t)} onClick={() => setTags(tags.includes(t) ? tags.filter((x) => x !== t) : [...tags, t])}>{t}</Chip>)}</div>
             {/* owner 2026-11-20: faces + quick tags only, then an optional comment */}
             {comment ? (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
@@ -233,7 +234,7 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
             ) : (
               <button type="button" onClick={() => setComment(true)} className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-peri-50 px-4 py-2.5 text-[14px] font-semibold text-navy"><Plus className="size-4" /> Add a comment</button>
             )}
-            <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-muted"><Check className="size-3.5" /> Visible only to your consultant</p>
+            <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-muted"><Check className="size-3.5" /> Visible only to Jitendra Khimlani</p>
             <Btn full className="mt-5" disabled={!rating} onClick={() => { give(id, { rating, tags, notes: comment ? notes : '', benefits: existing?.benefits ?? [] }); setSent(true); buzz(20) }}>Send to Jitendra Khimlani</Btn>
           </motion.div>
         )}

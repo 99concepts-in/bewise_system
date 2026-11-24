@@ -458,7 +458,7 @@ export function StepReview({ a, set, edit }: P & { edit: (step: string) => void 
       ))}
       {/* owner 2026-11-18: privacy stated plainly; no mention of an AI summary */}
       <div className="card space-y-3 p-5">
-        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Lock className="mt-0.5 size-5 shrink-0 text-navy" /><span>Your answers are <b className="text-navy">kept discreet</b> and never shared with anyone except Jitendra Khimlani, your consultant.</span></p>
+        <p className="flex items-start gap-3 text-[14px] leading-5 text-ink"><Lock className="mt-0.5 size-5 shrink-0 text-navy" /><span>Your answers are <b className="text-navy">kept discreet</b> and never shared with anyone except Jitendra Khimlani, your Certified Bach Flower Remedy Therapist.</span></p>
       </div>
     </div>
   )

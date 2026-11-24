@@ -43,6 +43,20 @@ test('feedback: face, quick tag, optional comment', async ({ page }) => {
   expect(fb).toMatchObject({ rating: 5, tags: ['Felt heard'], notes: 'Thank you' })
 })
 
+test('feedback: a smiling face hides the negative tags (and drops them if picked)', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/sessions/view?id=a1&feedback=1')
+  await page.getByRole('button', { name: '2 of 5' }).click()
+  await page.getByRole('checkbox', { name: 'Too short' }).click()
+  await page.getByRole('button', { name: '5 of 5' }).click()
+  await expect(page.getByRole('checkbox', { name: 'Too short' })).toHaveCount(0)
+  await expect(page.getByRole('checkbox', { name: 'Hard to connect' })).toHaveCount(0)
+  await expect(page.getByRole('checkbox', { name: 'Warm' })).toBeVisible()
+  await page.getByRole('button', { name: 'Send to Jitendra Khimlani' }).click()
+  const fb = (await state(page)).appointments.find((a: { id: string }) => a.id === 'a1').feedback
+  expect(fb.tags).toEqual([])
+})
+
 test('review card: 4 or 5 stars invites a shareable card; 3 stars does not', async ({ page }) => {
   await seed(page)
   await page.goto('/app/sessions/view?id=a1&feedback=1')

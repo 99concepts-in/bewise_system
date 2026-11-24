@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Feedback: no negative tags with a smiling face
+
+- Owner: remove negative words when the member picked a smiling face. With 4 or 5, the quick tags show only Felt heard, Clear guidance, Calming and Warm.
+- "Too short" and "Hard to connect" are hidden, and dropped if they were picked before the rating changed. With 1 to 3, all tags show.
+- Wording: "Visible only to your consultant" is now "Visible only to Jitendra Khimlani". The intake privacy line now says "your Certified Bach Flower Remedy Therapist".
+- Test added. 82/82 pass.
+
 ## 2026-11-24 · After onboarding: Add to Home Screen, then "Turn on notifications?"; simpler mood flower; real flower photos
 
 - **Setup after onboarding** (`components/prompts.tsx` `SetupFlow`, mounted on Home after the tour; once per device, `bewise-setup`):
