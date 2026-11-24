@@ -114,7 +114,7 @@ test('review card: 4 or 5 stars invites a shareable card; 3 stars does not', asy
   await expect(screen.getByRole('img', { name: 'Share card preview' })).toBeVisible({ timeout: 8000 })
   for (const n of ['Instagram', 'More', 'Save', 'Copy link']) await expect(screen.getByRole('button', { name: n })).toBeVisible()
   await expect(screen.getByRole('link', { name: 'WhatsApp' })).toHaveAttribute('href', /wa\.me\/\?text=.*welcome/)
-  await expect(screen.getByRole('link', { name: /Write a Google review instead/ })).toHaveAttribute('href', /google/)
+  await expect(screen.getByRole('link', { name: /write a Google review/ })).toHaveAttribute('href', /google/)
   // themes, edit the words, then review / tags / both
   const src = () => screen.getByRole('img', { name: 'Share card preview' }).getAttribute('src')
   const before = await src()

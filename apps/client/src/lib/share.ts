@@ -182,7 +182,8 @@ export async function reviewCard(r: { rating: number; quote: string; name: strin
     ctx.font = `italic 500 58px ${DISPLAY}`
     const room = show === 'both' ? 4 : 7
     const ql = wrap(ctx, r.quote, W - 300, room)
-    let y = cy + 250 + (show === 'both' ? 0 : Math.max(0, (6 - ql.length) * 30))
+    // keep short words centred in the card instead of hugging the top
+    let y = cy + 250 + (show === 'both' ? Math.max(0, (4 - ql.length) * 48) : Math.max(0, (6 - ql.length) * 34))
     ctx.fillStyle = ink
     for (const l of ql) { ctx.fillText(l, 150, y); y += 78 }
     if (show === 'both') chips(y + 10, 34)

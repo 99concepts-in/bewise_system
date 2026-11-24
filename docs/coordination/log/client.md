@@ -2,6 +2,18 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Share your experience: clean layout
+
+- Owner: "UI is all messed up". On iPhone the card preview (flex-1 + min height) overlapped the subtitle and the theme swatches.
+- `ShareScreen` is now normal-flow and scrollable on short phones:
+  - Title with the ✕ on one row, and a short line "Thank you 🌸 Pick a style, then share.".
+  - A fixed-size preview: `min(44svh, 400px)`, 9:16.
+  - Style chips in one row (Blush, Midnight, Garden, each with a colour dot).
+  - Review / Tags / Both next to a small Edit button.
+  - 5 share icons in a grid, then "Or write a Google review", then Done.
+- On the card, short words now sit centred instead of at the top.
+- 87/87 pass.
+
 ## 2026-11-24 · Feedback comment box: the real fix (focus kept)
 
 - Owner: the feedback text box still didn't work on iPhone.

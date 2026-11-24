@@ -118,35 +118,35 @@ export function ShareScreen({ open, onClose, title, sub, make, deps = '', contro
       {open && (
         <motion.div role="dialog" aria-modal="true" aria-label="Share your experience" className="fixed inset-0 z-[60] mx-auto flex max-w-[480px] flex-col overflow-y-auto bg-[linear-gradient(170deg,#FFF6EA_0%,#FDE9F0_45%,#EEEAFF_100%)] px-5 pb-[max(env(safe-area-inset-bottom),18px)] pt-[max(env(safe-area-inset-top),12px)]"
           initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 40 }} transition={{ type: 'spring', stiffness: 260, damping: 30 }}>
-          <div className="flex items-center justify-between">
-            <p className="text-[13px] font-bold uppercase tracking-[0.12em] text-[#8a4b6b]">Thank you 🌸</p>
-            <button onClick={onClose} aria-label="Close" className="grid size-11 place-items-center rounded-full bg-white/80 text-navy shadow-[var(--shadow-card)]"><X className="size-5" /></button>
+          {/* owner 2026-11-24: clean, normal-flow layout (nothing overlaps; the page scrolls on short phones) */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="h-duo text-[26px] leading-8">{title}</h2>
+              {sub && <p className="mt-0.5 text-[13px] text-ink-2">{sub}</p>}
+            </div>
+            <button onClick={onClose} aria-label="Close" className="grid size-10 shrink-0 place-items-center rounded-full bg-white/85 text-navy shadow-[var(--shadow-card)]"><X className="size-5" /></button>
           </div>
-          <h2 className="h-duo mt-1 text-[28px]">{title}</h2>
-          {sub && <p className="mt-0.5 text-[14px] text-ink-2">{sub}</p>}
 
-          <div className="my-3 flex min-h-0 flex-1 items-center justify-center">
-            <div className="aspect-[9/16] h-full max-h-[48svh] min-h-[240px] overflow-hidden rounded-[24px] bg-white/60 shadow-[0_24px_60px_rgba(90,60,140,.25)] ring-4 ring-white">
+          <div className="mt-4 flex shrink-0 justify-center">
+            <div className="aspect-[9/16] h-[min(44svh,400px)] overflow-hidden rounded-[22px] bg-white/60 shadow-[0_18px_44px_rgba(90,60,140,.22)] ring-4 ring-white">
               {src ? <motion.img key={src} initial={{ opacity: 0.4, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 20 }} src={src} alt="Share card preview" className="size-full object-cover" />
                 : <div className="grid size-full place-items-center px-6 text-center text-[13px] text-muted">{failed ? 'Could not make the image' : 'Making your card…'}</div>}
             </div>
           </div>
 
-          {controls}
-          <div className="mt-3 flex justify-between gap-1" role="group" aria-label="Share to">
+          {controls && <div className="mt-4 shrink-0">{controls}</div>}
+
+          <div className="mt-4 grid shrink-0 grid-cols-5 gap-1" role="group" aria-label="Share to">
             {items.map((x) => {
-              const inner = <><span className="grid size-[54px] place-items-center rounded-full bg-white shadow-[var(--shadow-card)]">{x.icon}</span><span className="text-[11px] font-semibold text-ink">{x.label}</span></>
+              const inner = <><span className="grid size-12 place-items-center rounded-full bg-white shadow-[var(--shadow-card)]">{x.icon}</span><span className="text-[11px] font-semibold text-ink">{x.label}</span></>
               return x.href
-                ? <a key={x.k} href={x.href} target="_blank" rel="noopener noreferrer" aria-label={x.label} className="flex w-[64px] flex-col items-center gap-1.5">{inner}</a>
-                : <button key={x.k} onClick={x.on} disabled={!src && x.k !== 'copy'} aria-label={x.label} className="flex w-[64px] flex-col items-center gap-1.5 disabled:opacity-50">{inner}</button>
+                ? <a key={x.k} href={x.href} target="_blank" rel="noopener noreferrer" aria-label={x.label} className="flex flex-col items-center gap-1.5">{inner}</a>
+                : <button key={x.k} onClick={x.on} disabled={!src && x.k !== 'copy'} aria-label={x.label} className="flex flex-col items-center gap-1.5 disabled:opacity-50">{inner}</button>
             })}
           </div>
 
-          {googleUrl && <>
-            <div className="my-3 flex items-center gap-3 text-[12px] font-semibold text-muted" aria-hidden><span className="h-px flex-1 bg-[#d9d3ea]" />or<span className="h-px flex-1 bg-[#d9d3ea]" /></div>
-            <a href={googleUrl} target="_blank" rel="noopener noreferrer" className="flex h-[52px] items-center justify-center gap-2 rounded-full bg-white text-[15px] font-semibold text-ink shadow-[var(--shadow-card)]">{GOOGLE} Write a Google review instead</a>
-          </>}
-          <button onClick={onClose} className="mt-2 h-11 text-[15px] font-semibold text-navy">Done</button>
+          {googleUrl && <a href={googleUrl} target="_blank" rel="noopener noreferrer" className="mt-4 flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-white text-[14px] font-semibold text-ink shadow-[var(--shadow-card)]">{GOOGLE} Or write a Google review</a>}
+          <button onClick={onClose} className="mt-1 h-11 shrink-0 text-[15px] font-semibold text-navy">Done</button>
         </motion.div>
       )}
     </AnimatePresence>

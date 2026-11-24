@@ -192,26 +192,26 @@ function CardControls({ theme, setTheme, show, setShow, canPick, text, setText, 
     </div>
   )
   return (
-    <div className="space-y-2.5">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex gap-2" role="radiogroup" aria-label="Card theme">
-          {CARD_THEMES.map((t) => (
-            <button key={t.id} role="radio" aria-checked={theme === t.id} aria-label={t.label} onClick={() => { buzz(6); setTheme(t.id) }} className="flex flex-col items-center gap-1">
-              <span className={cx('size-9 rounded-full ring-2 ring-offset-2 transition', theme === t.id ? 'ring-navy' : 'ring-transparent')} style={{ background: t.swatch, boxShadow: 'inset 0 0 0 1px rgba(23,33,74,.12)' }} />
-              <span className={cx('text-[11px] font-semibold', theme === t.id ? 'text-navy' : 'text-muted')}>{t.label}</span>
-            </button>
-          ))}
-        </div>
-        <button onClick={() => { buzz(6); setEditing(true) }} className="flex h-10 items-center gap-1.5 rounded-full bg-white px-4 text-[14px] font-semibold text-navy shadow-[var(--shadow-card)]"><PenLine className="size-4" /> Edit</button>
+    <div className="space-y-2">
+      <div className="flex gap-1.5" role="radiogroup" aria-label="Card theme">
+        {CARD_THEMES.map((t) => (
+          <button key={t.id} role="radio" aria-checked={theme === t.id} aria-label={t.label} onClick={() => { buzz(6); setTheme(t.id) }}
+            className={cx('flex h-10 flex-1 items-center justify-center gap-2 rounded-full text-[13px] font-semibold ring-1 transition-colors', theme === t.id ? 'bg-white text-navy ring-2 ring-navy' : 'bg-white/60 text-ink-2 ring-[#e3e0f0]')}>
+            <span className="size-4 rounded-full" style={{ background: t.swatch, boxShadow: 'inset 0 0 0 1px rgba(23,33,74,.18)' }} />{t.label}
+          </button>
+        ))}
       </div>
-      {canPick && (
-        <div className="flex rounded-full bg-white/80 p-1 shadow-[var(--shadow-card)]" role="radiogroup" aria-label="Show on the card">
-          {([['review', 'Review'], ['tags', 'Tags'], ['both', 'Both']] as const).map(([k, l]) => (
-            <button key={k} role="radio" aria-checked={show === k} onClick={() => { buzz(6); setShow(k) }}
-              className={cx('h-9 flex-1 rounded-full text-[13px] font-semibold transition-colors', show === k ? 'bg-navy text-white' : 'text-navy')}>{l}</button>
-          ))}
-        </div>
-      )}
+      <div className="flex gap-1.5">
+        {canPick ? (
+          <div className="flex flex-1 rounded-full bg-white/70 p-1 ring-1 ring-[#e3e0f0]" role="radiogroup" aria-label="Show on the card">
+            {([['review', 'Review'], ['tags', 'Tags'], ['both', 'Both']] as const).map(([k, l]) => (
+              <button key={k} role="radio" aria-checked={show === k} onClick={() => { buzz(6); setShow(k) }}
+                className={cx('h-8 flex-1 rounded-full text-[13px] font-semibold transition-colors', show === k ? 'bg-navy text-white' : 'text-navy')}>{l}</button>
+            ))}
+          </div>
+        ) : <span className="flex-1" />}
+        <button onClick={() => { buzz(6); setEditing(true) }} className="flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-white px-4 text-[13px] font-semibold text-navy ring-1 ring-[#e3e0f0]"><PenLine className="size-4" /> Edit</button>
+      </div>
     </div>
   )
 }
@@ -276,7 +276,7 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
       </AnimatePresence>
     </Sheet>
     {/* owner 2026-11-24: 4 or 5 stars → full screen with the card, share icons, or a Google review instead */}
-    <ShareScreen open={share} onClose={() => setShare(false)} title={<>Share your <em>experience</em></>} sub="Jitendra Khimlani will read your feedback. Your card is ready to share." googleUrl={GOOGLE_REVIEWS_URL}
+    <ShareScreen open={share} onClose={() => setShare(false)} title={<>Share your <em>experience</em></>} sub="Thank you 🌸 Pick a style, then share." googleUrl={GOOGLE_REVIEWS_URL}
       make={() => reviewCard({ rating, quote: cardQuote, name: shortName, tags: kind, theme, show }, appUrl())} deps={`${theme}|${show}|${cardQuote}|${kind.join(',')}`} filename="bewise-review.jpg"
       controls={<CardControls theme={theme} setTheme={setTheme} show={show} setShow={setShow} canPick={!!cardQuote && kind.length > 0} text={cardText} setText={setCardText} editing={editing} setEditing={setEditing} />}
       shareTitle="My BeWise wellness session" text="My wellness session with Jitendra Khimlani on BeWise. Begin your journey:" url={appUrl()} />
