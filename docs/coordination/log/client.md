@@ -2,6 +2,15 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Sheets no longer close while typing (iPhone)
+
+- Owner: tapping "Add a comment" in session feedback closed the sheet.
+- **Cause:** the comment box was 15 px. iPhone Safari zooms into any text box under 16 px on focus (the screenshot showed the sheet shifted). Sheets could also be swiped closed from anywhere, so the zoom and scroll movement counted as a swipe down.
+- **Fix:**
+  - `Sheet` (`components/ui.tsx`) now swipes closed only from the handle at the top (`useDragControls`, `dragListener={false}`). Typing, scrolling and zoom inside never close it. The X and backdrop still close it.
+  - Every text box in the app is now at least 16 px (14 inputs and textareas across 10 files), so iPhone never zooms.
+- Test: a comment drag inside the sheet keeps it open, the box is 16 px, and the handle drag closes it. 83/83 pass.
+
 ## 2026-11-24 · Feedback: no negative tags with a smiling face
 
 - Owner: remove negative words when the member picked a smiling face. With 4 or 5, the quick tags show only Felt heard, Clear guidance, Calming and Warm.

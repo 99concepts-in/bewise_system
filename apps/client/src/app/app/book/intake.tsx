@@ -365,7 +365,7 @@ export function StepLife({ a, set }: P) {
         })}
       </div>
       <input value={a.lifeOther} onChange={(e) => set({ lifeOther: e.target.value.slice(0, 300) })} placeholder="Anything else you’d like to share" aria-label="Anything else you’d like to share"
-        className="h-14 w-full rounded-[20px] bg-white px-5 text-[15px] shadow-[var(--shadow-card)] outline-none placeholder:text-muted focus:ring-2 focus:ring-blue" />
+        className="h-14 w-full rounded-[20px] bg-white px-5 text-[16px] shadow-[var(--shadow-card)] outline-none placeholder:text-muted focus:ring-2 focus:ring-blue" />
     </div>
   )
 }
@@ -499,7 +499,7 @@ export function CheckinNews({ c, set, showDrops = true }: { c: Checkin; set: (p:
     <div className="space-y-4">
       <StepTitle lead="Anything" em="new?" />
       <textarea value={c.news} onChange={(e) => set({ news: e.target.value.slice(0, 800) })} rows={4} placeholder="Optional. Anything you’d like Jitendra Khimlani to know" aria-label="Anything new"
-        className="card w-full resize-none p-5 text-[15px] outline-none placeholder:text-muted focus:ring-2 focus:ring-blue" />
+        className="card w-full resize-none p-5 text-[16px] outline-none placeholder:text-muted focus:ring-2 focus:ring-blue" />
       {showDrops && <div className="card p-5">
         <Label>I took my drops</Label>
         <div className="grid grid-cols-2 gap-2">{['Every day', 'Most days', 'Sometimes', 'Rarely'].map((d) => <Chip key={d} on={c.drops === d} onClick={() => set({ drops: d })} className="justify-center">{d}</Chip>)}</div>

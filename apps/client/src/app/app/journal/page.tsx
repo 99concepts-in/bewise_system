@@ -40,7 +40,7 @@ export default function Journal() {
         <Item>
           <label className="flex h-14 items-center gap-3 rounded-full bg-white px-5 shadow-[var(--shadow-card)] focus-within:ring-2 focus-within:ring-blue">
             <Search className="size-5 text-navy" aria-hidden />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings, notes or dates" aria-label="Search feelings, notes or dates" className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings, notes or dates" aria-label="Search feelings, notes or dates" className="flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted" />
             {q && <button aria-label="Clear search" onClick={() => setQ('')}><X className="size-4 text-muted" /></button>}
           </label>
         </Item>

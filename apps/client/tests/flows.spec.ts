@@ -43,6 +43,26 @@ test('feedback: face, quick tag, optional comment', async ({ page }) => {
   expect(fb).toMatchObject({ rating: 5, tags: ['Felt heard'], notes: 'Thank you' })
 })
 
+test('feedback: adding a comment keeps the sheet open; only the handle swipes it closed', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/sessions/view?id=a1&feedback=1')
+  await page.getByRole('button', { name: '5 of 5' }).click()
+  await page.getByRole('button', { name: 'Add a comment' }).click()
+  const box = page.getByLabel('Your comment')
+  await box.click(); await box.fill('Lovely session')
+  // a downward drag inside the sheet (like a scroll or iPhone's zoom on focus) must not close it
+  const bb = (await box.boundingBox())!
+  await page.mouse.move(bb.x + 40, bb.y + 10); await page.mouse.down(); await page.mouse.move(bb.x + 40, bb.y + 320, { steps: 8 }); await page.mouse.up()
+  await page.waitForTimeout(500)
+  await expect(page.getByLabel('Your comment')).toHaveValue('Lovely session')
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('#fbnotes')!).fontSize)).toBe('16px')
+  // dragging the handle down does close it
+  const dlg = page.getByRole('dialog', { name: 'How was your session?' })
+  const hb = (await dlg.boundingBox())!
+  await page.mouse.move(hb.x + hb.width / 2, hb.y + 12); await page.mouse.down(); await page.mouse.move(hb.x + hb.width / 2, hb.y + 400, { steps: 10 }); await page.mouse.up()
+  await expect(dlg).toHaveCount(0, { timeout: 3000 })
+})
+
 test('feedback: a smiling face hides the negative tags (and drops them if picked)', async ({ page }) => {
   await seed(page)
   await page.goto('/app/sessions/view?id=a1&feedback=1')

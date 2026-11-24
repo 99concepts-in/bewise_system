@@ -111,7 +111,7 @@ function DetailsSheet({ open, onClose }: { open: boolean; onClose: () => void })
       <div className="mt-4 space-y-3">
         {([['name', 'Name'], ['city', 'City'], ['allergies', 'Allergies (for product warnings)']] as const).map(([k, l]) => (
           <label key={k} className="block"><span className="mb-1 block px-1 text-[12px] font-semibold text-muted">{l}</span>
-            <input value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} className="h-12 w-full rounded-[16px] bg-peri-50 px-4 text-[15px] font-semibold text-navy outline-none focus:ring-2 focus:ring-blue" /></label>
+            <input value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} className="h-12 w-full rounded-[16px] bg-peri-50 px-4 text-[16px] font-semibold text-navy outline-none focus:ring-2 focus:ring-blue" /></label>
         ))}
         <p className="px-1 text-[12px] text-muted">Phone: +91 {p.phone} · date of birth {fmtIso(p.dob)}</p>
       </div>

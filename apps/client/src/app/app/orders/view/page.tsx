@@ -118,7 +118,7 @@ function ReviewCard({ id, review }: { id: string; review?: { rating: number; tex
         ))}
       </div>
       <textarea value={text} onChange={(e) => setText(e.target.value.slice(0, 500))} rows={2} placeholder="A line about how it feels (optional)" aria-label="Your review"
-        className="mt-3 w-full resize-none rounded-[18px] bg-peri-50/70 p-3.5 text-[15px] outline-none focus:ring-2 focus:ring-blue" />
+        className="mt-3 w-full resize-none rounded-[18px] bg-peri-50/70 p-3.5 text-[16px] outline-none focus:ring-2 focus:ring-blue" />
       <Btn size="md" className="mt-3" disabled={!rating} onClick={() => { save(id, rating, text.trim()); toast('Thank you for your review') }}>Send review</Btn>
     </section>
   )

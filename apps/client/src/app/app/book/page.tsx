@@ -429,7 +429,7 @@ function Prefs({ prefs, setPrefs }: { prefs: NonNullable<Appointment['prefs']>; 
           className="h-12 w-full rounded-full bg-peri-50 px-4 text-[16px] font-semibold tracking-[0.04em] text-navy outline-none placeholder:font-medium placeholder:text-[#9aa2b8] focus:ring-2 focus:ring-navy" />
         <p className="mb-2 mt-5 text-[15px] font-bold text-navy">Anything else? <span className="font-medium text-muted">(optional)</span></p>
         <textarea value={prefs.note ?? ''} onChange={(e) => up({ note: e.target.value.slice(0, 300) })} rows={2} placeholder="e.g. after 6 PM works best"
-          aria-label="Note for the team" className="w-full resize-none rounded-[18px] bg-peri-50 p-3.5 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
+          aria-label="Note for the team" className="w-full resize-none rounded-[18px] bg-peri-50 p-3.5 text-[16px] outline-none focus:ring-2 focus:ring-navy" />
       </div>
     </div>
   )

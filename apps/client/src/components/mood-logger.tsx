@@ -180,7 +180,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
                   </div>
                   <div className="relative px-5 pb-[max(env(safe-area-inset-bottom),14px)] pt-3">
                     {picks.length > 0 && <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 300))} rows={2} placeholder="Add a note (optional)" aria-label="Add a note"
-                      className="mb-2 w-full resize-none rounded-[18px] bg-white/10 p-3 text-[15px] text-white outline-none ring-1 ring-white/10 placeholder:text-white/50 focus:ring-white/40" />}
+                      className="mb-2 w-full resize-none rounded-[18px] bg-white/10 p-3 text-[16px] text-white outline-none ring-1 ring-white/10 placeholder:text-white/50 focus:ring-white/40" />}
                     <motion.button disabled={!picks.length} onClick={save} style={{ background: picks.length ? moodColor(level) : 'rgba(255,255,255,.12)', color: picks.length ? moodInk(level) : undefined }} whileTap={{ scale: 0.98 }}
                       className="h-14 w-full rounded-full text-[17px] font-semibold text-white ring-1 ring-white/20 disabled:text-white/50">{picks.length ? 'Log it' : 'Pick a feeling'}</motion.button>
                   </div>

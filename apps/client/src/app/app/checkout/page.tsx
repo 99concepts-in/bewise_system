@@ -196,7 +196,7 @@ function In({ label, v, on, span, num }: { label: string; v: string; on: (v: str
   return (
     <label className={cx('block', span && 'col-span-2')}>
       <span className="mb-1 block px-1 text-[12px] font-semibold text-muted">{label}</span>
-      <input value={v} onChange={(e) => on(e.target.value)} inputMode={num ? 'numeric' : undefined} className="h-12 w-full rounded-[16px] bg-peri-50 px-4 text-[15px] font-semibold text-navy outline-none focus:ring-2 focus:ring-blue" />
+      <input value={v} onChange={(e) => on(e.target.value)} inputMode={num ? 'numeric' : undefined} className="h-12 w-full rounded-[16px] bg-peri-50 px-4 text-[16px] font-semibold text-navy outline-none focus:ring-2 focus:ring-blue" />
     </label>
   )
 }

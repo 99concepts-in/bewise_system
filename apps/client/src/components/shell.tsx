@@ -168,7 +168,7 @@ function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
       <label className="mt-4 flex h-12 items-center gap-3 rounded-[16px] bg-sky-50 px-4 ring-1 ring-sky-200 focus-within:ring-2 focus-within:ring-blue">
         <Search className="size-[18px] text-navy" aria-hidden />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings like happy, stressed, loved…" aria-label="Search feelings"
-          className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted" />
+          className="flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted" />
         {q && <button aria-label="Clear search" onClick={() => setQ('')}><X className="size-4 text-muted" /></button>}
       </label>
       {q ? (
@@ -194,7 +194,7 @@ function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
           <motion.label initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 block overflow-hidden">
             <span className="mb-1.5 block text-[13px] font-semibold text-navy">Add a note <span className="font-normal text-muted">(optional)</span></span>
             <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 500))} rows={3} placeholder="What’s behind this feeling? A word or two is enough."
-              className="w-full resize-none rounded-[20px] bg-sky-50 p-4 text-[15px] leading-6 outline-none ring-1 ring-sky-200 placeholder:text-muted focus:ring-2 focus:ring-blue" />
+              className="w-full resize-none rounded-[20px] bg-sky-50 p-4 text-[16px] leading-6 outline-none ring-1 ring-sky-200 placeholder:text-muted focus:ring-2 focus:ring-blue" />
           </motion.label>
         )}
       </AnimatePresence>
@@ -226,7 +226,7 @@ function EntrySheet({ id, onClose }: { id: string | null; onClose: () => void })
           <label className="mt-5 block">
             <span className="mb-1.5 block text-[13px] font-semibold text-navy">Your note</span>
             <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 500))} rows={4} placeholder="What’s behind this feeling? A word or two is enough."
-              className="w-full resize-none rounded-[20px] bg-sky-50 p-4 text-[15px] leading-6 outline-none ring-1 ring-sky-200 placeholder:text-muted focus:ring-2 focus:ring-blue" />
+              className="w-full resize-none rounded-[20px] bg-sky-50 p-4 text-[16px] leading-6 outline-none ring-1 ring-sky-200 placeholder:text-muted focus:ring-2 focus:ring-blue" />
             <span className="mt-1 block text-right text-[11px] text-muted tnum">{note.length}/500</span>
           </label>
           <div className="mt-3 flex gap-3">

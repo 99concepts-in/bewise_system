@@ -8,7 +8,7 @@
  *           Small additive kit until HUB's src/components/ui exists; then these become variants there.
  */
 import Link from 'next/link'
-import { AnimatePresence, motion, type HTMLMotionProps, type PanInfo } from 'motion/react'
+import { AnimatePresence, motion, useDragControls, type HTMLMotionProps, type PanInfo } from 'motion/react'
 import { Check, Loader2, X } from 'lucide-react'
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { create } from 'zustand'
@@ -144,6 +144,7 @@ export function Segmented<T extends string>({ value, options, onChange, classNam
 /** Bottom sheet with spring entrance, drag-to-dismiss, Esc to close and focus handling. */
 export function Sheet({ open, onClose, children, title, tall }: { open: boolean; onClose: () => void; children: ReactNode; title?: string; tall?: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
+  const drag = useDragControls()
   useEffect(() => {
     if (!open) return
     const prev = document.activeElement as HTMLElement | null
@@ -162,10 +163,11 @@ export function Sheet({ open, onClose, children, title, tall }: { open: boolean;
           <motion.div
             ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title}
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ duration: 0.28, ease }}
-            drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0.05, bottom: 0.6 }} onDragEnd={onDragEnd}
+            // owner 2026-11-24: swipe down to close only from the handle; typing, scrolling or iPhone's zoom inside never closes it
+            drag="y" dragListener={false} dragControls={drag} dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0.05, bottom: 0.6 }} onDragEnd={onDragEnd}
             className={cx('relative w-full max-w-[480px] rounded-t-[32px] bg-white px-5 pt-3 shadow-[0_-12px_40px_rgba(23,33,74,.16)] outline-none safe-b', tall ? 'max-h-[92dvh]' : 'max-h-[86dvh]')}
           >
-            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-sky-200" />
+            <div onPointerDown={(e) => drag.start(e)} className="-mx-5 -mt-3 mb-1 flex h-8 cursor-grab touch-none items-center justify-center" aria-hidden><span className="h-1.5 w-12 rounded-full bg-sky-200" /></div>
             <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 z-20 grid size-11 place-items-center rounded-full bg-sky-50 text-navy hover:bg-sky-100"><X className="size-[18px]" /></button>
             <div className="no-scrollbar max-h-[calc(86dvh-40px)] overflow-y-auto overscroll-contain pb-2">{children}</div>
           </motion.div>

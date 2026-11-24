@@ -78,7 +78,7 @@ export default function Shop() {
           {searching && (
             <motion.label initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 56 }} exit={{ opacity: 0, height: 0 }} className="flex items-center gap-3 overflow-hidden rounded-[16px] bg-white px-5 ring-1 ring-sky-200 focus-within:ring-2 focus-within:ring-blue">
               <Search className="size-5 text-navy" />
-              <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search roll-ons, sprays, salts…" aria-label="Search products" className="min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted" />
+              <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search roll-ons, sprays, salts…" aria-label="Search products" className="min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted" />
               <button aria-label="Close search" onClick={() => { setQ(''); setSearching(false) }}><X className="size-5 text-muted" /></button>
             </motion.label>
           )}

@@ -160,7 +160,7 @@ function RescheduleSheet({ open, onClose, id, startsAt, used }: { open: boolean;
       {!blocked && (
         <>
           <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 300))} rows={3} placeholder="e.g. Any weekday evening next week" aria-label="When suits you"
-            className="mt-4 w-full resize-none rounded-[18px] bg-peri-50 p-3.5 text-[15px] outline-none focus:ring-2 focus:ring-navy" />
+            className="mt-4 w-full resize-none rounded-[18px] bg-peri-50 p-3.5 text-[16px] outline-none focus:ring-2 focus:ring-navy" />
           <Btn full className="mt-4" onClick={() => { request(id, note.trim()); toast('Request sent. We’ll confirm a new time'); onClose() }}>Request a new time</Btn>
         </>
       )}
@@ -229,7 +229,7 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
             {comment ? (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                 <label className="mt-6 block text-[15px] font-bold text-navy" htmlFor="fbnotes">Your comment</label>
-                <textarea id="fbnotes" rows={3} autoFocus={!notes} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder="Anything you’d like Jitendra Khimlani to know…" className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[15px] outline-none focus:ring-2 focus:ring-blue" />
+                <textarea id="fbnotes" rows={3} autoFocus={!notes} value={notes} onChange={(e) => setNotes(e.target.value.slice(0, 800))} placeholder="Anything you’d like Jitendra Khimlani to know…" className="mt-2 w-full resize-none rounded-[20px] bg-peri-50/70 p-4 text-[16px] outline-none focus:ring-2 focus:ring-blue" />
               </motion.div>
             ) : (
               <button type="button" onClick={() => setComment(true)} className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-peri-50 px-4 py-2.5 text-[14px] font-semibold text-navy"><Plus className="size-4" /> Add a comment</button>
