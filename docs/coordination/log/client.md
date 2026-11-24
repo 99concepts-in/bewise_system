@@ -2,6 +2,11 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Welcome fixes
+- Opening animation about twice as fast (ring in ~0.5 s, merge at ~1 s, owl at ~1.8 s) and the ring flowers stay hidden after merging; only the background flowers remain.
+- Products screen: bath salt behind in the middle, Sleep spray and Immutime roll-on in front on either side, nothing hidden.
+- Jitendra Khimlani screen: "Certified Bach Flower Therapist" tag moved below his face (bottom of the portrait); "5.0 Rated on Google" beside his shoulder.
+
 ## 2026-11-24 · Welcome polish + Jitendra Khimlani screen
 - Welcome: the flower ring circles, spirals into the glowing centre and merges, the owl blooms out with a soft burst, then the ring re-forms and keeps turning. CTA "Start my journey".
 - No "Benefit 1/2/3" labels. Smoother transitions: art crossfades with a soft scale and blur, text crossfades in place, background fades over 0.9 s.

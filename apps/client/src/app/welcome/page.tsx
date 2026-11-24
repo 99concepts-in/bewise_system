@@ -39,7 +39,7 @@ const SLIDES: Slide[] = [
   { bg: 'linear-gradient(170deg,#E3ECFF 0%,#F3E8FF 50%,#FFE7D6 100%)', title: 'Get personal guidance from', em: 'Jitendra Khimlani', sub: 'Certified Bach Flower Therapist. Book a wellness session and get a blend made just for you.', flowers: ['Mimulus', 'Larch'] },
 ]
 const LAST = SLIDES.length - 1
-const WELCOME_IMAGES = ['img/owl-wave.webp', 'img/bottle-remedy.png', ...STORIES.slice(0, 4).map((s) => `img/${s.cover}.webp`), 'img/products/sleep-spray.webp', 'img/products/aura-bath-salt.webp', 'img/products/migraine-go-rollon.webp', 'img/jitu-portrait.webp']
+const WELCOME_IMAGES = ['img/owl-wave.webp', 'img/bottle-remedy.png', ...STORIES.slice(0, 4).map((s) => `img/${s.cover}.webp`), 'img/products/sleep-spray.webp', 'img/products/aura-bath-salt.webp', 'img/products/immutime-rollon.webp', 'img/jitu-portrait.webp']
 
 export default function Welcome() {
   for (const src of WELCOME_IMAGES) preload(`${BP}/${src}`, { as: 'image', fetchPriority: 'high' })
@@ -64,7 +64,7 @@ export default function Welcome() {
             {/* owner 2026-11-21: the golden line splash (ring draws around the owl, name rises in) */}
             <div className="flex flex-col items-center">
               <div className="relative grid size-[150px] place-items-center">
-                <motion.span className="absolute inset-0 rounded-full bg-white/70" initial={{ scale: 0.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.9, ease }} />
+                <motion.span className="absolute inset-0 rounded-full bg-white/70" initial={{ scale: 0.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6, ease }} />
                 <svg className="absolute inset-0 -rotate-90" viewBox="0 0 150 150" aria-hidden>
                   <motion.circle cx="75" cy="75" r="72" fill="none" stroke="#b89b64" strokeWidth="1.5" strokeLinecap="round"
                     initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }} transition={{ duration: 1.2, ease, delay: 0.25 }} />
@@ -179,22 +179,23 @@ function ArtHello() {
   const [phase, setPhase] = useState<'ring' | 'merge' | 'bloom'>(still ? 'bloom' : 'ring')
   useEffect(() => {
     if (still) return
-    const t1 = setTimeout(() => setPhase('merge'), 1500)
-    const t2 = setTimeout(() => { setPhase('bloom'); buzz(10) }, 2700)
+    const t1 = setTimeout(() => setPhase('merge'), 950)
+    const t2 = setTimeout(() => { setPhase('bloom'); buzz(10) }, 1750)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [still])
-  const r = phase === 'merge' ? 0 : 44
+  const r = phase === 'ring' ? 44 : 0
+  const gone = phase !== 'ring' // owner 2026-11-24: after merging, the ring flowers stay hidden; only the background flowers remain
   return (
     <div className="relative grid h-full place-items-center">
-      <motion.div className="absolute aspect-square h-[88%]" animate={still ? undefined : { rotate: phase === 'merge' ? 540 : 360 }}
-        transition={phase === 'merge' ? { duration: 1.2, ease: [0.5, 0, 0.75, 0] } : { duration: 60, repeat: Infinity, ease: 'linear' }} aria-hidden>
+      <motion.div className="absolute aspect-square h-[88%]" animate={still ? undefined : { rotate: phase === 'ring' ? 90 : 300 }}
+        transition={phase === 'ring' ? { duration: 0.95, ease: 'easeIn' } : { duration: 0.8, ease: [0.5, 0, 0.75, 0] }} aria-hidden>
         {ring.map((n, k) => {
           const a = (k / ring.length) * Math.PI * 2
           return (
             <motion.span key={n} className="absolute grid size-[22%] place-items-center rounded-full bg-white/85 shadow-[0_8px_20px_rgba(176,83,47,.15)]"
               initial={{ left: '39%', top: '39%', scale: 0, opacity: 0 }}
-              animate={{ left: `${50 + r * Math.cos(a) - 11}%`, top: `${50 + r * Math.sin(a) - 11}%`, scale: phase === 'merge' ? 0.3 : 1, opacity: phase === 'merge' ? 0 : 1 }}
-              transition={phase === 'merge' ? { duration: 1.1, ease: [0.55, 0, 0.8, 0.2], delay: k * 0.03 } : { duration: 0.9, ease, delay: (phase === 'bloom' ? 0.35 : 0.1) + k * 0.06 }}>
+              animate={{ left: `${50 + r * Math.cos(a) - 11}%`, top: `${50 + r * Math.sin(a) - 11}%`, scale: gone ? 0.3 : 1, opacity: gone ? 0 : 1 }}
+              transition={gone ? { duration: 0.75, ease: [0.55, 0, 0.8, 0.2], delay: k * 0.02 } : { duration: 0.45, ease, delay: 0.05 + k * 0.035 }}>
               <FlowerArt name={n} decorative className="size-[80%]" />
             </motion.span>
           )
@@ -202,7 +203,7 @@ function ArtHello() {
       </motion.div>
       {/* the centre: a soft disc that glows as the flowers merge into it */}
       <motion.span className="absolute aspect-square h-[58%] rounded-full bg-white/75" aria-hidden
-        animate={{ scale: phase === 'merge' ? 0.7 : 1, boxShadow: phase === 'merge' ? '0 0 80px 30px rgba(255,214,170,.9)' : '0 0 40px 10px rgba(255,255,255,.6)' }} transition={{ duration: 0.9, ease }} />
+        animate={{ scale: phase === 'merge' ? 0.7 : phase === 'bloom' ? 0.85 : 1, boxShadow: phase === 'merge' ? '0 0 80px 30px rgba(255,214,170,.9)' : '0 0 40px 10px rgba(255,255,255,.6)' }} transition={{ duration: 0.6, ease }} />
       <AnimatePresence>
         {phase === 'bloom' && !still && (
           <motion.span key="burst" className="absolute aspect-square h-[40%] rounded-full border-2 border-[#f2b77a]" aria-hidden
@@ -314,18 +315,21 @@ function ArtAsk() {
 
 /** 5 · Wellness products: fanned out, centred, gently floating */
 function ArtShop() {
-  const items = ['products/sleep-spray', 'products/aura-bath-salt', 'products/migraine-go-rollon']
+  // bath salt sits behind in the middle; spray and roll-on stand in front on either side, nothing hidden
+  const items = [
+    { p: 'products/sleep-spray', h: 150, x: -92, r: -8, z: 2, y: 18 },
+    { p: 'products/aura-bath-salt', h: 190, x: 0, r: 0, z: 1, y: -6 },
+    { p: 'products/immutime-rollon', h: 150, x: 92, r: 8, z: 3, y: 18 },
+  ]
   return (
     <div className="relative flex h-full items-center justify-center" aria-hidden>
       <span className="absolute aspect-square h-[78%] rounded-full bg-white/60" />
-      <div className="relative flex items-end justify-center">
-        {items.map((p, k) => (
-          <motion.img key={p} src={`${BP}/img/${p}.webp`} alt="" className="h-[170px] w-auto object-contain drop-shadow-[0_14px_18px_rgba(120,50,40,.2)]"
-            style={{ marginLeft: k ? -28 : 0, zIndex: k === 1 ? 2 : 1 }}
-            initial={{ y: 30, opacity: 0, rotate: (k - 1) * 9 }} animate={{ y: k === 1 ? [-14, -22, -14] : [0, -6, 0], opacity: 1, rotate: (k - 1) * 9 }}
-            transition={{ opacity: { delay: 0.15 + k * 0.1 }, y: { delay: 0.15 + k * 0.1, duration: 4 + k, repeat: Infinity, ease: 'easeInOut' } }} />
-        ))}
-      </div>
+      {items.map((it, k) => (
+        <motion.img key={it.p} src={`${BP}/img/${it.p}.webp`} alt="" className="absolute w-auto object-contain drop-shadow-[0_14px_18px_rgba(120,50,40,.2)]"
+          style={{ height: it.h, zIndex: it.z, x: it.x, rotate: it.r }}
+          initial={{ y: it.y + 30, opacity: 0 }} animate={{ y: [it.y, it.y - 8, it.y], opacity: 1 }}
+          transition={{ opacity: { delay: 0.15 + k * 0.1 }, y: { delay: 0.15 + k * 0.1, duration: 4 + k, repeat: Infinity, ease: 'easeInOut' } }} />
+      ))}
     </div>
   )
 }
@@ -336,11 +340,11 @@ function ArtJitendra() {
     <div className="relative flex h-full items-end justify-center" aria-hidden>
       <span className="absolute bottom-0 aspect-[4/5] h-[90%] rounded-[999px_999px_28px_28px] bg-white/70" />
       <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="relative h-[86%] w-auto object-contain drop-shadow-[0_18px_24px_rgba(24,41,87,.18)] [mask-image:linear-gradient(to_bottom,black_82%,transparent)]" />
-      <motion.span className="absolute left-[4%] top-[16%] flex items-center gap-1.5 rounded-full bg-white px-3 py-2 text-[13px] font-bold text-navy shadow-[0_10px_24px_rgba(24,41,87,.15)]"
-        initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0, y: [0, -5, 0] }} transition={{ opacity: { delay: 0.3 }, x: { delay: 0.3 }, y: { duration: 4, repeat: Infinity, ease: 'easeInOut' } }}>
+      <motion.span className="absolute bottom-[4%] left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-white px-3 py-2 text-[13px] font-bold text-navy shadow-[0_10px_24px_rgba(24,41,87,.15)]"
+        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}>
         <Verified size={17} /> Certified Bach Flower Therapist
       </motion.span>
-      <motion.span className="absolute bottom-[14%] right-[3%] flex items-center gap-2 rounded-[18px] bg-white px-3 py-2 shadow-[0_10px_24px_rgba(24,41,87,.15)]"
+      <motion.span className="absolute right-[3%] top-[30%] z-10 flex items-center gap-2 rounded-[18px] bg-white px-3 py-2 shadow-[0_10px_24px_rgba(24,41,87,.15)]"
         initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0, y: [0, -6, 0] }} transition={{ opacity: { delay: 0.5 }, x: { delay: 0.5 }, y: { duration: 4.5, repeat: Infinity, ease: 'easeInOut' } }}>
         <span className="text-[20px] font-extrabold text-navy">5.0</span>
         <span className="leading-tight"><span className="block text-[13px] text-[#f2b33b]">★★★★★</span><span className="block text-[11px] font-semibold text-ink-2">Rated on Google</span></span>
