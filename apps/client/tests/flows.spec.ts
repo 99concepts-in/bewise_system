@@ -416,7 +416,7 @@ test('note to Jitendra Khimlani: pick a topic, send, see delivered then read', a
   await expect(page.getByText(/Read by Jitendra Khimlani/)).toBeVisible({ timeout: 16000 })
 })
 
-test('after logging a mood, a popup offers a note to Jitendra Khimlani', async ({ page }) => {
+test('after logging a mood, a popup offers a note to Jitendra Khimlani, once a day', async ({ page }) => {
   await seed(page); await page.goto('/app')
   await page.getByRole('button', { name: /Log how you feel|Log again/ }).first().click()
   await page.getByRole('button', { name: 'Next' }).click()
@@ -427,6 +427,15 @@ test('after logging a mood, a popup offers a note to Jitendra Khimlani', async (
   await page.getByRole('button', { name: 'Send a note' }).click()
   await page.waitForURL('**/app/chat?topic=feeling&mood=calm**')
   await expect(page.getByRole('textbox', { name: 'Message Jitendra Khimlani' })).toHaveValue(/^Today I’m feeling calm\./)
+  // only once a day: logging again today does not ask again
+  await page.goto('/app')
+  await page.getByRole('button', { name: /Log how you feel|Log again/ }).first().click()
+  await page.getByRole('button', { name: 'Next' }).click()
+  await page.getByRole('dialog', { name: 'Log how you feel' }).getByRole('button', { name: 'Calm', exact: true }).click()
+  await page.getByRole('button', { name: 'Log it' }).click()
+  await page.getByRole('button', { name: 'Done' }).click()
+  await page.waitForTimeout(1200)
+  await expect(page.getByRole('heading', { name: /Send a note to Jitendra Khimlani\?/ })).toHaveCount(0)
 })
 
 test('mood logger fits a short Safari screen: the Next button is fully visible', async ({ page }) => {

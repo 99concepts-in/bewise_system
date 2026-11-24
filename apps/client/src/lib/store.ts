@@ -107,6 +107,8 @@ type State = {
   orders: Order[]
   chat: ChatMsg[]
   notes: NoteMsg[]
+  /** owner 2026-11-24: the 'send a note' popup after a mood log shows at most once a day (day key it last showed) */
+  noteAskedOn?: string
   notices: Notice[]
   plan: Plan | null
   coupon: Coupon | null
@@ -121,6 +123,7 @@ type State = {
   setReminders: (r: Partial<State['reminders']>) => void
   sendNote: (n: Pick<NoteMsg, 'text' | 'topic' | 'mood' | 'valence'>) => NoteMsg   // messages.send
   markNote: (id: string, patch: Pick<NoteMsg, 'deliveredAt' | 'readAt'>) => void     // preview only: server sets these
+  setNoteAskedOn: (day: string) => void
   updateMood: (id: string, patch: Partial<Pick<JournalEntry, 'emotion' | 'note'>>) => void
   removeMood: (id: string) => void
   addGoal: (title: string, kind?: 'daily' | 'once') => void
@@ -304,6 +307,7 @@ export const useApp = create<State>()(
         set((s) => ({ notes: [...(s.notes ?? []), m].slice(-200) }))
         return m
       },
+      setNoteAskedOn: (day) => set({ noteAskedOn: day }),
       markNote: (id, patch) => set((s) => ({ notes: (s.notes ?? []).map((m) => (m.id === id ? { ...m, ...patch } : m)) })),
       confirmTime: (id) => {
         // preview of the staff side: the team sets a time (next day, 11:00 IST, or the client's preferred date) and, for a plain

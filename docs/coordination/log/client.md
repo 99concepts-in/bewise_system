@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · "Send a note" popup: once a day
+
+- Owner: the "Send a note to Jitendra Khimlani" popup after a mood log should come only once a day.
+- `AppChrome.askNote` now checks `noteAskedOn` (day key, persisted). The first mood log of the day shows the popup; later logs that day do not.
+- The Home note card and the chat are always available.
+- Test extended. 72/72 pass.
+
 ## 2026-11-24 · Mood logger: Next button cut off on iPhone 14 Safari
 
 - **Cause:** the sheet is 94% of the visible height, but its content was fixed: a 300 px flower plus title, label, slider and button. With Safari's toolbars showing, the content was taller than the sheet, so the Next button was clipped.

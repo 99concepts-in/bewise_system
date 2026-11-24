@@ -17,7 +17,7 @@ import { Avatar, Logo, MoodButton, MoodImg, LogoMark } from './brand'
 import { Btn, Chrome, IconBtn, Sheet, buzz, spring, toast, useChrome } from './ui'
 import { MOODS, PRIMARY_MOODS, moodOf, searchMoods, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
-import { fmtTime, fmtDay } from '@/lib/format'
+import { dayKey, fmtTime, fmtDay } from '@/lib/format'
 import { BP } from '@/lib/asset'
 import { InstallPrompt, usePromptBoot } from './prompts'
 import { NoteAsk } from './note-card'
@@ -310,9 +310,15 @@ export function AppChrome({ children }: { children: ReactNode }) {
   const openLog = useCallback(() => setLog(true), [])
   const openNotices = useCallback(() => setNotes(true), [])
   const flyToBag = useCallback((from: DOMRect, img: string) => setFly({ from, img, id: Date.now() }), [])
-  // owner 2026-11-24: after every mood log, offer to send a note to Jitendra Khimlani (a beat later, once the log closes)
+  // owner 2026-11-24: after a mood log (once a day), offer to send a note to Jitendra Khimlani (a beat later, once the log closes)
   const [ask, setAsk] = useState<{ mood: Emotion; valence?: number } | null>(null)
-  const askNote = useCallback((a: { mood: Emotion; valence?: number }) => { window.setTimeout(() => setAsk(a), 450) }, [])
+  // owner 2026-11-24: only once a day
+  const askNote = useCallback((a: { mood: Emotion; valence?: number }) => {
+    const st = useApp.getState(), today = dayKey(new Date())
+    if (st.noteAskedOn === today) return
+    st.setNoteAskedOn(today)
+    window.setTimeout(() => setAsk(a), 450)
+  }, [])
   const ctx = useMemo(() => ({ openLog, openNotices, openEntry, flyToBag, askNote }), [openLog, openNotices, openEntry, flyToBag, askNote])
   return (
     <Chrome.Provider value={ctx}>

@@ -65,7 +65,7 @@ export function NoteCard() {
   )
 }
 
-/** owner 2026-11-24: every time a mood is logged, offer to send a note to Jitendra Khimlani. */
+/** owner 2026-11-24: after a mood log, offer to send a note to Jitendra Khimlani, at most once a day. */
 export function NoteAsk({ ask, onClose }: { ask: { mood: Emotion; valence?: number } | null; onClose: () => void }) {
   const router = useRouter()
   const m = ask ? moodOf(ask.mood) : null

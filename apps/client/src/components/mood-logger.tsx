@@ -85,7 +85,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
     logged.current = { mood: picks[0], valence: level + 1 }
     buzz(14); setStep('done')
   }
-  // owner 2026-11-24: once the logger closes after a log (Done, X or backdrop), offer a note to Jitendra Khimlani
+  // owner 2026-11-24: once the logger closes after a log (Done, X or backdrop), offer a note to Jitendra Khimlani (once a day, see AppChrome)
   const logged = useRef<{ mood: Emotion; valence: number } | null>(null)
   useEffect(() => { if (!open && logged.current) { askNote(logged.current); logged.current = null } }, [open, askNote])
   const names = picks.map((p) => moodOf(p).label).join(', ')
