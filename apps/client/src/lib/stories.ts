@@ -195,6 +195,30 @@ export const STORIES: Story[] = [
       { k: 'end', title: 'Trust your own voice', body: 'Jitendra Khimlani listens to where doubt shows up for you and chooses a blend for how you feel.', care: 'Bach flowers support emotional wellbeing and do not replace professional help when you need it.' },
     ],
   },
+  {
+    id: 'anger', title: 'Bach flowers and anger', tag: 'Anger', cover: 'stories/anger', tint: '#8a2f24',
+    keywords: ['anger', 'angry', 'temper', 'irritable', 'irritation', 'frustrated', 'frustration', 'rage', 'impatient', 'resentment', 'jealous', 'snap'],
+    slides: [
+      { k: 'cover', title: 'Bach flowers and anger', sub: 'When small things set you off, and you wish they didn’t', minutes: 3 },
+      { k: 'text', kicker: 'Anger is a messenger', title: 'There is a feeling underneath', body: 'Anger often comes from somewhere else: feeling rushed, unheard, let down or hurt. Seeing what sits underneath is the first step to feeling calmer.', emoji: '🔥' },
+      { k: 'know', fact: 'Bach described Holly for “those who are sometimes attacked by thoughts of such kind as jealousy, envy, revenge, suspicion. For the different forms of vexation.”', source: 'Edward Bach, The Twelve Healers and Other Remedies, 1936' },
+      { k: 'remedies', title: 'Different kinds of anger', items: [
+        { name: 'Impatiens', line: 'Snapping when things feel too slow' },
+        { name: 'Vervain', line: 'Frustrated when plans are blocked' },
+        { name: 'Holly', line: 'Anger with jealousy or hurt' },
+        { name: 'Beech', line: 'Irritated by how others do things' },
+        { name: 'Willow', line: 'Quiet resentment, “why me?”' },
+      ] },
+      { k: 'steps', title: 'Cool down in the moment', items: [
+        { emoji: '🌬️', t: 'Breathe out slowly', d: 'Make the out breath longer than the in breath, five times.' },
+        { emoji: '🚶', t: 'Step away for a minute', d: 'A short walk or a glass of water before you reply.' },
+        { emoji: '🗣️', t: 'Name the feeling', d: '“I feel rushed” or “I feel unheard”. Naming it softens it.' },
+        { emoji: '💧', t: 'Keep your rhythm', d: 'Take your drops at the same times each day.' },
+      ] },
+      quote('Divya Solanki'),
+      { k: 'end', title: 'Calmer, from the inside', body: 'Jitendra Khimlani listens for what sits beneath your anger and chooses a blend for how you feel.', care: 'Bach flowers support emotional wellbeing and do not replace professional help when you need it.' },
+    ],
+  },
 ]
 
 export const storyById = (id: string) => STORIES.find((s) => s.id === id)

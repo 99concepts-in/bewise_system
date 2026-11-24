@@ -2,6 +2,20 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Learn: Anger story
+
+- Owner: "Add one story on Anger in learn tab". New story `anger` (7 slides) in `apps/client/src/lib/stories.ts`:
+  - Cover: "When small things set you off".
+  - "Anger is a messenger".
+  - Bach's own words on Holly (Twelve Healers, 1936).
+  - Kinds of anger: Impatiens, Vervain, Holly, Beech, Willow (the SessionOnly note shows as usual).
+  - Cool-down steps.
+  - Divya Solanki's real quote.
+  - End slide with the care note.
+- Higgsfield cover `public/img/stories/anger.webp` (holly, impatiens, glass of water, warm light cooling to blue).
+- Home and My care card slider: "Cool a quick temper" on a coral card. The Learn "Anger" chip now finds the story.
+- Test: Learn shows 8 stories including anger. 66/66 pass.
+
 ## 2026-11-24 · Learn header made concise
 - Headline "How Bach flowers help" (one line), description removed, shorter search placeholder ("Search sleep, worry, confidence…"), smaller chips and spacing; stories start higher.
 

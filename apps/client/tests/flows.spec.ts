@@ -400,13 +400,13 @@ test('mood slider: tap anywhere on the track and drag with a finger', async ({ p
   await expect(slider).toHaveAttribute('aria-valuetext', 'Very unpleasant')
 })
 
-test('home: Bach flower story cards slide and open their story; 7 stories in Learn', async ({ page }) => {
+test('home: Bach flower story cards slide and open their story; 8 stories in Learn', async ({ page }) => {
   await seed(page); await page.goto('/app')
   await page.getByRole('link', { name: 'Read: Bach flowers and self-doubt' }).click()
   await page.waitForURL('**/app/learn/story?id=self-doubt')
   await expect(page.getByText(/Self-doubt · 1 of \d/)).toBeVisible()
   await page.goto('/app/learn')
-  for (const t of ['confidence', 'money and business worries', 'constant change', 'self-doubt', 'sleep']) await expect(page.getByRole('link', { name: new RegExp(`Read: .*${t}`) })).toBeVisible()
+  for (const t of ['confidence', 'money and business worries', 'constant change', 'self-doubt', 'sleep', 'anger']) await expect(page.getByRole('link', { name: new RegExp(`Read: .*${t}`) })).toBeVisible()
 })
 
 test('stories: relaxing music can be muted and changed', async ({ page }) => {

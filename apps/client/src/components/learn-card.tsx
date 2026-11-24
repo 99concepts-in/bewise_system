@@ -14,7 +14,7 @@ import { cx } from './ui'
 // one bold colour pair per story: card background + blob flower
 const SHORT: Record<string, string> = {
   sleep: 'Rest easy tonight', anxiety: 'Calm a worried mind', relationships: 'Closer and kinder', confidence: 'Step into confidence',
-  finance: 'Calm about money', change: 'Steady in change', 'self-doubt': 'Trust yourself again',
+  finance: 'Calm about money', change: 'Steady in change', 'self-doubt': 'Trust yourself again', anger: 'Cool a quick temper',
 }
 const LOOK: Record<string, { bg: string; blob: string; ink: string }> = {
   sleep: { bg: '#C9C2F5', blob: '#3F3AA8', ink: '#17163d' },
@@ -24,6 +24,7 @@ const LOOK: Record<string, { bg: string; blob: string; ink: string }> = {
   finance: { bg: '#D8E7C5', blob: '#3F7A4A', ink: '#1a2e16' },
   change: { bg: '#C7E5EA', blob: '#2F7F8C', ink: '#0f2c31' },
   'self-doubt': { bg: '#D9D7FB', blob: '#6E5BD9', ink: '#1e1a4a' },
+  anger: { bg: '#FBD0C4', blob: '#C8402E', ink: '#3d140d' },
 }
 // soft five-lobed blob flower
 const BLOB = 'M0,-86 C22,-86 30,-48 20,-30 C40,-52 82,-40 80,-16 C78,8 40,8 30,6 C52,22 60,64 36,74 C14,84 6,46 0,32 C-6,46 -14,84 -36,74 C-60,64 -52,22 -30,6 C-40,8 -78,8 -80,-16 C-82,-40 -40,-52 -20,-30 C-30,-48 -22,-86 0,-86Z'
