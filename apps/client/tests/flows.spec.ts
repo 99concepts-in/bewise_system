@@ -56,6 +56,11 @@ test('feedback: adding a comment keeps the sheet open; only the handle swipes it
   await page.waitForTimeout(500)
   await expect(page.getByLabel('Your comment')).toHaveValue('Lovely session')
   expect(await page.evaluate(() => getComputedStyle(document.querySelector('#fbnotes')!).fontSize)).toBe('16px')
+  // the page behind ticks every second: the comment box must keep focus while typing (it used to lose it every second)
+  await box.click()
+  for (let i = 0; i < 8; i++) { await page.waitForTimeout(300); expect(await page.evaluate(() => document.activeElement?.id)).toBe('fbnotes') }
+  await page.keyboard.type(' and calm')
+  await expect(box).toHaveValue('Lovely session and calm')
   // dragging the handle down does close it
   const dlg = page.getByRole('dialog', { name: 'How was your session?' })
   const hb = (await dlg.boundingBox())!

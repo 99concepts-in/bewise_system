@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Feedback comment box: the real fix (focus kept)
+
+- Owner: the feedback text box still didn't work on iPhone.
+- **Real cause:** `Sheet` (`components/ui.tsx`) re-ran its open effect whenever `onClose` changed. The session page passes a new `onClose` on every render and re-renders every second (a 1-second clock). Each re-run moved focus back to the sheet, so within 0.3 s of tapping the comment box focus left it and the iPhone keyboard closed. This was reproduced in an iPhone 14 emulation: focus was on the dialog, not the textarea.
+- **Fix:** the effect runs only when `open` changes (`onClose` is read through a ref). Initial focus is skipped when something inside the sheet already has focus. Focus moves use `preventScroll`. This benefits every sheet in the app.
+- Test: samples focus 8 times over 2.4 s while the page ticks, then types more. It fails on the old code and passes now. 87/87 pass.
+
 ## 2026-11-24 · Feedback: reasons that fit an unhappy rating
 
 - Owner: if they're not happy, list reasons that resonate with unhappiness. The quick tags now follow the face:

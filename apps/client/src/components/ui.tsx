@@ -145,16 +145,21 @@ export function Segmented<T extends string>({ value, options, onChange, classNam
 export function Sheet({ open, onClose, children, title, tall }: { open: boolean; onClose: () => void; children: ReactNode; title?: string; tall?: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   const drag = useDragControls()
+  // owner 2026-11-24 (feedback comment box): run the open/close work only when `open` changes. Pages often pass a new
+  // onClose every render (a 1-second clock re-renders the session page); re-running this moved focus out of the text box
+  // every second, which closed the iPhone keyboard. onClose is read through a ref instead.
+  const close = useRef(onClose); close.current = onClose
   useEffect(() => {
     if (!open) return
     const prev = document.activeElement as HTMLElement | null
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close.current()
     window.addEventListener('keydown', onKey)
-    const t = setTimeout(() => ref.current?.focus(), 60)
+    // focus the sheet for screen readers, unless something inside already has focus (an autofocused text box)
+    const t = setTimeout(() => { if (!ref.current?.contains(document.activeElement)) ref.current?.focus({ preventScroll: true }) }, 60)
     document.body.style.overflow = 'hidden'
-    return () => { window.removeEventListener('keydown', onKey); clearTimeout(t); document.body.style.overflow = ''; prev?.focus?.() }
-  }, [open, onClose])
-  const onDragEnd = (_: unknown, i: PanInfo) => { if (i.offset.y > 110 || i.velocity.y > 600) onClose() }
+    return () => { window.removeEventListener('keydown', onKey); clearTimeout(t); document.body.style.overflow = ''; prev?.focus?.({ preventScroll: true }) }
+  }, [open])
+  const onDragEnd = (_: unknown, i: PanInfo) => { if (i.offset.y > 110 || i.velocity.y > 600) close.current() }
   return (
     <AnimatePresence>
       {open && (
