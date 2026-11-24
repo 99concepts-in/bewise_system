@@ -11,7 +11,7 @@
  */
 import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { ArrowRight, BookHeart, CalendarHeart, Check, ChevronRight, MessageCircleHeart, Target, Video, Smile } from 'lucide-react'
+import { ArrowRight, BookHeart, CalendarHeart, Check, ChevronRight, MessageCircleHeart, Target, Video, Smile, PenLine } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
@@ -92,6 +92,7 @@ export default function Home() {
 /** After logging, the card shows that feeling for 4 hours, then asks again. From 7 PM it also asks about the day overall. */
 function MoodPrompt({ onLog }: { onLog: (k: 'moment' | 'day') => void }) {
   const journal = useApp((s) => s.journal)
+  const { openEntry } = useChrome()
   const now = useNow(60_000)
   const last = journal.find((e) => e.kind !== 'day')
   const recent = last && now - +new Date(last.at) < 4 * 3600_000 ? last : null
@@ -100,13 +101,20 @@ function MoodPrompt({ onLog }: { onLog: (k: 'moment' | 'day') => void }) {
   return (
     <section className="space-y-2.5" aria-label="Log how you feel">
       {recent ? (
-        <div className="card flex items-center gap-3 p-4">
-          {recent.valence ? <span className="grid size-14 shrink-0 place-items-center rounded-[18px] bg-[#1f2128]"><MoodShape v={recent.valence - 1} size={48} spin={false} /></span> : <MoodImg mood={recent.emotion} size={48} />}
-          <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-semibold text-muted">You felt{recent.valence ? ` · ${MOOD_LEVELS[recent.valence - 1].toLowerCase()}` : ''}</p>
-            <p className="font-display text-[19px] font-semibold leading-6 text-ink">{[recent.emotion, ...(recent.also ?? [])].map((e) => moodOf(e).label).join(', ')} <span className="font-sans text-[13px] font-medium text-muted">· {fmtTime(recent.at)}</span></p>
+        <div className="card p-4">
+          <div className="flex items-center gap-3">
+            {recent.valence ? <span className="grid size-14 shrink-0 place-items-center rounded-[18px] bg-[#1f2128]"><MoodShape v={recent.valence - 1} size={48} spin={false} /></span> : <MoodImg mood={recent.emotion} size={48} />}
+            <div className="min-w-0 flex-1">
+              <p className="text-[12px] font-semibold text-muted">You felt{recent.valence ? ` · ${MOOD_LEVELS[recent.valence - 1].toLowerCase()}` : ''} · {fmtTime(recent.at)}</p>
+              <p className="font-display text-[19px] font-semibold leading-6 text-ink">{[recent.emotion, ...(recent.also ?? [])].map((e) => moodOf(e).label).join(', ')}</p>
+            </div>
           </div>
-          <button onClick={() => { buzz(8); onLog('moment') }} className="rounded-full bg-peri-50 px-3.5 py-2 text-[13px] font-semibold text-navy">Log again</button>
+          {recent.note && <button onClick={() => openEntry(recent.id)} className="mt-3 block w-full rounded-[16px] bg-peri-50/70 px-3.5 py-2.5 text-left text-[14px] italic leading-5 text-ink-2">“{recent.note}”</button>}
+          {/* owner 2026-11-24: after logging, an option to add a note */}
+          <div className="mt-3 flex gap-2">
+            <button onClick={() => { buzz(8); openEntry(recent.id) }} className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-navy text-[14px] font-semibold text-white"><PenLine className="size-4" /> {recent.note ? 'Edit note' : 'Add a note'}</button>
+            <button onClick={() => { buzz(8); onLog('moment') }} className="flex h-11 flex-1 items-center justify-center rounded-full bg-peri-50 text-[14px] font-semibold text-navy">Log again</button>
+          </div>
         </div>
       ) : (
         <motion.button onClick={() => { buzz(8); onLog('moment') }} whileTap={{ scale: 0.98 }} className="card relative flex w-full items-center gap-3 overflow-hidden p-4 text-left">

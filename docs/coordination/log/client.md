@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · "You felt" card: Add a note
+- After logging, the Home card shows "You felt · level · time", the feelings, the note if any (tap to edit), and two buttons: "Add a note" / "Edit note" (opens the journal note editor for that entry) and "Log again".
+
 ## 2026-11-24 · Simpler icon on "Log how you feel"
 - Replaced the animated six-petal flower on the Home card with a simple rounded tile in the mood colours (purple → teal → orange) with a smile icon and a slow, gentle breathing scale.
 
