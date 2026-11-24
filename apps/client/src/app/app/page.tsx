@@ -11,7 +11,7 @@
  */
 import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { ArrowRight, BookHeart, CalendarHeart, Check, ChevronRight, MessageCircleHeart, Target, Video } from 'lucide-react'
+import { ArrowRight, BookHeart, CalendarHeart, Check, ChevronRight, MessageCircleHeart, Target, Video, Smile } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
@@ -110,11 +110,11 @@ function MoodPrompt({ onLog }: { onLog: (k: 'moment' | 'day') => void }) {
         </div>
       ) : (
         <motion.button onClick={() => { buzz(8); onLog('moment') }} whileTap={{ scale: 0.98 }} className="card relative flex w-full items-center gap-3 overflow-hidden p-4 text-left">
-          <span aria-hidden className="relative grid size-12 shrink-0 place-items-center">
-            {[0, 1, 2, 3, 4, 5].map((k) => <motion.span key={k} className="absolute h-5 w-3 rounded-full" style={{ background: ['#7B63D6', '#7FB2DA', '#7CC4A4', '#F2B33B', '#F08A3C', '#E06A8E'][k], rotate: k * 60, transformOrigin: '50% 100%', top: 4 }}
-              animate={{ scaleY: [0.8, 1.1, 0.8] }} transition={{ duration: 3, delay: k * 0.2, repeat: Infinity, ease: 'easeInOut' }} />)}
-            <span className="relative size-3 rounded-full bg-white" />
-          </span>
+          {/* owner 2026-11-24: simple icon (the animated petals felt odd): a soft mood-colour tile with a smile, gently breathing */}
+          <motion.span aria-hidden className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-[linear-gradient(135deg,#8B5CF6,#5E9DB5_50%,#F0904A)] text-white shadow-[0_6px_16px_rgba(91,92,200,.25)]"
+            animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}>
+            <Smile className="size-6" strokeWidth={2.2} />
+          </motion.span>
           <span className="min-w-0 flex-1"><span className="block text-[16px] font-bold text-navy">Log how you feel right now</span><span className="text-[13px] text-muted">Takes 5 seconds</span></span>
           <ChevronRight className="size-5 text-navy" />
         </motion.button>
