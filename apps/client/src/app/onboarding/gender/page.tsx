@@ -6,7 +6,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
-import { Check } from 'lucide-react'
+import { Check, Lock, Mars, Venus } from 'lucide-react'
 import { useState } from 'react'
 import { OnboardShell } from '@/components/onboard-shell'
 import { Btn, buzz, cx } from '@/components/ui'
@@ -14,7 +14,8 @@ import { useApp } from '@/lib/store'
 import { goSafe } from '@/lib/nav'
 import { takeNextStep } from '@/lib/next-step'
 
-const OPTS = [{ v: 'Female', e: '🌸' }, { v: 'Male', e: '🌿' }, { v: 'Prefer not to say', e: '🤍' }]
+// owner 2026-11-24: proper icons instead of emoji
+const OPTS = [{ v: 'Female', Icon: Venus, tint: 'bg-rose-100 text-[#c2416a]' }, { v: 'Male', Icon: Mars, tint: 'bg-sky-100 text-[#2d6fb8]' }, { v: 'Prefer not to say', Icon: Lock, tint: 'bg-peri-50 text-navy' }]
 
 export default function GenderStep() {
   const router = useRouter()
@@ -35,7 +36,7 @@ export default function GenderStep() {
           return (
             <motion.button key={o.v} role="radio" aria-checked={on} whileTap={{ scale: 0.98 }} onClick={() => { buzz(6); setG(o.v) }}
               className={cx('flex h-16 w-full items-center gap-3 rounded-[20px] px-5 text-left text-[17px] font-semibold shadow-[var(--shadow-card)] transition-colors', on ? 'bg-navy text-white' : 'bg-white text-navy')}>
-              <span className="text-[22px]" aria-hidden>{o.e}</span><span className="flex-1">{o.v}</span>
+              <span className={cx('grid size-10 shrink-0 place-items-center rounded-full', on ? 'bg-white/15 text-white' : o.tint)} aria-hidden><o.Icon className="size-5" strokeWidth={2.2} /></span><span className="flex-1">{o.v}</span>
               {on && <Check className="size-5" strokeWidth={3} />}
             </motion.button>
           )

@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Gender step icons
+- Replaced the emoji with proper icons in tinted circles: Female (♀, rose), Male (♂, blue), Prefer not to say (lock, periwinkle); white on the selected option.
+
 ## 2026-11-24 · Products entrance + relaxing music in stories
 - Welcome products screen: bath salt pops up first, then the spray, then the roll-on, each springing up from below with a little bounce and sparkles, then floating.
 - Stories: relaxing loop music generated live with the Web Audio API (lib/ambient.ts, no audio files or licences): Calm (slow pad chords), Rain (soft rain and wind, droplets), Chimes (pentatonic wind chimes); all over a soft drone with reverb, gentle fade in/out. Header has the track button (tap to change) and a mute button; both remembered on the device. Each story starts on its own default track; sound begins on the first tap (browser rule) and fades out when the story closes. Test added (66).
