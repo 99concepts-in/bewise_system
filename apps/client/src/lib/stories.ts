@@ -102,6 +102,99 @@ export const STORIES: Story[] = [
       { k: 'end', title: 'Closer, calmer, kinder', body: 'Jitendra Khimlani listens to what is happening in your relationships and chooses a blend for how you feel.', care: 'Bach flowers support emotional wellbeing. They are not couples or family therapy, and do not replace professional help when you need it.' },
     ],
   },
+  {
+    id: 'confidence', title: 'Bach flowers and confidence', tag: 'Confidence', cover: 'stories/confidence', tint: '#8a4b1f',
+    keywords: ['confidence', 'self-esteem', 'shy', 'fail', 'courage', 'inferior', 'stage', 'interview'],
+    slides: [
+      { k: 'cover', title: 'Bach flowers and confidence', sub: 'When you know you can, but something holds you back', minutes: 3 },
+      { k: 'text', kicker: 'The quiet voice', title: '“I’m not good enough”', body: 'Many capable people hold back, not because they cannot, but because they expect to fail. So they never quite try. Bach saw this clearly, and named a flower for it.', emoji: '🌱' },
+      { k: 'know', fact: 'Bach described Larch for “those who do not consider themselves as good or capable as those around them, who expect failure… and so do not venture or make a strong enough attempt to succeed.”', source: 'Edward Bach, The Twelve Healers and Other Remedies, 1936' },
+      { k: 'remedies', title: 'Different roots of low confidence', items: [
+        { name: 'Larch', line: 'Expecting to fail, so not trying' },
+        { name: 'Mimulus', line: 'Shyness, nerves before known events' },
+        { name: 'Centaury', line: 'Too eager to please, hard to say no' },
+        { name: 'Cerato', line: 'Not trusting your own judgement' },
+      ] },
+      { k: 'steps', title: 'Small steps that build courage', items: [
+        { emoji: '✍️', t: 'Write one win a day', d: 'Even small ones. Proof builds belief.' },
+        { emoji: '🎯', t: 'Try one small brave thing', d: 'Speak first in one conversation today.' },
+        { emoji: '🗣️', t: 'Talk to yourself kindly', d: 'Say what you would say to a friend.' },
+        { emoji: '💧', t: 'Keep your rhythm', d: 'Take your drops at the same times each day.' },
+      ] },
+      quote('Divya Solanki'),
+      { k: 'end', title: 'Step forward, gently', body: 'Jitendra Khimlani listens for what is holding you back and chooses a blend for how you feel.', care: 'Bach flowers support emotional wellbeing and do not replace professional help when you need it.' },
+    ],
+  },
+  {
+    id: 'finance', title: 'Bach flowers for money and business worries', tag: 'Finance & work', cover: 'stories/finance', tint: '#3f5a3a',
+    keywords: ['finance', 'money', 'business', 'work', 'job', 'loss', 'debt', 'career', 'stress', 'pressure'],
+    slides: [
+      { k: 'cover', title: 'Bach flowers for money worries', sub: 'Steadier feelings when finances and business feel heavy', minutes: 3 },
+      { k: 'text', kicker: 'It’s not just numbers', title: 'Money worries are feelings too', body: 'A slow month, a loan, a business decision. The numbers are one part. The other part is how it feels: sleepless worry, pressure, fear of letting others down.', emoji: '📒' },
+      { k: 'know', fact: 'Bach described Elm for people “doing good work” who, at times, feel “the task they have undertaken is too difficult”. A passing feeling of being overwhelmed, even in very capable people.', source: 'Edward Bach, The Twelve Healers and Other Remedies, 1936' },
+      { k: 'remedies', title: 'Feelings money stress can bring', items: [
+        { name: 'Elm', line: 'Overwhelmed by responsibility' },
+        { name: 'Mimulus', line: 'Fear of known things, like bills or losses' },
+        { name: 'White Chestnut', line: 'Worries that circle at night' },
+        { name: 'Gentian', line: 'Discouraged after a setback' },
+        { name: 'Oak', line: 'Pushing on, never resting' },
+      ] },
+      { k: 'steps', title: 'Calmer about money', items: [
+        { emoji: '🗒️', t: 'Write it all down', d: 'Worries feel smaller on paper than in your head.' },
+        { emoji: '1️⃣', t: 'Pick one next step', d: 'Not the whole plan. Just the next small action.' },
+        { emoji: '⏰', t: 'Set a worry time', d: '15 minutes a day to think about money, then stop.' },
+        { emoji: '🌙', t: 'Protect your sleep', d: 'No bank apps or emails in the last hour of the day.' },
+      ] },
+      quote('Akshay Magnani'),
+      { k: 'end', title: 'Clearer head, steadier heart', body: 'Jitendra Khimlani listens to what weighs on you and chooses a blend for how you feel.', care: 'Bach flowers support emotional wellbeing. They are not financial advice and do not replace professional help when you need it.' },
+    ],
+  },
+  {
+    id: 'change', title: 'Bach flowers for constant change', tag: 'Change', cover: 'stories/change', tint: '#2f5d63',
+    keywords: ['change', 'move', 'transition', 'new job', 'marriage', 'baby', 'big life event', 'uncertain', 'unsettled'],
+    slides: [
+      { k: 'cover', title: 'Bach flowers for constant change', sub: 'Feeling steady when life keeps moving', minutes: 3 },
+      { k: 'text', kicker: 'Everything is shifting', title: 'When nothing stays still', body: 'A new city, a new job, a wedding, a baby, children leaving home. Even good changes can leave us unsettled, pulled between the old and the new.', emoji: '🍃' },
+      { k: 'know', fact: 'Bach wrote that Walnut “gives constancy and protection from outside influences”, for people on their own path who are being pulled away from it.', source: 'Edward Bach, The Twelve Healers and Other Remedies, 1936' },
+      { k: 'remedies', title: 'Feelings change can bring', items: [
+        { name: 'Walnut', line: 'Adjusting to a new phase of life' },
+        { name: 'Honeysuckle', line: 'Missing how things used to be' },
+        { name: 'Scleranthus', line: 'Going back and forth, can’t settle' },
+        { name: 'Wild Oat', line: 'Unsure which direction to take' },
+      ] },
+      { k: 'steps', title: 'Steady in the middle of change', items: [
+        { emoji: '⚓', t: 'Keep one anchor', d: 'One small routine that stays the same every day.' },
+        { emoji: '🙏', t: 'Honour what ends', d: 'It’s okay to miss the old, even when the new is good.' },
+        { emoji: '🧭', t: 'One step at a time', d: 'You don’t need the whole map today.' },
+        { emoji: '💧', t: 'Keep your rhythm', d: 'Your drops at the same times are an anchor too.' },
+      ] },
+      quote('Khushboo Gurnani'),
+      { k: 'end', title: 'Rooted, even as things change', body: 'Jitendra Khimlani listens to what is changing for you and chooses a blend for how you feel.', care: 'Bach flowers support emotional wellbeing and do not replace professional help when you need it.' },
+    ],
+  },
+  {
+    id: 'self-doubt', title: 'Bach flowers and self-doubt', tag: 'Self-doubt', cover: 'stories/self-doubt', tint: '#4b4a8a',
+    keywords: ['self-doubt', 'doubt', 'decide', 'decision', 'indecisive', 'confused', 'trust', 'second-guess', 'advice'],
+    slides: [
+      { k: 'cover', title: 'Bach flowers and self-doubt', sub: 'Learning to trust your own inner voice again', minutes: 3 },
+      { k: 'text', kicker: 'Asking everyone but yourself', title: 'Second-guessing every choice', body: 'You decide, then doubt it. You ask five people, then feel more confused. Self-doubt is tiring, and it can quietly take away the joy of your own choices.', emoji: '🪞' },
+      { k: 'know', fact: 'In his own grouping of the 38 remedies, Bach put Cerato under “uncertainty”: for those “who have not sufficient confidence in themselves to make their own decisions” and “constantly seek advice from others”.', source: 'Edward Bach, The Twelve Healers and Other Remedies, 1936' },
+      { k: 'remedies', title: 'The many shades of doubt', items: [
+        { name: 'Cerato', line: 'Not trusting your own judgement' },
+        { name: 'Scleranthus', line: 'Torn between two choices' },
+        { name: 'Larch', line: 'Doubting you can succeed' },
+        { name: 'Gentian', line: 'Doubt after a disappointment' },
+      ] },
+      { k: 'steps', title: 'Coming back to yourself', items: [
+        { emoji: '🤫', t: 'Decide before you ask', d: 'Write your own answer first, then ask others.' },
+        { emoji: '⏳', t: 'Give it a day', d: 'Sleep on it, then notice what still feels right.' },
+        { emoji: '📓', t: 'Keep a “good calls” list', d: 'Times you trusted yourself and it worked.' },
+        { emoji: '💬', t: 'Share it in your session', d: 'Jitendra Khimlani can help you see the pattern.' },
+      ] },
+      quote('Akshay Magnani'),
+      { k: 'end', title: 'Trust your own voice', body: 'Jitendra Khimlani listens to where doubt shows up for you and chooses a blend for how you feel.', care: 'Bach flowers support emotional wellbeing and do not replace professional help when you need it.' },
+    ],
+  },
 ]
 
 export const storyById = (id: string) => STORIES.find((s) => s.id === id)

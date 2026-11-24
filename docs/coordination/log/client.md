@@ -2,6 +2,10 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Bach flower story slider + 4 new stories
+- Home and My care: "How Bach flowers can help" is now a slider of bold colour cards with a big blob flower (owner reference), one per story with a short headline ("Rest easy tonight", "Calm about money"…); auto-slides every 5 s, swipe, dots; each card opens its story directly. "All" goes to Learn.
+- New stories (7 slides each, Higgsfield covers): Confidence, Money and business worries, Constant change, Self-doubt. "Did you know" quotes checked against Bach's text (Larch, Elm, Walnut, Cerato under "uncertainty"). Same care notes; testimonials reused from the 3 real quotes. Learn now has 7 stories. Test added (64).
+
 ## 2026-11-24 · Mood logger: our own flower + live backdrop
 - Replaced the abstract layered shapes (too close to Apple's) with our flower (MoodShape keeps its API): a small closed, cool-coloured bud at "very unpleasant" that opens into a full warm bloom at "very pleasant": outer petals grow, widen and round off, an inner petal layer unfolds, golden stamens appear; petals sway and the flower breathes. Same flower in the pick step, summary card and Home "You felt" tile.
 - LiveBackdrop: three soft mood-coloured lights drifting (GPU transforms) and pollen floating up, always moving; still for reduced motion.
