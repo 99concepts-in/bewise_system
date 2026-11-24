@@ -229,17 +229,23 @@ test('appointment with a plan: request only (optional preferences, typed date), 
   await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await expect(page.getByRole('heading', { name: /suits you/ })).toBeVisible()
   await page.getByRole('checkbox', { name: 'Evening' }).click()
-  await page.getByRole('textbox', { name: 'Preferred date (DD/MM/YYYY)' }).fill('05122026')
-  await expect(page.getByRole('textbox', { name: 'Preferred date (DD/MM/YYYY)' })).toHaveValue('05/12/2026')
+  // owner 2026-11-24: past dates are refused
+  const dateBox = page.getByRole('textbox', { name: 'Preferred date (DD/MM/YYYY)' })
+  await dateBox.fill('10051999')
+  await expect(page.getByRole('alert').filter({ hasText: 'Please choose today or a later date' })).toBeVisible()
+  const ahead = new Date(Date.now() + 10 * 864e5), dd = String(ahead.getDate()).padStart(2, '0'), mm = String(ahead.getMonth() + 1).padStart(2, '0'), yyyy = String(ahead.getFullYear())
+  await dateBox.fill(`${dd}${mm}${yyyy}`)
+  await expect(dateBox).toHaveValue(`${dd}/${mm}/${yyyy}`)
+  await expect(page.getByRole('alert').filter({ hasText: 'Please choose today' })).toHaveCount(0)
   await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await page.getByRole('button', { name: /Pay ₹8,000/ }).click(); await page.getByRole('button', { name: 'Google Pay' }).click()
   await expect(page.getByRole('heading', { name: /Request sent/ })).toBeVisible({ timeout: 8000 })
   const s = await state(page)
   const a = s.appointments[s.appointments.length - 1]
-  expect(a.timeTbc).toBe(true); expect(a.prefs).toMatchObject({ times: ['Evening'], date: '2026-12-05' }); expect(a.planId).toBe('yearly'); expect(s.plan.used).toBe(1)
+  expect(a.timeTbc).toBe(true); expect(a.prefs).toMatchObject({ times: ['Evening'], date: `${yyyy}-${mm}-${dd}` }); expect(a.planId).toBe('yearly'); expect(s.plan.used).toBe(1)
   // the team sets the time (preview tool) → the session shows a real date
   await page.goto('/app/me'); await page.getByRole('button', { name: 'Team confirms my time' }).click()
-  await page.goto(`/app/sessions/view?id=${a.id}`); await expect(page.getByText('05/12/2026')).toBeVisible()
+  await page.goto(`/app/sessions/view?id=${a.id}`); await expect(page.getByText(`${dd}/${mm}/${yyyy}`)).toBeVisible()
 })
 
 test('my care: remedies collapsed to what the blend supports; tap to expand', async ({ page }) => {

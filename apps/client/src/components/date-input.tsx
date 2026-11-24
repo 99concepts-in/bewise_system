@@ -19,12 +19,31 @@ export function parseDMY(text: string) {
   return `${yyyy}-${mm}-${dd}`
 }
 
-export function DateInput({ value, onChange, className, id, label = 'Date (DD/MM/YYYY)', autoComplete }: { value: string; onChange: (iso: string) => void; className?: string; id?: string; label?: string; autoComplete?: string }) {
+/** `min` / `max` (ISO) — owner 2026-11-24: a preferred session date can't be in the past. Out of range → onChange('') and a message. */
+export function DateInput({ value, onChange, className, id, label = 'Date (DD/MM/YYYY)', autoComplete, min, max, minMsg = 'Please choose today or a later date', maxMsg = 'Please choose an earlier date' }: {
+  value: string; onChange: (iso: string) => void; className?: string; id?: string; label?: string; autoComplete?: string
+  min?: string; max?: string; minMsg?: string; maxMsg?: string
+}) {
   const [text, setText] = useState(() => toText(value))
+  const [err, setErr] = useState('')
   useEffect(() => { if (value && toText(value) !== text) setText(toText(value)) }, [value]) // eslint-disable-line react-hooks/exhaustive-deps
+  // a saved date that is now out of range (e.g. yesterday's draft) is flagged and cleared from the answer
+  useEffect(() => {
+    if (!value) return
+    const e = min && value < min ? minMsg : max && value > max ? maxMsg : ''
+    if (e) { setErr(e); onChange('') }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  const change = (raw: string) => {
+    const t = mask(raw); setText(t)
+    const iso = parseDMY(t)
+    const e = iso && min && iso < min ? minMsg : iso && max && iso > max ? maxMsg : t.length === 10 && !iso ? 'Please check the date' : ''
+    setErr(e); onChange(e ? '' : iso)
+  }
   return (
-    <input id={id} type="text" inputMode="numeric" autoComplete={autoComplete} placeholder="DD/MM/YYYY" aria-label={label} maxLength={10} value={text}
-      onChange={(e) => { const t = mask(e.target.value); setText(t); onChange(parseDMY(t)) }}
-      className={className} />
+    <>
+      <input id={id} type="text" inputMode="numeric" autoComplete={autoComplete} placeholder="DD/MM/YYYY" aria-label={label} maxLength={10} value={text}
+        aria-invalid={!!err || undefined} onChange={(e) => change(e.target.value)} className={className} />
+      {err && (min || max) ? <p role="alert" className="mt-1.5 px-1 text-[13px] font-semibold text-[#b3261e]">{err}</p> : null}
+    </>
   )
 }

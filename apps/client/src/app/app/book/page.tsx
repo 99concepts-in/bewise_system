@@ -26,7 +26,7 @@ import { apptMinutes, apptName } from '@/lib/appt'
 import { rememberMember } from '@/lib/members'
 import { emptyIntake, planLeft, useApp, type Appointment, type IntakeAnswers, type Plan } from '@/lib/store'
 import { HELPLINE, PLANS, offerLive, planFull, planPrice, planSaving, type PlanId } from '@/lib/offer'
-import { addDays, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
+import { addDays, dayKey, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay } from '@/lib/format'
 import { addToCalendar, downloadIcs, googleCalUrl, isAndroid, sessionIcs } from '@/lib/ics'
 import * as I from './intake'
 import { BP } from '@/lib/asset'
@@ -425,7 +425,9 @@ function Prefs({ prefs, setPrefs }: { prefs: NonNullable<Appointment['prefs']>; 
         <p className="mb-3 mt-5 text-[15px] font-bold text-navy">Time of day</p>
         <div className="flex flex-wrap gap-2">{TIMES.map((t) => { const on = !!prefs.times?.includes(t); return <Chip key={t} on={on} onClick={() => up({ times: on ? prefs.times!.filter((x) => x !== t) : [...(prefs.times ?? []), t] })}>{t}</Chip> })}</div>
         <p className="mb-2 mt-5 text-[15px] font-bold text-navy">Preferred date <span className="font-medium text-muted">(optional)</span></p>
+        {/* owner 2026-11-24: no past dates; up to 6 months ahead */}
         <DateInput value={prefs.date ?? ''} onChange={(date) => up({ date: date || undefined })} label="Preferred date (DD/MM/YYYY)"
+          min={dayKey(new Date())} max={dayKey(addDays(new Date(), 183))} minMsg="Please choose today or a later date" maxMsg="Please choose a date within the next 6 months"
           className="h-12 w-full rounded-full bg-peri-50 px-4 text-[16px] font-semibold tracking-[0.04em] text-navy outline-none placeholder:font-medium placeholder:text-[#9aa2b8] focus:ring-2 focus:ring-navy" />
         <p className="mb-2 mt-5 text-[15px] font-bold text-navy">Anything else? <span className="font-medium text-muted">(optional)</span></p>
         <textarea value={prefs.note ?? ''} onChange={(e) => up({ note: e.target.value.slice(0, 300) })} rows={2} placeholder="e.g. after 6 PM works best"

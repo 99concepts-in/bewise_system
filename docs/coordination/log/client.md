@@ -2,6 +2,15 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Booking: no past dates for the preferred date
+
+- Owner: the preferred date accepted past dates (e.g. 10/05/1999).
+- `DateInput` (`components/date-input.tsx`) now takes `min` / `max` (ISO) with messages. An out-of-range or impossible date shows a red message under the box and isn't saved.
+- A saved draft date that is now in the past is flagged and cleared when the screen opens.
+- Booking preferences: today to 6 months ahead. "Please choose today or a later date" / "Please choose a date within the next 6 months".
+- Birth dates were already checked (18+ and a real year).
+- Test: a past date is refused and a date 10 days ahead is accepted (no fixed date in the test any more). 84/84 pass.
+
 ## 2026-11-24 · Booking: "One session" selected by default; member stories need real reviews
 
 - Owner: "pay once should be default selection". The plan picker on Book now starts on **One session (Pay later)**; 6 months and Yearly are a choice. Test updated. 84/84 pass.
