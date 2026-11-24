@@ -2,6 +2,14 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · My care: blend remedies collapsed to a summary
+
+- Owner: the long remedy list should be collapsed into a summary of what is being addressed, and expand on tap.
+- New `BlendRemedies` in `app/app/remedies/page.tsx`. The header reads "Your blend supports", with small flower icons and "N flower remedies · tap to see each".
+- Below the header are chips of what the blend supports (for example "Everyday fears of known things", "Low confidence").
+- Tapping the header expands the list of remedies (each still opens its detail sheet) and tapping again collapses it. `aria-expanded` is set.
+- Test added. 73/73 pass.
+
 ## 2026-11-24 · "Send a note" popup: once a day
 
 - Owner: the "Send a note to Jitendra Khimlani" popup after a mood log should come only once a day.

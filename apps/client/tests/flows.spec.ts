@@ -140,6 +140,16 @@ test('appointment with a plan: request only (optional preferences, typed date), 
   await page.goto(`/app/sessions/view?id=${a.id}`); await expect(page.getByText('05/12/2026')).toBeVisible()
 })
 
+test('my care: remedies collapsed to what the blend supports; tap to expand', async ({ page }) => {
+  await seed(page); await page.goto('/app/remedies')
+  const toggle = page.getByRole('button', { name: /Your blend supports/ })
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(page.getByRole('list', { name: 'What your blend supports' }).getByRole('listitem')).toHaveCount(3)
+  await expect(page.getByRole('list', { name: 'Remedies in your blend' })).toHaveCount(0)
+  await toggle.click()
+  await expect(page.getByRole('list', { name: 'Remedies in your blend' }).getByRole('button')).toHaveCount(3)
+})
+
 test('checkout: a saved address is selected on load; the new-address form can be closed', async ({ page }) => {
   await seed(page)
   await page.goto('/app/checkout')

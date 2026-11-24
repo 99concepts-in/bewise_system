@@ -7,8 +7,8 @@
  *   (flower tiles, day x of 25, drops tick) → FAQ accordion → existing content (progress, reorder, past blends).
  *   Flower art now uses the real Bach vectors (FlowerArt), with a soft fallback while a file is missing.
  */
-import { motion } from 'motion/react'
-import { Bell, CalendarHeart, ChevronRight } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import { Bell, CalendarHeart, ChevronDown, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Mascot, MoodImg } from '@/components/brand'
@@ -95,26 +95,8 @@ export default function Remedies() {
             </div>
             <p className="mt-2 text-[12px] text-muted">{sup.next ? 'Lasts until your next session.' : 'A follow-up refreshes your blend.'}</p>
 
-            {/* owner 2026-11-20: every remedy in the blend and the emotion it addresses */}
-            <h3 className="mt-5 font-sans text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-2">Remedies in your blend</h3>
-            <ul className="mt-3 space-y-2">
-              {blend.flowers.map((f, i) => {
-                const info = BACH_REMEDIES[f]
-                return (
-                  <motion.li key={f} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.05, ease, duration: 0.4 }}>
-                    <button onClick={() => setFlower(f)} className="flex w-full items-center gap-3 rounded-[20px] bg-sky-50 p-3 text-left">
-                      <FlowerArt name={f} decorative className="size-12 shrink-0" />
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-display text-[16px] font-semibold text-ink">{f}</span>
-                        <span className="block text-[13px] leading-[18px] text-ink-2">For: {info?.emotion ?? 'emotional balance'}</span>
-                      </span>
-                      {info && <MoodImg mood={info.mood as never} size={32} />}
-                      <ChevronRight className="size-4 shrink-0 text-muted" />
-                    </button>
-                  </motion.li>
-                )
-              })}
-            </ul>
+            {/* owner 2026-11-24: collapsed to a summary of what the blend supports; tap to see each remedy */}
+            <BlendRemedies flowers={blend.flowers} onFlower={setFlower} />
 
             <div className="mt-5 border-t border-line pt-5">
               <div className="mb-3 flex items-center justify-between gap-3">
@@ -176,6 +158,52 @@ export default function Remedies() {
   )
 }
 
+
+function BlendRemedies({ flowers, onFlower }: { flowers: string[]; onFlower: (f: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const issues = [...new Set(flowers.map((f) => BACH_REMEDIES[f]?.emotion).filter(Boolean) as string[])]
+  return (
+    <div className="mt-5 rounded-[22px] bg-sky-50 p-4">
+      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="blend-remedies" className="flex w-full items-center gap-3 text-left">
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-[17px] font-semibold leading-6 text-ink">Your blend supports</span>
+          <span className="mt-1 flex items-center gap-2 text-[12px] text-ink-2">
+            <span className="flex shrink-0 -space-x-2" aria-hidden>
+              {flowers.slice(0, 5).map((f) => <span key={f} className="grid size-7 place-items-center rounded-full bg-white ring-2 ring-sky-50"><FlowerArt name={f} decorative className="size-6" /></span>)}
+            </span>
+            {flowers.length} flower remedies · {open ? 'tap to hide' : 'tap to see each'}
+          </span>
+        </span>
+        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.25 }} className="grid size-8 shrink-0 place-items-center rounded-full bg-white text-navy"><ChevronDown className="size-4" /></motion.span>
+      </button>
+      <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="What your blend supports">
+        {issues.map((t) => <li key={t} className="rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold text-navy">{t}</li>)}
+      </ul>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.ul id="blend-remedies" key="list" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3, ease }} className="overflow-hidden" aria-label="Remedies in your blend">
+            {flowers.map((f, i) => {
+              const info = BACH_REMEDIES[f]
+              return (
+                <motion.li key={f} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.04 }} className={i === 0 ? 'mt-3' : 'mt-2'}>
+                  <button onClick={() => onFlower(f)} className="flex w-full items-center gap-3 rounded-[18px] bg-white p-2.5 text-left">
+                    <FlowerArt name={f} decorative className="size-11 shrink-0" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-display text-[15px] font-semibold text-ink">{f}</span>
+                      <span className="block text-[12px] leading-[17px] text-ink-2">For: {info?.emotion ?? 'emotional balance'}</span>
+                    </span>
+                    {info && <MoodImg mood={info.mood as never} size={28} />}
+                    <ChevronRight className="size-4 shrink-0 text-muted" />
+                  </button>
+                </motion.li>
+              )
+            })}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
 function ReminderSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const blend = useApp((s) => s.blend)
