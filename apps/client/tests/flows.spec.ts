@@ -408,3 +408,16 @@ test('home: Bach flower story cards slide and open their story; 7 stories in Lea
   await page.goto('/app/learn')
   for (const t of ['confidence', 'money and business worries', 'constant change', 'self-doubt', 'sleep']) await expect(page.getByRole('link', { name: new RegExp(`Read: .*${t}`) })).toBeVisible()
 })
+
+test('stories: relaxing music can be muted and changed', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/learn/story?id=sleep')
+  await page.getByRole('button', { name: 'Next slide' }).click()
+  const music = page.getByRole('button', { name: /^Music: / })
+  const first = await music.getAttribute('aria-label')
+  await music.click()
+  expect(await music.getAttribute('aria-label')).not.toBe(first)
+  await page.getByRole('button', { name: 'Mute music' }).click()
+  await expect(page.getByRole('button', { name: 'Turn music on' })).toBeVisible()
+  expect(await page.evaluate(() => localStorage.getItem('bw-story-sound'))).toBe('off')
+})

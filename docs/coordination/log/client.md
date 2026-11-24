@@ -2,6 +2,10 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Products entrance + relaxing music in stories
+- Welcome products screen: bath salt pops up first, then the spray, then the roll-on, each springing up from below with a little bounce and sparkles, then floating.
+- Stories: relaxing loop music generated live with the Web Audio API (lib/ambient.ts, no audio files or licences): Calm (slow pad chords), Rain (soft rain and wind, droplets), Chimes (pentatonic wind chimes); all over a soft drone with reverb, gentle fade in/out. Header has the track button (tap to change) and a mute button; both remembered on the device. Each story starts on its own default track; sound begins on the first tap (browser rule) and fades out when the story closes. Test added (66).
+
 ## 2026-11-24 · Welcome fixes
 - Opening animation about twice as fast (ring in ~0.5 s, merge at ~1 s, owl at ~1.8 s) and the ring flowers stay hidden after merging; only the background flowers remain.
 - Products screen: bath salt behind in the middle, Sleep spray and Immutime roll-on in front on either side, nothing hidden.

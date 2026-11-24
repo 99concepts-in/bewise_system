@@ -324,11 +324,18 @@ function ArtShop() {
   return (
     <div className="relative flex h-full items-center justify-center" aria-hidden>
       <span className="absolute aspect-square h-[78%] rounded-full bg-white/60" />
+      {/* owner 2026-11-24: products make an entrance: each pops up from below with a little bounce, then floats */}
       {items.map((it, k) => (
-        <motion.img key={it.p} src={`${BP}/img/${it.p}.webp`} alt="" className="absolute w-auto object-contain drop-shadow-[0_14px_18px_rgba(120,50,40,.2)]"
-          style={{ height: it.h, zIndex: it.z, x: it.x, rotate: it.r }}
-          initial={{ y: it.y + 30, opacity: 0 }} animate={{ y: [it.y, it.y - 8, it.y], opacity: 1 }}
-          transition={{ opacity: { delay: 0.15 + k * 0.1 }, y: { delay: 0.15 + k * 0.1, duration: 4 + k, repeat: Infinity, ease: 'easeInOut' } }} />
+        <motion.div key={it.p} className="absolute" style={{ zIndex: it.z, x: it.x }}
+          initial={{ y: 120, opacity: 0, scale: 0.5, rotate: it.r * 3 }} animate={{ y: it.y, opacity: 1, scale: 1, rotate: it.r }}
+          transition={{ delay: 0.2 + [1, 0, 2][k] * 0.22, type: 'spring', stiffness: 190, damping: 13 }}>
+          <motion.img src={`${BP}/img/${it.p}.webp`} alt="" className="w-auto object-contain drop-shadow-[0_14px_18px_rgba(120,50,40,.2)]" style={{ height: it.h }}
+            animate={{ y: [0, -8, 0] }} transition={{ delay: 1.2 + k * 0.3, duration: 4 + k, repeat: Infinity, ease: 'easeInOut' }} />
+        </motion.div>
+      ))}
+      {[0, 1, 2, 3, 4].map((k) => (
+        <motion.span key={`s${k}`} className="absolute text-[18px] text-[#f2b33b]" style={{ left: `${18 + k * 16}%`, top: `${14 + (k % 2) * 60}%` }}
+          initial={{ scale: 0, opacity: 0 }} animate={{ scale: [0, 1.2, 0], opacity: [0, 1, 0] }} transition={{ delay: 0.9 + k * 0.12, duration: 0.9 }}>✦</motion.span>
       ))}
     </div>
   )

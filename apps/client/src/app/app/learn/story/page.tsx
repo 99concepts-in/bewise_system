@@ -8,7 +8,7 @@
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { Lightbulb, Quote, X } from 'lucide-react'
+import { Lightbulb, Quote, Volume2, VolumeX, X } from 'lucide-react'
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { FlowerArt } from '@/components/flower'
 import { SessionOnly } from '@/components/made-with-care'
@@ -17,6 +17,7 @@ import { buzz, cx, ease } from '@/components/ui'
 import { STORIES, storyById, type Slide, type Story } from '@/lib/stories'
 import { BP } from '@/lib/asset'
 import { goSafe } from '@/lib/nav'
+import { AMBIENT, ambient, type AmbientKind } from '@/lib/ambient'
 
 export default function Page() { return <Suspense><StoryView /></Suspense> }
 
@@ -42,6 +43,17 @@ function StoryView() {
   }, [i, n, close])
 
   useEffect(() => { setNavHidden(true); return () => setNavHidden(false) }, [setNavHidden])
+
+  // owner 2026-11-24: relaxing loop music, 3 kinds, mutable (remembered on this device). Starts on the first tap (browser rule).
+  const storyIdx = Math.max(0, STORIES.findIndex((x) => x.id === story.id))
+  const [muted, setMuted] = useState(() => { try { return localStorage.getItem('bw-story-sound') === 'off' } catch { return false } })
+  const [track, setTrack] = useState<AmbientKind>(() => { try { return (localStorage.getItem('bw-story-track') as AmbientKind) || AMBIENT[storyIdx % AMBIENT.length].id } catch { return AMBIENT[storyIdx % AMBIENT.length].id } })
+  const started = useRef(false)
+  const sound = useCallback((m = muted, t = track) => { try { if (m) ambient().stop(); else { ambient().start(t); started.current = true } } catch { /* no audio */ } }, [muted, track])
+  useEffect(() => () => { try { ambient().stop() } catch { /* no audio */ } }, [])
+  const firstTap = () => { if (!started.current && !muted) sound() }
+  const toggleMute = () => { const m = !muted; setMuted(m); try { localStorage.setItem('bw-story-sound', m ? 'off' : 'on') } catch { /* private */ } ; sound(m) }
+  const nextTrack = () => { const t = AMBIENT[(AMBIENT.findIndex((a) => a.id === track) + 1) % AMBIENT.length].id; setTrack(t); try { localStorage.setItem('bw-story-track', t) } catch { /* private */ } ; if (!muted) sound(false, t) }
   useEffect(() => { setI(0); setProgress(0) }, [story.id])
   // auto-advance with a visible progress bar (paused while held, never on the last slide)
   useEffect(() => {
@@ -61,7 +73,7 @@ function StoryView() {
   }, [i, go, close])
 
   const holdT = useRef<number | null>(null)
-  const down = () => { holdT.current = window.setTimeout(() => setPaused(true), 220) }
+  const down = () => { firstTap(); holdT.current = window.setTimeout(() => setPaused(true), 220) }
   const up = (side: 'l' | 'r') => {
     if (holdT.current) clearTimeout(holdT.current)
     if (paused) { setPaused(false); return }
@@ -87,7 +99,13 @@ function StoryView() {
         </div>
         <div className="mt-2.5 flex items-center justify-between">
           <p className="text-[13px] font-semibold text-white/90">{story.tag} · {i + 1} of {n}</p>
-          <button onClick={close} aria-label="Close story" className="grid size-10 place-items-center rounded-full bg-black/25 backdrop-blur"><X className="size-5" /></button>
+          <div className="flex items-center gap-2">
+            <button onClick={nextTrack} aria-label={`Music: ${AMBIENT.find((a) => a.id === track)!.label}. Tap to change`} className="flex h-10 items-center gap-1.5 rounded-full bg-black/25 px-3 text-[13px] font-semibold backdrop-blur">
+              <span aria-hidden>{AMBIENT.find((a) => a.id === track)!.emoji}</span>{AMBIENT.find((a) => a.id === track)!.label}
+            </button>
+            <button onClick={toggleMute} aria-label={muted ? 'Turn music on' : 'Mute music'} aria-pressed={!muted} className="grid size-10 place-items-center rounded-full bg-black/25 backdrop-blur">{muted ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}</button>
+            <button onClick={close} aria-label="Close story" className="grid size-10 place-items-center rounded-full bg-black/25 backdrop-blur"><X className="size-5" /></button>
+          </div>
         </div>
       </div>
 
