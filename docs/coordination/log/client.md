@@ -2,6 +2,17 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Review card: full screen with the card, share icons, or a Google review
+
+- Owner: the 4 or 5 star thank-you should be a full screen with the card preview and share icons, or a Google review instead.
+- New `ShareScreen` (`components/share-sheet.tsx`). After 4 or 5 star feedback the sheet closes and a full screen opens. It shows:
+  - "Thank you 🌸" and "Share your experience".
+  - The review card as a large preview.
+  - Icons: Instagram (the system share sheet with the image, else it saves the image), WhatsApp (text + link), More (system share), Save, Copy link.
+  - "or", then "Write a Google review instead" with the Google icon, then Done.
+- 1 to 3 stars: the plain thank-you, as before. The in-sheet invite card is gone.
+- Test updated. 83/83 pass.
+
 ## 2026-11-24 · Sheets no longer close while typing (iPhone)
 
 - Owner: tapping "Add a comment" in session feedback closed the sheet.
