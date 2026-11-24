@@ -345,3 +345,15 @@ test('dose reminders: app follows up 45 min after the first (WhatsApp) one, then
   await page.reload(); await page.waitForTimeout(800)
   expect((await notices())[0]).toMatch(/2 of 4/)
 })
+
+test('last dose of the day → breathe in, breathe out → mood slider', async ({ page }) => {
+  await seed(page)
+  const today = await page.evaluate(() => { const x = new Date(); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}` })
+  await page.evaluate((d) => { const k = 'bewise-client-v1'; const r = JSON.parse(localStorage.getItem(k)!); r.state.doses = { ...(r.state.doses || {}), [d]: 3 }; localStorage.setItem(k, JSON.stringify(r)) }, today)
+  await page.goto('/app')
+  await page.getByRole('button', { name: 'Dose 4', exact: true }).click()
+  await expect(page.getByRole('dialog', { name: 'A moment to breathe' })).toBeVisible()
+  await expect(page.getByText('Breathe in…')).toBeVisible({ timeout: 4000 })
+  await expect(page.getByText('Breathe out…')).toBeVisible({ timeout: 7000 })
+  await expect(page.getByRole('slider', { name: 'How pleasant or unpleasant' })).toBeVisible({ timeout: 9000 })
+})

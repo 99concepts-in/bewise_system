@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Last dose → breathe → mood slider
+- Tapping the day's 4th dose opens components/breathe.tsx: "All 4 doses done today · Let's take one breath", then a glowing circle that grows for "Breathe in…" (4 s, blue) and settles for "Breathe out…" (6 s, teal), gentle haptic at each change, Skip anytime. It then opens the mood slider ("Right now"). Test added (62).
+
 ## 2026-11-24 · Learn search: no remedy names
 - Owner: no remedy suggestions in search. Searching a concern now shows "We can help with this" with the matching concerns, a line that Jitendra Khimlani prepares a blend made only for you in a session, and Book a session. No flower names or reasons. (The concern list in lib/remedy-finder.ts stays for the Consultant app.)
 

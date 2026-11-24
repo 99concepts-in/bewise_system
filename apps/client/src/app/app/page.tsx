@@ -16,6 +16,7 @@ import { useMemo, useState } from 'react'
 import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
 import { MoodLogger } from '@/components/mood-logger'
+import { Breathe } from '@/components/breathe'
 import { MOOD_LEVELS, MoodShape } from '@/components/mood-shape'
 import { LearnCard } from '@/components/learn-card'
 import { ReminderSetup, useMorningNudge } from '@/components/reminder-setup'
@@ -45,6 +46,8 @@ export default function Home() {
   const blend = useApp((s) => s.blend)
   const [story, setStory] = useState(false)
   const [logger, setLogger] = useState<'moment' | 'day' | null>(null)
+  // owner 2026-11-24: the day's last dose → breathe in, breathe out → mood slider
+  const [breathe, setBreathe] = useState(false)
   const now = useNow(60_000)
   useMorningNudge()
 
@@ -58,7 +61,7 @@ export default function Home() {
         </Item>
 
         {/* owner 2026-11-23: the remedy first, then "log how you feel" right under it (the feelings grid is gone) */}
-        {blend && <Item><TodaysBlend /></Item>}
+        {blend && <Item><TodaysBlend onAllDone={() => setBreathe(true)} /></Item>}
 
         <Item><MoodPrompt onLog={(k) => setLogger(k)} /></Item>
 
@@ -77,6 +80,7 @@ export default function Home() {
         <Item><YourSpace /></Item>
       </Reveal>
 
+      <Breathe open={breathe} onDone={() => { setBreathe(false); setLogger('moment') }} />
       <MoodLogger open={!!logger} kind={logger ?? 'moment'} onClose={() => setLogger(null)} />
       <ReminderSetup />
       <JituStory open={story} onClose={() => setStory(false)} />
@@ -358,7 +362,7 @@ function NextSession({ a }: { a: Appointment }) {
  * owner 2026-11-20: Home shows only the essentials of the blend: a bottle that empties as doses are checked in,
  * today's 4 drops, and a way into the full details (remedies, emotions, calendar) in My care.
  */
-function TodaysBlend() {
+function TodaysBlend({ onAllDone }: { onAllDone?: () => void }) {
   const s = useApp()
   const blend = s.blend!
   const [pulse, setPulse] = useState(0)
@@ -370,7 +374,7 @@ function TodaysBlend() {
   const tap = (i: number) => {
     const next = i < n ? i : i + 1
     s.logDoses(today, next); buzz(next > n ? 14 : 8)
-    if (next > n) { setPulse(Date.now()); if (next === of) toast(`All ${of} done today 🔥 Your streak grows`) }
+    if (next > n) { setPulse(Date.now()); if (next === of) { toast(`All ${of} done today 🔥 Your streak grows`); setTimeout(() => onAllDone?.(), 700) } }
   }
   const caption = n >= of ? 'All done for today 🌿' : n === 0 ? 'Tap a drop each time you take your dose' : `${of - n} more to go today`
   return (
