@@ -72,7 +72,7 @@ function Book() {
   const [skipAsk, setSkipAsk] = useState(false)
   const [payWhen, setPayWhen] = useState<'now' | 'later'>('now')
   // owner 2026-11-18: after the first consultation, offer 6 months (recommended), yearly (best value) or one time
-  const [planPick, setPlanPick] = useState<PlanPick>('half')
+  const [planPick, setPlanPick] = useState<PlanPick>('once') // owner 2026-11-24: one session is the default; plans are a choice
 
   // owner 2026-11-21: no first / follow-up choice any more (most clients met Jitendra Khimlani before the app).
   // Everyone books "an appointment": 2-minute check-in → online or in person → preferred time → send. The team sets type, fee and time.

@@ -2,6 +2,12 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Booking: "One session" selected by default; member stories need real reviews
+
+- Owner: "pay once should be default selection". The plan picker on Book now starts on **One session (Pay later)**; 6 months and Yearly are a choice. Test updated. 84/84 pass.
+- Owner: "add more member stories". Not done: only 3 real testimonials exist (brochure). A web search found no public reviews of Jitendra Khimlani, and Google reviews can't be read automatically. We never invent testimonials.
+  - Asked the owner to paste review texts (Google screenshots, or WhatsApp messages with the member's permission) with the name to show. Adding them is a one-line change each in `TESTIMONIALS` (`lib/data.ts`).
+
 ## 2026-11-24 · Home: "Connect with me on Instagram"
 
 - Owner: add "connect with me on Instagram" on Home (https://www.instagram.com/jitubhaiyajgd).

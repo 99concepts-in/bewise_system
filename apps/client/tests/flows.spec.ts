@@ -219,7 +219,9 @@ test('launch offer: yearly reveal → are you sure → 6-month offer → pay →
 test('appointment with a plan: request only (optional preferences, typed date), the team sets the time', async ({ page }) => {
   await seed(page)
   await page.goto('/app/book')
-  await expect(page.getByRole('radio', { name: /6 months/ })).toHaveAttribute('aria-checked', 'true')
+  // owner 2026-11-24: one session is selected by default
+  await expect(page.getByRole('radio', { name: /One session/ })).toHaveAttribute('aria-checked', 'true')
+  await expect(page.getByRole('radio', { name: /6 months/ })).toHaveAttribute('aria-checked', 'false')
   await page.getByRole('radio', { name: /Yearly/ }).click()
   await page.getByRole('button', { name: 'Start 2-minute check-in' }).click()
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue', exact: true }).click()
