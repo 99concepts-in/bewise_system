@@ -53,6 +53,16 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
   const ink = useTransform(v, (x) => moodInk(x))
   const thumbLeft = useTransform(v, (raw) => { const x = Math.max(0, Math.min(6, raw)); return `calc(${(x / 6) * 100}% + ${20 - (x / 6) * 40}px)` })
   const lastLevel = useRef(3)
+  // owner 2026-11-24 (iPhone 14 Safari): the flower takes only the room that is left, so the Next button always shows
+  const stage = useRef<HTMLDivElement>(null)
+  const [shape, setShape] = useState(300)
+  useEffect(() => {
+    const el = stage.current; if (!open || !el) return
+    const fit = () => setShape(Math.max(140, Math.min(300, Math.floor(el.clientHeight - 16), el.clientWidth)))
+    fit()
+    const ro = new ResizeObserver(fit); ro.observe(el)
+    return () => ro.disconnect()
+  }, [open, step])
   useMotionValueEvent(v, 'change', (x) => { const l = Math.max(0, Math.min(6, Math.round(x))); if (l !== lastLevel.current) { lastLevel.current = l; setLevel(l); buzz(6) } })
   const snap = useRef<ReturnType<typeof animate> | null>(null)
   const settle = () => { snap.current?.stop(); snap.current = animate(v, Math.max(0, Math.min(6, Math.round(v.get()))), { type: 'spring', bounce: 0, duration: 0.35 }) }
@@ -85,7 +95,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
       {open && (
         <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label={kind === 'day' ? 'How was your day overall' : 'Log how you feel'}>
           <motion.div className="absolute inset-0 bg-black/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
-          <motion.div className="absolute inset-x-0 bottom-0 mx-auto flex h-[94dvh] max-w-[480px] flex-col overflow-hidden rounded-t-[34px] bg-[#17181d] text-white"
+          <motion.div className="absolute inset-x-0 top-[5svh] mx-auto flex h-[95svh] max-w-[480px] flex-col overflow-hidden rounded-t-[34px] bg-[#17181d] text-white"
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', stiffness: 260, damping: 30 }}>
             <motion.div className="pointer-events-none absolute inset-0" style={{ background: bg }} aria-hidden />
             <LiveBackdrop v={v} />
@@ -109,9 +119,9 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
 
             <AnimatePresence mode="wait" initial={false}>
               {step === 'feel' && (
-                <motion.div key="feel" className="relative flex flex-1 flex-col px-6 pb-[max(env(safe-area-inset-bottom),20px)]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }}>
-                  <h2 className="mt-7 text-center font-sans text-[26px] font-semibold leading-8 text-white/90">{kind === 'day' ? 'Choose how you’ve felt overall today' : 'Choose how you feel right now'}</h2>
-                  <div className="flex flex-1 items-center justify-center"><MoodShape v={v} size={300} /></div>
+                <motion.div key="feel" className="relative flex min-h-0 flex-1 flex-col px-6 pb-[max(env(safe-area-inset-bottom),20px)]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }}>
+                  <h2 className="mt-5 text-center font-sans text-[26px] font-semibold leading-8 text-white/90">{kind === 'day' ? 'Choose how you’ve felt overall today' : 'Choose how you feel right now'}</h2>
+                  <div ref={stage} className="flex min-h-0 flex-1 items-center justify-center"><MoodShape v={v} size={shape} /></div>
                   <AnimatePresence mode="wait">
                     <motion.p key={level} initial={{ opacity: 0, y: 8, filter: 'blur(6px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0, y: -8, filter: 'blur(6px)' }} transition={{ duration: 0.2 }}
                       className="text-center text-[32px] font-semibold text-white/90" aria-live="polite">{MOOD_LEVELS[level]}</motion.p>
@@ -175,10 +185,10 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
               )}
 
               {step === 'done' && (
-                <motion.div key="done" className="relative flex flex-1 flex-col px-5 pb-[max(env(safe-area-inset-bottom),20px)] pt-6" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 22 }}>
-                  <div className="flex flex-1 flex-col items-center justify-center rounded-[30px] bg-black/25 px-6 py-8 text-center ring-1 ring-white/10">
+                <motion.div key="done" className="relative flex min-h-0 flex-1 flex-col px-5 pb-[max(env(safe-area-inset-bottom),20px)] pt-6" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 22 }}>
+                  <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden rounded-[30px] bg-black/25 px-6 py-6 text-center ring-1 ring-white/10">
                     <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-white/70">{kind === 'day' ? 'Daily mood' : 'Right now'}</p>
-                    <div className="my-4"><MoodShape v={level} size={190} /></div>
+                    <div className="my-4"><MoodShape v={level} size={Math.min(190, Math.max(120, shape - 80))} /></div>
                     <p className="text-[28px] font-semibold leading-8">{names}</p>
                     <p className="mt-1 text-[17px] text-white/85">{kind === 'day' ? `${dayWord(level)} day` : MOOD_LEVELS[level]}</p>
                     {note.trim() && <p className="mt-4 max-w-[300px] text-[14px] italic leading-5 text-white/70">“{note.trim()}”</p>}

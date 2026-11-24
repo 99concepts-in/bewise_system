@@ -429,6 +429,18 @@ test('after logging a mood, a popup offers a note to Jitendra Khimlani', async (
   await expect(page.getByRole('textbox', { name: 'Message Jitendra Khimlani' })).toHaveValue(/^Today I’m feeling calm\./)
 })
 
+test('mood logger fits a short Safari screen: the Next button is fully visible', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 600 })
+  await seed(page); await page.goto('/app')
+  await page.getByRole('button', { name: /Log how you feel|Log again/ }).first().click()
+  await page.waitForTimeout(900)
+  const next = page.getByRole('button', { name: 'Next' })
+  const b = (await next.boundingBox())!
+  expect(b.y + b.height).toBeLessThanOrEqual(600)
+  await next.click()
+  await expect(page.getByRole('button', { name: 'Pick a feeling' })).toBeInViewport()
+})
+
 test('mood slider: tap anywhere on the track and drag with a finger', async ({ page }) => {
   await seed(page); await page.goto('/app')
   await page.getByRole('button', { name: /Log how you feel|Log again/ }).first().click()

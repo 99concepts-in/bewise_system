@@ -2,6 +2,14 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Mood logger: Next button cut off on iPhone 14 Safari
+
+- **Cause:** the sheet is 94% of the visible height, but its content was fixed: a 300 px flower plus title, label, slider and button. With Safari's toolbars showing, the content was taller than the sheet, so the Next button was clipped.
+- **Fix** (`components/mood-logger.tsx`):
+  - The flower now measures the room that is left (ResizeObserver) and sizes itself between 140 and 300 px. The summary flower scales with it.
+  - The sheet is anchored from the top in `svh` (5svh + 95svh).
+- Test: on a 390×600 screen the Next button is fully on screen. 72/72 pass.
+
 ## 2026-11-24 · Checkout: saved address selected, new-address form closes
 
 - Owner: "Add an option to close this. It is not letting me check out even if I have one address already, and that is selected."
