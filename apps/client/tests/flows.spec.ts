@@ -295,32 +295,53 @@ test('my care: how to take your remedy', async ({ page }) => {
   await expect(page.getByRole('link', { name: /WhatsApp 98980 20939/ })).toHaveAttribute('href', /wa\.me\/919898020939/)
 })
 
-test('onboarding: member booked by Jitendra Khimlani signs in → details prefilled and editable → home, no booking prompt', async ({ page }) => {
+test('onboarding: phone → name → birthdate → gender → home; details we know are prefilled and editable', async ({ page }) => {
   await page.goto('/?reset=1'); await page.waitForURL('**/welcome**')
   await page.goto('/sign-in')
   await page.getByRole('textbox').first().fill('9898989898')
   await page.getByRole('button', { name: 'Send code' }).click()
   await page.getByLabel('4-digit code').fill('2468')
-  await page.waitForURL('**/onboarding/about')
-  await expect(page.getByText(/Jitendra Khimlani’s team already added your details/)).toBeVisible()
-  await expect(page.getByPlaceholder('Priya Shah')).toHaveValue('Meera Patel')
-  await page.getByPlaceholder('Priya Shah').fill('Meera P. Patel')
+  await page.waitForURL('**/onboarding/name')
+  await expect(page.getByLabel('Your name')).toHaveValue('Meera Patel')
+  await page.getByLabel('Your name').fill('Meera P. Patel')
   await page.getByRole('button', { name: 'Continue' }).click()
-  await page.waitForURL('**/onboarding/photo')
+  await page.waitForURL('**/onboarding/dob')
+  await expect(page.getByLabel('Date of birth (DD/MM/YYYY)')).toHaveValue('14/03/1988')
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.waitForURL('**/onboarding/gender')
+  await expect(page.getByRole('radio', { name: /Female/ })).toHaveAttribute('aria-checked', 'true')
+  await page.getByRole('button', { name: 'Let’s go' }).click()
+  await page.waitForURL('**/app')
   const s = await state(page)
-  expect(s.profile).toMatchObject({ name: 'Meera P. Patel', city: 'Vadodara', reference: 'Jitendra Khimlani', phone: '9898989898' })
-  expect(s.profile.prefilledFrom).toBeUndefined()
+  expect(s.profile).toMatchObject({ name: 'Meera P. Patel', dob: '1988-03-14', gender: 'Female', phone: '9898989898' })
+  expect(s.profile.onboardedAt).toBeTruthy()
+  // short tour, skippable
+  await expect(page.getByText(/Quick tour · 1 of/)).toBeVisible({ timeout: 5000 })
+  await page.getByRole('button', { name: 'Next' }).click()
+  await expect(page.getByText(/Quick tour · 2 of/)).toBeVisible()
+  await page.getByRole('button', { name: 'Skip tour' }).click()
+  await expect(page.getByText(/Quick tour/)).toHaveCount(0)
+  expect((await state(page)).profile.tourPending).toBe(false)
 })
 
-test('welcome: 4 slides end with the app’s benefits; You’re in has no booking prompt', async ({ page }) => {
+test('welcome: My journey → 5 benefits → Let’s get started → sign in; Already a member', async ({ page }) => {
   await page.goto('/?reset=1'); await page.waitForURL('**/welcome**')
-  await page.getByRole('button', { name: 'Get Started' }).click()
-  await page.getByRole('button', { name: 'Next' }).click(); await page.getByRole('button', { name: 'Next' }).click()
-  await expect(page.getByRole('heading', { name: /Stay connected to your wellness journey/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /Welcome to BeWise Holistic Wellness/ })).toBeVisible({ timeout: 5000 })
+  await expect(page.getByRole('button', { name: 'Already a member' })).toBeVisible()
+  await page.getByRole('button', { name: 'My journey' }).click()
+  await expect(page.getByRole('heading', { name: /emotional wellbeing/ })).toBeVisible()
+  for (const h of [/Bach flower journey/, /easy way/, /Ask BeWise/, /wellness shop/]) { await page.getByRole('button', { name: 'Next' }).click(); await expect(page.getByRole('heading', { name: h })).toBeVisible() }
+  await page.getByRole('button', { name: 'Let’s get started' }).click()
+  await page.waitForURL('**/sign-in')
+})
+
+test('blend being prepared: after a session, before the blend is ready', async ({ page }) => {
   await seed(page)
-  await page.goto('/onboarding/done')
-  await expect(page.getByRole('button', { name: /Take me home/ })).toBeVisible()
-  await expect(page.getByRole('button', { name: /Book a session/ })).toHaveCount(0)
+  await page.evaluate(() => { const k = 'bewise-client-v1'; const r = JSON.parse(localStorage.getItem(k)!); r.state.blend = null; localStorage.setItem(k, JSON.stringify(r)) })
+  await page.goto('/app')
+  await expect(page.getByRole('heading', { name: 'Your blend is being prepared' })).toBeVisible()
+  await page.goto('/app/remedies')
+  await expect(page.getByRole('heading', { name: 'Your blend is being prepared' })).toBeVisible()
 })
 
 test('dose reminders: app follows up 45 min after the first (WhatsApp) one, then 4 h after each dose, repeating every 45 min', async ({ page }) => {

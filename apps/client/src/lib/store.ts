@@ -22,6 +22,8 @@ export type Profile = {
   reference?: string
   /** details we already had (booking link or a booking made by Jitendra Khimlani / the team), shown for checking */
   prefilledFrom?: 'booking-link' | 'staff'
+  /** owner 2026-11-24: show the short Home tour once after sign-up */
+  tourPending?: boolean
   photo?: string; consents: { wellbeing: boolean; whatsapp: boolean; offers: boolean }
   allergies: string[]; onboardedAt?: string
 }

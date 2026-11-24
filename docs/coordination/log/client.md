@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · New onboarding: welcome + 5 benefits → phone → name → birthdate → gender → Home tour
+- Welcome (after the golden splash): colourful warm gradients and floating Bach flowers on every screen. 0 "Welcome to BeWise Holistic Wellness" (owl in a turning ring of flowers) with "My journey" + "Already a member". Benefits: 1 emotional wellbeing (mood flower opening and closing, faces), 2 Bach flower journey (our bottle, drops filling today's dose circles; reminders / moods / sessions), 3 Learn (story covers fanning and cycling), 4 Ask BeWise (chat typing in), 5 Sessions + shop (session reminder over products) → "Let's get started" → phone sign-in.
+- Sign-up is now one question per screen: /onboarding/name, /onboarding/dob, /onboarding/gender, then straight to Home (privacy agreement line on the last step; WhatsApp on for reminders). Prefill from the booking link / staff booking still applies. Old about/photo/privacy/done pages are no longer in the flow (city, reference, photo can be added later in Me).
+- Home tour (components/tour.tsx): spotlight + card, "Quick tour · n of N", Next / Skip tour; steps: remedy or blend, how you feel, book a session, learn, Ask BeWise, tabs. Shown once (profile.tourPending). Reminder popup waits until the tour is done.
+- "Your blend is being prepared" (components/blend-preparing.tsx) on Home and in My care after a session and before the blend is set: bottle filling, steps (session ✓, flowers chosen ✓, being prepared, ready on WhatsApp).
+- Tests: 65.
+
 ## 2026-11-24 · Bach flower story slider + 4 new stories
 - Home and My care: "How Bach flowers can help" is now a slider of bold colour cards with a big blob flower (owner reference), one per story with a short headline ("Rest easy tonight", "Calm about money"…); auto-slides every 5 s, swipe, dots; each card opens its story directly. "All" goes to Learn.
 - New stories (7 slides each, Higgsfield covers): Confidence, Money and business worries, Constant change, Self-doubt. "Did you know" quotes checked against Bach's text (Larch, Elm, Walnut, Cerato under "uncertainty"). Same care notes; testimonials reused from the 3 real quotes. Learn now has 7 stories. Test added (64).

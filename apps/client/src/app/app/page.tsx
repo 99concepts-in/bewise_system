@@ -16,6 +16,8 @@ import { useMemo, useState } from 'react'
 import { MoodImg } from '@/components/brand'
 import { LaunchBanner } from '@/components/launch-offer'
 import { MoodLogger } from '@/components/mood-logger'
+import { Tour } from '@/components/tour'
+import { BlendPreparing } from '@/components/blend-preparing'
 import { Breathe } from '@/components/breathe'
 import { MOOD_LEVELS, MoodShape } from '@/components/mood-shape'
 import { LearnCard } from '@/components/learn-card'
@@ -61,28 +63,29 @@ export default function Home() {
         </Item>
 
         {/* owner 2026-11-23: the remedy first, then "log how you feel" right under it (the feelings grid is gone) */}
-        {blend && <Item><TodaysBlend onAllDone={() => setBreathe(true)} /></Item>}
+        {blend ? <Item data-tour="remedy"><TodaysBlend onAllDone={() => setBreathe(true)} /></Item> : <BlendPreparing />}
 
-        <Item><MoodPrompt onLog={(k) => setLogger(k)} /></Item>
+        <Item data-tour="mood"><MoodPrompt onLog={(k) => setLogger(k)} /></Item>
 
         <ContextCard />
 
         <Item className="empty:hidden"><LaunchBanner /></Item>
 
-        <Item><MeetCard open={story} onOpen={() => { buzz(8); setStory(true) }} /></Item>
+        <Item data-tour="meet"><MeetCard open={story} onOpen={() => { buzz(8); setStory(true) }} /></Item>
 
-        <Item><LearnCard /></Item>
+        <Item data-tour="learn"><LearnCard /></Item>
 
         <GoalsCard />
 
         <Item><ShopRow /></Item>
 
-        <Item><YourSpace /></Item>
+        <Item data-tour="ask"><YourSpace /></Item>
       </Reveal>
 
       <Breathe open={breathe} onDone={() => { setBreathe(false); setLogger('moment') }} />
       <MoodLogger open={!!logger} kind={logger ?? 'moment'} onClose={() => setLogger(null)} />
       <ReminderSetup />
+      <Tour />
       <JituStory open={story} onClose={() => setStory(false)} />
     </main>
   )

@@ -25,7 +25,7 @@ export const NEXT_AFTER_MIN = 4 * 60
 export function ReminderSetup() {
   const s = useApp()
   const blend = s.blend
-  const asked = !!s.reminders?.askedAt
+  const asked = !!s.reminders?.askedAt || !!s.profile?.tourPending // owner 2026-11-24: never on top of the tour
   const [open, setOpen] = useState(false)
   const [first, setFirst] = useState(() => s.reminders?.firstAt ?? blend?.reminderTimes?.[0] ?? '08:00')
   useEffect(() => { if (blend && !asked) { const t = setTimeout(() => setOpen(true), 1200); return () => clearTimeout(t) } }, [blend, asked])

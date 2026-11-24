@@ -67,7 +67,7 @@ function SignIn() {
     const known = profile?.phone === phone && profile?.name ? null : lookupMember(phone)
     setProfile(known ? { phone, name: known.name, dob: known.dob, city: known.city, gender: known.gender, reference: known.reference, ...(known.photo ? { photo: known.photo } : {}), prefilledFrom: known.source } : { phone })
     if (profile?.onboardedAt && (returning || profile.phone === phone)) goSafe(router, takeNextStep() ?? '/app', 'replace')
-    else goSafe(router, '/onboarding/about')
+    else goSafe(router, '/onboarding/name')
   }
 
   const onCode = (v: string) => {

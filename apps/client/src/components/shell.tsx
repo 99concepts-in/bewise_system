@@ -72,7 +72,7 @@ function BottomNav() {
   return (
     <AnimatePresence>
       {show && (
-        <motion.nav aria-label="Main" initial={{ y: 90 }} animate={{ y: 0 }} exit={{ y: 90 }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+        <motion.nav data-tour="nav" aria-label="Main" initial={{ y: 90 }} animate={{ y: 0 }} exit={{ y: 90 }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
           <div className="flex h-16 items-stretch justify-around px-1">
             {NAV.map(({ href, label, icon: Icon, match }) => {

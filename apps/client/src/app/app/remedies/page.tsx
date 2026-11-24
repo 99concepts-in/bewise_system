@@ -25,6 +25,7 @@ import { dayKey, fmtDay, fmtTime } from '@/lib/format'
 import { dailyInsight, moodMix, progressLines } from '@/lib/insights'
 import { DoseTracker } from '@/components/dose-tracker'
 import { HowToTake } from '@/components/how-to-take'
+import { BlendPreparing, usePreparing } from '@/components/blend-preparing'
 import { MadeWithCare } from '@/components/made-with-care'
 import { LearnCard } from '@/components/learn-card'
 import { blendSupply } from '@/lib/supply'
@@ -41,6 +42,7 @@ const ABOUT: Record<string, string> = {
 
 export default function Remedies() {
   const blend = useApp((s) => s.blend)
+  const preparing = usePreparing()
   const appointments = useApp((s) => s.appointments)
   const journal = useApp((s) => s.journal)
   const [flower, setFlower] = useState<string | null>(null)
@@ -52,13 +54,13 @@ export default function Remedies() {
       <Reveal className="space-y-6">
         <Item><h1 className="h-duo pt-1">My <em>care</em></h1></Item>
         <Item><Upcoming /></Item>
-        <Item>
+        {preparing ? <Item><BlendPreparing inCare /></Item> : <Item>
           <div className="card flex flex-col items-center p-7 text-center">
             <Mascot pose="sleep" height={132} />
             <p className="mt-4 font-display text-[20px] font-semibold text-ink">Your blend will bloom here</p>
             <p className="mt-1 max-w-[290px] text-[14px] leading-5 text-ink-2">After your first session, Jitendra Khimlani prepares a personal blend of flower remedies, included in your wellness session.</p>
           </div>
-        </Item>
+        </Item>}
         <Item><PastSessions /></Item>
         <Item><FaqCard /></Item>
       </Reveal>
