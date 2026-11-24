@@ -248,6 +248,15 @@ test('appointment with a plan: request only (optional preferences, typed date), 
   await page.goto(`/app/sessions/view?id=${a.id}`); await expect(page.getByText(`${dd}/${mm}/${yyyy}`)).toBeVisible()
 })
 
+test('session page: "Before you begin" tips only for online sessions', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/sessions/view?id=a2') // in person
+  await expect(page.getByText('2-minute check-in').or(page.getByText(/Check-in shared/))).toBeVisible()
+  await expect(page.getByText('Before you begin')).toHaveCount(0)
+  await page.goto('/app/sessions/view?id=a3') // online
+  await expect(page.getByText('Before you begin')).toBeVisible()
+})
+
 test('my care: remedies collapsed to what the blend supports; tap to expand', async ({ page }) => {
   await seed(page); await page.goto('/app/remedies')
   const toggle = page.getByRole('button', { name: /Your blend supports/ })

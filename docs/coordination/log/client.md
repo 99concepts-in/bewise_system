@@ -2,6 +2,11 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Session page: "Before you begin" only for online sessions
+
+- Owner: no "Before you begin" tips (quiet spot, glass of water, three breaths before you join) on in-person session requests. They now show only when the session is online.
+- Test added. 85/85 pass.
+
 ## 2026-11-24 · Booking: no past dates for the preferred date
 
 - Owner: the preferred date accepted past dates (e.g. 10/05/1999).

@@ -95,7 +95,7 @@ function Detail() {
             </Link>
           )
         )}
-        {!past && (
+        {!past && a.mode === 'online' && ( /* owner 2026-11-24: online sessions only; not for in-person visits */
           <div className="card p-5">
             <p className="h-section">Before you begin</p>
             <ul className="mt-3 space-y-3">
