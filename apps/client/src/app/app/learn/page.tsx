@@ -10,8 +10,6 @@ import { motion } from 'motion/react'
 import { ChevronRight, ExternalLink, Quote, Search, Star, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { AppHeader } from '@/components/shell'
-import { FlowerArt } from '@/components/flower'
-import { SessionOnly } from '@/components/made-with-care'
 import { cx, ease } from '@/components/ui'
 import { STORIES } from '@/lib/stories'
 import { findConcerns } from '@/lib/remedy-finder'
@@ -66,25 +64,17 @@ export default function Learn() {
         </section>
       )}
 
+      {/* owner 2026-11-24: no remedy names in search. We say we can help, and the blend is chosen in a session. */}
       {t && concerns.length > 0 && (
-        <section className="mt-6 space-y-3" aria-label="Flowers often chosen">
-          <h2 className="h-section">Flowers often chosen</h2>
-          {concerns.map((c) => (
-            <div key={c.concern} className="card p-4">
-              <p className="text-[15px] font-bold text-navy">{c.concern}</p>
-              <ul className="mt-2 space-y-2">
-                {c.remedies.slice(0, 3).map((r) => (
-                  <li key={r.name} className="flex items-center gap-3">
-                    <FlowerArt name={r.name} decorative className="size-10 shrink-0" />
-                    <span className="min-w-0 text-[13px] leading-5"><b className="text-ink">{r.name}</b> <span className="text-muted">· {r.why}</span></span>
-                  </li>
-                ))}
-              </ul>
+        <section className="mt-6" aria-label="We can help with this">
+          <div className="card overflow-hidden p-5">
+            <p className="eyebrow text-sage-text">We can help with this</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {concerns.map((c) => <span key={c.concern} className="rounded-full bg-peri-50 px-3.5 py-2 text-[14px] font-semibold text-navy">{c.concern}</span>)}
             </div>
-          ))}
-          <SessionOnly />
-          <p className="px-1 text-[12px] leading-5 text-muted">Shown to explain how Bach flowers relate to feelings. Your blend is chosen for you by Jitendra Khimlani after a session. Emotional wellbeing support, not medical treatment.</p>
-          <Link href="/app/book" className="flex h-12 items-center justify-center rounded-full bg-navy text-[15px] font-semibold text-white shadow-[var(--shadow-cta)]">Book a session</Link>
+            <p className="mt-4 text-[14px] leading-5 text-ink-2">Bach flower remedies gently support feelings like these. In a session, Jitendra Khimlani listens to you and prepares a blend made only for you.</p>
+            <Link href="/app/book" className="mt-4 flex h-12 items-center justify-center rounded-full bg-navy text-[15px] font-semibold text-white shadow-[var(--shadow-cta)]">Book a session</Link>
+          </div>
         </section>
       )}
       {t && !stories.length && !concerns.length && (

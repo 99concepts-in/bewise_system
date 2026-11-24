@@ -2,6 +2,9 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Learn search: no remedy names
+- Owner: no remedy suggestions in search. Searching a concern now shows "We can help with this" with the matching concerns, a line that Jitendra Khimlani prepares a blend made only for you in a session, and Book a session. No flower names or reasons. (The concern list in lib/remedy-finder.ts stays for the Consultant app.)
+
 ## 2026-11-23 · Learn: member quotes no longer stick to the screen edge
 - The "What members say" carousel snapped cards flush to the left edge (no scroll padding). Now `snap-mandatory scroll-px-5` + an end spacer: every card rests 20 px from the edge, like the rest of the page.
 

@@ -274,7 +274,9 @@ test('learn: search a concern, open a story, tap through to the end, book', asyn
   await seed(page)
   await page.goto('/app/learn')
   await page.getByRole('textbox', { name: 'Search a concern' }).fill('sleep')
-  await expect(page.getByText('Flowers often chosen', { exact: true })).toBeVisible()
+  await expect(page.getByText('We can help with this', { exact: true })).toBeVisible()
+  // owner 2026-11-24: no remedy names in search results
+  await expect(page.getByText(/White Chestnut|Vervain|Olive/)).toHaveCount(0)
   await page.getByRole('link', { name: 'Read: Bach flowers and sleep' }).click()
   await page.waitForURL('**/app/learn/story**')
   for (let i = 0; i < 7; i++) await page.getByRole('button', { name: 'Next slide' }).click()
