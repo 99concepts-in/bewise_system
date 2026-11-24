@@ -14,6 +14,7 @@ import { AnimatePresence, animate, motion, useMotionValue, useMotionValueEvent, 
 import { Check, ChevronLeft, Search, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { buzz, cx, toast, useChrome } from './ui'
+import { encourage } from '@/lib/encourage'
 import { MoodImg } from './brand'
 import { LiveBackdrop, MOOD_LEVELS, MoodShape, moodColor, moodInk } from './mood-shape'
 import { MOODS, moodOf, type Emotion } from '@/lib/data'
@@ -38,6 +39,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
   const [q, setQ] = useState('')
   const [picks, setPicks] = useState<Emotion[]>([])
   const [note, setNote] = useState('')
+  const [cheer, setCheer] = useState('')
   useEffect(() => { if (open) { setKind(kind0); setStep('feel'); v.set(3); setLevel(3); lastLevel.current = 3; setQ(''); setPicks([]); setNote('') } }, [open, kind0, v])
   useEffect(() => {
     if (!open) return
@@ -83,6 +85,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
     if (!picks.length) return
     logMood(picks[0], new Date(), note, { valence: level + 1, kind, also: picks.slice(1) })
     logged.current = { mood: picks[0], valence: level + 1 }
+    setCheer(encourage())
     buzz(14); setStep('done')
   }
   // owner 2026-11-24: once the logger closes after a log (Done, X or backdrop), offer a note to Jitendra Khimlani (once a day, see AppChrome)
@@ -102,7 +105,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
 
             {/* header */}
             <div className="relative flex items-center justify-between px-4 pt-4">
-              <button onClick={() => (step === 'pick' ? setStep('feel') : onClose())} aria-label={step === 'pick' ? 'Back' : 'Close'} className="grid size-11 place-items-center rounded-full bg-black/25 ring-1 ring-white/10">
+              <button onClick={() => (step === 'pick' ? setStep('feel') : onClose())} aria-label={step === 'pick' ? 'Back' : 'Close'} aria-hidden={step === 'done' || undefined} tabIndex={step === 'done' ? -1 : undefined} className={cx('grid size-11 place-items-center rounded-full bg-black/25 ring-1 ring-white/10', step === 'done' && 'invisible')}>
                 {step === 'pick' ? <ChevronLeft className="size-5" /> : <X className="size-5" />}
               </button>
               {step !== 'done' ? (
@@ -193,6 +196,13 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
                     <p className="mt-1 text-[17px] text-white/85">{kind === 'day' ? `${dayWord(level)} day` : MOOD_LEVELS[level]}</p>
                     {note.trim() && <p className="mt-4 max-w-[300px] text-[14px] italic leading-5 text-white/70">“{note.trim()}”</p>}
                   </div>
+                  {/* owner 2026-11-24: a random word of encouragement after every log */}
+                  {cheer && (
+                    <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.4 }} role="status"
+                      className="mt-3 flex items-start gap-2.5 rounded-[20px] bg-white/12 px-4 py-3 text-left text-[15px] leading-[21px] text-white/90 ring-1 ring-white/10">
+                      <span aria-hidden className="text-[18px] leading-5">🌱</span><span>{cheer}</span>
+                    </motion.p>
+                  )}
                   <motion.button onClick={() => { toast('Saved to your journal 🌿'); onClose() }} style={{ background: moodColor(level), color: moodInk(level) }} whileTap={{ scale: 0.98 }}
                     className="mt-5 h-14 w-full rounded-full text-[17px] font-semibold ring-1 ring-white/20">Done</motion.button>
                 </motion.div>

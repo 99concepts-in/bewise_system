@@ -21,6 +21,7 @@ import { dayKey, fmtTime, fmtDay } from '@/lib/format'
 import { BP } from '@/lib/asset'
 import { InstallPrompt, usePromptBoot } from './prompts'
 import { NoteAsk } from './note-card'
+import { encourage } from '@/lib/encourage'
 
 export const useUi = create<{ navHidden: boolean; setNavHidden: (v: boolean) => void }>((set) => ({ navHidden: false, setNavHidden: (v) => set({ navHidden: v }) }))
 
@@ -198,7 +199,7 @@ function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
         )}
       </AnimatePresence>
       <div className="sticky bottom-0 -mx-5 mt-4 bg-white px-5 pb-1 pt-3">
-        <Btn full disabled={!pick} onClick={() => { if (!pick) return; logMood(pick, new Date(), note); toast(`Logged · ${moodOf(pick).label}`); onClose(); askNote({ mood: pick }) }}>
+        <Btn full disabled={!pick} onClick={() => { if (!pick) return; logMood(pick, new Date(), note); toast(`${moodOf(pick).label}, noted. ${encourage()}`); onClose(); askNote({ mood: pick }) }}>
           {pick ? `Save · ${moodOf(pick).label}` : 'Choose a feeling'}
         </Btn>
       </div>

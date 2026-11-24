@@ -4,19 +4,25 @@ import { seed } from './seed'
 
 const state = (page: import('@playwright/test').Page) => page.evaluate(() => JSON.parse(localStorage.getItem('bewise-client-v1') || '{}').state)
 
-test('dose check-ins: dots light up, streak, 25-day calendar with past days', async ({ page }) => {
+test('dose check-ins: each dose asks how you feel, then View my progress shows the 25 days', async ({ page }) => {
   await seed(page)
   await page.goto('/app')
   await expect(page.getByRole('group', { name: 'Today: 0 of 4 doses' })).toBeVisible()
   // Home (owner 2026-11-20): bottle + 4 drops; each tapped drop lowers the bottle
   const bottle = async () => Number((await page.getByRole('img', { name: /Remedy bottle/ }).getAttribute('aria-label'))!.match(/(\d+)%/)![1])
   const before = await bottle()
-  for (let i = 1; i <= 4; i++) await page.getByRole('button', { name: `Dose ${i}`, exact: true }).click()
+  // owner 2026-11-24: every dose asks how they feel (the mood logger opens); close it and carry on
+  for (let i = 1; i <= 4; i++) {
+    await page.getByRole('button', { name: `Dose ${i}`, exact: true }).click()
+    await expect(page.getByRole('slider', { name: 'How pleasant or unpleasant' })).toBeVisible({ timeout: 3000 })
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog', { name: 'Log how you feel' })).toHaveCount(0)
+  }
   await expect(page.getByRole('group', { name: 'Today: 4 of 4 doses' })).toBeVisible()
   await expect(page.getByText('All done for today')).toBeVisible()
   expect(await bottle()).toBeLessThan(before)
-  await page.getByRole('link', { name: /View my blend/ }).click(); await page.waitForURL('**/app/remedies**')
-  await page.getByRole('button', { name: /See all 25 days/ }).click()
+  // owner 2026-11-24: "View my progress" opens the 25-day summary on Home
+  await page.getByRole('button', { name: 'View my progress' }).click()
   await expect(page.getByRole('grid', { name: 'Doses by day' })).toBeVisible()
   const pastDay = page.getByRole('grid', { name: 'Doses by day' }).getByRole('button').filter({ hasNotText: '' }).first()
   await pastDay.click(); await page.getByRole('button', { name: 'All 4' }).click()
@@ -432,6 +438,7 @@ test('after logging a mood, a popup offers a note to Jitendra Khimlani, once a d
   await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('dialog', { name: 'Log how you feel' }).getByRole('button', { name: 'Calm', exact: true }).click()
   await page.getByRole('button', { name: 'Log it' }).click()
+  await expect(page.getByRole('status').filter({ hasText: /Keep it up|first step|Logging regularly|Naming a feeling|check-ins|showed up|journal|skill|Awareness|Feelings come|Well done|honesty/ })).toBeVisible()
   await page.getByRole('button', { name: 'Done' }).click()
   await expect(page.getByRole('heading', { name: /Send a note to Jitendra Khimlani\?/ })).toBeVisible({ timeout: 3000 })
   await page.getByRole('button', { name: 'Send a note' }).click()

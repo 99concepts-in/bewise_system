@@ -2,6 +2,16 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Home: "View my progress" sheet, every dose asks how you feel, encouragement after each log
+
+- **"View my progress":** Home's "View my blend & progress" link is now "View my progress". It opens the 25-day summary sheet (`DoseCalendar`) on Home instead of going to My care.
+- **Every dose asks how they feel:** each dose checked in on Home opens the mood logger (it was only the last dose of the day). Unticking a dose does not.
+- **Encouragement after each log** (`lib/encourage.ts`):
+  - 12 short lines, picked at random and never the same twice in a row. For example: "Keep it up", "The first step to easing any feeling is noticing it. You just did.", "Logging regularly helps Jitendra Khimlani understand your journey at your next session."
+  - They show on the logger's summary screen, and in the quick-log toast.
+- The logger's summary screen had two close buttons. The left one is now hidden.
+- Tests updated (each dose opens the logger; View my progress; the encouragement shows). 73/73 pass.
+
 ## 2026-11-24 · My care: blend remedies collapsed to a summary
 
 - Owner: the long remedy list should be collapsed into a summary of what is being addressed, and expand on tap.

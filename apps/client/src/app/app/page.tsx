@@ -34,7 +34,7 @@ import { ACCENTS, HOME_FEELINGS, type HomeFeeling } from '@/lib/feelings'
 import { apptName, isUpcoming, tbc, whenShort } from '@/lib/appt'
 import { GoalCheck } from '@/components/goal-check'
 import { doneToday, kindOf, streak } from '@/lib/goals'
-import { DoseBlooms, careDays } from '@/components/dose-tracker'
+import { DoseBlooms, DoseCalendar, careDays } from '@/components/dose-tracker'
 import { RemedyBottle } from '@/components/remedy-bottle'
 import { doseStats, dosesOn, perDay } from '@/lib/doses'
 import { useApp, type Appointment } from '@/lib/store'
@@ -63,7 +63,8 @@ export default function Home() {
 
         {/* owner 2026-11-23: the remedy first, then "log how you feel" right under it (the feelings grid is gone) */}
         {/* owner 2026-11-24: the day's last dose opens the mood logger straight away (the breathe screen is off for now) */}
-        {blend ? <Item data-tour="remedy"><TodaysBlend onAllDone={() => setLogger('moment')} /></Item> : <BlendPreparing />}
+        {/* owner 2026-11-24: every dose checked in asks how they feel */}
+        {blend ? <Item data-tour="remedy"><TodaysBlend onDose={() => setLogger('moment')} /></Item> : <BlendPreparing />}
 
         <Item data-tour="mood"><MoodPrompt onLog={(k) => setLogger(k)} /></Item>
 
@@ -379,8 +380,9 @@ function NextSession({ a }: { a: Appointment }) {
  * owner 2026-11-20: Home shows only the essentials of the blend: a bottle that empties as doses are checked in,
  * today's 4 drops, and a way into the full details (remedies, emotions, calendar) in My care.
  */
-function TodaysBlend({ onAllDone }: { onAllDone?: () => void }) {
+function TodaysBlend({ onDose }: { onDose?: () => void }) {
   const s = useApp()
+  const [cal, setCal] = useState(false)
   const blend = s.blend!
   const [pulse, setPulse] = useState(0)
   const of = perDay(s), today = dayKey(new Date()), n = dosesOn(s, today)
@@ -391,7 +393,7 @@ function TodaysBlend({ onAllDone }: { onAllDone?: () => void }) {
   const tap = (i: number) => {
     const next = i < n ? i : i + 1
     s.logDoses(today, next); buzz(next > n ? 14 : 8)
-    if (next > n) { setPulse(Date.now()); if (next === of) { toast(`All ${of} done today 🌸 Another day of self-care`); setTimeout(() => onAllDone?.(), 700) } }
+    if (next > n) { setPulse(Date.now()); if (next === of) toast(`All ${of} done today 🌸 Another day of self-care`); setTimeout(() => onDose?.(), 700) }
   }
   const caption = n >= of ? 'All done for today 🌿' : n === 0 ? 'Tap a drop each time you take your dose' : `${of - n} more to go today`
   return (
@@ -433,9 +435,11 @@ function TodaysBlend({ onAllDone }: { onAllDone?: () => void }) {
         <p className="mt-2.5 text-center text-[12px] font-semibold text-muted" aria-live="polite">{caption}</p>
       </div>
 
-      <Link href="/app/remedies" className="relative -mb-2 mt-2 flex h-12 items-center justify-between px-1 pt-1 text-[15px] font-semibold text-navy">
-        View my blend & progress<ChevronRight className="size-5" />
-      </Link>
+      {/* owner 2026-11-24: "View my progress" opens the 25-day summary right here */}
+      <button onClick={() => { buzz(6); setCal(true) }} aria-haspopup="dialog" className="relative -mb-2 mt-2 flex h-12 w-full items-center justify-between px-1 pt-1 text-[15px] font-semibold text-navy">
+        View my progress<ChevronRight className="size-5" />
+      </button>
+      <DoseCalendar open={cal} onClose={() => setCal(false)} />
     </section>
   )
 }
