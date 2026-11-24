@@ -1,7 +1,7 @@
-:HL["/bewise_system/preview/client/_next/static/chunks/38ysec6jcbfo0.css","style"]
+:HL["/bewise_system/preview/client/_next/static/chunks/13qn3y30jta4w.css","style"]
 :HC["/",""]
 4:[["children",{"s":"__PAGE__","h":160}]]
 3:[["children",{"s":{"n":"slug","t":"d","k":"protection-spray","s":[]},"h":65632,"c":"$Q4"}]]
 2:[["children",{"s":"shop","h":131168,"c":"$Q3"}]]
 1:[["children",{"s":"app","h":131172,"c":"$Q2"}]]
-0:{"b":"x02m22ZpqX_zPCNMaoGb5","t":{"t":{"s":"","h":131160,"c":"$Q1"}}}
+0:{"b":"ITT4zwV3BaXjbiMXMFGo9","t":{"t":{"s":"","h":131160,"c":"$Q1"}}}

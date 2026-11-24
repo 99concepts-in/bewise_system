@@ -43,6 +43,49 @@ test('feedback: face, quick tag, optional comment', async ({ page }) => {
   expect(fb).toMatchObject({ rating: 5, tags: ['Felt heard'], notes: 'Thank you' })
 })
 
+test('review card: 4 or 5 stars invites a shareable card; 3 stars does not', async ({ page }) => {
+  await seed(page)
+  await page.goto('/app/sessions/view?id=a1&feedback=1')
+  await page.getByRole('button', { name: '3 of 5' }).click()
+  await page.getByRole('button', { name: 'Send to Jitendra Khimlani' }).click()
+  await expect(page.getByText('Thank you', { exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Create my review card' })).toHaveCount(0)
+  await page.goto('/app/sessions/view?id=a1&feedback=1')
+  await page.getByRole('button', { name: '5 of 5' }).click()
+  await page.getByRole('checkbox', { name: 'Felt heard' }).click()
+  await page.getByRole('button', { name: 'Send to Jitendra Khimlani' }).click()
+  await page.getByRole('button', { name: 'Create my review card' }).click()
+  await expect(page.getByRole('heading', { name: 'Share your experience' })).toBeVisible()
+  await expect(page.getByRole('img', { name: 'Share card preview' })).toBeVisible({ timeout: 8000 })
+  await expect(page.getByRole('link', { name: /WhatsApp/ })).toHaveAttribute('href', /wa\.me\/\?text=.*welcome/)
+})
+
+test('story sharing: card preview and link to the public story page', async ({ page }) => {
+  await seed(page); await page.goto('/app/learn/story?id=anger')
+  await page.getByRole('button', { name: 'Share this story' }).first().click()
+  await expect(page.getByRole('heading', { name: 'Share this story' })).toBeVisible()
+  await expect(page.getByRole('img', { name: 'Share card preview' })).toBeVisible({ timeout: 8000 })
+  await expect(page.getByRole('link', { name: /WhatsApp/ })).toHaveAttribute('href', /s%2Fanger%2F/)
+})
+
+test('shared story link: anyone can read it; not signed in → "new here" → more stories → onboarding', async ({ page }) => {
+  await page.goto('/s/anger')
+  await expect(page.getByText('Anger · 1 of 7')).toBeVisible()
+  await page.getByRole('button', { name: 'Close story' }).click()
+  await expect(page.getByRole('heading', { name: 'You seem to be new here' })).toBeVisible()
+  await page.getByRole('link', { name: 'View more stories' }).click()
+  await page.waitForURL('**/stories**')
+  await expect(page.getByRole('link', { name: /^Read: / })).toHaveCount(8)
+  await page.getByRole('link', { name: 'Start my journey' }).click()
+  await page.waitForURL('**/welcome**')
+})
+
+test('shared story link: a signed-in member continues in the app', async ({ page }) => {
+  await seed(page); await page.goto('/s/sleep')
+  await page.waitForURL('**/app/learn/story?id=sleep')
+  await expect(page.getByText(/Sleep · 1 of/)).toBeVisible()
+})
+
 test('public booking link: new visitor → landing → sign-in; signed-in → booking', async ({ page }) => {
   await seed(page, { onboarded: false })
   await page.goto('/book/jitendra-khimlani?type=followup')

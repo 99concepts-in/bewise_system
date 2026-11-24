@@ -21,6 +21,9 @@ import { addToCalendar } from '@/lib/ics'
 import { apptMinutes, apptName, tbc } from '@/lib/appt'
 import { BP } from '@/lib/asset'
 import { Verified } from '@/components/verified'
+import { ShareSheet } from '@/components/share-sheet'
+import { appUrl, reviewCard } from '@/lib/share'
+import { GOOGLE_REVIEWS_URL } from '@/lib/data'
 
 export default function Page() { return <Suspense><Detail /></Suspense> }
 
@@ -167,6 +170,14 @@ function RescheduleSheet({ open, onClose, id, startsAt, used }: { open: boolean;
 
 const RATING: Emotion[] = ['sad', 'tired', 'calm', 'grateful', 'joyful']
 const TAGS = ['Felt heard', 'Clear guidance', 'Calming', 'Warm', 'Too short', 'Hard to connect']
+const POSITIVE = new Set(['Felt heard', 'Clear guidance', 'Calming', 'Warm'])
+/** the card quotes only the member's own words: their comment, else the kind tags they picked */
+function reviewQuote(f: { notes: string; tags: string[] }) {
+  if (f.notes.trim()) return f.notes.trim()
+  const t = f.tags.filter((x) => POSITIVE.has(x)).map((x, i) => (i ? x.toLowerCase() : x))
+  if (!t.length) return 'My wellness session with Jitendra Khimlani.'
+  return (t.length === 1 ? t[0] : `${t.slice(0, -1).join(', ')} and ${t[t.length - 1]}`) + '.'
+}
 function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => void; id: string }) {
   const existing = useApp((s) => s.appointments.find((x) => x.id === id)?.feedback)
   const give = useApp((s) => s.giveFeedback)
@@ -175,8 +186,13 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
   const [notes, setNotes] = useState(existing?.notes ?? '')
   const [comment, setComment] = useState(!!existing?.notes)
   const [sent, setSent] = useState(false)
+  const [share, setShare] = useState(false)
+  const profile = useApp((s) => s.profile)
+  const parts = (profile?.name ?? '').trim().split(/\s+/)
+  const shortName = parts[0] ? `${parts[0]}${parts[1] ? ` ${parts[1][0]}.` : ''}` : 'A member'
   useEffect(() => { if (open) setSent(false) }, [open])
   return (
+    <>
     <Sheet open={open} onClose={onClose} title="How was your session?" tall>
       <AnimatePresence mode="wait">
         {sent ? (
@@ -184,7 +200,17 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
             <Mascot pose="wave" height={160} />
             <p className="mt-3 text-[22px] font-extrabold text-navy">Thank you</p>
             <p className="mt-1 text-[14px] text-muted">Jitendra Khimlani will read this. You can edit it anytime.</p>
-            <Btn className="mt-6" onClick={onClose}>Done</Btn>
+            {/* owner 2026-11-24: only after 4 or 5 stars, invite them to share a review card */}
+            {rating >= 4 ? (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                className="mt-5 w-full rounded-[24px] bg-[linear-gradient(150deg,#FFF3DF,#FDE3EC_50%,#E7E4FF)] p-4 text-left">
+                <p className="font-display text-[19px] font-semibold leading-6 text-ink">Glad it helped 🌸 Share your experience?</p>
+                <p className="mt-1 text-[13px] leading-5 text-ink-2">We make a beautiful card with your stars and your words. Share it on Instagram, WhatsApp or anywhere, with a link to BeWise.</p>
+                <button onClick={() => { buzz(8); setShare(true) }} className="mt-3 flex h-12 w-full items-center justify-center rounded-full bg-navy text-[15px] font-semibold text-white shadow-[var(--shadow-cta)]">Create my review card</button>
+                <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="mt-2 flex h-11 w-full items-center justify-center rounded-full bg-white text-[14px] font-semibold text-navy">Also review on Google</a>
+              </motion.div>
+            ) : null}
+            <Btn className="mt-6" variant={rating >= 4 ? 'white' : 'primary'} onClick={onClose}>Done</Btn>
           </motion.div>
         ) : (
           <motion.div key="form" exit={{ opacity: 0 }}>
@@ -213,5 +239,9 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
         )}
       </AnimatePresence>
     </Sheet>
+    <ShareSheet open={share} onClose={() => setShare(false)} heading={<>Share your <em>experience</em></>} sub="Your stars and your words, with a link to BeWise."
+      make={() => reviewCard({ rating, quote: reviewQuote({ notes: comment ? notes : '', tags }), name: shortName }, appUrl())} filename="bewise-review.jpg"
+      shareTitle="My BeWise wellness session" text="My wellness session with Jitendra Khimlani on BeWise. Begin your journey:" url={appUrl()} />
+    </>
   )
 }

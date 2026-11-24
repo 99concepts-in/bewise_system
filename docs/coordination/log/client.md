@@ -2,6 +2,25 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Share stories (public story page) and review cards after 4 or 5 stars
+
+- **Story sharing:**
+  - Share icon on every slide and "Share this story" on the last slide (`components/story-viewer.tsx`, moved out of the route so the same viewer serves members and the public).
+  - The share sheet (`components/share-sheet.tsx`) previews a 1080×1920 card drawn on the device (`lib/share.ts` `storyCard`): cover, tag, title, line, a "Read more on BeWise Wellness" button and the link.
+  - Actions: Share (system sheet with the image; WhatsApp and Instagram stories), WhatsApp, Copy link, Save image.
+- **Public story page** `/s/<id>/` (one static page per story, `generateStaticParams`):
+  - Link preview per story (og:image `img/stories/og/<id>.jpg`, 1200×630, made from the covers).
+  - Not signed in: the whole story plays. Closing asks "You seem to be new here", with Start my journey (`/welcome`) or View more stories (`/stories`, a public list with Start my journey / Sign in).
+  - Signed-in members are sent to `/app/learn/story?id=<id>`.
+- **Consultant portal:** static `stories.json` (id, title, tag, line, link, cover, preview, shareText). Request filed: `requests/20261124-client-to-consultant-share-stories.md`.
+- **Review card** (session feedback, `app/app/sessions/view`):
+  - Only after 4 or 5 stars: "Glad it helped 🌸 Share your experience?" opens a 1080×1920 card (`reviewCard`).
+  - The card shows the stars and the member's own words: their comment, else the kind tags they picked, never invented. It also shows "First L., BeWise member", Jitendra Khimlani's photo and title, and "Begin your journey on BeWise" with the app link.
+  - Also offers "Review on Google". Nothing is shown for 1 to 3 stars.
+- New story covers need an og image too: re-run the small PIL step in this log entry's commit, or add `og/<id>.jpg` by hand.
+- Site robots.txt (`hosting/build-hostinger-site.sh`): link-preview bots may read `/client/s/` and images; search engines still blocked.
+- Tests: review card for 5 but not 3, story share sheet, public link (new here → stories → onboarding), member redirect. Axe and size checks on `/s/anger` and `/stories`.
+
 ## 2026-11-24 · Home: "View my progress" sheet, every dose asks how you feel, encouragement after each log
 
 - **"View my progress":** Home's "View my blend & progress" link is now "View my progress". It opens the 25-day summary sheet (`DoseCalendar`) on Home instead of going to My care.
