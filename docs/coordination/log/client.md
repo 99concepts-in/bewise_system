@@ -2,6 +2,18 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Review card: 3 themes, review / tags / both, edit the words
+
+- Owner: 2 or 3 card options and themes to choose from, some with the chip text and some with only the review, and an edit option.
+- `reviewCard` (`lib/share.ts`):
+  - Themes: **Blush** (pastel), **Midnight** (deep blue, gold stars, real rose and chicory photos, white button) and **Garden** (cream, real rose, mimulus and chicory photos).
+  - Content: **Review** (their words), **Tags** ("My session felt" + the kind tags as chips), or **Both** (words + chips).
+- Share screen controls (`CardControls` in sessions/view):
+  - Theme swatches, and a Review / Tags / Both switch (shown when there are both words and tags).
+  - **Edit** opens an inline box for the words on the card (up to 220 characters; the feedback already sent is unchanged).
+  - The preview redraws live (`ShareScreen` `deps`).
+- Test: theme change redraws the card, edit the words, Review / Tags / Both. 83/83 pass.
+
 ## 2026-11-24 · Review card: full screen with the card, share icons, or a Google review
 
 - Owner: the 4 or 5 star thank-you should be a full screen with the card preview and share icons, or a Google review instead.

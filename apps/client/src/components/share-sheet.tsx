@@ -67,8 +67,8 @@ const GOOGLE = <svg viewBox="0 0 24 24" className="size-5" aria-hidden><path fil
  * owner 2026-11-24: after 4 or 5 star feedback, a full screen with the review card itself, share icons
  * (Instagram, WhatsApp, More, Save, Copy link) and, instead, "Write a Google review".
  */
-export function ShareScreen({ open, onClose, title, sub, make, filename, shareTitle, text, url, googleUrl }: {
-  open: boolean; onClose: () => void; title: ReactNode; sub?: string; make: () => Promise<Blob>; filename: string
+export function ShareScreen({ open, onClose, title, sub, make, deps = '', controls, filename, shareTitle, text, url, googleUrl }: {
+  open: boolean; onClose: () => void; title: ReactNode; sub?: string; make: () => Promise<Blob>; deps?: string; controls?: ReactNode; filename: string
   shareTitle: string; text: string; url: string; googleUrl?: string
 }) {
   const [blob, setBlob] = useState<Blob>()
@@ -76,14 +76,21 @@ export function ShareScreen({ open, onClose, title, sub, make, filename, shareTi
   const [failed, setFailed] = useState(false)
   useEffect(() => {
     if (!open) return
-    let alive = true, u = ''
-    setFailed(false)
     const prev = document.body.style.overflow; document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
-    make().then((b) => { if (!alive) return; u = URL.createObjectURL(b); setBlob(b); setSrc(u) }).catch(() => alive && setFailed(true))
-    return () => { alive = false; if (u) URL.revokeObjectURL(u); setBlob(undefined); setSrc(undefined); document.body.style.overflow = prev; window.removeEventListener('keydown', onKey) }
+    return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey); setBlob(undefined); setSrc((u) => { if (u) URL.revokeObjectURL(u); return undefined }) }
   }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
+  // (re)draw the card whenever an option changes; the old preview stays until the new one is ready
+  useEffect(() => {
+    if (!open) return
+    let alive = true
+    setFailed(false)
+    const t = setTimeout(() => {
+      make().then((b) => { if (!alive) return; const u = URL.createObjectURL(b); setBlob(b); setSrc((old) => { if (old) URL.revokeObjectURL(old); return u }) }).catch(() => alive && setFailed(true))
+    }, 120)
+    return () => { alive = false; clearTimeout(t) }
+  }, [open, deps]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const save = () => { if (!src) return; const a = document.createElement('a'); a.href = src; a.download = filename; a.click(); toast('Image saved') }
   const system = async () => {
@@ -118,14 +125,15 @@ export function ShareScreen({ open, onClose, title, sub, make, filename, shareTi
           <h2 className="h-duo mt-1 text-[28px]">{title}</h2>
           {sub && <p className="mt-0.5 text-[14px] text-ink-2">{sub}</p>}
 
-          <div className="my-4 flex min-h-0 flex-1 items-center justify-center">
-            <div className="aspect-[9/16] h-full max-h-[56svh] min-h-[260px] overflow-hidden rounded-[24px] bg-white/60 shadow-[0_24px_60px_rgba(90,60,140,.25)] ring-4 ring-white">
-              {src ? <motion.img initial={{ opacity: 0, scale: 0.94, rotate: -1.5 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 180, damping: 18 }} src={src} alt="Share card preview" className="size-full object-cover" />
+          <div className="my-3 flex min-h-0 flex-1 items-center justify-center">
+            <div className="aspect-[9/16] h-full max-h-[48svh] min-h-[240px] overflow-hidden rounded-[24px] bg-white/60 shadow-[0_24px_60px_rgba(90,60,140,.25)] ring-4 ring-white">
+              {src ? <motion.img key={src} initial={{ opacity: 0.4, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 20 }} src={src} alt="Share card preview" className="size-full object-cover" />
                 : <div className="grid size-full place-items-center px-6 text-center text-[13px] text-muted">{failed ? 'Could not make the image' : 'Making your card…'}</div>}
             </div>
           </div>
 
-          <div className="flex justify-between gap-1" role="group" aria-label="Share to">
+          {controls}
+          <div className="mt-3 flex justify-between gap-1" role="group" aria-label="Share to">
             {items.map((x) => {
               const inner = <><span className="grid size-[54px] place-items-center rounded-full bg-white shadow-[var(--shadow-card)]">{x.icon}</span><span className="text-[11px] font-semibold text-ink">{x.label}</span></>
               return x.href

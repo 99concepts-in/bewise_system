@@ -95,6 +95,18 @@ test('review card: 4 or 5 stars invites a shareable card; 3 stars does not', asy
   for (const n of ['Instagram', 'More', 'Save', 'Copy link']) await expect(screen.getByRole('button', { name: n })).toBeVisible()
   await expect(screen.getByRole('link', { name: 'WhatsApp' })).toHaveAttribute('href', /wa\.me\/\?text=.*welcome/)
   await expect(screen.getByRole('link', { name: /Write a Google review instead/ })).toHaveAttribute('href', /google/)
+  // themes, edit the words, then review / tags / both
+  const src = () => screen.getByRole('img', { name: 'Share card preview' }).getAttribute('src')
+  const before = await src()
+  await screen.getByRole('radio', { name: 'Midnight' }).click()
+  await expect.poll(src).not.toBe(before)
+  await expect(screen.getByRole('radiogroup', { name: 'Show on the card' })).toHaveCount(0) // only tags so far
+  await screen.getByRole('button', { name: 'Edit' }).click()
+  await screen.getByLabel('Your words on the card').fill('I felt calm for the first time in weeks.')
+  await screen.getByRole('button', { name: 'Done' }).first().click()
+  for (const n of ['Review', 'Tags', 'Both']) await expect(screen.getByRole('radio', { name: n })).toBeVisible()
+  await screen.getByRole('radio', { name: 'Both' }).click()
+  await expect(screen.getByRole('radio', { name: 'Both' })).toHaveAttribute('aria-checked', 'true')
   await screen.getByRole('button', { name: 'Done' }).click()
   await expect(screen).toHaveCount(0)
 })
