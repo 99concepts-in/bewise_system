@@ -39,7 +39,7 @@ export function RemedyBottle({ level, height = 140, pulse = 0 }: { level: number
         </motion.div>
       </div>
       {/* the bottle photo, multiplied so its white background disappears and the glass sits over the liquid */}
-      <img src={`${BP}/img/bottle-remedy.webp`} alt="" className="absolute inset-0 h-full w-full mix-blend-multiply" draggable={false} />
+      <img src={`${BP}/img/bottle-remedy.png`} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
     </div>
   )
 }

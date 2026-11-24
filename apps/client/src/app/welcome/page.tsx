@@ -22,21 +22,24 @@ import { FlowerArt } from '@/components/flower'
 import { MoodShape } from '@/components/mood-shape'
 import { RemedyBottle } from '@/components/remedy-bottle'
 import { Btn, buzz, cx, ease } from '@/components/ui'
+import { Verified } from '@/components/verified'
 import { STORIES } from '@/lib/stories'
 import { BP } from '@/lib/asset'
 
 type Slide = { bg: string; kicker?: string; title: string; em?: string; sub: string; bullets?: { icon: React.ReactNode; t: string }[]; flowers: string[] }
 const SLIDES: Slide[] = [
   { bg: 'linear-gradient(170deg,#FFE7D6 0%,#FDE3EB 55%,#F3E8FF 100%)', title: 'Welcome to', em: 'BeWise Holistic Wellness', sub: 'A warm, private space for your emotional wellbeing, with Jitendra Khimlani and the gentle wisdom of Bach flowers.', flowers: ['Wild Rose', 'Mimulus', 'Centaury', 'Chicory'] },
-  { bg: 'linear-gradient(170deg,#EDE6FF 0%,#E3ECFF 60%,#FFF1E6 100%)', kicker: 'Benefit 1', title: 'Take charge of your', em: 'emotional wellbeing', sub: 'Notice how you feel, day by day, and gently move towards calm, balance and joy.', flowers: ['Larch', 'Agrimony', 'Clematis'] },
-  { bg: 'linear-gradient(170deg,#FFF1D6 0%,#FFE9C9 55%,#FDE3EB 100%)', kicker: 'Benefit 2', title: 'Keep track of your', em: 'Bach flower journey', sub: 'Your blend, your daily drops and how you are changing, all in one place.',
+  { bg: 'linear-gradient(170deg,#EDE6FF 0%,#E3ECFF 60%,#FFF1E6 100%)', title: 'Take charge of your', em: 'emotional wellbeing', sub: 'Notice how you feel, day by day, and gently move towards calm, balance and joy.', flowers: ['Larch', 'Agrimony', 'Clematis'] },
+  { bg: 'linear-gradient(170deg,#FFF1D6 0%,#FFE9C9 55%,#FDE3EB 100%)', title: 'Keep track of your', em: 'Bach flower journey', sub: 'Your blend, your daily drops and how you are changing, all in one place.',
     bullets: [{ icon: <Bell className="size-4" />, t: 'Regular reminders for your remedy' }, { icon: <Smile className="size-4" />, t: 'Become aware of your moods and emotions' }, { icon: <CalendarCheck2 className="size-4" />, t: 'Book sessions right from the app' }], flowers: ['Gorse', 'Honeysuckle'] },
-  { bg: 'linear-gradient(170deg,#DDF4EA 0%,#E3F2FF 60%,#FFF6E0 100%)', kicker: 'Benefit 3', title: 'Learn the', em: 'easy way', sub: 'Short, beautiful stories on sleep, anxiety, confidence and more. Three minutes each.', flowers: ['White Chestnut', 'Walnut'] },
-  { bg: 'linear-gradient(170deg,#DFF0FF 0%,#E9E6FF 60%,#FDE3EB 100%)', kicker: 'Benefit 4', title: 'Ask', em: 'BeWise', sub: 'Get answers about you and your journey, anytime: your drops, your blend, your next session.', flowers: ['Cerato', 'Vervain'] },
-  { bg: 'linear-gradient(170deg,#FDE3EB 0%,#FFE7D6 55%,#FFF6E0 100%)', kicker: 'Benefit 5', title: 'Sessions and', em: 'wellness shop', sub: 'Book wellness sessions with reminders, and find our aromatherapy and wellness products.', flowers: ['Wild Rose', 'Holly'] },
+  { bg: 'linear-gradient(170deg,#DDF4EA 0%,#E3F2FF 60%,#FFF6E0 100%)', title: 'Learn how Bach flowers', em: 'can help you', sub: 'Short, beautiful stories on sleep, anxiety, confidence and more. Three minutes each.', flowers: ['White Chestnut', 'Walnut'] },
+  { bg: 'linear-gradient(170deg,#DFF0FF 0%,#E9E6FF 60%,#FDE3EB 100%)', title: 'Ask', em: 'BeWise', sub: 'Get answers about you and your journey, anytime: your drops, your blend, your next session.', flowers: ['Cerato', 'Vervain'] },
+  { bg: 'linear-gradient(170deg,#FDE3EB 0%,#FFE7D6 55%,#FFF6E0 100%)', title: 'All your favourite', em: 'wellness products in one place', sub: 'Aromatherapy roll-ons, mists and bath rituals, made to support your Bach flower journey.', flowers: ['Wild Rose', 'Holly'] },
+  // owner 2026-11-24: end on Jitendra Khimlani — book a session, personal guidance
+  { bg: 'linear-gradient(170deg,#E3ECFF 0%,#F3E8FF 50%,#FFE7D6 100%)', title: 'Get personal guidance from', em: 'Jitendra Khimlani', sub: 'Certified Bach Flower Therapist. Book a wellness session and get a blend made just for you.', flowers: ['Mimulus', 'Larch'] },
 ]
 const LAST = SLIDES.length - 1
-const WELCOME_IMAGES = ['img/owl-wave.webp', 'img/bottle-remedy.webp', ...STORIES.slice(0, 4).map((s) => `img/${s.cover}.webp`), 'img/products/sleep-spray.webp', 'img/products/aura-bath-salt.webp', 'img/products/migraine-go-rollon.webp']
+const WELCOME_IMAGES = ['img/owl-wave.webp', 'img/bottle-remedy.png', ...STORIES.slice(0, 4).map((s) => `img/${s.cover}.webp`), 'img/products/sleep-spray.webp', 'img/products/aura-bath-salt.webp', 'img/products/migraine-go-rollon.webp', 'img/jitu-portrait.webp']
 
 export default function Welcome() {
   for (const src of WELCOME_IMAGES) preload(`${BP}/${src}`, { as: 'image', fetchPriority: 'high' })
@@ -84,7 +87,7 @@ export default function Welcome() {
           <motion.div key="story" className="relative flex flex-1 flex-col safe-t" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
             {/* colourful, warm background that changes per screen */}
             <AnimatePresence initial={false}>
-              <motion.div key={i} aria-hidden className="absolute inset-0" style={{ background: s.bg }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} />
+              <motion.div key={i} aria-hidden className="absolute inset-0" style={{ background: s.bg }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.9, ease: 'easeInOut' }} />
             </AnimatePresence>
             <FloatingFlowers names={s.flowers} k={i} />
 
@@ -96,14 +99,14 @@ export default function Welcome() {
             <motion.div className="relative flex flex-1 touch-pan-y flex-col" drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.18} onDragEnd={onDragEnd}>
               <div className={cx('relative', i === 0 ? 'h-[40dvh] min-h-[250px]' : 'h-[36dvh] min-h-[230px]')}>
                 <AnimatePresence mode="popLayout" custom={dir} initial={false}>
-                  <motion.div key={i} custom={dir} className="absolute inset-0" initial={{ opacity: 0, x: dir * 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -60 }} transition={{ duration: 0.5, ease }}>
-                    {i === 0 ? <ArtHello /> : i === 1 ? <ArtMood /> : i === 2 ? <ArtBottle /> : i === 3 ? <ArtLearn /> : i === 4 ? <ArtAsk /> : <ArtShop />}
+                  <motion.div key={i} custom={dir} className="absolute inset-0" initial={{ opacity: 0, x: dir * 40, scale: 0.96, filter: 'blur(6px)' }} animate={{ opacity: 1, x: 0, scale: 1, filter: 'blur(0px)' }} exit={{ opacity: 0, x: dir * -40, scale: 0.96, filter: 'blur(6px)' }} transition={{ duration: 0.6, ease }}>
+                    {i === 0 ? <ArtHello /> : i === 1 ? <ArtMood /> : i === 2 ? <ArtBottle /> : i === 3 ? <ArtLearn /> : i === 4 ? <ArtAsk /> : i === 5 ? <ArtShop /> : <ArtJitendra />}
                   </motion.div>
                 </AnimatePresence>
               </div>
               <div className="relative z-10 mt-2 px-6">
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div key={i} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35, ease }}>
+                <AnimatePresence mode="popLayout" initial={false}>
+                  <motion.div key={i} initial={{ opacity: 0, y: 16, filter: 'blur(4px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0, y: -12, filter: 'blur(4px)' }} transition={{ duration: 0.55, ease }}>
                     {s.kicker && <p className="mb-1.5 text-[12px] font-bold uppercase tracking-[0.14em] text-[#b0532f]">{s.kicker}</p>}
                     <h1 className={cx('h-duo', i === 0 && 'text-[34px] leading-[40px]')}>{s.title} <em>{s.em}</em></h1>
                     <p className="mt-2.5 text-[16px] leading-6 text-ink-2">{s.sub}</p>
@@ -125,7 +128,7 @@ export default function Welcome() {
               {i > 0 && (
                 <div className="mb-2 flex justify-center gap-2" role="tablist" aria-label="Benefits">
                   {SLIDES.slice(1).map((_, k) => (
-                    <button key={k} role="tab" aria-selected={k + 1 === i} aria-label={`Benefit ${k + 1}`} onClick={() => go(k + 1)} className="grid h-6 place-items-center px-0.5">
+                    <button key={k} role="tab" aria-selected={k + 1 === i} aria-label={`Screen ${k + 2}`} onClick={() => go(k + 1)} className="grid h-6 place-items-center px-0.5">
                       <motion.span className="block h-2 rounded-full" animate={{ width: k + 1 === i ? 26 : 8, backgroundColor: k + 1 === i ? '#243D91' : '#ffffffcc' }} transition={{ duration: 0.35, ease }} />
                     </button>
                   ))}
@@ -133,7 +136,7 @@ export default function Welcome() {
               )}
               {i === 0 ? (
                 <>
-                  <Btn variant="gradient" full onClick={() => go(1)}>My journey</Btn>
+                  <Btn variant="gradient" full onClick={() => go(1)}>Start my journey</Btn>
                   <Btn variant="ghost" full size="md" onClick={() => goSafe(router, '/sign-in?returning=1')}>Already a member</Btn>
                 </>
               ) : i < LAST ? (
@@ -169,26 +172,47 @@ function FloatingFlowers({ names, k }: { names: string[]; k: number }) {
   )
 }
 
-/** 0 · Welcome: the owl waves inside a ring of Bach flowers that slowly turns */
+/** 0 · Welcome: the flowers circle, spiral into the centre and merge; the owl blooms out of them; the ring re-forms */
 function ArtHello() {
   const still = useReducedMotion()
   const ring = ['Wild Rose', 'Mimulus', 'Larch', 'Chicory', 'Gorse', 'Centaury', 'Clematis', 'Honeysuckle']
+  const [phase, setPhase] = useState<'ring' | 'merge' | 'bloom'>(still ? 'bloom' : 'ring')
+  useEffect(() => {
+    if (still) return
+    const t1 = setTimeout(() => setPhase('merge'), 1500)
+    const t2 = setTimeout(() => { setPhase('bloom'); buzz(10) }, 2700)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [still])
+  const r = phase === 'merge' ? 0 : 44
   return (
     <div className="relative grid h-full place-items-center">
-      <motion.div className="absolute aspect-square h-[88%]" animate={still ? undefined : { rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: 'linear' }} aria-hidden>
+      <motion.div className="absolute aspect-square h-[88%]" animate={still ? undefined : { rotate: phase === 'merge' ? 540 : 360 }}
+        transition={phase === 'merge' ? { duration: 1.2, ease: [0.5, 0, 0.75, 0] } : { duration: 60, repeat: Infinity, ease: 'linear' }} aria-hidden>
         {ring.map((n, k) => {
           const a = (k / ring.length) * Math.PI * 2
           return (
             <motion.span key={n} className="absolute grid size-[22%] place-items-center rounded-full bg-white/85 shadow-[0_8px_20px_rgba(176,83,47,.15)]"
-              style={{ left: `${50 + 44 * Math.cos(a) - 11}%`, top: `${50 + 44 * Math.sin(a) - 11}%` }}
-              initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.15 + k * 0.06, type: 'spring', stiffness: 260, damping: 16 }}>
+              initial={{ left: '39%', top: '39%', scale: 0, opacity: 0 }}
+              animate={{ left: `${50 + r * Math.cos(a) - 11}%`, top: `${50 + r * Math.sin(a) - 11}%`, scale: phase === 'merge' ? 0.3 : 1, opacity: phase === 'merge' ? 0 : 1 }}
+              transition={phase === 'merge' ? { duration: 1.1, ease: [0.55, 0, 0.8, 0.2], delay: k * 0.03 } : { duration: 0.9, ease, delay: (phase === 'bloom' ? 0.35 : 0.1) + k * 0.06 }}>
               <FlowerArt name={n} decorative className="size-[80%]" />
             </motion.span>
           )
         })}
       </motion.div>
-      <span className="absolute aspect-square h-[58%] rounded-full bg-white/70 blur-[2px]" aria-hidden />
-      <div className="relative"><Mascot pose="wave" height={150} priority /></div>
+      {/* the centre: a soft disc that glows as the flowers merge into it */}
+      <motion.span className="absolute aspect-square h-[58%] rounded-full bg-white/75" aria-hidden
+        animate={{ scale: phase === 'merge' ? 0.7 : 1, boxShadow: phase === 'merge' ? '0 0 80px 30px rgba(255,214,170,.9)' : '0 0 40px 10px rgba(255,255,255,.6)' }} transition={{ duration: 0.9, ease }} />
+      <AnimatePresence>
+        {phase === 'bloom' && !still && (
+          <motion.span key="burst" className="absolute aspect-square h-[40%] rounded-full border-2 border-[#f2b77a]" aria-hidden
+            initial={{ scale: 0.4, opacity: 0.9 }} animate={{ scale: 2.2, opacity: 0 }} transition={{ duration: 1.1, ease: 'easeOut' }} />
+        )}
+      </AnimatePresence>
+      <motion.div className="relative" initial={false} animate={phase === 'bloom' ? { scale: 1, opacity: 1, rotate: 0 } : { scale: 0.2, opacity: 0, rotate: -20 }}
+        transition={{ type: 'spring', stiffness: 220, damping: 14 }}>
+        <Mascot pose="wave" height={150} priority />
+      </motion.div>
     </div>
   )
 }
@@ -288,23 +312,39 @@ function ArtAsk() {
   )
 }
 
-/** 5 · Sessions + shop: a session reminder drops in over the products */
+/** 5 · Wellness products: fanned out, centred, gently floating */
 function ArtShop() {
   const items = ['products/sleep-spray', 'products/aura-bath-salt', 'products/migraine-go-rollon']
   return (
-    <div className="relative grid h-full place-items-center">
-      <div className="relative flex items-end" aria-hidden>
+    <div className="relative flex h-full items-center justify-center" aria-hidden>
+      <span className="absolute aspect-square h-[78%] rounded-full bg-white/60" />
+      <div className="relative flex items-end justify-center">
         {items.map((p, k) => (
-          <motion.img key={p} src={`${BP}/img/${p}.webp`} alt="" className="h-[150px] w-auto object-contain drop-shadow-[0_14px_18px_rgba(120,50,40,.2)]"
-            style={{ marginLeft: k ? -24 : 0, zIndex: k === 1 ? 2 : 1 }} initial={{ y: 30, opacity: 0, rotate: (k - 1) * 8 }} animate={{ y: k === 1 ? -10 : 0, opacity: 1, rotate: (k - 1) * 8 }}
-            transition={{ delay: 0.15 + k * 0.1, type: 'spring', stiffness: 180, damping: 18 }} />
+          <motion.img key={p} src={`${BP}/img/${p}.webp`} alt="" className="h-[170px] w-auto object-contain drop-shadow-[0_14px_18px_rgba(120,50,40,.2)]"
+            style={{ marginLeft: k ? -28 : 0, zIndex: k === 1 ? 2 : 1 }}
+            initial={{ y: 30, opacity: 0, rotate: (k - 1) * 9 }} animate={{ y: k === 1 ? [-14, -22, -14] : [0, -6, 0], opacity: 1, rotate: (k - 1) * 9 }}
+            transition={{ opacity: { delay: 0.15 + k * 0.1 }, y: { delay: 0.15 + k * 0.1, duration: 4 + k, repeat: Infinity, ease: 'easeInOut' } }} />
         ))}
       </div>
-      <motion.div className="absolute left-1/2 top-[4%] flex w-[84%] -translate-x-1/2 items-center gap-3 rounded-[20px] bg-white/95 p-3 shadow-[0_14px_30px_rgba(120,50,40,.18)]"
-        initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6, type: 'spring', stiffness: 200, damping: 18 }} aria-hidden>
-        <span className="grid size-10 shrink-0 place-items-center rounded-[12px] bg-navy text-white"><CalendarCheck2 className="size-5" /></span>
-        <span className="min-w-0"><span className="block text-[13px] font-bold text-navy">Session tomorrow · 11:00 AM</span><span className="block text-[12px] text-ink-2">with Jitendra Khimlani · Online</span></span>
-      </motion.div>
+    </div>
+  )
+}
+
+/** 6 · Jitendra Khimlani: portrait in an arch, verified, Google rating, a session reminder */
+function ArtJitendra() {
+  return (
+    <div className="relative flex h-full items-end justify-center" aria-hidden>
+      <span className="absolute bottom-0 aspect-[4/5] h-[90%] rounded-[999px_999px_28px_28px] bg-white/70" />
+      <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="relative h-[86%] w-auto object-contain drop-shadow-[0_18px_24px_rgba(24,41,87,.18)] [mask-image:linear-gradient(to_bottom,black_82%,transparent)]" />
+      <motion.span className="absolute left-[4%] top-[16%] flex items-center gap-1.5 rounded-full bg-white px-3 py-2 text-[13px] font-bold text-navy shadow-[0_10px_24px_rgba(24,41,87,.15)]"
+        initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0, y: [0, -5, 0] }} transition={{ opacity: { delay: 0.3 }, x: { delay: 0.3 }, y: { duration: 4, repeat: Infinity, ease: 'easeInOut' } }}>
+        <Verified size={17} /> Certified Bach Flower Therapist
+      </motion.span>
+      <motion.span className="absolute bottom-[14%] right-[3%] flex items-center gap-2 rounded-[18px] bg-white px-3 py-2 shadow-[0_10px_24px_rgba(24,41,87,.15)]"
+        initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0, y: [0, -6, 0] }} transition={{ opacity: { delay: 0.5 }, x: { delay: 0.5 }, y: { duration: 4.5, repeat: Infinity, ease: 'easeInOut' } }}>
+        <span className="text-[20px] font-extrabold text-navy">5.0</span>
+        <span className="leading-tight"><span className="block text-[13px] text-[#f2b33b]">★★★★★</span><span className="block text-[11px] font-semibold text-ink-2">Rated on Google</span></span>
+      </motion.span>
     </div>
   )
 }

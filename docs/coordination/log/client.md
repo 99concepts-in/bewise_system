@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-24 · Welcome polish + Jitendra Khimlani screen
+- Welcome: the flower ring circles, spirals into the glowing centre and merges, the owl blooms out with a soft burst, then the ring re-forms and keeps turning. CTA "Start my journey".
+- No "Benefit 1/2/3" labels. Smoother transitions: art crossfades with a soft scale and blur, text crossfades in place, background fades over 0.9 s.
+- Bottle: bottle-remedy.png with real transparency (the white box on iPhone came from mix-blend-multiply not applying inside an animated layer). Used everywhere the bottle shows.
+- Learn screen: "Learn how Bach flowers can help you". Shop screen: "All your favourite wellness products in one place", products centred and floating (session card removed).
+- New last screen: "Get personal guidance from Jitendra Khimlani" with his portrait in an arch, verified "Certified Bach Flower Therapist" tag and "5.0 ★★★★★ Rated on Google" (owner-stated rating), then "Let's get started".
+
 ## 2026-11-24 · New onboarding: welcome + 5 benefits → phone → name → birthdate → gender → Home tour
 - Welcome (after the golden splash): colourful warm gradients and floating Bach flowers on every screen. 0 "Welcome to BeWise Holistic Wellness" (owl in a turning ring of flowers) with "My journey" + "Already a member". Benefits: 1 emotional wellbeing (mood flower opening and closing, faces), 2 Bach flower journey (our bottle, drops filling today's dose circles; reminders / moods / sessions), 3 Learn (story covers fanning and cycling), 4 Ask BeWise (chat typing in), 5 Sessions + shop (session reminder over products) → "Let's get started" → phone sign-in.
 - Sign-up is now one question per screen: /onboarding/name, /onboarding/dob, /onboarding/gender, then straight to Home (privacy agreement line on the last step; WhatsApp on for reminders). Prefill from the booking link / staff booking still applies. Old about/photo/privacy/done pages are no longer in the flow (city, reference, photo can be added later in Me).

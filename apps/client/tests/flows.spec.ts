@@ -324,13 +324,13 @@ test('onboarding: phone → name → birthdate → gender → home; details we k
   expect((await state(page)).profile.tourPending).toBe(false)
 })
 
-test('welcome: My journey → 5 benefits → Let’s get started → sign in; Already a member', async ({ page }) => {
+test('welcome: Start my journey → 6 screens → Let’s get started → sign in; Already a member', async ({ page }) => {
   await page.goto('/?reset=1'); await page.waitForURL('**/welcome**')
   await expect(page.getByRole('heading', { name: /Welcome to BeWise Holistic Wellness/ })).toBeVisible({ timeout: 5000 })
   await expect(page.getByRole('button', { name: 'Already a member' })).toBeVisible()
-  await page.getByRole('button', { name: 'My journey' }).click()
+  await page.getByRole('button', { name: 'Start my journey' }).click()
   await expect(page.getByRole('heading', { name: /emotional wellbeing/ })).toBeVisible()
-  for (const h of [/Bach flower journey/, /easy way/, /Ask BeWise/, /wellness shop/]) { await page.getByRole('button', { name: 'Next' }).click(); await expect(page.getByRole('heading', { name: h })).toBeVisible() }
+  for (const h of [/Bach flower journey/, /can help you/, /Ask BeWise/, /wellness products/, /Jitendra Khimlani/]) { await page.getByRole('button', { name: 'Next' }).click(); await expect(page.getByRole('heading', { name: h })).toBeVisible() }
   await page.getByRole('button', { name: 'Let’s get started' }).click()
   await page.waitForURL('**/sign-in')
 })
