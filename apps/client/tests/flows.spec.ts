@@ -247,6 +247,9 @@ test('appointment with a plan: request only (optional preferences, typed date), 
   await page.goto('/app/book')
   // owner 2026-11-24: one session is selected by default
   await expect(page.getByRole('radio', { name: /One session/ })).toHaveAttribute('aria-checked', 'true')
+  // owner 2026-11-25: plans are tucked behind "Save with a plan"
+  await expect(page.getByRole('radio', { name: /6 months/ })).toHaveCount(0)
+  await page.getByRole('button', { name: /Save with a plan/ }).click()
   await expect(page.getByRole('radio', { name: /6 months/ })).toHaveAttribute('aria-checked', 'false')
   await page.getByRole('radio', { name: /Yearly/ }).click()
   await page.getByRole('button', { name: 'Start 2-minute check-in' }).click()
@@ -290,7 +293,8 @@ test('spotlight story: public accounts with their sources, and the About Bach fl
   await expect(page.getByText('Emma Watson')).toBeVisible()
   await expect(page.getByText('Her own words, as quoted')).toBeVisible()
   await page.goto('/app/book')
-  const about = page.getByRole('region', { name: /About Bach flower remedies/ }).or(page.locator('section[aria-labelledby="about-rem-h"]'))
+  await page.getByRole('button', { name: 'About Bach flower remedies' }).click()
+  const about = page.getByRole('dialog', { name: 'About Bach flower remedies' })
   await expect(about.getByText(/Dr Edward Bach, a London doctor/)).toBeVisible()
   await about.getByRole('button', { name: 'How do I take it?' }).click()
   await expect(about.getByText(/4 drops, 4 times a day/)).toBeVisible()

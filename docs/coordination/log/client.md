@@ -2,6 +2,19 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-25 · Book page: simpler, one clear path
+
+- Owner: the Book screen was cluttered and hard to understand, and other offers should be subtle. UX pass on the first step (`Choose` in `app/app/book/page.tsx`):
+  1. Title, then a compact Jitendra Khimlani row (photo, name with badge, title, "About ›").
+  2. **How it works**, 3 numbered steps:
+     - Tell us how you feel (2-minute check-in).
+     - We confirm your time (on WhatsApp; ₹1,000 first visit, ₹800 after that).
+     - Meet Jitendra Khimlani (online or at the Center; blend included).
+  3. **How you'll pay:** "One session · Pay once we confirm your time" selected. The plans sit behind a quiet "Coming every month? Save with a plan" row and open on tap (compact rows, launch-price note inside).
+  4. Two quiet links: What members say, and About Bach flower remedies (opens a sheet with the accordion and the spotlight story link).
+  5. The reschedule note. "Start 2-minute check-in" stays the one main button.
+- Tests updated (plans open on tap; About opens a sheet). 91/91 pass.
+
 ## 2026-11-25 · Spotlight story: simpler words, initials instead of emoji
 
 - "at the first tee" (a golf term) is now "before a big game". The line reads: "Before a film premiere, on a stage, before a big game."

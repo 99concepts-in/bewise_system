@@ -11,7 +11,7 @@
  */
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { CalendarPlus, Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Info, Laptop, MapPin, Phone, Quote, Sparkles, Video, CalendarCheck2 } from 'lucide-react'
+import { CalendarPlus, Check, ChevronDown, ChevronLeft, ChevronRight, Clock, ExternalLink, Info, Laptop, MapPin, Phone, Quote, Sparkles, Video, CalendarCheck2 } from 'lucide-react'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Mascot, Petals } from '@/components/brand'
 import { JituPortrait, JituStory } from '@/components/jitu-story'
@@ -211,41 +211,56 @@ function Book() {
   )
 }
 
-/** owner 2026-11-18: after the first consultation, 6 months (recommended) or yearly (best value), or one time. */
+/**
+ * owner 2026-11-18: after the first consultation, 6 months (recommended) or yearly (best value), or one time.
+ * owner 2026-11-25: one session is the clear default; plans are a quiet "save with a plan" option that opens on tap.
+ */
 function PlanPicker({ pick, setPick }: { pick: PlanPick; setPick: (p: PlanPick) => void }) {
   const live = offerLive()
-  const opts: { k: PlanPick; t: string; tag?: string; price: number; full?: number; note: string; emoji: string }[] = [
-    { k: 'half', t: '6 months', tag: 'Recommended', price: planPrice('half'), full: live ? planFull('half') : undefined, note: live ? '1 month free' : '6 wellness sessions', emoji: '🌱' },
-    { k: 'yearly', t: 'Yearly', tag: 'Best value', price: planPrice('yearly'), full: live ? planFull('yearly') : undefined, note: live ? `2 months free · save ${formatINR(planSaving('yearly'))}` : '12 wellness sessions', emoji: '🌳' },
-    { k: 'once', t: 'One session', price: 0, note: 'Pay once the team sets your fee', emoji: '🌼' },
+  const [open, setOpen] = useState(pick !== 'once')
+  const plans: { k: PlanId; t: string; tag: string; price: number; full?: number; note: string }[] = [
+    { k: 'half', t: '6 months', tag: 'Recommended', price: planPrice('half'), full: live ? planFull('half') : undefined, note: live ? '6 sessions · 1 month free' : '6 wellness sessions' },
+    { k: 'yearly', t: 'Yearly', tag: 'Best value', price: planPrice('yearly'), full: live ? planFull('yearly') : undefined, note: live ? `12 sessions · 2 months free` : '12 wellness sessions' },
   ]
+  const Radio = ({ on }: { on: boolean }) => <span className={cx('grid size-6 shrink-0 place-items-center rounded-full border-2', on ? 'border-navy bg-navy text-white' : 'border-sky-200')}>{on && <Check className="size-3.5" strokeWidth={3} />}</span>
   return (
     <section aria-labelledby="plan-h">
-      <h2 id="plan-h" className="scroll-mt-24 px-1 text-[15px] font-bold text-navy">How would you like to book?</h2>
-      <p className="px-1 text-[13px] text-muted">A session every month keeps your blend fresh. Plans include one session a month.</p>
-      <div className="mt-3 space-y-2.5" role="radiogroup" aria-label="Plan">
-        {opts.map((o, i) => {
-          const on = pick === o.k
-          return (
-            <motion.button key={o.k} type="button" role="radio" aria-checked={on} onClick={() => { buzz(6); setPick(o.k) }} whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.05 }}
-              className={cx('relative flex w-full items-center gap-3 rounded-[20px] p-4 text-left transition-colors', on ? 'bg-white ring-2 ring-navy shadow-[var(--shadow-float)]' : 'bg-white shadow-[var(--shadow-card)]')}>
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-peri-50 text-[22px]" aria-hidden>{o.emoji}</span>
-              <span className="min-w-0 flex-1">
-                <span className="flex flex-wrap items-center gap-1.5"><span className="text-[16px] font-bold text-navy">{o.t}</span>
-                  {o.tag && <span className={cx('rounded-full px-2 py-0.5 text-[11px] font-bold', o.k === 'yearly' ? 'bg-marigold-100 text-ink' : 'bg-teal-100 text-sage-text')}>{o.tag}</span>}</span>
-                <span className="block text-[12px] text-muted">{o.note}</span>
-              </span>
-              <span className="text-right">
-                {o.full && <span className="block text-[12px] text-muted line-through tnum">{formatINR(o.full)}</span>}
-                {o.k === 'once' ? <span className="block text-[14px] font-bold text-navy">Pay later</span> : <span className="block text-[17px] font-extrabold text-navy tnum">{formatINR(o.price)}</span>}
-              </span>
-              <span className={cx('grid size-6 shrink-0 place-items-center rounded-full border-2', on ? 'border-navy bg-navy text-white' : 'border-sky-200')}>{on && <Check className="size-3.5" strokeWidth={3} />}</span>
-            </motion.button>
-          )
-        })}
+      <h2 id="plan-h" className="scroll-mt-24 px-1 font-sans text-[13px] font-bold uppercase tracking-[0.1em] text-muted">How you’ll pay</h2>
+      <div className="mt-2 overflow-hidden rounded-[22px] bg-white shadow-[var(--shadow-card)]" role="radiogroup" aria-label="Plan">
+        <button type="button" role="radio" aria-checked={pick === 'once'} onClick={() => { buzz(6); setPick('once') }} className="flex w-full items-center gap-3 p-4 text-left">
+          <span className="min-w-0 flex-1"><span className="block text-[16px] font-bold text-navy">One session</span><span className="block text-[13px] text-muted">Pay once we confirm your time</span></span>
+          <Radio on={pick === 'once'} />
+        </button>
+        <button type="button" onClick={() => { buzz(5); setOpen((o) => !o) }} aria-expanded={open} className="flex w-full items-center gap-2 border-t border-line px-4 py-3 text-left">
+          <span className="text-[16px]" aria-hidden>🌱</span>
+          <span className="flex-1 text-[13px] text-ink-2"><b className="font-semibold text-navy">Coming every month?</b> Save with a plan</span>
+          <ChevronDown className={cx('size-4 text-muted transition-transform', open && 'rotate-180')} />
+        </button>
+        <AnimatePresence initial={false}>
+          {open && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease }} className="overflow-hidden">
+              {plans.map((o) => {
+                const on = pick === o.k
+                return (
+                  <button key={o.k} type="button" role="radio" aria-checked={on} onClick={() => { buzz(6); setPick(o.k) }}
+                    className={cx('flex w-full items-center gap-3 border-t border-line px-4 py-3 text-left transition-colors', on && 'bg-peri-50/60')}>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-1.5"><span className="text-[15px] font-bold text-navy">{o.t}</span><span className="rounded-full bg-peri-50 px-2 py-0.5 text-[10px] font-bold text-navy">{o.tag}</span></span>
+                      <span className="block text-[12px] text-muted">{o.note}</span>
+                    </span>
+                    <span className="text-right">
+                      {o.full && <span className="block text-[11px] text-muted line-through tnum">{formatINR(o.full)}</span>}
+                      <span className="block text-[15px] font-bold text-navy tnum">{formatINR(o.price)}</span>
+                    </span>
+                    <Radio on={on} />
+                  </button>
+                )
+              })}
+              {live && <p className="border-t border-line px-4 py-2.5 text-[12px] text-muted">Launch prices till 1 December</p>}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-      {live && <p className="mt-2 px-1 text-[12px] font-semibold text-ink-2">🎁 Launch prices till 1 December</p>}
     </section>
   )
 }
@@ -266,50 +281,72 @@ function Stepper({ at }: { at: number }) {
   )
 }
 
-/** owner 2026-11-21: one way in for everyone — "Book an appointment". The team decides first visit or follow-up and the fee. */
+/**
+ * owner 2026-11-21: one way in for everyone — "Book an appointment". The team decides first visit or follow-up and the fee.
+ * owner 2026-11-25 (UX pass): one clear path. Who you meet (compact) → how it works in 3 steps (with the fees) →
+ * how you'll pay (one session by default, plans tucked away) → two quiet links (member stories, about the remedies).
+ */
 function Choose({ plan, planPick, setPlanPick, onMeet, meetOpen, onStories }: { plan: Plan | null; planPick: PlanPick; setPlanPick: (p: PlanPick) => void; onMeet: () => void; meetOpen: boolean; onStories: () => void }) {
   const first = CONSULTATIONS.find((x) => x.id === 'first')!.feePaise, follow = CONSULTATIONS.find((x) => x.id === 'followup')!.feePaise
+  const [about, setAbout] = useState(false)
+  const steps = [
+    { t: 'Tell us how you feel', d: 'A 2-minute check-in, right after this' },
+    { t: 'We confirm your time', d: `On WhatsApp. ${formatINR(first)} first visit, ${formatINR(follow)} after that` },
+    { t: 'Meet Jitendra Khimlani', d: `Online or at ${STUDIO.name}. Your remedy blend is included` },
+  ]
   return (
-    <div className="space-y-4">
-      <h1 className="h-duo pt-2">Book a <em>wellness session</em></h1>
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease }} className="card overflow-hidden">
-        <button onClick={onMeet} aria-haspopup="dialog" aria-label="Meet Jitendra Khimlani" className="flex w-full items-end gap-4 bg-sky-100 px-5 pt-4 text-left">
-          {!meetOpen ? <JituPortrait className="h-[118px] w-[94px] shrink-0 ring-[3px] ring-white" radius="999px 999px 16px 16px" /> : <span className="h-[118px] w-[94px] shrink-0" />}
-          <span className="min-w-0 flex-1 pb-4">
-            <span className="block font-display text-[20px] font-semibold leading-6 text-ink">Jitendra Khimlani <Verified size={18} /></span>
-            <span className="block text-[13px] text-ink-2">{CONSULTANT.title}</span>
-            <span className="mt-1.5 inline-flex items-center gap-0.5 text-[13px] font-semibold text-navy">More about him <ChevronRight className="size-4" /></span>
+    <div className="space-y-6">
+      <div>
+        <h1 className="h-duo pt-2">Book a <em>wellness session</em></h1>
+        <motion.button onClick={onMeet} aria-haspopup="dialog" aria-label="Meet Jitendra Khimlani" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease }}
+          className="mt-4 flex w-full items-center gap-3 rounded-[22px] bg-white p-3 pr-4 text-left shadow-[var(--shadow-card)]">
+          {!meetOpen ? <JituPortrait className="size-14 shrink-0 ring-2 ring-white" radius="999px" /> : <span className="size-14 shrink-0" />}
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-[17px] font-semibold leading-6 text-ink">Jitendra Khimlani <Verified size={16} /></span>
+            <span className="block text-[12px] text-ink-2">{CONSULTANT.title}</span>
           </span>
-        </button>
-        <ul className="divide-y divide-line px-5">
-          {[
-            { i: <Video className="size-5" />, t: 'One to one, online or in person', d: `Video call, or at ${STUDIO.name}` },
-            { i: <Sparkles className="size-5" />, t: 'Your remedy blend is included', d: 'Prepared for you after the session' },
-            { i: <Clock className="size-5" />, t: 'Our team confirms your time and fee', d: `${formatINR(first)} first visit · ${formatINR(follow)} after that` },
-          ].map((r) => (
-            <li key={r.t} className="flex items-center gap-3 py-3.5">
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-peri-50 text-navy">{r.i}</span>
-              <span className="min-w-0"><span className="block text-[15px] font-semibold text-ink">{r.t}</span><span className="block text-[12px] text-muted">{r.d}</span></span>
+          <span className="inline-flex items-center gap-0.5 text-[13px] font-semibold text-navy">About <ChevronRight className="size-4" /></span>
+        </motion.button>
+      </div>
+
+      <section aria-labelledby="how-h">
+        <h2 id="how-h" className="px-1 font-sans text-[13px] font-bold uppercase tracking-[0.1em] text-muted">How it works</h2>
+        <ol className="mt-2 rounded-[22px] bg-white p-4 shadow-[var(--shadow-card)]">
+          {steps.map((x, i) => (
+            <li key={x.t} className="relative flex gap-3 pb-4 last:pb-0">
+              {i < steps.length - 1 && <span className="absolute left-[13px] top-7 h-[calc(100%-20px)] w-[2px] rounded-full bg-peri-50" aria-hidden />}
+              <span className="relative grid size-7 shrink-0 place-items-center rounded-full bg-navy text-[13px] font-bold text-white">{i + 1}</span>
+              <span className="min-w-0 pt-0.5"><span className="block text-[15px] font-semibold text-ink">{x.t}</span><span className="block text-[13px] leading-5 text-muted">{x.d}</span></span>
             </li>
           ))}
-        </ul>
-      </motion.section>
+        </ol>
+      </section>
+
       {planLeft(plan) > 0 ? (
         <div className="flex items-center gap-3 rounded-[20px] bg-teal-100 p-4 text-[14px] text-sage-text">
           <span className="text-[22px]" aria-hidden>{PLANS[plan!.id].emoji}</span>
           <span className="flex-1"><b>{PLANS[plan!.id].name}</b> · {planLeft(plan)} sessions left. This one is included.</span>
         </div>
       ) : <PlanPicker pick={planPick} setPick={setPlanPick} />}
-      <motion.button onClick={onStories} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.36 }} className="card flex w-full items-center gap-4 p-4 text-left">
-        <span className="relative grid size-14 shrink-0 place-items-center rounded-full bg-rose-100 ring-4 ring-sky-100">
-          <Quote className="size-6 fill-rose-500 text-rose-500" aria-hidden />
-        </span>
-        <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Member stories</span><span className="text-[13px] text-muted">{TESTIMONIALS.length ? `View ${TESTIMONIALS.length} testimonials` : 'View testimonials'}</span></span>
-        <ChevronRight className="size-5 text-soft" />
-      </motion.button>
-      {/* owner 2026-11-25: more about the remedy */}
-      <AboutRemedies storyHref="/app/learn/story?id=spotlight" />
-      <p className="px-2 text-center text-[13px] text-muted">Sessions are non-refundable, but you can reschedule.</p>
+
+      <div className="overflow-hidden rounded-[22px] bg-white shadow-[var(--shadow-card)]">
+        <button onClick={onStories} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
+          <Quote className="size-5 shrink-0 fill-rose-500 text-rose-500" aria-hidden />
+          <span className="flex-1 text-[15px] font-semibold text-navy">What members say</span>
+          <ChevronRight className="size-5 text-soft" />
+        </button>
+        <button onClick={() => { buzz(5); setAbout(true) }} aria-haspopup="dialog" className="flex w-full items-center gap-3 border-t border-line px-4 py-3.5 text-left">
+          <span className="text-[18px] leading-5" aria-hidden>🌼</span>
+          <span className="flex-1 text-[15px] font-semibold text-navy">About Bach flower remedies</span>
+          <ChevronRight className="size-5 text-soft" />
+        </button>
+      </div>
+      <p className="px-2 text-center text-[12px] text-muted">Sessions are non-refundable, but you can reschedule.</p>
+
+      {/* owner 2026-11-25: more about the remedy, one tap away */}
+      <Sheet open={about} onClose={() => setAbout(false)} title="About Bach flower remedies" tall>
+        <div className="pb-2 pt-8"><AboutRemedies storyHref="/app/learn/story?id=spotlight" /></div>
+      </Sheet>
     </div>
   )
 }
