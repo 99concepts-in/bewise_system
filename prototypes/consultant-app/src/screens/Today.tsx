@@ -44,13 +44,8 @@ export default function Today() {
     : live ? `You're with ${person.get(live.personId)?.first} now.`
     : `${done} of ${todays.length} done. Next at ${fmtTime(next.start)}.`
 
-  // one primary action on this screen (spec §4): the remedy that's waiting, else the session that's ready to start
-  const pendingRemedy = todays.find((a) => a.status === 'completed' && !a.remedy)
-  const ready = todays.find((a) => a.status === 'in_session') ?? todays.find((a) => a.status === 'checked_in')
-  const pill = pendingRemedy
-    ? { label: `Build ${person.get(pendingRemedy.personId)?.first}'s remedy`, Icon: Droplet, run: () => sheets.remedy(pendingRemedy.id) }
-    : ready ? { label: `${ready.status === 'in_session' ? 'Open' : 'Start'} ${person.get(ready.personId)?.first}'s session`, Icon: Play, run: () => go(`/session/${ready.id}`) }
-    : null
+  // Owner 2026-11-25: no floating "Build X's remedy" / "Start X's session" pill on Today. It pulled attention away
+  // from the day; each session row already carries its own Start / Open / Give remedy action.
 
   return (
     <div className="screen today">
@@ -103,13 +98,6 @@ export default function Today() {
 
       {todays.length === 0 && <Empty img="owl-read" title="A quiet day" body="No sessions booked today. Follow-ups that are due are a gentle place to start." action={<button className="btn btn-quiet" onClick={() => go('/people?due')}>See follow-ups due</button>} />}
 
-      <AnimatePresence>
-        {pill && (
-          <m.button key={pill.label} className="fab" onClick={pill.run} initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 24, opacity: 0 }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }} whileTap={{ scale: 0.97 }}>
-            <pill.Icon size={20} aria-hidden /> {pill.label}
-          </m.button>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
