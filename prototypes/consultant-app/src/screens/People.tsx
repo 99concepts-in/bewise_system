@@ -124,4 +124,4 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
 }
 
 /** From a remedy group (missed, ending, on a remedy) open the person's Remedy tab; everywhere else the Overview. */
-function tabFor(b: Bucket) { return b === 'missing' || b === 'ending7' || b === 'ending14' || b === 'remedy' ? '?care' : '' }
+function tabFor(b: Bucket) { return b === 'missing' || b === 'ending7' || b === 'ending14' || b === 'remedy' ? '?remedy' : '' }

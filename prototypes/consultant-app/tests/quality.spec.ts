@@ -29,14 +29,14 @@ async function routes(page: Page) {
   const scan = s.appts.find((a: { service: string; status: string }) => a.service === 'scanning' && a.status === 'completed')
   const aid = s.appts.find((a: { status: string; start: number }) => a.status === 'confirmed' && a.start > Date.now()).id
   const tid = s.threads[0].personId
-  return ['/', '/people', `/people/${pid}`, `/people/${scan.personId}`, '/messages', `/messages/${tid}`, '/dashboard', '/finance', '/sessions', `/session/${aid}`, '/growth']
+  return ['/', '/people', `/people/${pid}`, `/people/${scan.personId}`, `/appt/${aid}`, `/appt/${aid}?loshu`, `/appt/${aid}?moods`, `/people/${pid}?remedy`, `/people/${pid}?notes`, '/messages', `/messages/${tid}`, '/dashboard', '/finance', '/marketing', '/sessions', `/session/${aid}`, '/growth']
 }
 
 /** Anything sticking out sideways, except deliberate horizontal scrollers. */
 async function overflow(page: Page) {
   return page.evaluate(() => {
     const W = document.documentElement.clientWidth
-    const scrollers = '.chips-scroll, .daystrip, .felt-chips, .mood-strip, .quick-replies, .pf-tablist'
+    const scrollers = '.chips-scroll, .daystrip, .felt-chips, .mood-strip, .quick-replies, .pf-tablist, .mk-gallery'
     const bad: string[] = []
     if (document.documentElement.scrollWidth > W + 1) bad.push(`page scrolls sideways: ${document.documentElement.scrollWidth} > ${W}`)
     for (const el of document.querySelectorAll<HTMLElement>('main *, nav *')) {

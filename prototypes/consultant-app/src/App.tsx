@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useLayoutEffect, useRef } from 'react'
 import { LazyMotion, MotionConfig, m } from 'motion/react'
-import { Home, IndianRupee, LayoutDashboard, MessageSquare, Users } from 'lucide-react'
+import { Home, IndianRupee, LayoutDashboard, Megaphone, MessageSquare, Users } from 'lucide-react'
 import { StoreProvider, useStore } from './state/store'
 import { ToastProvider, go, spring, useRoute } from './ui/kit'
 import { SheetsProvider } from './screens/Sheets'
@@ -18,23 +18,25 @@ const Growth = lazyWithPreload(() => import('./screens/Growth'))
 const Messages = lazyWithPreload(() => import('./screens/Messages'))
 const Dashboard = lazyWithPreload(() => import('./screens/Dashboard'))
 const Finance = lazyWithPreload(() => import('./screens/Finance'))
+const Marketing = lazyWithPreload(() => import('./screens/Marketing'))
 const loadFeatures = () => import('./motionFeatures').then((r) => r.default)
 
 function prefetchAll() {
-  const run = () => { loadFeatures(); SheetBody.preload(); [People, Messages, Dashboard, Finance, Profile, Live, Sessions, Growth].forEach((c) => c.preload()) }
+  const run = () => { loadFeatures(); SheetBody.preload(); [People, Messages, Dashboard, Finance, Marketing, Profile, Live, Sessions, Growth].forEach((c) => c.preload()) }
   const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => void }).requestIdleCallback
   if (ric) ric(run, { timeout: 1500 }); else setTimeout(run, 300)
 }
 
-// Owner 2026-11-20: Today · People (mood board) · Messages · Dashboard · Finance
+// Owner 2026-11-20: Today · People (mood board) · Messages · Dashboard · Finance · (2026-11-25) Marketing
 const TABS = [
   { path: '/', key: '', label: 'Today', Icon: Home },
   { path: '/people', key: 'people', label: 'People', Icon: Users },
   { path: '/messages', key: 'messages', label: 'Messages', Icon: MessageSquare },
   { path: '/dashboard', key: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { path: '/finance', key: 'finance', label: 'Finance', Icon: IndianRupee },
+  { path: '/marketing', key: 'marketing', label: 'Marketing', Icon: Megaphone },
 ]
-const TAB_OF: Record<string, string> = { sessions: '', session: '', growth: 'dashboard' }
+const TAB_OF: Record<string, string> = { sessions: '', session: '', appt: '', growth: 'dashboard' }
 
 function useUnread() {
   const { s } = useStore()
@@ -64,11 +66,13 @@ function Shell() {
   if (top === 'session' && parts[1]) screen = <Live id={parts[1]} />
   else if (top === 'sessions') screen = <Sessions />
   else if (top === 'people' && parts[1]) screen = <Profile key={parts[1]} id={parts[1]} tab={q || undefined} />
+  else if (top === 'appt' && parts[1]) screen = <Profile key={'a' + parts[1]} apptId={parts[1]} tab={q || undefined} />
   else if (top === 'people') screen = <People initialBucket={(q || undefined) as Bucket | undefined} />
   else if (top === 'growth') screen = <Growth />
   else if (top === 'messages') screen = <Messages pid={parts[1]} />
   else if (top === 'dashboard') screen = <Dashboard />
   else if (top === 'finance') screen = <Finance />
+  else if (top === 'marketing') screen = <Marketing />
   else screen = <Today />
   const activeTab = TAB_OF[top] ?? top
   const unread = useUnread()

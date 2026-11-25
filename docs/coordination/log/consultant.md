@@ -78,3 +78,11 @@
 - Overview tab is now the console: AI wellness summary (blend routine flag, feelings noted, last blend, journey, 1–2 lines of suggested focus), then Lo Shu card, wellness journey timeline, concerns across sessions, blend journey, week of feelings.
 - Wording: descriptive only; `NOT_SAID` word list + test over every demo member. Spec: `specs/consultant/03-CONSULTANT-CONSOLE.md`.
 - Tests: 58 unit, 113 browser passed (3 skipped).
+
+## 2026-11-25 — Appointment view with sliding tabs + Marketing tab (owner request)
+**Status:** Done in the prototype · backend requested
+- Tapping an appointment opens `#/appt/:id`: appointment card (one main action, video link, Move/Message/Call/WhatsApp) + sliding tabs Overview · Lo Shu · Moods · Notes · Remedy · Sessions · About, each with a summary on top. Profile uses the same tabs.
+- Lo Shu general reading (driver, conductor, personal year). Moods board (4-week calendar, bars, check-in). Notes for every member (add more). Remedy tab: create new (this session or between sessions), current blend with flower pictures, all past remedies.
+- Marketing tab: smart nudges (not using app, follow-up due, drifting, happy members → reviews, missed drops), broadcast with confirm, share a story / review / ready posts as images (canvas, BeWise logo + website flower art), booking link, recent activity.
+- Request: `requests/20261125-consultant-to-hub-marketing-and-appointment-view.md`. Spec: `specs/consultant/04-APPOINTMENT-VIEW-AND-MARKETING.md`.
+- Tests: 64 unit, 121 browser passed (3 skipped).

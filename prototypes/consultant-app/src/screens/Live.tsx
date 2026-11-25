@@ -101,7 +101,7 @@ export default function Live({ id }: { id: string }) {
 
       <div className="live-foot">
         {ended
-          ? <button className="btn btn-primary btn-block" onClick={() => { go(`/people/${p.id}${scanning ? '?care' : ''}`); if (!scanning && !a.remedy && a.status === 'completed') setTimeout(() => sheets.remedy(a.id), 120) }}>{scanning || a.remedy ? 'Back to profile' : <><Leaf size={16} /> Give remedy</>}</button>
+          ? <button className="btn btn-primary btn-block" onClick={() => { go(`/people/${p.id}${scanning ? '?notes' : ''}`); if (!scanning && !a.remedy && a.status === 'completed') setTimeout(() => sheets.remedy(a.id), 120) }}>{scanning || a.remedy ? 'Back to profile' : <><Leaf size={16} /> Give remedy</>}</button>
           : <button className="btn btn-primary btn-block" onClick={() => setEnding(true)}><StopCircle size={17} /> End session</button>}
       </div>
 
@@ -109,7 +109,7 @@ export default function Live({ id }: { id: string }) {
         <EndBody first={p.first} poss={poss} scanning={scanning} onCancel={() => setEnding(false)} onEnd={(outcome, weeks, summary) => {
           dispatch({ type: 'endSession', apptId: a.id, outcome, followUpWeeks: weeks, shareSummary: summary })
           setEnding(false)
-          go(`/people/${p.id}${scanning ? '?care' : ''}`) // scanning: straight to the notes
+          go(`/people/${p.id}${scanning ? '?notes' : ''}`) // scanning: straight to the notes
           if (outcome === 'completed' && !scanning) setTimeout(() => sheets.remedy(a.id), 160)
         }} />
       </Sheet>

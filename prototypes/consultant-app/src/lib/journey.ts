@@ -144,7 +144,7 @@ export function journeySteps(v: PersonView): JourneyStep[] {
 // ---------------------------------------------------------------- blend journey
 export interface BlendStep { appt: Appt; flowers: string[]; added: string[]; dropped: string[]; kept: string[] }
 export function blendJourney(v: PersonView): BlendStep[] {
-  const blends = v.past.filter((a) => a.status === 'completed' && a.remedy)
+  const blends = v.remedies
   return blends.map((a, i) => {
     const prev = i ? blends[i - 1].remedy!.flowers : []
     const now = a.remedy!.flowers

@@ -3,7 +3,7 @@
  * @owner    CONSULTANT
  * Purpose:  Lo Shu grid views — the full panel (profile tab) and a small grid (overview, live session).
  */
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { m } from 'motion/react'
 import { MessageCircle } from 'lucide-react'
 import { LOSHU_LAYOUT, NUMBER_MEANING, PLANES, ageOn, loShu, parseDob, type LoShu } from '../lib/loshu'
@@ -37,7 +37,7 @@ export function LoShuGrid({ ls, small = false }: { ls: LoShu; small?: boolean })
 }
 
 /** Full Lo Shu tab: grid, driver + conductor, missing / repeated numbers, complete planes, how it was worked out. */
-export function LoShuPanel({ p, now }: { p: Person; now: number }) {
+export function LoShuPanel({ p, now, after }: { p: Person; now: number; after?: ReactNode }) {
   const ls = loShu(p.dob)
   if (!ls) return <NoDob p={p} />
   const d = parseDob(p.dob)!
@@ -54,6 +54,8 @@ export function LoShuPanel({ p, now }: { p: Person; now: number }) {
         <LoShuGrid ls={ls} />
         <p className="tagline">Digits of {digits}{ls.added.length === 2 ? `, plus driver ${ls.driver} and conductor ${ls.conductor}` : `, plus conductor ${ls.conductor}`} (in italics). Zeros are not placed.</p>
       </section>
+
+      {after}
 
       <section className="card pf-card">
         <h2>Missing numbers <span className="muted small">{ls.missing.length}</span></h2>

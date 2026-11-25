@@ -73,9 +73,10 @@ test.describe('@flows', () => {
     test.skip(!a, 'every online session already has a link in this seed')
     await page.goto('./#/sessions')
     await page.locator('.rows .row-hit', { hasText: s.people.find((p: { id: string }) => p.id === a.personId).name }).first().click()
-    const sheet = page.getByRole('dialog', { name: 'Session details' })
-    await sheet.getByRole('button', { name: 'Use my room' }).click()
-    await expect(sheet.getByRole('link', { name: 'Share on WhatsApp' })).toHaveAttribute('href', /wa\.me\/\d+\?text=.*meet\.google\.com/)
+    await expect(page).toHaveURL(new RegExp('#/appt/' + a.id))
+    const card = page.getByRole('region', { name: 'Appointment' })
+    await card.getByRole('button', { name: 'Use my room' }).click()
+    await expect(card.getByRole('link', { name: 'Share link on WhatsApp' })).toHaveAttribute('href', /wa\.me\/\d+\?text=.*meet\.google\.com/)
     expect((await state(page)).appts.find((x: { id: string }) => x.id === a.id).meetingUrl).toContain('meet.google.com')
   })
 
@@ -109,7 +110,8 @@ test.describe('@flows', () => {
     await expect(page.locator('.pf-head')).toBeVisible()
     await expect(page.getByRole('dialog', { name: 'Give remedy' })).toBeHidden()
     await expect(page.locator('.note-tl')).toContainText('Energy steadier')
-    await expect(page.locator('.scan-sum')).toContainText('To follow up: Suggested a 10-minute walk after lunch.')
+    await expect(page.getByRole('tab', { name: 'Notes' })).toHaveAttribute('aria-selected', 'true')
+    await expect(page.locator('.tab-sum')).toContainText('To follow up: Suggested a 10-minute walk after lunch.')
   })
 
   test('mood board: missed remedy first, open details, archive and bring back', async ({ page }) => {
@@ -191,7 +193,7 @@ test.describe('@flows', () => {
     await fresh(page, '/sessions')
     const before = await state(page)
     await page.locator('.rows .row-hit').nth(1).click()
-    await page.getByRole('dialog', { name: 'Session details' }).getByRole('button', { name: 'Move' }).click()
+    await page.getByRole('region', { name: 'Appointment' }).getByRole('button', { name: 'Move' }).click()
     const pick = page.getByRole('dialog', { name: 'Pick a time' })
     await pick.locator('.day:not([disabled])').nth(2).click()
     await pick.locator('.slot:not([disabled])').first().click()
@@ -232,7 +234,9 @@ test.describe('@flows', () => {
     const s = await state(page)
     const withDob = s.people.find((p: { dob?: string; archived?: boolean }) => p.dob && !p.archived)
     await page.goto('./#/people/' + withDob.id)
-    await page.getByRole('button', { name: /Full reading/ }).click()
+    await page.locator('.gl-tile', { hasText: 'Lo Shu' }).click()
+    await expect(page.getByRole('heading', { name: 'General reading' })).toBeVisible()
+    await expect(page.locator('.tab-sum')).toContainText(/Driver \d, conductor \d\. \d{4} is a personal year \d/)
     await expect(page.getByRole('tab', { name: 'Lo Shu' })).toHaveAttribute('aria-selected', 'true')
     await expect(page.locator('.ls-main .ls-cell')).toHaveCount(9)
     await expect(page.getByRole('heading', { name: /Missing numbers/ })).toBeVisible()
@@ -247,5 +251,74 @@ test.describe('@flows', () => {
     await expect(page.locator('.ls-key').first()).toContainText('6') // driver
     await expect(page.locator('.ls-key').nth(1)).toContainText('3') // conductor
     expect((await state(page)).people.find((p: { id: string }) => p.id === noDob.id).dob).toBe('1987-08-15')
+  })
+
+  test('appointment opens with sliding tabs: summary on every tab, add a note, create a remedy', async ({ page, isMobile }) => {
+    await fresh(page)
+    await page.locator('.tdl-who').first().click()
+    await expect(page).toHaveURL(/#\/appt\//)
+    await expect(page.getByRole('region', { name: 'Appointment' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Wellness summary' })).toBeVisible()
+    for (const t of ['Lo Shu', 'Moods', 'Notes', 'Remedy', 'Sessions', 'About']) {
+      await page.getByRole('tab', { name: new RegExp('^' + t) }).click()
+      await expect(page.getByRole('tab', { name: new RegExp('^' + t) })).toHaveAttribute('aria-selected', 'true')
+      await expect(page.locator('.tab-sum')).toBeVisible()
+    }
+    // notes: add one
+    await page.getByRole('tab', { name: 'Notes' }).click()
+    await page.getByRole('button', { name: 'Add a note' }).click()
+    await page.getByLabel(/New note for/).fill('Lighter today. Suggested a morning walk.')
+    await page.getByRole('button', { name: 'Save note' }).click()
+    await expect(page.locator('.note-tl li').first()).toContainText('Lighter today')
+    await expect(page.locator('.tab-sum')).toContainText('Lighter today')
+    // remedy: create a new one
+    await page.getByRole('tab', { name: 'Remedy' }).click()
+    await page.locator('.rm-create').click()
+    const sheet = page.getByRole('dialog', { name: 'Give remedy' })
+    await sheet.locator('.flower-list .chip', { hasText: 'Hornbeam' }).click()
+    await sheet.getByRole('button', { name: /(Create|Give) remedy with/ }).click()
+    await expect(page.locator('.toast').last()).toContainText(/Remedy (given|created)/)
+    await expect(page.locator('.rm-current')).toContainText('Hornbeam')
+    // swipe between tabs on touch screens
+    if (isMobile) {
+      await page.getByRole('tab', { name: 'Overview' }).click()
+      const box = (await page.locator('.pf-panel').boundingBox())!
+      await page.evaluate(() => document.querySelector('.pf-panel')!.scrollIntoView({ block: 'start' }))
+      const cdp = await page.context().newCDPSession(page)
+      const y = 160, tp = (type: string, x: number) => cdp.send('Input.dispatchTouchEvent', { type: type as 'touchStart', touchPoints: type === 'touchEnd' ? [] : [{ x, y }] })
+      await tp('touchStart', box.width - 30); for (let x = box.width - 50; x > 60; x -= 30) await tp('touchMove', x); await tp('touchEnd', 60)
+      await expect(page.getByRole('tab', { name: 'Lo Shu' })).toHaveAttribute('aria-selected', 'true')
+    }
+  })
+
+  test('marketing: nudge people not using the app, broadcast, share a review image', async ({ page }) => {
+    await fresh(page, '/marketing')
+    await expect(page.getByRole('heading', { name: 'Grow BeWise' })).toBeVisible()
+    await page.locator('.mk-row', { hasText: 'Not using the app' }).click()
+    const nudge = page.getByRole('dialog', { name: 'Send a nudge' })
+    await expect(nudge.locator('.nudge-preview')).toContainText(/^Namaste \w+/)
+    const n = await nudge.locator('.nudge-list li').count()
+    await nudge.locator('.nudge-list input').first().uncheck()
+    await nudge.getByRole('button', { name: `Send to ${n - 1} people` }).click()
+    await expect(page.locator('.toast').last()).toContainText(`Sent to ${n - 1} people`)
+    expect((await state(page)).mkt.nudges).toHaveLength(n - 1)
+    // the same people aren't offered again this week
+    await expect(page.locator('.mk-row', { hasText: 'Not using the app' }).locator('em')).toHaveText('1')
+
+    await page.getByRole('button', { name: /Broadcast to all/ }).click()
+    const cast = page.getByRole('dialog', { name: 'Broadcast' })
+    await cast.getByRole('button', { name: /Festival wishes/ }).click()
+    await cast.getByRole('button', { name: /Review and send to \d+/ }).click()
+    await cast.getByRole('button', { name: 'Yes, send now' }).click()
+    await expect(page.locator('.toast').last()).toContainText('Broadcast sent')
+    await expect(page.locator('.mk-recent')).toContainText('Broadcast to')
+
+    await page.getByRole('button', { name: /Share a review/ }).click()
+    const post = page.getByRole('dialog', { name: 'Share a post' })
+    await expect(post.locator('canvas')).toBeVisible()
+    await post.getByRole('tab', { name: 'Story (tall)' }).click()
+    const dl = page.waitForEvent('download')
+    await post.getByRole('button', { name: 'Save image' }).click()
+    expect((await dl).suggestedFilename()).toBe('bewise-review-story.png')
   })
 })

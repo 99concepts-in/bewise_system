@@ -1,114 +1,22 @@
 /**
  * @screens CN-09 CN-10 CN-14 CN-15 CN-19 CN-28 — every bottom-sheet body, loaded lazily (and prefetched on idle).
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, CalendarClock, Leaf, MapPin, MessageCircle, MessageSquare, Phone, Play, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat, Inbox, NotebookPen, Brain, Flower2 } from 'lucide-react'
+import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, Leaf, MapPin, MessageCircle, MessageSquare, Phone, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat, Inbox, Brain, Flower2 } from 'lucide-react'
 import { durationOf, useIndex, useStore } from '../state/store'
 import { parseDob } from '../lib/loshu'
 import { Avatar, Chip, Segmented, go, softSpring, spring, useToast } from '../ui/kit'
 import { dayLabel, fmtDay, fmtShort, fmtTime, relative, inr } from '../lib/time'
 import { freeTimes, nextDays, nextFreeAny } from '../lib/slots'
-import { FLOWERS, MIN, startOfDay } from '../data/seed'
+import { FLOWERS, startOfDay } from '../data/seed'
 import { suggestFlowers } from '../lib/derive'
 import { Suggestions } from '../ui/care'
 import { TypeBadge } from '../ui/bits'
-import { pron, type Appt, type Kind, type Mode, type Person, type Service } from '../data/types'
+import { type Appt, type Kind, type Mode, type Person, type Service } from '../data/types'
 
-import { DEFAULT_MEET, FEE, STATUS_LABEL, feeOf, linkMessage, typeLabel, waLink, BOOKING_LINK } from '../lib/labels'
+import { DEFAULT_MEET, FEE, STATUS_LABEL, feeOf, typeLabel, BOOKING_LINK } from '../lib/labels'
 import type { Api, Open } from './Sheets'
-
-// ---------------------------------------------------------------- session details
-function SessionBody({ id, close, api }: { id: string; close: () => void; api: Api }) {
-  const { s, dispatch, now } = useStore()
-  const { person } = useIndex()
-  const toast = useToast()
-  const a = s.appts.find((x) => x.id === id)
-  const [link, setLink] = useState(a?.meetingUrl ?? '')
-  // save a half-typed link if the sheet is closed without leaving the field
-  const latest = useRef({ link, saved: a?.meetingUrl ?? '' })
-  latest.current.link = link
-  useEffect(() => () => { const { link: l, saved } = latest.current; if (a && l.trim() !== saved) dispatch({ type: 'setLink', apptId: a.id, url: l }) }, []) // eslint-disable-line react-hooks/exhaustive-deps
-  if (!a) return null
-  const p = person.get(a.personId)!
-  const upcoming = a.status === 'confirmed' || a.status === 'awaiting_payment' || a.status === 'checked_in'
-  const startsSoon = a.start - now < 30 * MIN
-  const when = `${dayLabel(a.start, now).toLowerCase()} at ${fmtTime(a.start)}`
-  const saveLink = (value = link) => { if (value.trim() !== (a.meetingUrl ?? '')) { dispatch({ type: 'setLink', apptId: a.id, url: value }); latest.current.saved = value.trim(); toast(value.trim() ? 'Link saved. It shows in the client\'s app.' : 'Link removed') } }
-  return (
-    <div className="sd">
-      <button className="sd-head" onClick={() => { close(); go(`/people/${p.id}`) }}>
-        <Avatar name={p.name} size={52} mood={p.moods.at(-1)?.mood} />
-        <span>
-          <strong>{p.name}</strong>
-          <small>{p.city}</small>
-        </span>
-        <span className="sd-open">Profile <ChevronRight size={16} /></span>
-      </button>
-
-      <TypeBadge service={a.service} kind={a.kind} big />
-      <div className="sd-when">
-        <div><span className="muted">{dayLabel(a.start, now)}</span><b>{fmtTime(a.start)}</b></div>
-        <div><span className="muted">Length</span><b>{a.durationMin} min</b></div>
-        <div><span className="muted">{a.mode === 'online' ? 'Online' : 'In person'}</span><b>{a.mode === 'online' ? <Video size={18} /> : <MapPin size={18} />}</b></div>
-      </div>
-      <div className={`status status-${a.status}`}><span>{STATUS_LABEL[a.status]}{upcoming ? `, starts ${relative(a.start, now)}` : ''}</span>{a.status !== 'no_show' && <span className="fee"><IndianRupee size={12} />{inr(feeOf(a.service, a.kind)).slice(1)}{a.service === 'bach' ? ' incl. remedy' : ''}</span>}</div>
-      {a.assignedBy && upcoming && <p className="muted small assigned">Time fixed by {a.assignedBy}</p>}
-
-      {a.mode === 'online' && upcoming && (
-        <section className="sd-sec link-sec">
-          <h4><Video size={15} /> Video link</h4>
-          <div className="link-edit">
-            <input value={link} onChange={(e) => setLink(e.target.value)} onBlur={() => saveLink()} onKeyDown={(e) => { if (e.key === 'Enter') saveLink() }} placeholder="Paste a Google Meet or Zoom link" aria-label="Video link" inputMode="url" />
-            {!link && <button className="link" onClick={() => { setLink(DEFAULT_MEET); saveLink(DEFAULT_MEET) }}>Use my room</button>}
-          </div>
-          {link && (
-            <div className="btn-row">
-              <a className="btn btn-quiet btn-sm" href={waLink(p.phone, linkMessage(p.first, when, link))} target="_blank" rel="noreferrer" onClick={() => saveLink()}><MessageCircle size={15} /> Share on WhatsApp</a>
-              <a className="btn btn-quiet btn-sm" href={link} target="_blank" rel="noreferrer"><Video size={15} /> Open</a>
-            </div>
-          )}
-          <p className="muted small">{link ? `${p.first} also sees this link in the BeWise app.` : 'Add a link so it reaches ' + p.first + ' on WhatsApp and in the app.'}</p>
-        </section>
-      )}
-
-      {a.note && <blockquote className="quote-note">“{a.note}”<cite>{p.first}'s note when asking</cite></blockquote>}
-
-      {a.service === 'scanning' && a.privateNote && (
-        <section className="sd-sec"><h4><NotebookPen size={15} /> Your notes</h4><p className="scan-note">{a.privateNote}</p></section>
-      )}
-      {a.troubling && (
-        <section className="sd-sec"><h4>What was troubling {pron(p).obj}</h4>
-          <div className="chips-wrap">{a.troubling.map((t) => <span key={t} className="tag">{t}</span>)}</div></section>
-      )}
-      {a.remedy && (
-        <section className="sd-sec"><h4><Leaf size={15} /> Remedy given {fmtShort(a.remedy.givenAt)}</h4>
-          <div className="chips-wrap">{a.remedy.flowers.map((f) => <span key={f} className="tag tag-sage">{f}</span>)}</div></section>
-      )}
-      {a.rating && (
-        <section className="sd-sec"><h4>{p.first}'s feedback</h4>
-          <div className="stars" aria-label={`${a.rating} out of 5`}>{Array.from({ length: 5 }, (_, i) => <Star key={i} size={16} className={i < a.rating! ? 'on' : ''} />)}</div>
-          {a.feedback && <p className="kind-small">“{a.feedback}”</p>}</section>
-      )}
-
-      <div className="sd-actions">
-        {upcoming && <>
-          <button className="btn btn-primary" disabled={!startsSoon} onClick={() => { close(); go(`/session/${a.id}`) }}>
-            <Play size={16} /> {startsSoon ? 'Start session' : `Starts ${relative(a.start, now)}`}
-          </button>
-          <div className="btn-row">
-            <button className="btn btn-quiet" onClick={() => api.reschedule(a.id)}><CalendarClock size={16} /> Move</button>
-            <button className="btn btn-quiet" onClick={() => { close(); go(`/messages/${p.id}`) }}><MessageSquare size={16} /> Message</button>
-            <a className="btn btn-quiet" href={`tel:${p.phone.replace(/\s/g, '')}`}><Phone size={16} /> Call</a>
-          </div>
-        </>}
-        {a.status === 'completed' && a.service === 'bach' && !a.remedy && <button className="btn btn-primary" onClick={() => api.remedy(a.id)}><Leaf size={16} /> Give remedy</button>}
-        {(a.status === 'completed' || a.status === 'no_show') && <button className="btn btn-quiet" onClick={() => api.newAppt({ personId: p.id, service: a.service })}><CalendarPlus size={16} /> Book the next one</button>}
-      </div>
-    </div>
-  )
-}
-
 
 // ---------------------------------------------------------------- time picker (his timings are never fixed: any time 7 AM–10 PM, clashes blocked)
 function TimePicker({ duration, value, onChange, ignoreId }: { duration: number; value: number | null; onChange: (t: number) => void; ignoreId?: string }) {
@@ -179,23 +87,30 @@ function SlotBody({ o, close }: { o: Extract<Open, { k: 'slots' }>; close: () =>
 }
 
 // ---------------------------------------------------------------- give remedy
-function RemedyBody({ apptId, close }: { apptId: string; close: () => void }) {
+function RemedyBody({ apptId, personId, close }: { apptId?: string; personId: string; close: () => void }) {
   const { s, dispatch, now } = useStore()
   const { person, byPerson } = useIndex()
   const toast = useToast()
-  const a = s.appts.find((x) => x.id === apptId)!
-  const p = person.get(a.personId)!
-  const last = [...(byPerson.get(p.id) ?? [])].reverse().find((x) => x.remedy && x.id !== a.id)
-  const [picked, setPicked] = useState<string[]>(last?.remedy?.flowers ?? [])
+  const a = apptId ? s.appts.find((x) => x.id === apptId) : undefined
+  const p = person.get(a?.personId ?? personId)!
+  const all = byPerson.get(p.id) ?? []
+  const lastFlowers = [...all.filter((x) => x.remedy && x.id !== a?.id).map((x) => x.remedy!), ...(p.remedies ?? [])].sort((x, y) => x.givenAt - y.givenAt).at(-1)?.flowers
+  const [picked, setPicked] = useState<string[]>(lastFlowers ?? [])
   const [q, setQ] = useState('')
-  const history = (byPerson.get(p.id) ?? []).filter((x) => x.id !== a.id && x.start < a.start)
-  const suggestions = useMemo(() => suggestFlowers(p, history, a.troubling ?? []), [p, history.length, a.troubling]) // eslint-disable-line react-hooks/exhaustive-deps
+  const history = all.filter((x) => x.id !== a?.id && x.start < (a?.start ?? now))
+  const suggestions = useMemo(() => suggestFlowers(p, history, a?.troubling ?? []), [p, history.length, a?.troubling]) // eslint-disable-line react-hooks/exhaustive-deps
   const list = FLOWERS.filter((f) => f.toLowerCase().includes(q.toLowerCase()))
   const toggle = (f: string) => setPicked((x) => x.includes(f) ? x.filter((y) => y !== f) : [...x, f])
+  const give = () => {
+    if (a) dispatch({ type: 'giveRemedy', apptId: a.id, flowers: picked, now: Date.now() })
+    else dispatch({ type: 'giveRemedyBetween', personId: p.id, id: `rm${Date.now()}`, flowers: picked, now: Date.now() })
+    toast(`${a ? 'Remedy given' : 'Remedy created'}. The office is preparing ${p.first}'s bottle.`)
+    close()
+  }
   return (
     <div className="remedy">
-      <h3 className="sheet-title">Give {p.first}'s remedy</h3>
-      <p className="muted small">Session {dayLabel(a.start, now).toLowerCase()} at {fmtTime(a.start)}. Included in the {inr(FEE[a.kind])} fee.{last ? ' Started from the last blend.' : ''}</p>
+      <h3 className="sheet-title">{a ? `Give ${p.first}'s remedy` : `New remedy for ${p.first}`}</h3>
+      <p className="muted small">{a ? `Session ${dayLabel(a.start, now).toLowerCase()} at ${fmtTime(a.start)}. Included in the ${inr(FEE[a.kind])} fee.` : 'Between sessions: a refill or a changed blend. The office prepares and sends it.'}{lastFlowers ? ' Started from the last blend.' : ''}</p>
       <Suggestions first={p.first} items={suggestions} picked={picked} onToggle={toggle} onAddAll={() => setPicked((x) => [...new Set([...x, ...suggestions.slice(0, 5).map((s) => s.flower)])])} />
       <h4 className="blend-head">{p.first}'s blend{picked.length ? `, ${picked.length} ${picked.length === 1 ? 'flower' : 'flowers'}` : ''}</h4>
       <div className="blend">
@@ -211,8 +126,8 @@ function RemedyBody({ apptId, close }: { apptId: string; close: () => void }) {
       <div className="flower-list">
         {list.map((f) => <Chip key={f} active={picked.includes(f)} onClick={() => toggle(f)}>{f}</Chip>)}
       </div>
-      <button className="btn btn-primary btn-block" disabled={!picked.length} onClick={() => { dispatch({ type: 'giveRemedy', apptId, flowers: picked, now: Date.now() }); toast(`Remedy given. The office is preparing ${p.first}'s bottle.`); close() }}>
-        <Leaf size={16} /> Give remedy with {picked.length} {picked.length === 1 ? 'flower' : 'flowers'}
+      <button className="btn btn-primary btn-block" disabled={!picked.length} onClick={give}>
+        <Leaf size={16} /> {a ? 'Give remedy' : 'Create remedy'} with {picked.length} {picked.length === 1 ? 'flower' : 'flowers'}
       </button>
     </div>
   )
@@ -558,9 +473,8 @@ function CalendarBody({ api }: { api: Api }) {
 /** One lazily loaded entry point for every sheet body. */
 export default function SheetBody({ open, close, api }: { open: NonNullable<Open>; close: () => void; api: Api }) {
   switch (open.k) {
-    case 'session': return <SessionBody id={open.id} close={close} api={api} />
     case 'slots': return <SlotBody o={open} close={close} />
-    case 'remedy': return <RemedyBody apptId={open.apptId} close={close} />
+    case 'remedy': return <RemedyBody apptId={open.apptId} personId={open.personId} close={close} />
     case 'notices': return <NoticesBody close={close} />
     case 'add': return <AddPersonBody then={open.then} close={close} api={api} />
     case 'new': return <NewApptBody key={(open.requestId ?? '') + (open.personId ?? '') + (open.service ?? '')} o={open} close={close} api={api} />

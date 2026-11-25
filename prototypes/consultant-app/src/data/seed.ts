@@ -348,6 +348,13 @@ export function makeSeed(now: number): Seed {
   const assigned = appts.find((a) => a.start > now && a.assignedBy === 'Shivani di')
   if (assigned) nx(70, 'booked', `Shivani di assigned ${nameOf(assigned.personId)} a time: ${new Date(assigned.start).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}`, assigned.personId)
   notices.sort((a, b) => b.at - a.at)
+  // BeWise app usage: some never installed it, some haven't opened it in a while
+  const rapp = mulberry32(3131)
+  people.forEach((p) => {
+    const x = rapp()
+    p.app = x < 0.22 ? { installed: false } : { installed: true, lastOpen: now - (x < 0.38 ? 15 + Math.floor(rapp() * 60) : Math.floor(rapp() * 6)) * DAY - Math.floor(rapp() * 20) * HOUR }
+  })
+
   // date of birth: entered by the member in the client app (CL-05); a few haven't added it yet
   const rdob = mulberry32(1955)
   const thisYear = new Date(now).getFullYear()

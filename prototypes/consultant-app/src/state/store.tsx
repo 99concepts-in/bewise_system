@@ -16,7 +16,16 @@ export interface State {
   readUpTo: number
   dismissed: string[]
   saturdayMorning: boolean
+  /** marketing: what he shared, nudged and broadcast (owner 2026-11-25) */
+  mkt: Mkt
 }
+export interface Mkt {
+  nudges: { id: string; personId: string; at: number; kind: NudgeKind }[]
+  broadcasts: { id: string; at: number; audience: string; text: string; count: number; channels: ('app' | 'whatsapp')[] }[]
+  shares: { id: string; at: number; kind: string }[]
+}
+export type NudgeKind = 'app' | 'drifting' | 'due' | 'review' | 'drops'
+const MKT0: Mkt = { nudges: [], broadcasts: [], shares: [] }
 
 export type Action =
   | { type: 'giveRemedy'; apptId: string; flowers: string[]; now: number }
@@ -38,12 +47,16 @@ export type Action =
   | { type: 'setNote'; apptId: string; note: string }
   | { type: 'endSession'; apptId: string; outcome: 'completed' | 'no_show'; followUpWeeks?: number; shareSummary?: string }
   | { type: 'reset'; now: number }
+  | { type: 'giveRemedyBetween'; personId: string; id: string; flowers: string[]; now: number }
+  | { type: 'nudge'; personIds: string[]; kind: NudgeKind; now: number }
+  | { type: 'broadcast'; id: string; audience: string; text: string; count: number; channels: ('app' | 'whatsapp')[]; now: number }
+  | { type: 'shared'; kind: string; now: number }
 
 const KEY = 'bewise.consult.v2' // v2: services, requests, chat (2026-11-20)
 
 export function fresh(now: number): State {
   const s = makeSeed(now)
-  return { day: startOfDay(now), ...s, readUpTo: 0, dismissed: [], saturdayMorning: false }
+  return { day: startOfDay(now), ...s, readUpTo: 0, dismissed: [], saturdayMorning: false, mkt: MKT0 }
 }
 
 function load(now: number): State {
@@ -51,7 +64,7 @@ function load(now: number): State {
     const raw = localStorage.getItem(KEY)
     if (raw) {
       const s = JSON.parse(raw) as State
-      if (s.day === startOfDay(now)) return s
+      if (s.day === startOfDay(now)) return { ...s, mkt: s.mkt ?? MKT0 }
     }
   } catch { /* storage unavailable — start fresh */ }
   return fresh(now)
@@ -85,6 +98,14 @@ export function reducer(s: State, a: Action): State {
       return { ...s, appts: s.appts.map((x) => x.id === a.apptId ? { ...x, meetingUrl: a.url.trim() || undefined } : x) }
     case 'archive':
       return { ...s, people: s.people.map((p) => p.id === a.personId ? { ...p, archived: a.on } : p) }
+    case 'giveRemedyBetween':
+      return { ...s, people: s.people.map((p) => p.id === a.personId ? { ...p, remedies: [...(p.remedies ?? []), { id: a.id, flowers: a.flowers, givenAt: a.now, stage: 'preparing' }] } : p) }
+    case 'nudge':
+      return { ...s, mkt: { ...s.mkt, nudges: [...a.personIds.map((personId, i) => ({ id: `nd${a.now}-${i}`, personId, at: a.now, kind: a.kind })), ...s.mkt.nudges] } }
+    case 'broadcast':
+      return { ...s, mkt: { ...s.mkt, broadcasts: [{ id: a.id, at: a.now, audience: a.audience, text: a.text, count: a.count, channels: a.channels }, ...s.mkt.broadcasts] } }
+    case 'shared':
+      return { ...s, mkt: { ...s.mkt, shares: [{ id: `sh${a.now}`, at: a.now, kind: a.kind }, ...s.mkt.shares] } }
     case 'setDob':
       return { ...s, people: s.people.map((p) => p.id === a.personId ? { ...p, dob: a.dob } : p) }
     case 'addNote': {

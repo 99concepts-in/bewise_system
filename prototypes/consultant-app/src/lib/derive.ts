@@ -22,6 +22,7 @@ export interface PersonView {
   avgRating?: number
   service: Service // what they come for (latest appointment)
   endsOn?: number // the current blend runs out on this day
+  remedies: Appt[] // every remedy, oldest first: from sessions and between sessions (remedyOnly)
   daysLeft?: number // days until it runs out (negative = finished)
 }
 
@@ -30,7 +31,9 @@ export function personView(p: Person, list: Appt[] = [], now: number): PersonVie
   const done = past.filter((a) => a.status === 'completed')
   const last = done.at(-1)
   const next = list.find((a) => a.start > now - 30 * MIN && (a.status === 'confirmed' || a.status === 'awaiting_payment' || a.status === 'checked_in' || a.status === 'in_session'))
-  const blend = [...done].reverse().find((a) => a.remedy)
+  const between: Appt[] = (p.remedies ?? []).map((r) => ({ id: r.id, personId: p.id, start: r.givenAt, durationMin: 0, service: 'bach', kind: 'followup', mode: 'in_person', status: 'completed', remedy: { flowers: r.flowers, stage: r.stage, givenAt: r.givenAt, weeks: r.weeks }, remedyOnly: true }))
+  const remedies = [...done.filter((a) => a.remedy), ...between].sort((a, b) => a.remedy!.givenAt - b.remedy!.givenAt)
+  const blend = remedies.at(-1)
   const dueOn = last && !next ? startOfDay(last.start) + (last.followUpWeeks ?? 4) * 7 * DAY : undefined
   const buckets: Bucket[] = ['all']
   const sinceLast = last ? now - last.start : Infinity
@@ -41,7 +44,7 @@ export function personView(p: Person, list: Appt[] = [], now: number): PersonVie
   const service: Service = (next ?? list.at(-1))?.service ?? 'bach'
   const endsOn = blend?.remedy ? startOfDay(blend.remedy.givenAt) + (blend.remedy.weeks ?? 3) * 7 * DAY : undefined
   const daysLeft = endsOn !== undefined ? Math.round((endsOn - startOfDay(now)) / DAY) : undefined
-  if (p.archived) return { p, sessions: list, past, last, next, blend, dueOn, buckets: ['all', 'archived'], latestMood: p.moods.at(-1)?.mood, service, endsOn, daysLeft }
+  if (p.archived) return { p, sessions: list, past, last, next, blend, remedies, dueOn, buckets: ['all', 'archived'], latestMood: p.moods.at(-1)?.mood, service, endsOn, daysLeft }
   const ad = adherence(p, now)
   const onRemedy = daysLeft !== undefined && daysLeft >= 0
   if (onRemedy) buckets.push('remedy')
@@ -51,7 +54,7 @@ export function personView(p: Person, list: Appt[] = [], now: number): PersonVie
   if (service === 'scanning') buckets.push('scanning')
   const rated = done.filter((a) => a.rating)
   return {
-    p, sessions: list, past, last, next, blend, dueOn, buckets, service, endsOn, daysLeft,
+    p, sessions: list, past, last, next, blend, remedies, dueOn, buckets, service, endsOn, daysLeft,
     latestMood: p.moods.at(-1)?.mood,
     avgRating: rated.length ? rated.reduce((s, a) => s + (a.rating ?? 0), 0) / rated.length : undefined,
   }
@@ -327,7 +330,18 @@ export function scanNotes(sessions: Appt[], extra: { id: string; at: number; tex
 }
 
 export function scanSummary(sessions: Appt[], extra: { id: string; at: number; text: string }[] = []) {
-  const notes = scanNotes(sessions, extra)
+  return summariseNotes(scanNotes(sessions, extra))
+}
+
+/** Every note he wrote about a person, any service, oldest first (session notes + notes added from the profile). */
+export function allNotes(sessions: Appt[], extra: { id: string; at: number; text: string }[] = []): ScanNote[] {
+  return [
+    ...sessions.filter((a) => a.status === 'completed' && a.privateNote).map((a) => ({ id: a.id, start: a.start, text: a.privateNote! })),
+    ...extra.map((n) => ({ id: n.id, start: n.at, text: n.text, extra: true })),
+  ].sort((a, b) => a.start - b.start)
+}
+
+export function summariseNotes(notes: ScanNote[]) {
   if (!notes.length) return null
   const sessionCount = notes.filter((n) => !n.extra).length
   const themes = THEMES.map(([name, re]) => [name, notes.filter((n) => re.test(n.text)).length] as [string, number]).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).slice(0, 4)

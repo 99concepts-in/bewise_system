@@ -25,7 +25,11 @@ export interface Person {
   moods: { day: number; mood: Mood }[] // journal entries (shared with him), newest last
   checkin?: { at: number; better: string[]; same: string[]; harder: string[] }
   drops?: { day: number; taken: boolean }[] // client ticks "took my drops" in their app (CL-26); missing day = not logged
-  notes?: { id: string; at: number; text: string }[] // scanning notes added from the profile (not tied to a session)
+  notes?: { id: string; at: number; text: string }[] // his notes added from the profile (not tied to a session)
+  /** remedies he gives between sessions (refills, a changed blend) — sessions keep their own on Appt.remedy */
+  remedies?: { id: string; flowers: string[]; givenAt: number; stage: RemedyStage; weeks?: number }[]
+  /** BeWise app usage (from the client app): not installed, or the last time it was opened */
+  app?: { installed: boolean; lastOpen?: number }
   archived?: boolean // hidden from the mood board and remedy lists; restorable
 }
 
@@ -55,6 +59,7 @@ export interface Appt {
   privateNote?: string // 🔒 only him
   sharedSummary?: string // optional summary shared with the client (D-26)
   greeting?: string // the WhatsApp greeting he sent when booking
+  remedyOnly?: boolean // synthetic: a remedy given between sessions (never stored in appts)
 }
 
 /** Clients only ask for an appointment; Jitu Bhaiya's timings are never fixed, so Haresh bhai / Shivani di call and assign a time.

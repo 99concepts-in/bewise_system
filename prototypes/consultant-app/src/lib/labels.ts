@@ -28,4 +28,5 @@ export function reminderText(first: string, start: number | undefined, now: numb
   return `Namaste ${first} 🙏 Just checking you got the BeWise message about your session${start ? ` on ${dayLabel(start, now).toLowerCase()} at ${fmtTime(start)}` : ''}. The payment link is in that chat. Looking forward to seeing you. Jitu Bhaiya`
 }
 
-export const BOOKING_LINK = 'https://bewise.in/book/jitu-bhaiya' // illustrative until the domain is set (D-12)
+export const BOOKING_LINK = 'https://bewiseglobal.in/consultations.html' // live site (bewiseglobal.in)
+export const APP_LINK = 'https://app.bewiseglobal.in/client/'

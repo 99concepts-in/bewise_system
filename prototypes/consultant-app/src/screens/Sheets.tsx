@@ -1,18 +1,18 @@
 /**
  * Sheets: one provider, lazily loaded bodies (SheetBodies.tsx) so the first screen paints with less JavaScript.
  */
-import { createContext, Suspense, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import { Sheet } from '../ui/kit'
+import { createContext, Suspense, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useStore } from '../state/store'
+import { Sheet, go } from '../ui/kit'
 import { lazyWithPreload } from '../ui/lazy'
 export * from '../lib/labels'
 import type { Service } from '../data/types'
 
 
 export type Open =
-  | { k: 'session'; id: string }
   | { k: 'slots'; mode: 'reschedule'; apptId: string }
   | { k: 'new'; personId?: string; requestId?: string; service?: Service }
-  | { k: 'remedy'; apptId: string }
+  | { k: 'remedy'; apptId?: string; personId: string }
   | { k: 'notices' }
   | { k: 'add'; then: 'profile' | 'express' }
   | { k: 'share' }
@@ -24,6 +24,8 @@ export interface Api {
   reschedule: (apptId: string) => void
   book: (personId: string) => void
   remedy: (apptId: string) => void
+  /** new remedy: for a session (apptId) or between sessions */
+  newRemedy: (personId: string, apptId?: string) => void
   notices: () => void
   addPerson: (then?: 'profile' | 'express') => void
   /** New appointment by Jitu Bhaiya or the team — any time of day; `express` jumps straight to the next free times */
@@ -37,13 +39,17 @@ const C = createContext<Api | null>(null)
 export const useSheets = () => useContext(C)!
 
 export function SheetsProvider({ children }: { children: ReactNode }) {
+  const { s } = useStore()
+  const appts = useRef(s.appts)
+  appts.current = s.appts
   const [open, setOpen] = useState<Open>(null)
   const close = useCallback(() => setOpen(null), [])
   const api = useMemo<Api>(() => ({
-    session: (id) => setOpen({ k: 'session', id }),
+    session: (id) => { setOpen(null); go(`/appt/${id}`) }, // appointments open as a full screen with sliding tabs (owner 2026-11-25)
     reschedule: (apptId) => setOpen({ k: 'slots', mode: 'reschedule', apptId }),
     book: (personId) => setOpen({ k: 'new', personId }),
-    remedy: (apptId) => setOpen({ k: 'remedy', apptId }),
+    remedy: (apptId) => setOpen({ k: 'remedy', apptId, personId: appts.current.find((a) => a.id === apptId)?.personId ?? '' }),
+    newRemedy: (personId, apptId) => setOpen({ k: 'remedy', apptId, personId }),
     notices: () => setOpen({ k: 'notices' }),
     addPerson: (then = 'profile') => setOpen({ k: 'add', then }),
     express: (personId) => setOpen({ k: 'new', personId }),
@@ -65,9 +71,9 @@ export function SheetsProvider({ children }: { children: ReactNode }) {
 }
 
 type Kind_ = NonNullable<Open>['k']
-const KINDS: Kind_[] = ['session', 'slots', 'remedy', 'notices', 'add', 'new', 'share', 'calendar']
+const KINDS: Kind_[] = ['slots', 'remedy', 'notices', 'add', 'new', 'share', 'calendar']
 const SHEET_LABEL: Record<Kind_, string> = {
-  session: 'Session details', slots: 'Pick a time', remedy: 'Give remedy', notices: 'Updates',
+  slots: 'Pick a time', remedy: 'Give remedy', notices: 'Updates',
   add: 'Add a person', new: 'New appointment', share: 'Share your booking link', calendar: 'Calendar',
 }
 export const SheetBody = lazyWithPreload(() => import('./SheetBodies'))

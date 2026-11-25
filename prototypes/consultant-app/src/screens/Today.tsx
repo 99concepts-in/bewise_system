@@ -109,7 +109,7 @@ function MissedStrip({ people }: { people: PersonView[] }) {
         {people.slice(0, 12).map((v, i) => {
           const a = adherence(v.p, now)
           return (
-            <m.button key={v.p.id} role="listitem" className="mood-card" onClick={() => go(`/people/${v.p.id}?care`)} initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...softSpring, delay: 0.1 + i * 0.04 }}>
+            <m.button key={v.p.id} role="listitem" className="mood-card" onClick={() => go(`/people/${v.p.id}?remedy`)} initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...softSpring, delay: 0.1 + i * 0.04 }}>
               {v.latestMood ? <MoodFace mood={v.latestMood} size={56} /> : <Avatar name={v.p.name} size={56} />}
               <b>{v.p.first}</b>
               <small className="miss">Missed {a?.last7Missed ?? 0} of 7 days</small>
