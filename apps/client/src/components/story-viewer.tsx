@@ -222,12 +222,19 @@ function SlideBody({ s, story, next, pub, onShare }: { s: Slide; story: Story; n
         {s.items.map((x, k) => (
           <motion.li key={x.name} {...rise(0.25 + k * 0.15)} className="rounded-[20px] bg-white/92 p-3.5 text-ink shadow-[0_10px_30px_rgba(0,0,0,.15)]">
             <div className="flex items-center gap-2.5">
-              {/* initials badge (owner 2026-11-25: no photos of public figures until licensing and consent are settled) */}
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,#F7C873,#E5577A)] font-display text-[15px] font-semibold text-white" aria-hidden>{x.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}</span>
+              {/* owner 2026-11-25: licensed photos (Wikimedia Commons, credited below); initials when there is no free photo */}
+              {x.photo
+                ? <img src={`${BP}/img/${x.photo.src}.webp`} alt={x.name} className="size-11 shrink-0 rounded-full object-cover ring-2 ring-white shadow-[0_2px_6px_rgba(0,0,0,.15)]" />
+                : <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,#F7C873,#E5577A)] font-display text-[15px] font-semibold text-white" aria-hidden>{x.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}</span>}
               <span className="min-w-0"><span className="block font-display text-[16px] font-semibold leading-5 text-navy">{x.name}</span><span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{x.role}</span></span>
             </div>
             <p className="mt-2 text-[14px] leading-5 text-ink">{x.line}</p>
             <p className="mt-1 text-[11px] font-semibold text-muted">{x.source}</p>
+            {x.photo && (
+              <p className="pointer-events-auto relative z-20 mt-0.5 text-[10px] leading-4 text-muted">
+                Photo: <a href={x.photo.page} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{x.photo.author}</a>, <a href={x.photo.licenseUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{x.photo.license}</a>, Wikimedia Commons, cropped
+              </p>
+            )}
           </motion.li>
         ))}
       </ul>
