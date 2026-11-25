@@ -2,6 +2,17 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-25 · Spotlight story: licensed photos with credits
+
+- Owner chose to use licensed photos and accept the endorsement / personality-rights risk.
+- Five cropped portraits from Wikimedia Commons, all CC BY-SA, in `public/img/people/`. Sources, licences and the owner decision are in `public/img/people/CREDITS.md`:
+  - Emma Watson (Georges Biard, 3.0), Cate Blanchett (Harald Krichel, 4.0), Jennifer Aniston (Angela George, 3.0), Hugh Grant (Kurt Kulac, 3.0), Salma Hayek (Martin Kraft, 4.0).
+- Each card shows the photo, and under it "Photo: <author>, <licence>, Wikimedia Commons, cropped", with links to the file page and the licence.
+- Kris Tschetter has no free photo, so her card keeps the initials.
+- Martin Kraft asks to be sent the URL where his photo is used (told the owner).
+- Test hardened: the "one appointment" test checked a short-lived toast and flaked under parallel load; it now checks the saved booking.
+- 91/91 pass.
+
 ## 2026-11-25 · Book: "How you'll pay" moved to the end
 
 - Owner: "How you'll pay" should come after the check-in, when everything is answered, not up front.

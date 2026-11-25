@@ -1,6 +1,6 @@
-:HL["/bewise_system/preview/client/_next/static/chunks/38mg2ev0uck2r.css","style"]
+:HL["/bewise_system/preview/client/_next/static/chunks/0fmwwflmo_ypo.css","style"]
 :HC["/",""]
 3:[["children",{"s":"__PAGE__","h":160}]]
 2:[["children",{"s":"learn","h":96,"c":"$Q3"}]]
 1:[["children",{"s":"app","h":100,"c":"$Q2"}]]
-0:{"b":"NTiGenQE7UiYybTX-rlg_","t":{"t":{"s":"","h":88,"c":"$Q1"}}}
+0:{"b":"YjQupf1rejco0itKk8UeX","t":{"t":{"s":"","h":88,"c":"$Q1"}}}

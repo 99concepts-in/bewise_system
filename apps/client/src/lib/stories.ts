@@ -9,6 +9,11 @@
  */
 import { TESTIMONIALS } from './data'
 
+/** a freely licensed photo, always shown with its credit (owner 2026-11-25: Wikimedia Commons, photographer credited) */
+export type Photo = { src: string; author: string; license: string; licenseUrl: string; page: string }
+const BYSA3 = 'https://creativecommons.org/licenses/by-sa/3.0/', BYSA4 = 'https://creativecommons.org/licenses/by-sa/4.0/'
+const commons = (f: string) => `https://commons.wikimedia.org/wiki/File:${f}`
+
 export type Slide =
   | { k: 'cover'; title: string; sub: string; minutes: number }
   | { k: 'text'; kicker: string; title: string; body: string; flower?: string; emoji?: string }
@@ -16,7 +21,7 @@ export type Slide =
   | { k: 'steps'; title: string; items: { emoji: string; t: string; d: string }[] }
   | { k: 'know'; fact: string; source: string }
   /** owner 2026-11-25: well-known people and what they have said publicly, each with its source */
-  | { k: 'people'; title: string; items: { name: string; role: string; line: string; source: string; emoji: string }[] }
+  | { k: 'people'; title: string; items: { name: string; role: string; line: string; source: string; emoji: string; photo?: Photo }[] }
   | { k: 'quote'; quote: string; name: string }
   | { k: 'end'; title: string; body: string; care: string }
 
@@ -230,13 +235,13 @@ export const STORIES: Story[] = [
       { k: 'cover', title: 'Bach flowers in the spotlight', sub: 'Actors and athletes who have spoken about their little bottle', minutes: 3 },
       { k: 'text', kicker: 'A quiet habit', title: 'Calm, carried in a pocket', body: 'Before a film premiere, on a stage, before a big game. Many people in high pressure moments keep Bach flowers close. Here is what some of them have shared in interviews and magazines.', emoji: '🎬' },
       { k: 'people', title: 'On screen', items: [
-        { name: 'Emma Watson', role: 'Actor', line: '“A few drops of it under my tongue before I go out calms me down. It is in my makeup bag all the time.”', source: 'Her own words, as quoted', emoji: '🎥' },
-        { name: 'Cate Blanchett', role: 'Actor', line: 'Asked what she carries, she named little beyond Rescue Remedy: “a little pick-me-up thing”.', source: 'As reported', emoji: '💄' },
-        { name: 'Jennifer Aniston', role: 'Actor', line: 'Reportedly uses Bach flowers to keep cool under pressure before films and premieres.', source: 'As reported', emoji: '🌟' },
+        { name: 'Emma Watson', role: 'Actor', photo: { src: 'people/watson', author: 'Georges Biard', license: 'CC BY-SA 3.0', licenseUrl: BYSA3, page: commons('Emma_Watson_2013.jpg') }, line: '“A few drops of it under my tongue before I go out calms me down. It is in my makeup bag all the time.”', source: 'Her own words, as quoted', emoji: '🎥' },
+        { name: 'Cate Blanchett', role: 'Actor', photo: { src: 'people/blanchett', author: 'Harald Krichel', license: 'CC BY-SA 4.0', licenseUrl: BYSA4, page: commons('Cate_Blanchett-63298_(cropped_2).jpg') }, line: 'Asked what she carries, she named little beyond Rescue Remedy: “a little pick-me-up thing”.', source: 'As reported', emoji: '💄' },
+        { name: 'Jennifer Aniston', role: 'Actor', photo: { src: 'people/aniston', author: 'Angela George', license: 'CC BY-SA 3.0', licenseUrl: BYSA3, page: commons('JenniferAnistonHWoFFeb2012.jpg') }, line: 'Reportedly uses Bach flowers to keep cool under pressure before films and premieres.', source: 'As reported', emoji: '🌟' },
       ] },
       { k: 'people', title: 'On stage, on the course, on busy days', items: [
-        { name: 'Hugh Grant', role: 'Actor', line: 'Takes Rescue Remedy for stage fright.', source: 'Daily Mail', emoji: '🎭' },
-        { name: 'Salma Hayek', role: 'Actor', line: 'Uses Rescue Pastilles on crazy busy days, to keep her calm.', source: 'InStyle magazine', emoji: '✨' },
+        { name: 'Hugh Grant', role: 'Actor', photo: { src: 'people/grant', author: 'Kurt Kulac', license: 'CC BY-SA 3.0', licenseUrl: BYSA3, page: commons('Hugh_Grant_in_2014.jpg') }, line: 'Takes Rescue Remedy for stage fright.', source: 'Daily Mail', emoji: '🎭' },
+        { name: 'Salma Hayek', role: 'Actor', photo: { src: 'people/hayek', author: 'Martin Kraft (photo.martinkraft.com)', license: 'CC BY-SA 4.0', licenseUrl: BYSA4, page: commons('MKr383631_Salma_Hayek_(Women_In_Motion,_Cannes_2025)_crop.jpg') }, line: 'Uses Rescue Pastilles on crazy busy days, to keep her calm.', source: 'InStyle magazine', emoji: '✨' },
         { name: 'Kris Tschetter', role: 'Golfer', line: '“A few drops of Rescue Remedy mixed in my water bottle does the trick.”', source: 'Golf Today magazine', emoji: '⛳' },
       ] },
       { k: 'know', fact: 'Rescue Remedy is Dr Bach’s best known combination, five of his flowers together for sudden moments of stress. It is the one most of these stories mention.', source: 'Dr Edward Bach, 1930s' },
