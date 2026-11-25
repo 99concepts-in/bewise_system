@@ -26,7 +26,7 @@ import { goSafe } from '@/lib/nav'
 import { AMBIENT, ambient, randomAmbient, type AmbientKind } from '@/lib/ambient'
 
 // reading time per slide (ms): long enough to read, the member can always tap on sooner
-const DWELL: Record<Slide['k'], number> = { cover: 5000, text: 11000, remedies: 12000, steps: 12000, know: 10000, quote: 9000, end: 0 }
+const DWELL: Record<Slide['k'], number> = { cover: 5000, text: 11000, remedies: 12000, steps: 12000, know: 10000, quote: 9000, people: 13000, end: 0 }
 
 export type StoryMode = 'member' | 'public'
 
@@ -213,6 +213,23 @@ function SlideBody({ s, story, next, pub, onShare }: { s: Slide; story: Story; n
           </motion.li>
         ))}
       </ol>
+    </div>
+  )
+  if (s.k === 'people') return (
+    <div className="my-auto">
+      <motion.h2 {...rise(0.1)} className="font-display text-[26px] font-semibold leading-8">{s.title}</motion.h2>
+      <ul className="mt-4 space-y-2.5">
+        {s.items.map((x, k) => (
+          <motion.li key={x.name} {...rise(0.25 + k * 0.15)} className="rounded-[20px] bg-white/92 p-3.5 text-ink shadow-[0_10px_30px_rgba(0,0,0,.15)]">
+            <div className="flex items-center gap-2.5">
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-peri-50 text-[18px]" aria-hidden>{x.emoji}</span>
+              <span className="min-w-0"><span className="block font-display text-[16px] font-semibold leading-5 text-navy">{x.name}</span><span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{x.role}</span></span>
+            </div>
+            <p className="mt-2 text-[14px] leading-5 text-ink">{x.line}</p>
+            <p className="mt-1 text-[11px] font-semibold text-muted">{x.source}</p>
+          </motion.li>
+        ))}
+      </ul>
     </div>
   )
   if (s.k === 'know') return (

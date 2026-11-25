@@ -15,6 +15,8 @@ export type Slide =
   | { k: 'remedies'; title: string; sub?: string; items: { name: string; line: string }[] }
   | { k: 'steps'; title: string; items: { emoji: string; t: string; d: string }[] }
   | { k: 'know'; fact: string; source: string }
+  /** owner 2026-11-25: well-known people and what they have said publicly, each with its source */
+  | { k: 'people'; title: string; items: { name: string; role: string; line: string; source: string; emoji: string }[] }
   | { k: 'quote'; quote: string; name: string }
   | { k: 'end'; title: string; body: string; care: string }
 
@@ -217,6 +219,29 @@ export const STORIES: Story[] = [
       ] },
       quote('Divya Solanki'),
       { k: 'end', title: 'Calmer, from the inside', body: 'Jitendra Khimlani listens for what sits beneath your anger and chooses a blend for how you feel.', care: 'Bach flowers support emotional wellbeing and do not replace professional help when you need it.' },
+    ],
+  },
+  {
+    // owner 2026-11-25: from public accounts collected at olive-tree.in/celebrities, each line attributed as reported.
+    // Left out on purpose: accounts with medical or performance claims (blood cleansing, sports form).
+    id: 'spotlight', title: 'Bach flowers in the spotlight', tag: 'In the spotlight', cover: 'stories/spotlight', tint: '#5a3a2a',
+    keywords: ['celebrity', 'celebrities', 'famous', 'actor', 'actress', 'stage fright', 'nervous', 'calm', 'rescue', 'spotlight', 'performance', 'interview'],
+    slides: [
+      { k: 'cover', title: 'Bach flowers in the spotlight', sub: 'Actors and athletes who have spoken about their little bottle', minutes: 3 },
+      { k: 'text', kicker: 'A quiet habit', title: 'Calm, carried in a pocket', body: 'Before a premiere, on a stage, at the first tee. Many people in high pressure moments keep Bach flowers close. Here is what some of them have shared in interviews and magazines.', emoji: '🎬' },
+      { k: 'people', title: 'On screen', items: [
+        { name: 'Emma Watson', role: 'Actor', line: '“A few drops of it under my tongue before I go out calms me down. It is in my makeup bag all the time.”', source: 'Her own words, as quoted', emoji: '🎥' },
+        { name: 'Cate Blanchett', role: 'Actor', line: 'Asked what she carries, she named little beyond Rescue Remedy: “a little pick-me-up thing”.', source: 'As reported', emoji: '💄' },
+        { name: 'Jennifer Aniston', role: 'Actor', line: 'Reportedly uses Bach flowers to keep cool under pressure before films and premieres.', source: 'As reported', emoji: '🌟' },
+      ] },
+      { k: 'people', title: 'On stage, on the course, on busy days', items: [
+        { name: 'Hugh Grant', role: 'Actor', line: 'Takes Rescue Remedy for stage fright.', source: 'Daily Mail', emoji: '🎭' },
+        { name: 'Salma Hayek', role: 'Actor', line: 'Uses Rescue Pastilles on crazy busy days, to keep her calm.', source: 'InStyle magazine', emoji: '✨' },
+        { name: 'Kris Tschetter', role: 'Golfer', line: '“A few drops of Rescue Remedy mixed in my water bottle does the trick.”', source: 'Golf Today magazine', emoji: '⛳' },
+      ] },
+      { k: 'know', fact: 'Rescue Remedy is Dr Bach’s best known combination, five of his flowers together for sudden moments of stress. It is the one most of these stories mention.', source: 'Dr Edward Bach, 1930s' },
+      { k: 'text', kicker: 'Ready-made or made for you', title: 'A blend that is yours', body: 'A ready-made blend helps in a busy moment. A personal blend goes further: Jitendra Khimlani listens to how you feel and chooses flowers only for you.', emoji: '🌼' },
+      { k: 'end', title: 'Find your own calm', body: 'Book a wellness session and get a personal blend, prepared only for you.', care: 'These are public accounts from interviews and magazines, not endorsements of BeWise. Bach flowers support emotional wellbeing and do not replace professional help.' },
     ],
   },
 ]

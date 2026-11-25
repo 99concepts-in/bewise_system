@@ -2,6 +2,21 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-25 · Story "Bach flowers in the spotlight" + "About Bach flower remedies" section
+
+- **New story** `spotlight` (7 slides), from public accounts on olive-tree.in/celebrities. Each line is attributed as reported, with its source shown:
+  - Emma Watson (her words), Cate Blanchett, Jennifer Aniston, Hugh Grant (Daily Mail), Salma Hayek (InStyle), Kris Tschetter (Golf Today).
+  - Left out on purpose: Princess Diana (mixed with vitamin C and "cleansing the blood") and Messi (sports-form claim).
+  - The end note says these are public accounts, not endorsements of BeWise.
+  - New slide kind `people` (name, role, line, source).
+  - Higgsfield cover `img/stories/spotlight.webp` (backstage vanity, unlabelled bottle, wild flowers; no people) and `og/spotlight.jpg`.
+  - Learn card "In the spotlight".
+- **"About Bach flower remedies"** (`components/about-remedies.tsx`), on the in-app Book page and the public booking link `/book/jitendra-khimlani`:
+  - An accordion: What are they / How is my blend made (made with mantras, best quality essences) / How do I take it / Can I take it with my other care.
+  - Plus "Who else uses them?" linking to the spotlight story (public `/s/spotlight` on the booking link).
+  - No remedy names, no medical claims.
+- Tests: spotlight story + About section; 9 stories in Learn and on /stories. 89/89 pass.
+
 ## 2026-11-25 · Review card share screen redesigned; remedy names removed from My care
 
 - **Share screen** (owner: swipeable styles, cleaner, Share as the main button, Google with their words). `ShareScreen` in `components/share-sheet.tsx`, laid out like a story editor:

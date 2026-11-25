@@ -21,6 +21,7 @@ import { setNextStep } from '@/lib/next-step'
 import { BP } from '@/lib/asset'
 import { useApp } from '@/lib/store'
 import { Verified } from '@/components/verified'
+import { AboutRemedies } from '@/components/about-remedies'
 
 export default function Page() { return <Suspense><BookingLink /></Suspense> }
 
@@ -57,6 +58,9 @@ function BookingLink() {
         <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-sky-200"><MapPin className="size-3.5" /> {STUDIO.short}</span>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-sky-200">🌿 Remedy blend included</span>
       </div>
+
+      {/* owner 2026-11-25: more about the remedy, for people who don't know Bach flowers yet */}
+      <div className="mt-6"><AboutRemedies storyHref="/s/spotlight" /></div>
 
       <div className="mt-auto space-y-2 pt-8 safe-b">
         <Btn full variant="gradient" onClick={go}>Book a session</Btn>

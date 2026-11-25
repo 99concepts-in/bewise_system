@@ -30,6 +30,7 @@ import { addDays, dayKey, fmtLongDay, fmtMonth, fmtTime, formatINR, startOfDay }
 import { addToCalendar, downloadIcs, googleCalUrl, isAndroid, sessionIcs } from '@/lib/ics'
 import * as I from './intake'
 import { BP } from '@/lib/asset'
+import { AboutRemedies } from '@/components/about-remedies'
 import { Verified } from '@/components/verified'
 
 // owner 2026-11-18: breathe first → feelings → … → personal message later ('who' = the share/voice-note step)
@@ -306,6 +307,8 @@ function Choose({ plan, planPick, setPlanPick, onMeet, meetOpen, onStories }: { 
         <span className="flex-1"><span className="block text-[16px] font-bold text-navy">Member stories</span><span className="text-[13px] text-muted">{TESTIMONIALS.length ? `View ${TESTIMONIALS.length} testimonials` : 'View testimonials'}</span></span>
         <ChevronRight className="size-5 text-soft" />
       </motion.button>
+      {/* owner 2026-11-25: more about the remedy */}
+      <AboutRemedies storyHref="/app/learn/story?id=spotlight" />
       <p className="px-2 text-center text-[13px] text-muted">Sessions are non-refundable, but you can reschedule.</p>
     </div>
   )

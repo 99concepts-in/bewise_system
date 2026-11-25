@@ -150,7 +150,7 @@ test('shared story link: anyone can read it; not signed in → "new here" → mo
   await expect(page.getByRole('heading', { name: 'You seem to be new here' })).toBeVisible()
   await page.getByRole('link', { name: 'View more stories' }).click()
   await page.waitForURL('**/stories**')
-  await expect(page.getByRole('link', { name: /^Read: / })).toHaveCount(8)
+  await expect(page.getByRole('link', { name: /^Read: / })).toHaveCount(9)
   await page.getByRole('link', { name: 'Start my journey' }).click()
   await page.waitForURL('**/welcome**')
 })
@@ -279,6 +279,20 @@ test('session page: "Before you begin" tips only for online sessions', async ({ 
   await expect(page.getByText('Before you begin')).toHaveCount(0)
   await page.goto('/app/sessions/view?id=a3') // online
   await expect(page.getByText('Before you begin')).toBeVisible()
+})
+
+test('spotlight story: public accounts with their sources, and the About Bach flower remedies section on Book', async ({ page }) => {
+  await seed(page); await page.goto('/app/learn/story?id=spotlight')
+  await expect(page.getByText(/In the spotlight · 1 of 7/)).toBeVisible()
+  await page.getByRole('button', { name: 'Next slide' }).click(); await page.getByRole('button', { name: 'Next slide' }).click()
+  await expect(page.getByText('Emma Watson')).toBeVisible()
+  await expect(page.getByText('Her own words, as quoted')).toBeVisible()
+  await page.goto('/app/book')
+  const about = page.getByRole('region', { name: /About Bach flower remedies/ }).or(page.locator('section[aria-labelledby="about-rem-h"]'))
+  await expect(about.getByText(/Dr Edward Bach, a London doctor/)).toBeVisible()
+  await about.getByRole('button', { name: 'How do I take it?' }).click()
+  await expect(about.getByText(/4 drops, 4 times a day/)).toBeVisible()
+  await expect(about.getByRole('link', { name: /Who else uses them/ })).toHaveAttribute('href', /story\?id=spotlight/)
 })
 
 test('my care: remedy names are never shown, only their images and what they support', async ({ page }) => {
@@ -686,13 +700,13 @@ test('mood slider: tap anywhere on the track and drag with a finger', async ({ p
   await expect(slider).toHaveAttribute('aria-valuetext', 'Very unpleasant')
 })
 
-test('home: Bach flower story cards slide and open their story; 8 stories in Learn', async ({ page }) => {
+test('home: Bach flower story cards slide and open their story; 9 stories in Learn', async ({ page }) => {
   await seed(page); await page.goto('/app')
   await page.getByRole('link', { name: 'Read: Bach flowers and self-doubt' }).click()
   await page.waitForURL('**/app/learn/story?id=self-doubt')
   await expect(page.getByText(/Self-doubt · 1 of \d/)).toBeVisible()
   await page.goto('/app/learn')
-  for (const t of ['confidence', 'money and business worries', 'constant change', 'self-doubt', 'sleep', 'anger']) await expect(page.getByRole('link', { name: new RegExp(`Read: .*${t}`) })).toBeVisible()
+  for (const t of ['confidence', 'money and business worries', 'constant change', 'self-doubt', 'sleep', 'anger', 'in the spotlight']) await expect(page.getByRole('link', { name: new RegExp(`Read: .*${t}`) })).toBeVisible()
 })
 
 test('stories: relaxing music can be muted and changed', async ({ page }) => {
