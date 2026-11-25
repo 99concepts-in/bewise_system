@@ -245,13 +245,8 @@ test('launch offer: yearly reveal → are you sure → 6-month offer → pay →
 test('appointment with a plan: request only (optional preferences, typed date), the team sets the time', async ({ page }) => {
   await seed(page)
   await page.goto('/app/book')
-  // owner 2026-11-24: one session is selected by default
-  await expect(page.getByRole('radio', { name: /One session/ })).toHaveAttribute('aria-checked', 'true')
-  // owner 2026-11-25: plans are tucked behind "Save with a plan"
-  await expect(page.getByRole('radio', { name: /6 months/ })).toHaveCount(0)
-  await page.getByRole('button', { name: /Save with a plan/ }).click()
-  await expect(page.getByRole('radio', { name: /6 months/ })).toHaveAttribute('aria-checked', 'false')
-  await page.getByRole('radio', { name: /Yearly/ }).click()
+  // owner 2026-11-25: no payment choice up front; it comes after the check-in
+  await expect(page.getByRole('radio', { name: /One session/ })).toHaveCount(0)
   await page.getByRole('button', { name: 'Book my appointment' }).click()
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await page.getByRole('radio', { name: /^Online/ }).click()
@@ -267,6 +262,11 @@ test('appointment with a plan: request only (optional preferences, typed date), 
   await expect(dateBox).toHaveValue(`${dd}/${mm}/${yyyy}`)
   await expect(page.getByRole('alert').filter({ hasText: 'Please choose today' })).toHaveCount(0)
   await page.getByRole('button', { name: 'Continue', exact: true }).click()
+  // owner 2026-11-25: how you'll pay, at the end: one session by default, plans tucked behind "Save with a plan"
+  await expect(page.getByRole('radio', { name: /One session/ })).toHaveAttribute('aria-checked', 'true')
+  await expect(page.getByRole('radio', { name: /6 months/ })).toHaveCount(0)
+  await page.getByRole('button', { name: /Save with a plan/ }).click()
+  await page.getByRole('radio', { name: /Yearly/ }).click()
   await page.getByRole('button', { name: /Pay ₹8,000/ }).click(); await page.getByRole('button', { name: 'Google Pay' }).click()
   await expect(page.getByRole('heading', { name: /Request sent/ })).toBeVisible({ timeout: 8000 })
   const s = await state(page)
@@ -443,7 +443,6 @@ test('one appointment: no first/follow-up choice, nothing to pay now; the team s
   await page.goto('/app/book')
   await expect(page.getByRole('heading', { name: /Book a wellness session/ })).toBeVisible()
   await expect(page.getByText('First consultation', { exact: true })).toHaveCount(0)
-  await page.getByRole('radio', { name: /One session/ }).click()
   await page.getByRole('button', { name: 'Book my appointment' }).click()
   await page.getByRole('button', { name: 'calm' }).click()
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue', exact: true }).click()
@@ -451,6 +450,7 @@ test('one appointment: no first/follow-up choice, nothing to pay now; the team s
   await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await expect(page.getByText('To pay now')).toBeVisible()
+  await expect(page.getByRole('radio', { name: /One session/ })).toHaveAttribute('aria-checked', 'true')
   await page.getByRole('button', { name: 'Send request' }).click()
   await expect(page.getByRole('heading', { name: /Request sent/ })).toBeVisible()
   let s = await state(page)

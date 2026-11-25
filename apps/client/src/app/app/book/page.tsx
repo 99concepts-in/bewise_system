@@ -165,7 +165,8 @@ function Book() {
             {step === 'ck-news' && <I.CheckinNews c={checkin} set={(p) => setCheckin((x) => ({ ...x, ...p }))} showDrops={hasBlend} />}
             {step === 'mode' && <Mode mode={mode} setMode={setMode} />}
             {step === 'prefs' && <Prefs prefs={prefs} setPrefs={setPrefs} />}
-            {step === 'pay' && mode && <Review mode={mode} fee={fee} pick={pick} inPlan={inPlan} />}
+            {/* owner 2026-11-25: how you'll pay comes after the check-in, once everything is answered, right above the summary */}
+            {step === 'pay' && mode && <div className="space-y-5">{!inPlan && <PlanPicker pick={planPick} setPick={setPlanPick} />}<Review mode={mode} fee={fee} pick={pick} inPlan={inPlan} /></div>}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -284,7 +285,7 @@ function Stepper({ at }: { at: number }) {
 /**
  * owner 2026-11-21: one way in for everyone — "Book an appointment". The team decides first visit or follow-up and the fee.
  * owner 2026-11-25 (UX pass): one clear path. Who you meet (compact) → how it works in 3 steps (with the fees) →
- * how you'll pay (one session by default, plans tucked away) → two quiet links (member stories, about the remedies).
+ * two quiet links (member stories, about the remedies). How you'll pay moved to the last step, after the check-in.
  */
 function Choose({ plan, planPick, setPlanPick, onMeet, meetOpen, onStories }: { plan: Plan | null; planPick: PlanPick; setPlanPick: (p: PlanPick) => void; onMeet: () => void; meetOpen: boolean; onStories: () => void }) {
   const first = CONSULTATIONS.find((x) => x.id === 'first')!.feePaise, follow = CONSULTATIONS.find((x) => x.id === 'followup')!.feePaise
@@ -322,12 +323,12 @@ function Choose({ plan, planPick, setPlanPick, onMeet, meetOpen, onStories }: { 
         </ol>
       </section>
 
-      {planLeft(plan) > 0 ? (
+      {planLeft(plan) > 0 && (
         <div className="flex items-center gap-3 rounded-[20px] bg-teal-100 p-4 text-[14px] text-sage-text">
           <span className="text-[22px]" aria-hidden>{PLANS[plan!.id].emoji}</span>
           <span className="flex-1"><b>{PLANS[plan!.id].name}</b> · {planLeft(plan)} sessions left. This one is included.</span>
         </div>
-      ) : <PlanPicker pick={planPick} setPick={setPlanPick} />}
+      )}
 
       <div className="overflow-hidden rounded-[22px] bg-white shadow-[var(--shadow-card)]">
         <button onClick={onStories} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">

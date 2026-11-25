@@ -2,6 +2,13 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-25 · Book: "How you'll pay" moved to the end
+
+- Owner: "How you'll pay" should come after the check-in, when everything is answered, not up front.
+- The plan picker (one session by default, plans behind "Coming every month? Save with a plan") now sits on the last step, above the review summary and the Send request / Pay button.
+- The first screen is now only who you meet, how it works, and the two quiet links. Members with plan sessions left still see the "included" note there.
+- Tests updated. 91/91 pass.
+
 ## 2026-11-25 · Book page CTA: "Book my appointment"
 
 - Owner: the main button on the Book page is now **Book my appointment** (was "Start 2-minute check-in"). The 2-minute check-in is still step 1 of "How it works".
