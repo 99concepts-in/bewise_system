@@ -2,6 +2,16 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-25 · Spotlight story: simpler words, initials instead of emoji
+
+- "at the first tee" (a golf term) is now "before a big game". The line reads: "Before a film premiere, on a stage, before a big game."
+- The people cards show an initials badge (EW, CB, JA…) instead of emoji.
+- **Actor photos not added yet.** Using public figures' photos next to our brand can read as an endorsement (personality and publicity rights), and press photos are copyrighted. Asked the owner to decide:
+  - (a) licensed photos (e.g. Wikimedia Commons with credit) and accept the risk, or
+  - (b) keep initials, or
+  - (c) remove the names.
+- 91/91 pass.
+
 ## 2026-11-25 · "Send a note" popup also after the day's last dose
 
 - Owner: the note popup should come first on a mood log, and also when the last (4th) dose is checked in.

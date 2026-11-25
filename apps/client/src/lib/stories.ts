@@ -228,7 +228,7 @@ export const STORIES: Story[] = [
     keywords: ['celebrity', 'celebrities', 'famous', 'actor', 'actress', 'stage fright', 'nervous', 'calm', 'rescue', 'spotlight', 'performance', 'interview'],
     slides: [
       { k: 'cover', title: 'Bach flowers in the spotlight', sub: 'Actors and athletes who have spoken about their little bottle', minutes: 3 },
-      { k: 'text', kicker: 'A quiet habit', title: 'Calm, carried in a pocket', body: 'Before a premiere, on a stage, at the first tee. Many people in high pressure moments keep Bach flowers close. Here is what some of them have shared in interviews and magazines.', emoji: '🎬' },
+      { k: 'text', kicker: 'A quiet habit', title: 'Calm, carried in a pocket', body: 'Before a film premiere, on a stage, before a big game. Many people in high pressure moments keep Bach flowers close. Here is what some of them have shared in interviews and magazines.', emoji: '🎬' },
       { k: 'people', title: 'On screen', items: [
         { name: 'Emma Watson', role: 'Actor', line: '“A few drops of it under my tongue before I go out calms me down. It is in my makeup bag all the time.”', source: 'Her own words, as quoted', emoji: '🎥' },
         { name: 'Cate Blanchett', role: 'Actor', line: 'Asked what she carries, she named little beyond Rescue Remedy: “a little pick-me-up thing”.', source: 'As reported', emoji: '💄' },
