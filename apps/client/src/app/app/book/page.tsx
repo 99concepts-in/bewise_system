@@ -172,7 +172,7 @@ function Book() {
 
       <div className={cx('fixed inset-x-0 z-30 mx-auto max-w-[480px] px-5', step === 'choose' ? 'bottom-[calc(max(env(safe-area-inset-bottom),12px)+76px)] pb-2' : 'bottom-0 bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent pb-3 pt-8 safe-b')}>
         {step === 'choose' ? (
-          <Btn full variant="gradient" onClick={next}>Start 2-minute check-in</Btn>
+          <Btn full variant="gradient" onClick={next}>Book my appointment</Btn>
         ) : step === 'pay' ? (
           <>
             {inPlan ? <>

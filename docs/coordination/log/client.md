@@ -2,6 +2,11 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-25 · Book page CTA: "Book my appointment"
+
+- Owner: the main button on the Book page is now **Book my appointment** (was "Start 2-minute check-in"). The 2-minute check-in is still step 1 of "How it works".
+- Tests updated. 91/91 pass.
+
 ## 2026-11-25 · Book page: simpler, one clear path
 
 - Owner: the Book screen was cluttered and hard to understand, and other offers should be subtle. UX pass on the first step (`Choose` in `app/app/book/page.tsx`):
