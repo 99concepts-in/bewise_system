@@ -38,7 +38,7 @@ function bw_seed(): void
        ('first', 'First consultation', 60, 100000, '[\"online\",\"in_person\"]', 1, 1),
        ('followup', 'Follow-up', 30, 80000, '[\"online\",\"in_person\"]', 1, 2)");
 
-    // Bach library — D-30: 38 + Rescue, hideable; one-line notes are drafts pending Jitu Bhaiya (D-10)
+    // Bach library — D-30: 38 + Rescue, hideable; one-line notes are drafts pending Jitendra Khimlani (D-10)
     $groups = [
         'Fear' => ['Rock Rose', 'Mimulus', 'Cherry Plum', 'Aspen', 'Red Chestnut'],
         'Uncertainty' => ['Cerato', 'Scleranthus', 'Gentian', 'Gorse', 'Hornbeam', 'Wild Oat'],
@@ -64,7 +64,7 @@ function bw_seed(): void
             [strtolower(preg_replace('/[^a-z0-9]+/i', '_', $label)), $label, json_encode($flowers), ++$i]);
     }
 
-    // intake statement → flower mapping (D-37) — pending Jitu Bhaiya's approval (CONTENT-CHECKLIST #4b)
+    // intake statement → flower mapping (D-37) — pending Jitendra Khimlani's approval (CONTENT-CHECKLIST #4b)
     $map = json_decode((string)file_get_contents(dirname(__DIR__) . '/seed/intake-mapping.json'), true) ?: [];
     foreach ($map as $statement => $flowers) {
         q('INSERT IGNORE INTO intake_mapping (id, statement, statement_key, flowers) VALUES (?, ?, ?, ?)',

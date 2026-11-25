@@ -2,7 +2,7 @@
 /**
  * @owner HUB · One-time web installer: https://<your-domain>/api/install.php
  * Connects the Hostinger MySQL database, writes the PRIVATE config outside public_html, creates tables,
- * seeds data and creates the owner (+ optional Jitu Bhaiya / Haresh) accounts. Locks itself afterwards.
+ * seeds data and creates the owner (+ optional Jitendra Khimlani / Haresh) accounts. Locks itself afterwards.
  * Safety: only accepts a database on this server (localhost) so nobody else can point the site at their own database.
  */
 declare(strict_types=1);
@@ -96,9 +96,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 };
                 $mk($ownerEmail, $f('owner_name') ?: 'Owner', (string)$_POST['owner_password'], 'owner');
                 foreach ($staff as $r => $s) {
-                    $sid = $mk($s['email'], $s['name'] ?: ($r === 'consultant' ? 'Jitu Bhaiya' : 'Haresh Moorjani'), $s['pass'], $r);
+                    $sid = $mk($s['email'], $s['name'] ?: ($r === 'consultant' ? 'Jitendra Khimlani' : 'Haresh Moorjani'), $s['pass'], $r);
                     if ($r === 'consultant' && !val('SELECT 1 FROM availability_rules WHERE consultant_id = ?', [$sid])) {
-                        // default hours until Jitu Bhaiya edits them: Mon–Sat 10:00–13:00 and 16:00–19:00
+                        // default hours until Jitendra Khimlani edits them: Mon–Sat 10:00–13:00 and 16:00–19:00
                         for ($d = 1; $d <= 6; $d++) foreach ([['10:00:00', '13:00:00'], ['16:00:00', '19:00:00']] as [$s1, $e1]) {
                             insert('availability_rules', ['id' => uuid(), 'consultant_id' => $sid, 'weekday' => $d, 'start_time' => $s1, 'end_time' => $e1, 'modes' => ['online', 'in_person']]);
                         }
@@ -114,7 +114,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     if ($done) {
         page('BeWise · ready', '<h1>All set 🎉</h1><div class=ok>Database tables created, data seeded and accounts ready.</div>
         <p>Private config saved at <code>' . $h($done) . '</code>' . (str_starts_with($done, __DIR__) ? ' (inside the site, protected from the web)' : ' (outside public_html — safe from deploys)') . '.</p>
-        <ul><li>Owner app: <a href="../owner/">/owner/</a></li><li>Jitu Bhaiya: <a href="../consultant/">/consultant/</a></li><li>Haresh: <a href="../manager/">/manager/</a></li><li>Clients: <a href="../client/">/client/</a></li>
+        <ul><li>Owner app: <a href="../owner/">/owner/</a></li><li>Jitendra Khimlani: <a href="../consultant/">/consultant/</a></li><li>Haresh: <a href="../manager/">/manager/</a></li><li>Clients: <a href="../client/">/client/</a></li>
         <li>Health check: <a href="v1/system.health">/api/v1/system.health</a></li></ul><p>This installer is now locked.</p>');
     }
 }
@@ -139,8 +139,8 @@ $err
 <label>Password <small>(10+ characters)</small></label><input type="password" name="owner_password" required>
 
 <h2>3 · Team (optional — you can add them later in the owner app)</h2>
-<div class="row"><div><label>Jitu Bhaiya's email</label><input type="email" name="consultant_email" value="{$v('consultant_email')}"></div><div><label>Temporary password</label><input type="password" name="consultant_password"></div></div>
-<input type="hidden" name="consultant_name" value="Jitu Bhaiya">
+<div class="row"><div><label>Jitendra Khimlani's email</label><input type="email" name="consultant_email" value="{$v('consultant_email')}"></div><div><label>Temporary password</label><input type="password" name="consultant_password"></div></div>
+<input type="hidden" name="consultant_name" value="Jitendra Khimlani">
 <div class="row"><div><label>Haresh's email</label><input type="email" name="manager_email" value="{$v('manager_email')}"></div><div><label>Temporary password</label><input type="password" name="manager_password"></div></div>
 <input type="hidden" name="manager_name" value="Haresh Moorjani">
 
@@ -151,7 +151,7 @@ $err
 <div class="row"><div><label>SMTP host</label><input name="smtp_host" value="{$v('smtp_host', 'smtp.hostinger.com')}"></div><div><label>SMTP port</label><input name="smtp_port" value="{$v('smtp_port', '465')}"></div></div>
 
 <h2>5 · Razorpay (optional — add later)</h2>
-<p><small>Without it, clients can book with "Pay at the studio / pay later" and Haresh records payments.</small></p>
+<p><small>Without it, clients can book with "Pay at the center / pay later" and Haresh records payments.</small></p>
 <label>Key id</label><input name="rzp_key_id" value="{$v('rzp_key_id')}" placeholder="rzp_test_…">
 <div class="row"><div><label>Key secret</label><input type="password" name="rzp_key_secret"></div><div><label>Webhook secret</label><input type="password" name="rzp_webhook_secret"></div></div>
 <button type="submit">Create tables &amp; finish setup</button>

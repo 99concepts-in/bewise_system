@@ -11,7 +11,7 @@ for using [[DOMAIN]] and the BeWise app. By signing in or booking you agree to t
 [Shipping Policy](shipping-policy.md), [Replacement Policy](replacement-policy.md) and [Wellness Disclaimer](wellness-disclaimer.md).
 
 ## 1. What BeWise offers
-- **Consultations** with Jitu Bhaiya (Jitendra Khimlani), Bach Remedy Therapist — online by video link or in person at our studio, 102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007.
+- **Consultations** with Jitendra Khimlani, Bach Remedy Therapist — online by video link or in person at our studio, 102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007.
 - A **personal Bach flower remedy blend** prepared after your session.
 - **Aromatherapy products** (oils, sprays, bath salts and more) from our shop.
 - App features: mood journal, goals, ritual reminders and **Ask BeWise**, an AI companion.
@@ -34,10 +34,10 @@ BeWise offers complementary wellness support. **It is not medical care** — ple
 | First consultation | **₹1,000** | 60 min ⚠️ OWNER TO CONFIRM | Your personal remedy blend |
 | Follow-up | **₹800** | 30 min ⚠️ OWNER TO CONFIRM | Your updated remedy blend |
 
-- Before your first booking you complete a short intake (about 5 minutes); before a follow-up, a 2-minute check-in. Jitu Bhaiya reads these before you meet.
+- Before your first booking you complete a short intake (about 5 minutes); before a follow-up, a 2-minute check-in. Jitendra Khimlani reads these before you meet.
 - Fees are paid in full when you book. A slot is held for a short time while you pay; if payment isn't completed, the slot is released.
 - **Sessions are non-refundable.** You can reschedule: free when it's 24 hours or more before your session; once when it's less than 24 hours; a missed session (no-show) is forfeited. ⚠️ OWNER TO CONFIRM window (D-08). Full details in the [Consultation & Cancellation Policy](consultation-and-cancellation-policy.md).
-- The choice of flowers in your blend is Jitu Bhaiya's professional judgement.
+- The choice of flowers in your blend is Jitendra Khimlani's professional judgement.
 
 ## 5. Remedies and products
 - Your blend is prepared for you after your session and delivered or handed over at the studio. Reordering the same blend costs **[[REMEDY_REORDER_PRICE]]**. ⚠️ OWNER TO CONFIRM (D-02)
@@ -53,7 +53,7 @@ BeWise offers complementary wellness support. **It is not medical care** — ple
 
 ## 7. Ask BeWise (AI companion)
 - Ask BeWise uses artificial intelligence to answer questions from your own BeWise information and our product catalogue.
-- It **can be wrong**. It is **not medical advice**, it does not diagnose, and it never changes your remedy — for your blend, ask Jitu Bhaiya.
+- It **can be wrong**. It is **not medical advice**, it does not diagnose, and it never changes your remedy — for your blend, ask Jitendra Khimlani.
 - It only takes an action (like adding to your bag or setting a reminder) when you tap to confirm.
 - If you are in distress, it will show you helplines. In an emergency call **112**.
 

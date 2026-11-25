@@ -29,7 +29,7 @@ Your intake answers move with your booking, and you can still update them until 
 - Having trouble joining online? WhatsApp us at [[SUPPORT_WHATSAPP]] straight away and we'll help.
 
 ## If we need to move your session
-Sometimes Jitu Bhaiya may need to change a time. We'll tell you as early as we can and offer a new time **at no cost** — it never counts as one of your reschedules.
+Sometimes Jitendra Khimlani may need to change a time. We'll tell you as early as we can and offer a new time **at no cost** — it never counts as one of your reschedules.
 
 ## Online sessions
 - The "Join" button appears in your appointment 10 minutes before the start.

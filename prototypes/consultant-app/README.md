@@ -1,4 +1,4 @@
-# BeWise Consultant app — interactive prototype (Jitu Bhaiya)
+# BeWise Consultant app — interactive prototype (Jitendra Khimlani)
 
 > **Owner:** CONSULTANT chat · **Status:** prototype on demo data, built 2026-11-17 at the owner's request.
 > Lives in its own folder on purpose: the real app is built inside `src/app/(consultant)/consult/**` once the HUB
@@ -6,8 +6,8 @@
 
 ![Overview](screenshots/overview.jpg)
 
-## What it does (structure v3 — Jitu Bhaiya's own order, 2026-11-20; spec `docs/specs/consultant/01-STRUCTURE-V3.md`)
-| Tab | What Jitu Bhaiya gets |
+## What it does (structure v3 — Jitendra Khimlani's own order, 2026-11-20; spec `docs/specs/consultant/01-STRUCTURE-V3.md`)
+| Tab | What Jitendra Khimlani gets |
 |---|---|
 | **Today** | 1. **Today's appointments** (Check in → Start → Open / Give remedy, Bach flower vs Scanning badge, video-link and check-in-form state, Calendar, **+ New**) · 2. **Asking for a time** — client requests: Call, **Assign** any time · 3. **Missed their remedy** mood strip · 4. **Remedy about to end** — within a week / 1–2 weeks, Message, Book, **Archive** |
 | **People** | **Mood board**: latest feeling per person; Missed remedy · Ends this week · Ends in 1–2 weeks · On a remedy · Scanning · Everyone · Archived; board or list; tap → full profile (Bach: progress, mood week, troubling, blend, drops · Scanning: notes timeline + summary of all notes) |

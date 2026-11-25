@@ -3,7 +3,7 @@
 #
 #   yourdomain/             landing page (links to every app)
 #   yourdomain/client/      client app        (apps/client, Next.js static export)
-#   yourdomain/consultant/  Jitu Bhaiya's app (prototypes/consultant-app)
+#   yourdomain/consultant/  Jitendra Khimlani's app (prototypes/consultant-app)
 #   yourdomain/manager/     Haresh's app      (prototypes/manager)
 #   yourdomain/owner/       owner app         (docs/specs/owner/prototype)
 #   yourdomain/api/         backend API (PHP + MySQL) · one-time setup at /api/install.php
@@ -44,7 +44,13 @@ php -l "$OUT/api/index.php" >/dev/null 2>&1 || echo "note: php not found locally
 # 5. Landing page at the site root, links pointing at /client/, /consultant/ …
 sed 's#href="preview/#href="#g' "$ROOT/index.html" > "$OUT/index.html"
 sed "s#__BASE__#${BASE}#g" "$ROOT/hosting/htaccess-site.template" > "$OUT/.htaccess"
-printf 'User-agent: *\nDisallow: /\n' > "$OUT/robots.txt"
+# Search engines stay out. Link-preview bots (WhatsApp, Facebook, Telegram, X, LinkedIn, Slack) may read the public story
+# pages and their images so a shared story shows its cover and title (CLIENT 2026-11-24).
+{
+  printf 'User-agent: facebookexternalhit\nUser-agent: WhatsApp\nUser-agent: TelegramBot\nUser-agent: Twitterbot\nUser-agent: LinkedInBot\nUser-agent: Slackbot-LinkExpanding\n'
+  printf 'Allow: %s/client/s/\nAllow: %s/client/img/\nAllow: %s/client/_next/\nDisallow: /\n\n' "$BASE" "$BASE" "$BASE"
+  printf 'User-agent: *\nDisallow: /\n'
+} > "$OUT/robots.txt"
 printf 'BeWise site build %s · %s\n' "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || echo local)" "$(date -u +%Y-%m-%dT%H:%MZ)" > "$OUT/version.txt"
 
 (cd "$OUT" && zip -qr "$ROOT/dist/bewise-hostinger-site.zip" . -x '*.DS_Store')

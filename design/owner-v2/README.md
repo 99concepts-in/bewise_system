@@ -17,4 +17,4 @@
 | `OW-desktop-11-accountant-view.jpg` | OW-30 Accountant (read-only) |
 
 Deferred (owner 2026-11-17): personal finance, payroll.
-QA: logo descriptor must be "Holistic Wellness" (some boards say "OWNER"); command-centre desktop lists "Refund to client" — remove (no refunds, D-16); activity log must use Jitu Bhaiya's real photo; greeting name pending (D-42).
+QA: logo descriptor must be "Holistic Wellness" (some boards say "OWNER"); command-centre desktop lists "Refund to client" — remove (no refunds, D-16); activity log must use Jitendra Khimlani's real photo; greeting name pending (D-42).

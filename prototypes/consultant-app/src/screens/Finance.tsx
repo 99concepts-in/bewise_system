@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
 import { Lock, TrendingDown, TrendingUp } from 'lucide-react'
 import { useStore } from '../state/store'
-import { CountUp, softSpring } from '../ui/kit'
+import { AppHeader, CountUp, softSpring } from '../ui/kit'
 import { financeBoard, type Source } from '../data/finance'
 import { fmtMonth, fmtShort, inr } from '../lib/time'
 
@@ -27,6 +27,7 @@ export default function Finance() {
 
   return (
     <div className="screen fin">
+      <AppHeader />
       <div className="title-row"><h1 className="page-title">Finance</h1><span className="ro-pill"><Lock size={13} /> Read-only</span></div>
 
       <m.section className="card fin-today" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={softSpring} aria-label="Today">

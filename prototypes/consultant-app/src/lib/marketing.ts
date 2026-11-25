@@ -61,8 +61,8 @@ export function broadcastAudiences(people: Person[], byPerson: Map<string, Appt[
 }
 export const BROADCAST_TEMPLATES: { key: string; label: string; text: string }[] = [
   { key: 'slots', label: 'New times open', text: 'Namaste {name} 🙏 I have a few calm hours free this week, in person in Vadodara and online. Ask for a time and my team will call you: ' + BOOKING_LINK },
-  { key: 'festival', label: 'Festival wishes', text: 'Namaste {name} 🙏 Wishing you and your family a peaceful and joyful festive season. May the days ahead feel lighter. Jitu Bhaiya, BeWise' },
-  { key: 'tip', label: 'Wellness thought', text: 'Namaste {name} 🙏 A small practice for this week: before sleep, write down one thing that went well today. It quietly changes how the mind settles. Jitu Bhaiya' },
+  { key: 'festival', label: 'Festival wishes', text: 'Namaste {name} 🙏 Wishing you and your family a peaceful and joyful festive season. May the days ahead feel lighter. Jitendra Khimlani, BeWise' },
+  { key: 'tip', label: 'Wellness thought', text: 'Namaste {name} 🙏 A small practice for this week: before sleep, write down one thing that went well today. It quietly changes how the mind settles. Jitendra Khimlani' },
   { key: 'event', label: 'Talk or workshop', text: 'Namaste {name} 🙏 I am holding a free 45-minute talk on calming an anxious mind with Bach flowers, this Sunday at 11 AM, online. Reply YES and we will send the link.' },
 ]
 

@@ -7,7 +7,7 @@ return [
         'status' => 'ok', 'version' => BW_API_VERSION, 'db' => (bool)val('SELECT 1'), 'time' => iso(now_utc()),
         'migrations' => (int)val('SELECT COUNT(*) FROM schema_migrations'),
     ],
-    /** Public, cache-safe: fees, studio, policies, Razorpay key id (never the secret), signed-in user if any. */
+    /** Public, cache-safe: fees, center, policies, Razorpay key id (never the secret), signed-in user if any. */
     'publicConfig' => function (array $in) {
         $settings = [];
         foreach (all('SELECT `key`, value FROM settings WHERE is_public = 1') as $r) $settings[$r['key']] = json_decode($r['value'], true);

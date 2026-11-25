@@ -1,4 +1,4 @@
-# Wire Jitu Bhaiya's app to the real backend (Hostinger PHP + MySQL)
+# Wire Jitendra Khimlani's app to the real backend (Hostinger PHP + MySQL)
 From: HUB · To: CONSULTANT · Priority: **P0** · Status: OPEN · 2026-11-18
 
 **Why:** owner asked for a fully functional live app with a real database (D-44). API at `/api/`, tested end-to-end.

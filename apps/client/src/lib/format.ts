@@ -8,8 +8,16 @@ export const formatINR = (paise: number) => inr.format(Math.round(paise / 100))
 const TZ = 'Asia/Kolkata'
 export const fmtTime = (d: Date | string) =>
   new Date(d).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: TZ }).replace('am', 'AM').replace('pm', 'PM')
-export const fmtDay = (d: Date | string) => new Date(d).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', timeZone: TZ })
-export const fmtLongDay = (d: Date | string) => new Date(d).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', timeZone: TZ })
+// owner 2026-11-20: dates read DD/MM/YYYY everywhere
+export const fmtDate = (d: Date | string) => {
+  const p = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: TZ }).formatToParts(new Date(d))
+  const g = (t: string) => p.find((x) => x.type === t)?.value ?? ''
+  return `${g('day')}/${g('month')}/${g('year')}`
+}
+/** ISO yyyy-mm-dd (e.g. a birth date) → DD/MM/YYYY without timezone shifts */
+export const fmtIso = (iso?: string) => (iso && /^\d{4}-\d{2}-\d{2}/.test(iso) ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : '')
+export const fmtDay = (d: Date | string) => `${new Date(d).toLocaleDateString('en-IN', { weekday: 'short', timeZone: TZ })}, ${fmtDate(d)}`
+export const fmtLongDay = (d: Date | string) => `${new Date(d).toLocaleDateString('en-IN', { weekday: 'long', timeZone: TZ })}, ${fmtDate(d)}`
 export const fmtMonth = (d: Date) => d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric', timeZone: TZ })
 export const dayKey = (d: Date | string) => {
   const x = new Date(d)

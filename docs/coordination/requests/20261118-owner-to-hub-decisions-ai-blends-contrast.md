@@ -14,5 +14,5 @@ Please record in `DECISIONS.md`:
    Update `design/tokens.json → v4` and `docs/01-DESIGN-SYSTEM.md`; OWNER has already switched the owner prototype and the Pages landing page.
 
 Also pending owner decisions surfaced in specs (please add as OPEN): staff cash/complimentary bookings (default no), 24 h hold for
-staff bookings, WhatsApp sender number (business vs Jitu Bhaiya), template languages (English v1), refunds for double/late
+staff bookings, WhatsApp sender number (business vs Jitendra Khimlani), template languages (English v1), refunds for double/late
 payments (default: credit — `04-RAZORPAY-FLOW.md`).

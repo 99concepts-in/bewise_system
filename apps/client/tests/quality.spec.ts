@@ -77,7 +77,8 @@ test.describe('accessibility (axe WCAG A/AA)', () => {
     test(`axe ${r}`, async ({ page }) => {
       await seed(page, { onboarded: !PUBLIC.includes(r) })
       await settle(page, r)
-      await page.waitForTimeout(600)
+      // the welcome splash fades text in over ~2 s; check the settled screen, not a mid-fade frame
+      await page.waitForTimeout(r === '/welcome' ? 2800 : 600)
       const res = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()
       const serious = res.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
         .map((v) => `${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ') + (n.any[0]?.message ? ` (${n.any[0].message.slice(0, 90)})` : '')).join(' | ')}`)

@@ -138,7 +138,7 @@ function PersonHead({ p, v, now }: { p: Person; v: PersonView; now: number }) {
       <div className="pf-actions">
         <button className="btn btn-quiet" onClick={() => go(`/messages/${p.id}`)}><MessageSquare size={16} /> Message</button>
         <a className="btn btn-quiet" href={`tel:${p.phone.replace(/\s/g, '')}`} aria-label={`Call ${p.first}`}><Phone size={16} /><span className="hide-xs">Call</span></a>
-        <a className="btn btn-quiet" href={waLink(p.phone, `Namaste ${p.first}, this is Jitu Bhaiya from BeWise. `)} target="_blank" rel="noreferrer" aria-label="WhatsApp"><MessageCircle size={16} /><span className="hide-sm">WhatsApp</span></a>
+        <a className="btn btn-quiet" href={waLink(p.phone, `Namaste ${p.first}, this is Jitendra Khimlani from BeWise. `)} target="_blank" rel="noreferrer" aria-label="WhatsApp"><MessageCircle size={16} /><span className="hide-sm">WhatsApp</span></a>
         <button className="btn btn-primary" onClick={() => sheets.newAppt({ personId: p.id, service: v.service })}><CalendarPlus size={16} /> Book</button>
       </div>
       {v.next && v.next.start - now < 60 * MIN && (

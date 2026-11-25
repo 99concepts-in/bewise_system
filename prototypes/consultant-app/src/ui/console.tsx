@@ -5,7 +5,7 @@
  *           Lo Shu card, wellness journey timeline, concerns over time, blend journey.
  */
 import { m } from 'motion/react'
-import { AlertCircle, ChevronRight, Compass, Flower2, Leaf, MessageCircleHeart, Sparkles, Star } from 'lucide-react'
+import { AlertCircle, ChevronRight, Compass, Flower2, Droplet, MessageCircleHeart, Sparkles, Star } from 'lucide-react'
 import type { PersonView } from '../lib/derive'
 import { blendJourney, feelingWord, journeySteps, journeyTag, recency, wellnessSummary, JOURNEY_RULE, type Journey } from '../lib/journey'
 import { loShu, NUMBER_MEANING } from '../lib/loshu'
@@ -50,7 +50,7 @@ export function WellnessSummaryCard({ v, now }: { v: PersonView; now: number }) 
           <dd>{s.emotions.length > 0 && <span className="chips-wrap tight">{s.emotions.map((e) => <span key={e} className="tag tag-mist">{e}</span>)}</span>}<span>{s.emotionLine}</span></dd>
         </div>
         <div>
-          <dt><Leaf size={15} aria-hidden /> Last blend</dt>
+          <dt><Droplet size={15} aria-hidden /> Last blend</dt>
           <dd>{s.blendLine}</dd>
         </div>
         {j && (

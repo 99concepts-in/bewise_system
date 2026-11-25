@@ -18,6 +18,6 @@
 | `MG-desktop-11-products-collection.jpg` | MG-30 Products (computer) |
 | `MG-desktop-12-add-product.jpg` | MG-31 Add / edit product (computer) |
 
-Consultant addition: `design/consultant-v2/CN-phone-11-business-best-sellers-orders-stock.jpg` (CN-30…32, Jitu Bhaiya's read-only sales view).
+Consultant addition: `design/consultant-v2/CN-phone-11-business-best-sellers-orders-stock.jpg` (CN-30…32, Jitendra Khimlani's read-only sales view).
 
 QA: logo descriptor must always be "Holistic Wellness" (some boards say "Office Manager"); desktop board 12 shows user "Priya Shah" — should be Haresh; no refund actions anywhere (policy D-16).

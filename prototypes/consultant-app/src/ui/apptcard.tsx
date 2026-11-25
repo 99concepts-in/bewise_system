@@ -6,7 +6,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { m } from 'motion/react'
-import { CalendarClock, CalendarPlus, ChevronRight, IndianRupee, Leaf, MapPin, MessageCircle, MessageSquare, Phone, Play, UserCheck, Video } from 'lucide-react'
+import { CalendarClock, CalendarPlus, ChevronRight, IndianRupee, Droplet, MapPin, MessageCircle, MessageSquare, Phone, Play, UserCheck, Video } from 'lucide-react'
 import { useStore } from '../state/store'
 import { Avatar, go, softSpring, useToast } from './kit'
 import { TypeBadge } from './bits'
@@ -36,7 +36,7 @@ export function ApptCard({ a, v, api, onRemedy }: { a: Appt; v: PersonView; api:
   if (a.status === 'confirmed' && soon) primary = <button className="btn btn-primary" onClick={() => { dispatch({ type: 'checkIn', apptId: a.id }); toast(`${p.first} ${a.mode === 'online' ? 'has joined' : 'has arrived'}. Start when you're ready.`) }}><UserCheck size={16} /> Check in</button>
   else if (a.status === 'checked_in') primary = <button className="btn btn-primary" onClick={() => go(`/session/${a.id}`)}><Play size={16} /> Start session</button>
   else if (a.status === 'in_session') primary = <button className="btn btn-primary" onClick={() => go(`/session/${a.id}`)}><Play size={16} /> Open the live session</button>
-  else if (a.status === 'completed' && a.service === 'bach' && !a.remedy) primary = <button className="btn btn-primary" onClick={onRemedy}><Leaf size={16} /> Give remedy</button>
+  else if (a.status === 'completed' && a.service === 'bach' && !a.remedy) primary = <button className="btn btn-primary" onClick={onRemedy}><Droplet size={16} /> Give remedy</button>
   else if (a.status === 'completed' || a.status === 'no_show') primary = <button className="btn btn-primary" onClick={() => api.newAppt({ personId: p.id, service: a.service })}><CalendarPlus size={16} /> Book the next one</button>
   else if (upcoming) primary = <button className="btn btn-quiet" disabled><Play size={16} /> Starts {relative(a.start, now)}</button>
 
@@ -76,7 +76,7 @@ export function ApptCard({ a, v, api, onRemedy }: { a: Appt; v: PersonView; api:
         {upcoming && <button className="btn btn-quiet btn-sm" onClick={() => api.reschedule(a.id)}><CalendarClock size={15} /> Move</button>}
         <button className="btn btn-quiet btn-sm" onClick={() => go(`/messages/${p.id}`)}><MessageSquare size={15} /> Message</button>
         <a className="btn btn-quiet btn-sm" href={`tel:${p.phone.replace(/\s/g, '')}`}><Phone size={15} /> Call</a>
-        <a className="btn btn-quiet btn-sm" href={waLink(p.phone, `Namaste ${p.first}, this is Jitu Bhaiya from BeWise. `)} target="_blank" rel="noreferrer"><MessageCircle size={15} /> WhatsApp</a>
+        <a className="btn btn-quiet btn-sm" href={waLink(p.phone, `Namaste ${p.first}, this is Jitendra Khimlani from BeWise. `)} target="_blank" rel="noreferrer"><MessageCircle size={15} /> WhatsApp</a>
       </div>
     </m.section>
   )

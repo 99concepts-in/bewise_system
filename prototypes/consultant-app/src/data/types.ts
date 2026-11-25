@@ -8,7 +8,7 @@ export type Mode = 'online' | 'in_person'
 export type Kind = 'first' | 'followup'
 /** Two kinds of appointment (owner 2026-11-20). Scanning sessions keep only notes; Bach flower sessions lead to a remedy. */
 export type Service = 'bach' | 'scanning'
-export type Staff = 'Jitu Bhaiya' | 'Haresh bhai' | 'Shivani di'
+export type Staff = 'Jitendra Khimlani' | 'Haresh bhai' | 'Shivani di'
 export type Mood = 'calm' | 'joyful' | 'grateful' | 'hopeful' | 'tired' | 'anxious' | 'sad' | 'irritated'
 export type ApptStatus = 'awaiting_payment' | 'confirmed' | 'checked_in' | 'in_session' | 'completed' | 'no_show'
 export type RemedyStage = 'given' | 'preparing' | 'dispatched' | 'delivered'
@@ -60,9 +60,12 @@ export interface Appt {
   sharedSummary?: string // optional summary shared with the client (D-26)
   greeting?: string // the WhatsApp greeting he sent when booking
   remedyOnly?: boolean // synthetic: a remedy given between sessions (never stored in appts)
+  // v5 (HUB 2026-11-20): from the client's intake quiz (client app "Book" flow, API shape unchanged)
+  feelings?: string[] // feelings the client chose when booking, up to 3 (shown as coloured chips on Today)
+  safety?: boolean // the intake safety question needs his attention before the session (shown as a small dot)
 }
 
-/** Clients only ask for an appointment; Jitu Bhaiya's timings are never fixed, so Haresh bhai / Shivani di call and assign a time.
+/** Clients only ask for an appointment; Jitendra Khimlani's timings are never fixed, so Haresh bhai / Shivani di call and assign a time.
  *  Backend: an appointment row with starts_at = NULL (api/migrations/0001_core.sql). */
 export interface ApptRequest { id: string; personId: string; service: Service; kind: Kind; mode: Mode; preferred: string; note?: string; at: number }
 

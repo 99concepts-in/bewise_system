@@ -22,7 +22,7 @@ It is **one app with four role spaces** (plus the public website). Everyone sign
 
 | # | Role (who) | Space & URL | Device priority | Feel |
 |---|---|---|---|---|
-| 1 | **Consultant** (Jitu Bhaiya) | Consultant Workspace `/consult` | Tablet → desktop → phone | Calm, focused, private |
+| 1 | **Consultant** (Jitendra Khimlani) | Consultant Workspace `/consult` | Tablet → desktop → phone | Calm, focused, private |
 | 2 | **Client** (person booking / buying) | Public site `/` + Client Portal `/app` | **Phone first** | Warm, simple, reassuring |
 | 3 | **Manager** (Mr. Haresh Moorjani, BeWise office) | Operations `/ops` | Desktop → tablet (phone for dispatch) | Efficient, data-rich |
 | 4 | **Owner** (super admin) | Command Centre `/owner` | Desktop + phone summary | Executive, precise |
@@ -160,7 +160,7 @@ Must exist on `main` before any chat writes app code. `docs/coordination/STATUS.
 While a dependency isn't live, build against the contract stub with seed data **behind a feature flag** (see protocol).
 
 ### Phase 7 — Go-live (HUB coordinates)
-Real credentials (Razorpay live, WhatsApp templates approved, courier, email domain), accountant sign-off on chart of accounts & GST, content sign-off (Bach library, product labels/claims), data import, UAT per role with Jitu Bhaiya, Haresh and the owner, backups & monitoring, launch.
+Real credentials (Razorpay live, WhatsApp templates approved, courier, email domain), accountant sign-off on chart of accounts & GST, content sign-off (Bach library, product labels/claims), data import, UAT per role with Jitendra Khimlani, Haresh and the owner, backups & monitoring, launch.
 
 ## 6. Decisions waiting for the owner
 

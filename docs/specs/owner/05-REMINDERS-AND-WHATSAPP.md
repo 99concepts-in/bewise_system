@@ -27,7 +27,7 @@ provider webhook (/api/webhooks/whatsapp) ─▶ delivery status sent/delivered/
 | Booking confirmed | client | on `appointment.confirmed` | WhatsApp + email + in-app | — |
 | Appointment reminder | client | **24 h** and **1 h** before (`startsAt`) | WhatsApp + in-app (email at 24 h) | cancelled / rescheduled (re-scheduled for the new time) |
 | Online link | client | in the 1 h reminder | WhatsApp | — |
-| Consultant day plan | Jitu Bhaiya | 07:30 IST daily | in-app + push | — |
+| Consultant day plan | Jitendra Khimlani | 07:30 IST daily | in-app + push | — |
 | Payment failed | client | 15 min after `payment.failed`, if the hold is still valid | WhatsApp + in-app | paid / hold expired |
 | Invoice issued (manual) | client | on `invoice.issued` (not for auto-paid ones) | WhatsApp + email (PDF link + pay link) | — |
 | **Payment reminders** (J5) | client | **−2 d, 0 d (due day), +3 d, +7 d**, then every 7 d up to **+30 d** | WhatsApp + email | paid / disputed / owner pauses |
@@ -35,14 +35,14 @@ provider webhook (/api/webhooks/whatsapp) ─▶ delivery status sent/delivered/
 | Remedy dispatched | client | `shipment.dispatched` | WhatsApp + in-app | — |
 | Delivered | client | `shipment.delivered` | in-app | — |
 | Feedback request | client | 2 h after `appointment.completed` | in-app + WhatsApp | feedback submitted |
-| Follow-up due | client + Jitu Bhaiya | `followup.due` | WhatsApp + in-app | booked |
+| Follow-up due | client + Jitendra Khimlani | `followup.due` | WhatsApp + in-app | booked |
 | Remedy reorder nudge | client | when the blend has ≈ 5 days left (from CL-26 ritual) | in-app (+ WhatsApp if marketing consent) | reordered |
 | Supplier bill due | Haresh | −3 d, 0 d | in-app | paid |
 | Expense submitted | owner | `expense.submitted` | push + in-app (OW-03, OW-13) | decided |
 | Expense decided | submitter | `expense.approved/rejected` | in-app | — |
 | Low stock / failed delivery | Haresh (+ owner alert tile) | `stock.low`, `shipment.failed` | in-app | — |
 | Daily summary | owner | 20:00 IST | push + in-app | — |
-| Safety flag | **Jitu Bhaiya only** (D-38) | `intake.safety_flagged` | push + in-app, priority; lock screen says only "a client needs your attention" (no name, 08 §4) | — never to owner |
+| Safety flag | **Jitendra Khimlani only** (D-38) | `intake.safety_flagged` | push + in-app, priority; lock screen says only "a client needs your attention" (no name, 08 §4) | — never to owner |
 | Staff booking greeting → payment link | client | `appointment.greeting_sent` | WhatsApp (session text or template) → link sent automatically | paid / hold expired (08) |
 | Unfinished intake | client | 24 h after last edit of a draft (`intake.draft_abandoned`) | WhatsApp + in-app, once | submitted |
 | Check-in ask before follow-up | client | 48 h before a follow-up without a check-in | WhatsApp + in-app, once | check-in done |
@@ -54,7 +54,7 @@ Tone: warm, short, no medical claims (brand guide §7).
 
 | Template | Body | Vars | Button |
 |---|---|---|---|
-| `booking_confirmed` | Hi {{1}}, your {{2}} with Jitu Bhaiya is confirmed for {{3}}. We look forward to seeing you. 🌿 | name, type, date-time | View booking |
+| `booking_confirmed` | Hi {{1}}, your {{2}} with Jitendra Khimlani is confirmed for {{3}}. We look forward to seeing you. 🌿 | name, type, date-time | View booking |
 | `appointment_reminder_24h` | Hi {{1}}, a gentle reminder: your {{2}} is tomorrow at {{3}}. Need to change it? You can reschedule in the app. | name, type, time | Manage booking |
 | `appointment_reminder_1h_online` | Hi {{1}}, your session starts at {{2}}. Join here: {{3}} | name, time, link | — |
 | `appointment_reminder_1h_in_person` | Hi {{1}}, see you at {{2}} today at {{3}}. | name, place, time | Directions |
@@ -65,13 +65,13 @@ Tone: warm, short, no medical claims (brand guide §7).
 | `payment_reminder_due` | Hi {{1}}, a gentle reminder that invoice {{2}} for ₹{{3}} is due {{4}}. | name, inv no., amount, due | Pay now |
 | `payment_reminder_overdue` | Hi {{1}}, invoice {{2}} for ₹{{3}} is now {{4}} days past due. If you've already paid, please ignore this. | name, inv no., amount, days | Pay now |
 | `remedy_dispatched` | Hi {{1}}, your {{2}} is on its way with {{3}}. Track: {{4}} | name, item, courier, link | Track |
-| `feedback_request` | Hi {{1}}, how did today's session feel? Two taps help Jitu Bhaiya care for you better. | name | Share feedback |
-| `followup_due` | Hi {{1}}, it's time for your follow-up with Jitu Bhaiya. Book a time that suits you. | name | Book follow-up |
+| `feedback_request` | Hi {{1}}, how did today's session feel? Two taps help Jitendra Khimlani care for you better. | name | Share feedback |
+| `followup_due` | Hi {{1}}, it's time for your follow-up with Jitendra Khimlani. Book a time that suits you. | name | Book follow-up |
 | `remedy_reorder_nudge` — **marketing** (Meta may reclassify) | Hi {{1}}, your blend has about {{2}} days left. Reorder in one tap. | name, days | Reorder |
 | `otp_login` — **authentication** (HUB / SMS provider D-04) | {{1}} is your BeWise code. | code | Copy code |
 | `booking_greeting`, `payment_link_appointment`, `checkin_form_ask`, `drops_nudge`, `intake_unfinished_24h` | see `08-BOOKING-GREETING-AND-AUTOPAY.md` §4 | | |
 
-Staff messages (owner, Haresh, Jitu Bhaiya) use **in-app + web push**, not WhatsApp, in v1. No template approval is needed and there are no per-message costs.
+Staff messages (owner, Haresh, Jitendra Khimlani) use **in-app + web push**, not WhatsApp, in v1. No template approval is needed and there are no per-message costs.
 
 **Meta rules to respect:** templates are needed outside the 24-hour customer-service window; free-form text only inside it. Pricing is per message by category *(verify current Meta pricing at setup)*. Utility templates must not contain promotional content, or Meta reclassifies them as marketing.
 

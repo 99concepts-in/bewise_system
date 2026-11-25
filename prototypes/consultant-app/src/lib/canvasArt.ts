@@ -43,7 +43,7 @@ export interface Assets { logo: HTMLImageElement | null; flower: HTMLImageElemen
 export async function loadAssets(post: Post): Promise<Assets> {
   await fontsReady()
   const [logo, flower, owl, photo] = await Promise.all([
-    loadImg('./img/brand/bewise-logo-horizontal.svg', 1200),
+    loadImg('./brand/bewise-logo-horizontal.svg', 1200),
     post.kind === 'flower' && post.flower ? loadImg(flowerImg(post.flower), 900) : Promise.resolve(null),
     post.kind === 'story' || post.kind === 'review' || post.kind === 'tip' || post.kind === 'impact' ? loadImg('./img/owl-wave.webp') : Promise.resolve(null),
     post.kind === 'book' ? loadImg('./img/jitu.webp') : Promise.resolve(null),
@@ -196,7 +196,7 @@ export function paint(ctx: CanvasRenderingContext2D, post: Post, format: Format,
   ctx.fillStyle = INK; ctx.font = `700 ${32 * k}px ${SANS}`; ctx.textAlign = 'center'
   ctx.fillText('bewiseglobal.in', W / 2, footY)
   ctx.fillStyle = MUTED; ctx.font = `500 ${26 * k}px ${SANS}`
-  ctx.fillText('Jitu Bhaiya · Bach flower remedies · Vadodara', W / 2, footY + 44 * k)
+  ctx.fillText('Jitendra Khimlani · Bach flower remedies · Vadodara', W / 2, footY + 44 * k)
 }
 
 // ---------------------------------------------------------------- export + share

@@ -11,18 +11,25 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { ConsultationId, Emotion } from './data'
-import { PRODUCTS, REORDER_PRICE_PAISE, STUDIO, productTitle, variantById } from './data'
+import { CONSULTATIONS, PRODUCTS, REORDER_PRICE_PAISE, STUDIO, istDate, productTitle, variantById } from './data'
 import { isoDay } from './supply'
 import { COUPON_DAYS, COUPON_PCT, PLANS, type PlanId } from './offer'
-import { uid, dayKey } from './format'
+import { uid, dayKey, formatINR } from './format'
 
 export type Profile = {
   name: string; phone: string; dob: string; city: string; gender?: string
+  /** owner 2026-11-23: how they heard of us / who referred them */
+  reference?: string
+  /** details we already had (booking link or a booking made by Jitendra Khimlani / the team), shown for checking */
+  prefilledFrom?: 'booking-link' | 'staff'
+  /** owner 2026-11-24: show the short Home tour once after sign-up */
+  tourPending?: boolean
   photo?: string; consents: { wellbeing: boolean; whatsapp: boolean; offers: boolean }
   allergies: string[]; onboardedAt?: string
 }
 // @decision(D-19) owner 2026-11-18: journal entries may carry an optional note (was emotion + time only)
-export type JournalEntry = { id: string; emotion: Emotion; at: string; note?: string }
+/** owner 2026-11-23: `valence` 1 (very unpleasant) to 7 (very pleasant) from the slider; `kind` right now vs the day overall */
+export type JournalEntry = { id: string; emotion: Emotion; at: string; note?: string; valence?: number; kind?: 'moment' | 'day'; also?: Emotion[] }
 /** owner 2026-11-18: daily goals get a check-in each day; long-term goals are checked off once. `progress` is legacy. */
 export type Goal = { id: string; title: string; progress: number; done: boolean; kind?: 'daily' | 'once'; days?: string[]; doneAt?: string }
 export type Feedback = { rating: number; tags: string[]; notes: string; benefits?: string[] } // benefits: 'How do you feel after the session?' (client's words, owner 2026-11-18)
@@ -33,12 +40,19 @@ export type Appointment = {
   source?: 'client' | 'consultant' | 'manager'
   /** paid after the hold expired → no time yet; client picks a new one at no cost (consultant K1 §4.3) */
   needsNewTime?: boolean; paidAt?: string
-  /** owner 2026-11-18: client chose to pay after the consultation (UPI, card or at the studio) */
+  /** owner 2026-11-18: client chose to pay after the consultation (UPI, card or at the center) */
   payLater?: boolean
-  /** owner 2026-11-18: the client picks a preferred time after paying; Jitu Bhaiya or Haresh bhai confirm it (else the team calls) */
+  /** owner 2026-11-18: the client picks a preferred time after paying; Jitendra Khimlani or Haresh bhai confirm it (else the team calls) */
   timeRequested?: boolean
   /** covered by a consultation plan */
   planId?: PlanId
+  /** owner 2026-11-21: the client just books an appointment; Jitendra Khimlani or Haresh bhai decide first visit or
+   *  follow-up and the fee (most clients already met him before the app), then the client pays in the app */
+  kindTbc?: boolean
+  /** owner 2026-11-20: clients only request; the Manager or Jitendra Khimlani set the time. True until they do. */
+  timeTbc?: boolean
+  /** the client's optional hints for the team */
+  prefs?: { days?: string; times?: string[]; date?: string; note?: string }
 }
 export type Plan = { id: PlanId; months: number; pricePaise: number; startedAt: string; used: number }
 export type Coupon = { code: string; pct: number; expiresAt: string; usedAt?: string }
@@ -59,6 +73,11 @@ export type CartLine = { key: string; qty: number } // key = variantId | 'remedy
 export type Address = { id: string; name: string; phone: string; line1: string; line2: string; city: string; state: string; pin: string }
 export type OrderLine = { key: string; name: string; label: string; qty: number; pricePaise: number; kind: 'product' | 'remedy' }
 export type Order = { id: string; code: string; lines: OrderLine[]; totalPaise: number; address: Address; placedAt: string; stage: 0 | 1 | 2 | 3; pickup?: boolean; discountPaise?: number; coupon?: string; subscribed?: string[]; review?: { rating: number; text: string; at: string } }
+/**
+ * owner 2026-11-24: a personal chat with Jitendra Khimlani. A note can carry how the member feels, a thank-you, or anything else.
+ * Server (requested from FOUNDATION + CONSULTANT, 20261124-member-notes): messages.send / messages.list, consultant inbox, readAt when he opens it.
+ */
+export type NoteMsg = { id: string; from: 'me' | 'jitendra'; text: string; at: string; topic?: 'feeling' | 'gratitude' | 'other'; mood?: Emotion; valence?: number; deliveredAt?: string; readAt?: string }
 export type ChatMsg = { id: string; role: 'user' | 'bot'; text: string; products?: string[]; actions?: { id: string; label: string }[]; safety?: boolean; at: string }
 export type Notice = { id: string; title: string; body: string; at: string; read: boolean; href?: string }
 
@@ -79,20 +98,35 @@ type State = {
   blend: Blend | null
   /** daily "Took my drops" tick — remedies.logDrops({ date, taken }) (consultant request 2026-11-18) */
   drops: Record<string, boolean>
+  /** owner 2026-11-18: each dose checked in (4 drops, up to timesPerDay a day) → count per day */
+  doses: Record<string, number>
   checkins: Record<string, { at: string; answers: CheckinAnswers }>
   cart: CartLine[]
   wishlist: string[]
   addresses: Address[]
   orders: Order[]
   chat: ChatMsg[]
+  notes: NoteMsg[]
+  /** owner 2026-11-24: the 'send a note' popup after a mood log shows at most once a day (day key it last showed) */
+  noteAskedOn?: string
+  /** owner 2026-11-25: the day the note popup last came after the final dose */
+  noteAskedLastDoseOn?: string
   notices: Notice[]
   plan: Plan | null
   coupon: Coupon | null
   offer: { skippedAt?: string; downsellAt?: string }
+  /** owner 2026-11-23: first-time reminder popup, reminders on, and the day a morning nudge was last shown */
+  /** owner 2026-11-23: firstAt = time of the first dose (WhatsApp reminder); next reminders 4 h after each dose, then every 45 min until logged */
+  reminders: { askedAt?: string; on?: boolean; nudgedOn?: string; firstAt?: string; lastDoseAt?: string; lastNudgeAt?: string }
   seq: number
   // actions
   setProfile: (p: Partial<Profile>) => void
-  logMood: (e: Emotion, at?: Date, note?: string) => JournalEntry   // journal.createEntry
+  logMood: (e: Emotion, at?: Date, note?: string, extra?: Pick<JournalEntry, 'valence' | 'kind' | 'also'>) => JournalEntry   // journal.createEntry
+  setReminders: (r: Partial<State['reminders']>) => void
+  sendNote: (n: Pick<NoteMsg, 'text' | 'topic' | 'mood' | 'valence'>) => NoteMsg   // messages.send
+  markNote: (id: string, patch: Pick<NoteMsg, 'deliveredAt' | 'readAt'>) => void     // preview only: server sets these
+  setNoteAskedOn: (day: string) => void
+  setNoteAskedLastDoseOn: (day: string) => void
   updateMood: (id: string, patch: Partial<Pick<JournalEntry, 'emotion' | 'note'>>) => void
   removeMood: (id: string) => void
   addGoal: (title: string, kind?: 'daily' | 'once') => void
@@ -102,13 +136,15 @@ type State = {
   saveIntake: (answers: IntakeAnswers, step: number) => void // intake.saveIntakeDraft
   submitIntake: () => void                                   // intake.submitIntake
   book: (a: Omit<Appointment, 'id' | 'code' | 'createdAt' | 'status'>) => Appointment // holdAppointment + payment.captured
-  reschedule: (id: string, startsAt: string) => void         // scheduling.rescheduleAppointment
+  reschedule: (id: string, startsAt: string) => void         // scheduling.rescheduleAppointment (staff side)
+  requestNewTime: (id: string, note?: string) => void          // client asks for a different time; the team sets it
   giveFeedback: (id: string, f: Feedback) => void            // scheduling.submitSessionFeedback
   logDrops: (date: string, taken: boolean) => void            // remedies.logDrops
+  logDoses: (date: string, n: number) => void                  // remedies.logDrops({ date, doses })
   payAppointment: (id: string) => void                         // finance checkout for an existing appointment → payment.captured
   pickNewTime: (id: string, startsAt: string) => void          // scheduling.rescheduleAppointment (no cost) → confirmed
   submitCheckin: (appointmentId: string, answers: CheckinAnswers) => void // intake.submitCheckin
-  simulateStaffBooking: (late?: boolean) => Appointment         // preview only: what a booking from Jitu Bhaiya / Haresh looks like
+  simulateStaffBooking: (late?: boolean) => Appointment         // preview only: what a booking from Jitendra Khimlani / Haresh looks like
   setReminderTimes: (t: string[]) => void
   addToCart: (key: string, qty?: number) => void             // commerce.addToCart
   setQty: (key: string, qty: number) => void
@@ -117,7 +153,7 @@ type State = {
   placeOrder: (addressId: string, subscribe?: string[]) => Order // commerce.createOrderFromCart + payment (coupon applied, subscriptions confirmed)
   buyPlan: (id: PlanId, pricePaise: number) => Plan            // finance: plan purchase → unlocks the first-purchase coupon
   setOffer: (o: { skippedAt?: string; downsellAt?: string }) => void
-  confirmTime: (id: string) => void                            // preview only: Jitu Bhaiya / Haresh bhai approve the preferred time
+  confirmTime: (id: string) => void                            // preview only: Jitendra Khimlani / Haresh bhai approve the preferred time
   reviewOrder: (id: string, rating: number, text: string) => void
   subscribeOrder: (id: string, keys: string[]) => void          // commerce.createSubscription (refills confirmed on WhatsApp)
   pushChat: (m: Omit<ChatMsg, 'id' | 'at'>) => void
@@ -129,8 +165,8 @@ type State = {
 }
 
 const initial = {
-  profile: null, journal: [], goals: [], appointments: [], intake: null, blend: null, drops: {}, checkins: {}, cart: [], wishlist: [],
-  addresses: [], orders: [], chat: [], notices: [], plan: null, coupon: null, offer: {}, seq: 41,
+  profile: null, journal: [], goals: [], appointments: [], intake: null, blend: null, drops: {}, doses: {}, checkins: {}, cart: [], wishlist: [],
+  addresses: [], orders: [], chat: [], notes: [], notices: [], plan: null, coupon: null, offer: {}, reminders: {}, seq: 41,
 }
 
 /** a valid, unused coupon (owner 2026-11-18: 15% off every product on the first shop order, 7 days) */
@@ -153,8 +189,8 @@ export const useApp = create<State>()(
       hydrated: false,
       ...initial,
       setProfile: (p) => set((s) => ({ profile: { ...(s.profile ?? { name: '', phone: '', dob: '', city: '', consents: { wellbeing: false, whatsapp: false, offers: false }, allergies: [] }), ...p } })),
-      logMood: (emotion, at = new Date(), note) => {
-        const e: JournalEntry = { id: uid(), emotion, at: at.toISOString(), ...(note?.trim() ? { note: note.trim().slice(0, 500) } : {}) }
+      logMood: (emotion, at = new Date(), note, extra) => {
+        const e: JournalEntry = { id: uid(), emotion, at: at.toISOString(), ...(note?.trim() ? { note: note.trim().slice(0, 500) } : {}), ...(extra?.valence ? { valence: extra.valence } : {}), ...(extra?.kind ? { kind: extra.kind } : {}), ...(extra?.also?.length ? { also: extra.also } : {}) }
         set((s) => ({ journal: [e, ...s.journal] }))
         return e
       },
@@ -186,24 +222,36 @@ export const useApp = create<State>()(
         const seq = get().seq + 1
         const appt: Appointment = { ...a, id: uid(), code: `BW-A-${String(seq).padStart(5, '0')}`, createdAt: new Date().toISOString(), status: 'confirmed' }
         set((s) => ({ appointments: [...s.appointments, appt], seq, ...(a.planId && s.plan ? { plan: { ...s.plan, used: s.plan.used + 1 } } : {}) }))
-        if (!appt.needsNewTime) get().notify(appt.timeRequested ? { title: 'Time requested', body: 'Jitu Bhaiya or Haresh bhai will confirm your time soon. If it doesn’t suit, our team will call you.', href: `/app/sessions/view?id=${appt.id}` } : { title: 'You’re booked', body: 'Jitu Bhaiya will read your answers before you meet.', href: `/app/sessions/view?id=${appt.id}` })
+        if (!appt.needsNewTime) get().notify(appt.timeRequested ? { title: 'Request sent', body: 'Jitendra Khimlani or the team will confirm a time and message you on WhatsApp.', href: `/app/sessions/view?id=${appt.id}` } : { title: 'You’re booked', body: 'Jitendra Khimlani will read your answers before you meet.', href: `/app/sessions/view?id=${appt.id}` })
         return appt
+      },
+      requestNewTime: (id, note) => {
+        set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, timeTbc: true, timeRequested: true, rescheduled: (a.rescheduled ?? 0) + 1, prefs: { ...a.prefs, note: note || a.prefs?.note } } : a)) }))
+        get().notify({ title: 'New time requested', body: 'The team will confirm a new time and message you on WhatsApp.', href: `/app/sessions/view?id=${id}` })
       },
       reschedule: (id, startsAt) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, startsAt, rescheduled: (a.rescheduled ?? 0) + 1 } : a)) })),
       giveFeedback: (id, f) => set((s) => ({ appointments: s.appointments.map((a) => (a.id === id ? { ...a, feedback: f } : a)) })),
-      logDrops: (date, taken) => set((s) => ({ drops: { ...s.drops, [date]: taken } })),
+      logDrops: (date, taken) => set((s) => ({ drops: { ...s.drops, [date]: taken }, doses: { ...s.doses, [date]: taken ? (s.blend?.timesPerDay ?? 4) : 0 } })),
+      logDoses: (date, n) => set((s) => {
+        const max = s.blend?.timesPerDay ?? 4, v = Math.max(0, Math.min(max, n))
+        // a new dose today restarts the 4-hour reminder clock
+        const now = new Date(), today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+        const more = date === today && v > (s.doses[date] ?? 0)
+        return { doses: { ...s.doses, [date]: v }, drops: { ...s.drops, [date]: v > 0 }, ...(more ? { reminders: { ...(s.reminders ?? {}), lastDoseAt: now.toISOString() } } : {}) }
+      }),
       payAppointment: (id) => {
         const a = get().appointments.find((x) => x.id === id)
         if (!a) return
         if (a.payLater) { set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString() } : x)) })); get().notify({ title: 'Payment received', body: 'Thank you. Your receipt is in Payments.', href: `/app/sessions/view?id=${id}` }); return }
         const late = a.status === 'expired'
-        set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString(), ...(late ? { needsNewTime: true } : { status: 'confirmed' as const }) } : x)) }))
-        get().notify(late ? { title: 'Payment received', body: 'Please pick a new time for your session, no extra cost.', href: `/app/pay?appointment=${id}` } : { title: 'You’re booked', body: 'Payment received. See you soon.', href: `/app/sessions/view?id=${id}` })
+        // owner 2026-11-20: a late payment no longer asks the client to pick; the team confirms a new time
+        set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, paidAt: new Date().toISOString(), status: 'confirmed' as const, ...(late ? { timeTbc: true, timeRequested: true } : {}) } : x)) }))
+        get().notify(late ? { title: 'Payment received', body: 'The team will confirm a new time with you, at no extra cost.', href: `/app/sessions/view?id=${id}` } : { title: 'You’re booked', body: 'Payment received. See you soon.', href: `/app/sessions/view?id=${id}` })
       },
-      // owner 2026-11-18: a chosen time is a request until Jitu Bhaiya or Haresh bhai confirm it
+      // owner 2026-11-18: a chosen time is a request until Jitendra Khimlani or Haresh bhai confirm it
       pickNewTime: (id, startsAt) => {
         set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, startsAt, status: 'confirmed' as const, needsNewTime: false, timeRequested: true } : x)) }))
-        get().notify({ title: 'Time requested', body: 'Jitu Bhaiya or Haresh bhai will confirm your time soon. If it doesn’t suit, our team will call you.', href: `/app/sessions/view?id=${id}` })
+        get().notify({ title: 'Time requested', body: 'Jitendra Khimlani or our team will confirm your time soon and message you on WhatsApp.', href: `/app/sessions/view?id=${id}` })
       },
       submitCheckin: (appointmentId, answers) => set((s) => ({ checkins: { ...s.checkins, [appointmentId]: { at: new Date().toISOString(), answers } } })),
       simulateStaffBooking: (late = false) => {
@@ -214,7 +262,7 @@ export const useApp = create<State>()(
           status: late ? 'expired' : 'awaiting_payment', amountPaise: get().appointments.length ? 80000 : 100000, createdAt: new Date().toISOString(), source: 'consultant',
         }
         set((s) => ({ appointments: [...s.appointments, appt], seq }))
-        get().notify({ title: 'Jitu Bhaiya booked a session for you', body: 'Complete the payment to confirm it.', href: `/app/pay?appointment=${appt.id}` })
+        get().notify({ title: 'Jitendra Khimlani booked a session for you', body: 'Complete the payment to confirm it.', href: `/app/pay?appointment=${appt.id}` })
         return appt
       },
       setReminderTimes: (t) => set((s) => (s.blend ? { blend: { ...s.blend, reminderTimes: t } } : {})),
@@ -256,9 +304,36 @@ export const useApp = create<State>()(
         return plan
       },
       setOffer: (o) => set((s) => ({ offer: { ...s.offer, ...o } })),
+      setReminders: (r) => set((s) => ({ reminders: { ...(s.reminders ?? {}), ...r } })),
+      sendNote: (n) => {
+        const m: NoteMsg = { id: uid(), from: 'me', at: new Date().toISOString(), ...n, text: n.text.trim().slice(0, 1000) }
+        set((s) => ({ notes: [...(s.notes ?? []), m].slice(-200) }))
+        return m
+      },
+      setNoteAskedOn: (day) => set({ noteAskedOn: day }),
+      setNoteAskedLastDoseOn: (day) => set({ noteAskedLastDoseOn: day }),
+      markNote: (id, patch) => set((s) => ({ notes: (s.notes ?? []).map((m) => (m.id === id ? { ...m, ...patch } : m)) })),
       confirmTime: (id) => {
-        set((s) => ({ appointments: s.appointments.map((x) => (x.id === id ? { ...x, timeRequested: false } : x)) }))
-        get().notify({ title: 'Your time is confirmed', body: 'Jitu Bhaiya will see you then.', href: `/app/sessions/view?id=${id}` })
+        // preview of the staff side: the team sets a time (next day, 11:00 IST, or the client's preferred date) and, for a plain
+        // appointment request, the type and fee (owner 2026-11-21) — then the client pays in the app ("Complete your booking")
+        const before = get().appointments.find((x) => x.id === id)
+        const returning = !!get().blend || get().appointments.some((x) => x.id !== id && x.status === 'completed')
+        set((s) => ({ appointments: s.appointments.map((x) => {
+          if (x.id !== id) return x
+          let y: Appointment = x.timeTbc
+            ? { ...x, timeTbc: false, timeRequested: false, startsAt: istDate(x.prefs?.date ? new Date(`${x.prefs.date}T00:00:00+05:30`) : new Date(Date.now() + 864e5), '11:00').toISOString() }
+            : { ...x, timeRequested: false }
+          if (y.kindTbc) {
+            const t = returning ? 'followup' : 'first'
+            const fee = CONSULTATIONS.find((c) => c.id === t)!.feePaise
+            y = { ...y, kindTbc: false, type: t, ...(y.planId ? { amountPaise: 0 } : { amountPaise: fee, status: 'awaiting_payment', source: 'manager' }) }
+          }
+          return y
+        }) }))
+        const after = get().appointments.find((x) => x.id === id)
+        if (before?.kindTbc && after?.status === 'awaiting_payment')
+          get().notify({ title: 'Your appointment is set', body: `Pay ${formatINR(after.amountPaise)} in the app to confirm it.`, href: `/app/pay?appointment=${id}` })
+        else get().notify({ title: 'Your time is confirmed', body: 'Jitendra Khimlani will see you then.', href: `/app/sessions/view?id=${id}` })
       },
       subscribeOrder: (id, keys) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, subscribed: keys } : o)) })),
       reviewOrder: (id, rating, text) => set((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, review: { rating, text, at: new Date().toISOString() } } : o)) })),
@@ -291,12 +366,14 @@ function demoState(s: State): Partial<State> {
   }).reverse()
   const drops: Record<string, boolean> = {}
   for (let i = 1; i <= 12; i++) drops[dayKey(d(-i))] = i % 5 !== 0
+  const doses: Record<string, number> = {}
+  for (let i = 1; i <= 12; i++) doses[dayKey(d(-i))] = i % 5 === 0 ? 1 : i % 3 === 0 ? 3 : 4
   const first: Appointment = { id: 'demo-a1', code: 'BW-A-00038', type: 'first', mode: 'online', startsAt: d(-14, 11).toISOString(), status: 'completed', amountPaise: 100000, createdAt: d(-17).toISOString() }
   const next: Appointment = { id: 'demo-a2', code: 'BW-A-00041', type: 'followup', mode: 'online', startsAt: d(3, 11).toISOString(), status: 'confirmed', amountPaise: 80000, createdAt: d(-1).toISOString() }
   const addr: Address = { id: 'demo-addr', name: s.profile?.name || 'Priya Shah', phone: s.profile?.phone || '9876543210', line1: '12, Shanti Kunj', line2: 'Alkapuri', city: 'Vadodara', state: 'Gujarat', pin: '390007' }
   return {
     journal: [...journal, ...s.journal],
-    drops,
+    drops, doses,
     appointments: [first, next],
     blend: { name: 'Personal blend', version: 1, flowers: ['Mimulus', 'White Chestnut', 'Larch', 'Impatiens', 'Walnut'], drops: 4, timesPerDay: 4, startedOn: d(-13).toISOString(), days: 25, reminderTimes: ['08:00', '13:00', '18:00', '22:00'], alcoholFree: true },
     goals: s.goals.length ? s.goals : [{ id: uid(), title: 'Sleep by 11 PM', progress: 0, done: false, kind: 'daily', days: [-1, -2, -3].map((n) => isoDay(d(n))) }, { id: uid(), title: 'Finish a 30-day morning walk habit', progress: 0, done: false, kind: 'once' }],

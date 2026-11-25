@@ -1,5 +1,5 @@
 /**
- * Finance board demo data (read-only for Jitu Bhaiya, D-33). Live: finance.getSalesSummary {from, to}.
+ * Finance board demo data (read-only for Jitendra Khimlani, D-33). Live: finance.getSalesSummary {from, to}.
  * Consultation income comes from the real demo appointments; shop and reorder sales are generated per day.
  * Prices and costs are placeholders until the owner's product list arrives (CONTENT-CHECKLIST #6).
  */

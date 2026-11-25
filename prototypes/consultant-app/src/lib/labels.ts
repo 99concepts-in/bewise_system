@@ -11,10 +11,12 @@ export const SERVICE_LABEL: Record<Service, string> = { bach: 'Bach flower', sca
 export function typeLabel(a: { service: Service; kind: Kind }) {
   return a.service === 'scanning' ? 'Scanning' : a.kind === 'first' ? 'Bach flower, first visit' : 'Bach flower, follow-up'
 }
-export const DEFAULT_MEET = 'https://meet.google.com/jitu-bhaiya-room' // his own room (CN-25 setting); per-session links override it
+export const DEFAULT_MEET = 'https://meet.google.com/jitendra-khimlani-room' // his own room (CN-25 setting); per-session links override it
 export function linkMessage(first: string, when: string, url: string) {
-  return `Namaste ${first} 🙏 Here is the link for your online session with Jitu Bhaiya ${when}: ${url}\nPlease join 2 minutes early from a quiet place.`
+  return `Namaste ${first} 🙏 Here is the link for your online session with Jitendra Khimlani ${when}: ${url}\nPlease join 2 minutes early from a quiet place.`
 }
+/** v5 (HUB 2026-11-20): a blend holds at most 7 flowers (spec §5 "Build remedy · 3/7 flowers"). */
+export const MAX_FLOWERS = 7
 export const KIND_LABEL: Record<Kind, string> = { first: 'First consultation', followup: 'Follow-up' }
 export const STATUS_LABEL: Record<Appt['status'], string> = {
   awaiting_payment: 'Awaiting payment', confirmed: 'Confirmed', checked_in: 'Checked in', in_session: 'In session', completed: 'Completed', no_show: 'No-show',
@@ -25,8 +27,8 @@ export function waLink(phone: string, text: string) {
 }
 /** A warm payment reminder — he never sends the link himself; BeWise already did. */
 export function reminderText(first: string, start: number | undefined, now: number) {
-  return `Namaste ${first} 🙏 Just checking you got the BeWise message about your session${start ? ` on ${dayLabel(start, now).toLowerCase()} at ${fmtTime(start)}` : ''}. The payment link is in that chat. Looking forward to seeing you. Jitu Bhaiya`
+  return `Namaste ${first} 🙏 Just checking you got the BeWise message about your session${start ? ` on ${dayLabel(start, now).toLowerCase()} at ${fmtTime(start)}` : ''}. The payment link is in that chat. Looking forward to seeing you. Jitendra Khimlani`
 }
 
-export const BOOKING_LINK = 'https://bewiseglobal.in/consultations.html' // live site (bewiseglobal.in)
+export const BOOKING_LINK = 'https://app.bewiseglobal.in/client/book/jitendra-khimlani' // live address (owner 2026-11-20); old /book/jitendra-khimlani still works
 export const APP_LINK = 'https://app.bewiseglobal.in/client/'

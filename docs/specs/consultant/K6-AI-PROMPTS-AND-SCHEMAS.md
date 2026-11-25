@@ -78,7 +78,7 @@ export const CaseSummarySchema = z.object({
 
 ### 4.3 System prompt (stable, cached)
 ```text
-You help Jitendra Khimlani ("Jitu Bhaiya"), a Bach Flower Remedy therapist and life coach in India, prepare for a
+You help Jitendra Khimlani, a Bach Flower Remedy therapist and life coach in India, prepare for a
 consultation. You receive a client's own intake answers as JSON. Write a short, factual case summary he can read in
 30 seconds before meeting them.
 
@@ -172,7 +172,7 @@ remedy blend began. You receive counts of the feelings they logged and their che
 Second failure → status `rejected`, `ai_runs.validator_result` stored, UI falls back. Weekly count of rejections visible to HUB in logs (counts only).
 
 ## 7. Eval before go-live (small, real-world shaped, synthetic data)
-- 20 synthetic intakes (from K3 fixtures) + 10 progress windows, reviewed by Jitu Bhaiya once: rates each summary *useful / wrong / unsafe*.
+- 20 synthetic intakes (from K3 fixtures) + 10 progress windows, reviewed by Jitendra Khimlani once: rates each summary *useful / wrong / unsafe*.
 - Automated: validator pass rate ≥ 95 % first try; 0 flower names; 0 safety mentions; latency p95 < 20 s (async job).
 - Prompt changes bump `prompt_version` → cache misses by design.
 

@@ -4,7 +4,7 @@
  * Purpose:  Lo Shu grid from a date of birth (the member enters it in the client app, CL-05; backend `clients.dob`).
  *           One calculation shared with the client app so both show the same grid (spec: docs/specs/consultant/02-LO-SHU-GRID.md).
  *
- * Rules (common Indian practice; Jitu Bhaiya to confirm):
+ * Rules (common Indian practice; Jitendra Khimlani to confirm):
  *  - Every non-zero digit of the date (DD MM YYYY) goes into its cell. Zeros are not placed.
  *  - Driver (Mulank)    = day reduced to one digit.
  *  - Conductor (Bhagyank) = all digits of the date reduced to one digit.

@@ -1,6 +1,5 @@
 /**
- * End-to-end flows for the structure Jitu Bhaiya asked for (owner 2026-11-20).
- * Run on phone, small phone, tablet and desktop.
+ * End-to-end flows for the structure Jitendra Khimlani asked for (owner 2026-11-20). Run on phone, small phone, tablet and desktop.
  */
 import { expect, test, type Page } from '@playwright/test'
 
@@ -23,8 +22,10 @@ test.afterEach(() => expect(errors, 'no console errors').toEqual([]))
 test.describe('@flows', () => {
   test('Today in the asked order: appointments, requests, missed remedy, remedy ending', async ({ page }) => {
     await fresh(page)
-    const order = await page.evaluate(() => [...document.querySelectorAll('.today > section')].map((x) => x.getAttribute('aria-label')))
-    expect(order).toEqual(["Today's appointments", 'Asking for an appointment', 'Missed their remedy', 'Remedy about to end'])
+    const order = await page.evaluate(() => [...document.querySelectorAll('.today section[aria-label]')].map((x) => x.getAttribute('aria-label')))
+    expect(order).toEqual(['Today at a glance', "Today's appointments", 'Asking for an appointment', 'Missed their remedy', 'Remedy about to end'])
+    await expect(page.locator('.fab')).toHaveCount(0) // owner 2026-11-25: no floating pill on Today
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Jitendra Khimlani')
     await expect(page.locator('.tdl-row')).toHaveCount(5)
     await expect(page.locator('.tdl-row .type-scanning').first()).toBeVisible()
     await expect(page.locator('.tdl-row .type-bach').first()).toBeVisible()
@@ -44,7 +45,7 @@ test.describe('@flows', () => {
     await sheet.getByRole('button', { name: 'Done' }).click()
     const after = await state(page)
     expect(after.requests.length).toBe(before - 1)
-    expect(after.appts.some((a: { assignedBy?: string; greeting?: string }) => a.assignedBy === 'Jitu Bhaiya' && a.greeting)).toBe(true)
+    expect(after.appts.some((a: { assignedBy?: string; greeting?: string }) => a.assignedBy === 'Jitendra Khimlani' && a.greeting)).toBe(true)
   })
 
   test('new scanning appointment, online, with a video link in the greeting', async ({ page }) => {
@@ -92,7 +93,7 @@ test.describe('@flows', () => {
     await page.getByRole('button', { name: 'End and give remedy' }).click()
     const remedy = page.getByRole('dialog', { name: 'Give remedy' })
     await remedy.getByRole('button', { name: /Add all/ }).click()
-    await remedy.getByRole('button', { name: /Give remedy with \d+ flowers/ }).click()
+    await remedy.getByRole('button', { name: /Give remedy · \d+\/7 flowers/ }).click()
     await expect(page.locator('.toast').last()).toContainText('Remedy given')
   })
 
@@ -255,7 +256,7 @@ test.describe('@flows', () => {
 
   test('appointment opens with sliding tabs: summary on every tab, add a note, create a remedy', async ({ page, isMobile }) => {
     await fresh(page)
-    await page.locator('.tdl-who').first().click()
+    await page.locator('.tl-hit').first().click()
     await expect(page).toHaveURL(/#\/appt\//)
     await expect(page.getByRole('region', { name: 'Appointment' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Wellness summary' })).toBeVisible()
@@ -275,8 +276,10 @@ test.describe('@flows', () => {
     await page.getByRole('tab', { name: 'Remedy' }).click()
     await page.locator('.rm-create').click()
     const sheet = page.getByRole('dialog', { name: 'Give remedy' })
-    await sheet.locator('.flower-list .chip', { hasText: 'Hornbeam' }).click()
-    await sheet.getByRole('button', { name: /(Create|Give) remedy with/ }).click()
+    if (await sheet.locator('.blend-chip').count() >= 7) await sheet.locator('.blend-chip').first().click()
+    await sheet.getByLabel('Search flowers').fill('Hornb')
+    await sheet.locator('.ftile', { hasText: 'Hornbeam' }).click()
+    await sheet.getByRole('button', { name: /(Create|Give) remedy · \d+\/7 flowers/ }).click()
     await expect(page.locator('.toast').last()).toContainText(/Remedy (given|created)/)
     await expect(page.locator('.rm-current')).toContainText('Hornbeam')
     // swipe between tabs on touch screens

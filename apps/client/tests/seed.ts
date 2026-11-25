@@ -22,15 +22,16 @@ export function seedState(opts: { onboarded?: boolean } = {}) {
       checkins: {}, cart: [{ key: 'sleep-roll-on-15', qty: 1 }], wishlist: ['aura-spray'],
       addresses: [{ id: 'ad1', name: 'Priya Shah', phone: '9876543210', line1: '12, Shanti Kunj', line2: 'Alkapuri', city: 'Vadodara', state: 'Gujarat', pin: '390007' }],
       orders: [{ id: 'o1', code: 'BW-00040', lines: [{ key: 'remedy', name: 'Personal blend v1', label: '30 ml', qty: 1, pricePaise: 0, kind: 'remedy' }], totalPaise: 0, address: { id: 'ad1', name: 'Priya Shah', phone: '9876543210', line1: '12, Shanti Kunj', line2: 'Alkapuri', city: 'Vadodara', state: 'Gujarat', pin: '390007' }, placedAt: iso(now - 12 * D), stage: 3 }],
-      chat: [], notices: [], seq: 42,
+      chat: [], notices: [], seq: 42, reminders: { askedAt: iso(now - D), on: false },
     },
     version: 0,
   }
 }
 export async function seed(page: Page, opts: { onboarded?: boolean } = {}) {
   await page.goto('/welcome')
-  await page.evaluate((s) => { localStorage.setItem('bewise-client-v1', JSON.stringify(s)) }, seedState(opts))
+  // the after-onboarding setup (home screen + notifications) is covered by its own tests
+  await page.evaluate((s) => { localStorage.setItem('bewise-client-v1', JSON.stringify(s)); localStorage.setItem('bewise-setup', 'done') }, seedState(opts))
 }
-export const ROUTES = ['/app', '/app/journal', '/app/goals', '/app/remedies', '/app/book', '/app/sessions', '/app/sessions/view?id=a2', '/app/checkin?appointment=a2',
-  '/app/pay?appointment=a3', '/app/shop', '/app/shop/sleep-roll-on', '/app/bag', '/app/checkout', '/app/orders', '/app/orders/view?id=o1', '/app/ask', '/app/me', '/app/help']
-export const PUBLIC = ['/welcome', '/sign-in', '/book/jitu-bhaiya?type=followup', '/onboarding/about', '/onboarding/photo', '/onboarding/privacy']
+export const ROUTES = ['/app', '/app/learn', '/app/learn/story?id=anxiety', '/app/journal', '/app/goals', '/app/remedies', '/app/book', '/app/sessions', '/app/sessions/view?id=a2', '/app/checkin?appointment=a2',
+  '/app/pay?appointment=a3', '/app/shop', '/app/shop/sleep-roll-on', '/app/bag', '/app/checkout', '/app/orders', '/app/orders/view?id=o1', '/app/ask', '/app/chat', '/app/me', '/app/help']
+export const PUBLIC = ['/welcome', '/sign-in', '/book/jitendra-khimlani?type=followup', '/onboarding/name', '/onboarding/dob', '/onboarding/gender', '/s/anger', '/stories']

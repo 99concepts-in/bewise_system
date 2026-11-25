@@ -3,7 +3,7 @@
  */
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, Leaf, MapPin, MessageCircle, MessageSquare, Phone, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat, Inbox, Brain, Flower2 } from 'lucide-react'
+import { Copy, Share2, ChevronLeft, Check, ArrowLeft, Zap, UserPlus, Search, ChevronRight, MapPin, MessageCircle, MessageSquare, Phone, Star, Video, BellRing, PackageCheck, CalendarPlus, ClipboardCheck, IndianRupee, Repeat, Inbox, Brain, Flower2, Droplet, X } from 'lucide-react'
 import { durationOf, useIndex, useStore } from '../state/store'
 import { parseDob } from '../lib/loshu'
 import { Avatar, Chip, Segmented, go, softSpring, spring, useToast } from '../ui/kit'
@@ -11,11 +11,12 @@ import { dayLabel, fmtDay, fmtShort, fmtTime, relative, inr } from '../lib/time'
 import { freeTimes, nextDays, nextFreeAny } from '../lib/slots'
 import { FLOWERS, startOfDay } from '../data/seed'
 import { suggestFlowers } from '../lib/derive'
-import { Suggestions } from '../ui/care'
+import { FlowerTile, Suggestions } from '../ui/care'
+import { FeelingChips, FlowerArt } from '../ui/art'
 import { TypeBadge } from '../ui/bits'
 import { type Appt, type Kind, type Mode, type Person, type Service } from '../data/types'
 
-import { DEFAULT_MEET, FEE, STATUS_LABEL, feeOf, typeLabel, BOOKING_LINK } from '../lib/labels'
+import { DEFAULT_MEET, FEE, MAX_FLOWERS, STATUS_LABEL, feeOf, typeLabel, BOOKING_LINK } from '../lib/labels'
 import type { Api, Open } from './Sheets'
 
 // ---------------------------------------------------------------- time picker (his timings are never fixed: any time 7 AM–10 PM, clashes blocked)
@@ -95,40 +96,69 @@ function RemedyBody({ apptId, personId, close }: { apptId?: string; personId: st
   const p = person.get(a?.personId ?? personId)!
   const all = byPerson.get(p.id) ?? []
   const lastFlowers = [...all.filter((x) => x.remedy && x.id !== a?.id).map((x) => x.remedy!), ...(p.remedies ?? [])].sort((x, y) => x.givenAt - y.givenAt).at(-1)?.flowers
-  const [picked, setPicked] = useState<string[]>(lastFlowers ?? [])
+  const [picked, setPicked] = useState<string[]>((lastFlowers ?? []).slice(0, MAX_FLOWERS))
   const [q, setQ] = useState('')
   const history = all.filter((x) => x.id !== a?.id && x.start < (a?.start ?? now))
   const suggestions = useMemo(() => suggestFlowers(p, history, a?.troubling ?? []), [p, history.length, a?.troubling]) // eslint-disable-line react-hooks/exhaustive-deps
-  const list = FLOWERS.filter((f) => f.toLowerCase().includes(q.toLowerCase()))
-  const toggle = (f: string) => setPicked((x) => x.includes(f) ? x.filter((y) => y !== f) : [...x, f])
+  const suggested = new Set(suggestions.map((x) => x.flower))
+  const ql = q.trim().toLowerCase()
+  // all 38 + Rescue: while searching show every match; otherwise the ones not already offered above
+  const list = FLOWERS.filter((f) => (ql ? f.toLowerCase().includes(ql) : !suggested.has(f)))
+  const full = picked.length >= MAX_FLOWERS
+  const toggle = (f: string) => {
+    if (picked.includes(f)) { setPicked((x) => x.filter((y) => y !== f)); return }
+    if (full) { toast(`A blend holds up to ${MAX_FLOWERS} flowers. Remove one to add ${f}.`); return }
+    setPicked((x) => [...x, f])
+  }
   const give = () => {
     if (a) dispatch({ type: 'giveRemedy', apptId: a.id, flowers: picked, now: Date.now() })
     else dispatch({ type: 'giveRemedyBetween', personId: p.id, id: `rm${Date.now()}`, flowers: picked, now: Date.now() })
     toast(`${a ? 'Remedy given' : 'Remedy created'}. The office is preparing ${p.first}'s bottle.`)
     close()
   }
+  const feel = a?.troubling ?? a?.feelings
   return (
     <div className="remedy">
       <h3 className="sheet-title">{a ? `Give ${p.first}'s remedy` : `New remedy for ${p.first}`}</h3>
       <p className="muted small">{a ? `Session ${dayLabel(a.start, now).toLowerCase()} at ${fmtTime(a.start)}. Included in the ${inr(FEE[a.kind])} fee.` : 'Between sessions: a refill or a changed blend. The office prepares and sends it.'}{lastFlowers ? ' Started from the last blend.' : ''}</p>
-      <Suggestions first={p.first} items={suggestions} picked={picked} onToggle={toggle} onAddAll={() => setPicked((x) => [...new Set([...x, ...suggestions.slice(0, 5).map((s) => s.flower)])])} />
-      <h4 className="blend-head">{p.first}'s blend{picked.length ? `, ${picked.length} ${picked.length === 1 ? 'flower' : 'flowers'}` : ''}</h4>
-      <div className="blend">
-        <AnimatePresence initial={false}>
-          {picked.map((f) => (
-            <m.button layout key={f} className="tag tag-sage tag-x" onClick={() => toggle(f)} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.6, opacity: 0 }} transition={spring} aria-label={`Remove ${f}`}>{f} ×</m.button>
-          ))}
-        </AnimatePresence>
-        {picked.length === 0 && <span className="muted small">Tap flowers below to add them.</span>}
+      {feel && <div className="remedy-feel"><FeelingChips items={feel} max={6} size="sm" /></div>}
+
+      <section className="blend-box" aria-label={`${p.first}'s blend`}>
+        <div className="blend-head"><h4>{p.first}'s blend</h4><span className="blend-count" aria-live="polite">{picked.length}/{MAX_FLOWERS} flowers</span></div>
+        <div className="blend">
+          <AnimatePresence initial={false}>
+            {picked.map((f) => (
+              <m.button layout key={f} type="button" className="blend-chip" onClick={() => toggle(f)} initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.7, opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} aria-label={`Remove ${f}`}>
+                <FlowerArt name={f} decorative /><span>{f}</span><X size={14} aria-hidden />
+              </m.button>
+            ))}
+          </AnimatePresence>
+          {picked.length === 0 && <span className="muted small">Tap flowers below to add them.</span>}
+        </div>
+        <p className="dosage"><b>4 drops, 4 times a day</b> for 3 weeks, 30 ml bottle</p>
+      </section>
+
+      {!ql && <Suggestions first={p.first} items={suggestions} picked={picked} onToggle={toggle} full={full} limit={7}
+        onAddAll={() => setPicked((x) => [...new Set([...x, ...suggestions.map((sg) => sg.flower)])].slice(0, MAX_FLOWERS))} />}
+
+      <section className="all-flowers">
+        <h4 className="sugg-title">{ql ? `Flowers matching “${q.trim()}”` : suggestions.length ? 'All other flowers' : 'All flowers'}</h4>
+        <div className="search-wrap search-in-sheet">
+          <Search size={18} aria-hidden />
+          <input className="search" placeholder="Search by flower name" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search flowers" />
+          {q && <button type="button" className="icon-btn sm" onClick={() => setQ('')} aria-label="Clear search"><X size={16} /></button>}
+        </div>
+        {list.length === 0 && <p className="muted small">No flower matches “{q.trim()}”.</p>}
+        <ul className="ftile-grid">
+          {list.map((f) => <li key={f}><FlowerTile name={f} on={picked.includes(f)} onToggle={toggle} full={full} /></li>)}
+        </ul>
+      </section>
+
+      <div className="sheet-fab">
+        <m.button type="button" className="fab" disabled={!picked.length} onClick={give} whileTap={{ scale: 0.97 }}>
+          <Droplet size={20} aria-hidden /> {a ? 'Give remedy' : 'Create remedy'} · {picked.length}/{MAX_FLOWERS} flowers
+        </m.button>
       </div>
-      <p className="dosage"><b>4 drops, 4 times a day</b> for 3 weeks, 30 ml bottle</p>
-      <input className="search" placeholder="Add any other flower: search 38 and Rescue Remedy" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search flowers" />
-      <div className="flower-list">
-        {list.map((f) => <Chip key={f} active={picked.includes(f)} onClick={() => toggle(f)}>{f}</Chip>)}
-      </div>
-      <button className="btn btn-primary btn-block" disabled={!picked.length} onClick={give}>
-        <Leaf size={16} /> {a ? 'Give remedy' : 'Create remedy'} with {picked.length} {picked.length === 1 ? 'flower' : 'flowers'}
-      </button>
     </div>
   )
 }
@@ -227,7 +257,7 @@ function greetingFor(p: Person, start: number, service: Service, kind: Kind, mod
   const what = service === 'scanning' ? 'Scanning session' : kind === 'first' ? 'first Bach flower consultation' : 'Bach flower follow-up'
   return [
     `Namaste ${p.first} 🙏`,
-    `This is Jitu Bhaiya from BeWise. Your ${what} is fixed for ${when}, ${mode === 'online' ? 'online' : 'at the studio in Alkapuri, Vadodara'}.`,
+    `This is Jitendra Khimlani from BeWise. Your ${what} is fixed for ${when}, ${mode === 'online' ? 'online' : 'at the center in Alkapuri, Vadodara'}.`,
     mode === 'online' ? (url ? `Join here: ${url}` : 'The video link comes with your reminder.') : '',
     service === 'bach' && kind === 'first' ? 'Before we meet, please fill the short intake form in the BeWise app.' : 'Looking forward to seeing you.',
   ].filter(Boolean).join('\n\n')
@@ -240,7 +270,7 @@ function ConfirmBooking({ d, onBack, close }: { d: Draft; onBack: () => void; cl
   const [msg, setMsg] = useState(() => greetingFor(p, start, service, kind, mode, url, now))
   const [stage, setStage] = useState<'review' | 'sending' | 'done'>('review')
   const send = () => {
-    dispatch({ type: 'book', personId: p.id, start, service, kind, mode, meetingUrl: url, id: `b${Date.now()}`, now: Date.now(), greeting: msg, by: 'Jitu Bhaiya', requestId })
+    dispatch({ type: 'book', personId: p.id, start, service, kind, mode, meetingUrl: url, id: `b${Date.now()}`, now: Date.now(), greeting: msg, by: 'Jitendra Khimlani', requestId })
     setStage('sending')
     setTimeout(() => setStage('done'), 1500)
   }
@@ -251,7 +281,7 @@ function ConfirmBooking({ d, onBack, close }: { d: Draft; onBack: () => void; cl
   ]
   if (stage !== 'review') return (
     <div className="confirm-done">
-      <m.div className="done-badge" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={softSpring}><img src="./img/owl-wave.webp" width={96} height={96} alt="" /></m.div>
+      <m.div className="done-badge" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={softSpring}><Check size={40} strokeWidth={2.6} aria-hidden /></m.div>
       <h3 className="sheet-title">{p.first} is booked</h3>
       <ol className="done-steps">
         {steps.map((st, i) => (
@@ -282,7 +312,7 @@ function ConfirmBooking({ d, onBack, close }: { d: Draft; onBack: () => void; cl
   )
 }
 
-// ---------------------------------------------------------------- new appointment (Jitu Bhaiya or the team): type → person → online/link → any time → greet
+// ---------------------------------------------------------------- new appointment (Jitendra Khimlani or the team): type → person → online/link → any time → greet
 function NewApptBody({ o, close, api }: { o: Extract<Open, { k: 'new' }>; close: () => void; api: Api }) {
   const { s, now } = useStore()
   const { person, byPerson } = useIndex()
@@ -372,7 +402,7 @@ function ShareBody() {
   const msg = `${SHARE_MSGS[kind].text}\n${BOOKING_LINK}`
   useEffect(() => {
     let live = true
-    import('qrcode').then((Q) => Q.toDataURL(BOOKING_LINK, { margin: 1, width: 360, color: { dark: '#182957', light: '#FFFFFF' } })).then((u) => { if (live) setQr(u) }).catch(() => {})
+    import('qrcode').then((Q) => Q.toDataURL(BOOKING_LINK, { margin: 1, width: 360, color: { dark: '#17214A', light: '#FFFFFF' } })).then((u) => { if (live) setQr(u) }).catch(() => {})
     return () => { live = false }
   }, [])
   const m0 = new Date(now); m0.setDate(1); m0.setHours(0, 0, 0, 0)
@@ -392,13 +422,13 @@ function ShareBody() {
       <div className="form-actions">
         <a className="btn btn-quiet" href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a>
         {canShare
-          ? <button className="btn btn-primary" onClick={() => navigator.share({ title: 'Book with Jitu Bhaiya', text: SHARE_MSGS[kind].text, url: BOOKING_LINK }).catch(() => {})}><Share2 size={16} /> Share</button>
+          ? <button className="btn btn-primary" onClick={() => navigator.share({ title: 'Book with Jitendra Khimlani', text: SHARE_MSGS[kind].text, url: BOOKING_LINK }).catch(() => {})}><Share2 size={16} /> Share</button>
           : <button className="btn btn-primary" onClick={() => copy(msg, 'Message copied')}><Copy size={16} /> Copy message</button>}
       </div>
       <div className="qr">
         {qr ? <m.img src={qr} width={180} height={180} alt="QR code for your booking link" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={softSpring} /> : <span className="qr-ph" />}
-        <div><b>QR code</b><p className="muted small">Show it at workshops or keep it at the studio desk. People scan and book.</p>
-          {qr && <a className="link" href={qr} download="jitu-bhaiya-booking-qr.png">Download QR</a>}</div>
+        <div><b>QR code</b><p className="muted small">Show it at workshops or keep it at the center desk. People scan and book.</p>
+          {qr && <a className="link" href={qr} download="jitendra-khimlani-booking-qr.png">Download QR</a>}</div>
       </div>
     </div>
   )

@@ -16,7 +16,7 @@ const FEE = { 'First consultation': 100000, 'Follow-up': 80000 } as const // D-0
 const MIN = { 'First consultation': 60, 'Follow-up': 30 } as const
 export const STATUS_LABEL: Record<Appointment['status'], string> = { awaiting_payment: 'Awaiting payment', confirmed: 'Confirmed', checked_in: 'Checked in', completed: 'Completed' }
 
-/** Check-in control shared by Today and Appointments — same states as Jitu Bhaiya's Today. */
+/** Check-in control shared by Today and Appointments — same states as Jitendra Khimlani's Today. */
 export function CheckInControl({ a, big }: { a: Appointment; big?: boolean }) {
   const s = useStore()
   const c = s.clients.find((x) => x.id === a.clientId)!
@@ -30,7 +30,7 @@ export function CheckInControl({ a, big }: { a: Appointment; big?: boolean }) {
           <motion.span key="ap"><Chip tone="gold">Awaiting payment</Chip></motion.span>
         ) : (
           <motion.button key="btn" exit={{ scale: 0.85, opacity: 0 }} whileTap={{ scale: 0.94 }} transition={spring}
-            onClick={(e) => { e.stopPropagation(); s.checkIn(a.id); s.toast(`${firstName(c.name)} ${a.mode === 'online' ? 'has joined' : 'has arrived'}. Jitu Bhaiya can see it too.`) }}
+            onClick={(e) => { e.stopPropagation(); s.checkIn(a.id); s.toast(`${firstName(c.name)} ${a.mode === 'online' ? 'has joined' : 'has arrived'}. Jitendra Khimlani can see it too.`) }}
             className={cx('cta inline-flex shrink-0 items-center gap-1.5 rounded-full font-bold shadow-lift', h)}><UserCheck size={16} />Check in</motion.button>
         )}
     </AnimatePresence>
@@ -46,7 +46,7 @@ export function Appointments() {
   const now = Date.now()
   const today = s.appointments.filter((a) => new Date(a.startsAt).toDateString() === new Date(now).toDateString() || a.startsAt > now)
   return (
-    <Screen title="Appointments" sub={`${s.appointments.length} sessions with Jitu Bhaiya`}
+    <Screen title="Appointments" sub={`${s.appointments.length} sessions with Jitendra Khimlani`}
       actions={<Button kind="primary" className="h-11" icon={<Zap size={18} />} onClick={() => setExpress(true)}>Express booking</Button>}>
       <div className="relative space-y-2.5 pl-5">
         <span className="absolute top-3 bottom-3 left-[5px] w-[2px] rounded-full bg-[var(--line)]" aria-hidden />
@@ -80,7 +80,7 @@ export function Appointments() {
           )
         })}
       </div>
-      <p className="mt-4 px-2 text-[12.5px] text-ink-2">Check-in shows on Jitu Bhaiya's Today as well. To move a session, use his calendar. No refunds — cancellations become a reschedule.</p>
+      <p className="mt-4 px-2 text-[12.5px] text-ink-2">Check-in shows on Jitendra Khimlani's Today as well. To move a session, use his calendar. No refunds — cancellations become a reschedule.</p>
       <ExpressBookingSheet open={express} onClose={() => setExpress(false)} />
       <PaidAtDeskSheet a={desk} onClose={() => setDesk(undefined)} />
     </Screen>
@@ -129,8 +129,8 @@ const dayLabel = (t: number) => {
 function greetingFor(c: Client, start: number, type: Appointment['type'], mode: Appointment['mode']) {
   return [
     `Namaste ${firstName(c.name)} 🙏`,
-    `This is Haresh from BeWise. Your ${type.toLowerCase()} with Jitu Bhaiya is booked for ${dayLabel(start).toLowerCase()} at ${time(start)}, ${mode === 'online' ? 'online (the video link comes with your reminder)' : 'at the studio in Vadodara'}.`,
-    type === 'First consultation' ? 'Before you come, please fill the short intake form so Jitu Bhaiya can understand you better.' : 'Jitu Bhaiya is looking forward to hearing how you have been.',
+    `This is Haresh from BeWise. Your ${type.toLowerCase()} with Jitendra Khimlani is booked for ${dayLabel(start).toLowerCase()} at ${time(start)}, ${mode === 'online' ? 'online (the video link comes with your reminder)' : 'at the center in Vadodara'}.`,
+    type === 'First consultation' ? 'Before you come, please fill the short intake form so Jitendra Khimlani can understand you better.' : 'Jitendra Khimlani is looking forward to hearing how you have been.',
   ].join('\n\n')
 }
 
@@ -348,7 +348,7 @@ export function ClientDetail({ id }: { id: string }) {
         {c.email && <Row onClick={() => copy(c.email!, 'Email')}><Mail size={18} className="text-ink-3" /><span className="flex-1 truncate text-[15px] text-ink select-all">{c.email}</span><span className="text-[13px] font-semibold text-accent">Copy</span></Row>}
         <div className="flex items-start gap-3 px-4 py-3.5"><MapPin size={18} className="mt-0.5 text-ink-3" /><span className="text-[15px] text-ink">{c.address || 'No address yet'}{c.address && <>, {c.city} {c.pincode}</>}</span></div>
       </Divided>
-      <p className="mt-3 flex items-center gap-2 px-2 text-[12.5px] text-ink-2"><Lock size={13} /> Consultation notes and intake answers stay with Jitu Bhaiya.</p>
+      <p className="mt-3 flex items-center gap-2 px-2 text-[12.5px] text-ink-2"><Lock size={13} /> Consultation notes and intake answers stay with Jitendra Khimlani.</p>
 
       <SectionTitle>Orders</SectionTitle>
       {orders.length ? (

@@ -72,7 +72,7 @@ ok((await owner.call('intake.getCaseSummary', { appointmentId: appt.id })).statu
 ok((await owner.call('consultation.listNotes', { clientId: me.clientId })).status === 403, 'owner cannot read private notes')
 const mInbox = await haresh.req('notifications.listInbox'); ok(!mInbox.items.some((n) => /safety|check in with/i.test(n.title)), 'manager got no safety alert')
 const oInbox = await owner.req('notifications.listInbox'); ok(!oInbox.items.some((n) => /safety|check in with/i.test(n.title)), 'owner got no safety alert')
-const jInbox = await jitu.req('notifications.listInbox'); ok(jInbox.items.some((n) => n.priority === 'high' && /check in/i.test(n.title)), 'Jitu Bhaiya got the safety alert')
+const jInbox = await jitu.req('notifications.listInbox'); ok(jInbox.items.some((n) => n.priority === 'high' && /check in/i.test(n.title)), 'Jitendra Khimlani got the safety alert')
 const mView = (await haresh.req('scheduling.getAppointment', { id: appt.id })); ok(mView.clientNote === undefined, 'manager does not see booking note')
 
 console.log('consultant session')

@@ -49,7 +49,7 @@
 
 ## 3. Team management (OW-16 / OW-17)
 - Roles are presets. OW-17 shows toggles grouped as **Money · Clients · Operations · Reports · Setup**. A toggle overrides the preset per member (`user_permission_overrides`), always audited.
-- Some toggles are hard-locked and greyed out with a reason: consultation notes and intake (D-03), safety alerts (D-38, Jitu Bhaiya only).
+- Some toggles are hard-locked and greyed out with a reason: consultation notes and intake (D-03), safety alerts (D-38, Jitendra Khimlani only).
 - Deactivate = revoke sessions, keep history. Users are never deleted.
 - Multi-role users (e.g. owner who is also a consultant, D-17) get a role switcher (HUB shell).
 - Security defaults: owner & accountant require TOTP 2FA. Owner phone app re-locks with biometrics/passkey after 5 min in the background (OW-01).

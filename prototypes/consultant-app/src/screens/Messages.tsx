@@ -1,12 +1,12 @@
 /**
- * Messages (owner 2026-11-20): clients chat with Jitu Bhaiya in the BeWise app. Inbox + conversation.
+ * Messages (owner 2026-11-20): clients chat with Jitendra Khimlani in the BeWise app. Inbox + conversation.
  * Live: a new messaging module (request filed) — client UI by CLIENT, this side by CONSULTANT.
  */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
 import { ArrowLeft, CalendarPlus, Phone, Search, Send, UserRound } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { Avatar, Empty, go, spring, useMedia } from '../ui/kit'
+import { AppHeader, Avatar, Empty, go, spring, useMedia } from '../ui/kit'
 import { TypeBadge } from '../ui/bits'
 import { useSheets } from './Sheets'
 import { personView } from '../lib/derive'
@@ -30,7 +30,7 @@ export default function Messages({ pid }: { pid?: string }) {
       {pid ? <Conversation pid={pid} key={pid} /> : <div className="msg-empty"><Empty img="owl-read" title="Pick a conversation" body="Messages from people appear here. Replies reach them in the BeWise app." /></div>}
     </div>
   )
-  return <div className="screen">{pid ? <Conversation pid={pid} key={pid} /> : <Inbox />}</div>
+  return <div className="screen">{pid ? <Conversation pid={pid} key={pid} /> : <><AppHeader /><Inbox /></>}</div>
 }
 
 function Inbox({ active }: { active?: string }) {

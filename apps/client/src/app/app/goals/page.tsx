@@ -53,12 +53,12 @@ export default function Goals() {
           <Segmented value={kind} onChange={setKind} options={[{ value: 'daily', label: '☀️ Daily' }, { value: 'once', label: '🎯 Long-term' }]} />
           <p className="mt-2 px-1 text-[12px] text-muted">{kind === 'daily' ? 'Check in each day you do it.' : 'Tick it off once, when you get there.'}</p>
           <form onSubmit={(e) => { e.preventDefault(); if (t.trim()) { add(t.trim(), kind); setT(''); buzz() } }} className="mt-3 flex gap-2">
-            <input value={t} onChange={(e) => setT(e.target.value.slice(0, 60))} placeholder={kind === 'daily' ? 'e.g. Drink 8 glasses of water' : 'e.g. Run a 5 km'} aria-label="New goal" className="h-12 min-w-0 flex-1 rounded-full bg-peri-50 px-4 text-[16px] outline-none focus:ring-2 focus:ring-navy" />
+            <input value={t} onChange={(e) => setT(e.target.value.slice(0, 60))} placeholder={kind === 'daily' ? 'e.g. Drink 8 glasses of water' : 'e.g. Run a 5 km'} aria-label="New goal" className="h-12 min-w-0 flex-1 rounded-full bg-peri-50 px-4 text-[16px] outline-none focus:ring-2 focus:ring-blue" />
             <Btn size="md" type="submit" disabled={!t.trim()}>Add</Btn>
           </form>
           <div className="mt-3 flex flex-wrap gap-2">
             {IDEAS.filter((i) => i.k === kind && !goals.some((g) => g.title === i.t)).map((i) => (
-              <button key={i.t} onClick={() => add(i.t, i.k)} className="rounded-full bg-[#f6f1e8] px-3 py-1.5 text-[13px] font-semibold text-navy">+ {i.t}</button>
+              <button key={i.t} onClick={() => add(i.t, i.k)} className="rounded-full bg-marigold-100 px-3 py-1.5 text-[13px] font-semibold text-navy">+ {i.t}</button>
             ))}
           </div>
         </div>
@@ -76,7 +76,7 @@ function GoalRow({ g, onDelete, onParty }: { g: Goal; onDelete: () => void; onPa
         <GoalCheck g={g} onParty={onParty} />
         <div className="min-w-0 flex-1">
           <p className={cx('text-[16px] font-bold', once && g.done ? 'text-sage-text line-through decoration-sage/50' : 'text-navy')}>{g.title}</p>
-          <p className="text-[12px] text-muted">{once ? (g.done ? 'Achieved' : 'Long-term goal · tick it off when you get there') : s ? `🔥 ${s}-day streak` : 'Check in today'}</p>
+          <p className="text-[12px] text-muted">{once ? (g.done ? 'Achieved' : 'Long-term goal · tick it off when you get there') : s ? `🌸 ${s} day${s === 1 ? '' : 's'} in a row` : 'Check in today'}</p>
         </div>
         <button aria-label={`Remove ${g.title}`} onClick={onDelete} className="grid size-9 place-items-center rounded-full text-muted"><Trash2 className="size-4" /></button>
       </div>

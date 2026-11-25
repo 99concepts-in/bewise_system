@@ -9,12 +9,12 @@
 | When | To | Template |
 |---|---|---|
 | Booking confirmed, paid or "pay later" (and when the time is changed) | Client | `bw_booking_confirmed` |
-| Jitu Bhaiya or Haresh books for a client who still has to pay | Client | `bw_payment_due` |
+| Jitendra Khimlani or Haresh books for a client who still has to pay | Client | `bw_payment_due` |
 | About 24 h and about 2 h before the session (cron job) | Client | `bw_session_reminder` |
 | Blend ready to collect at the studio | Client | `bw_remedy_ready` |
 | Order paid | Client | `bw_order_confirmed` |
 | Order dispatched (courier and tracking) | Client | `bw_order_dispatched` |
-| New booking · **safety alert from the intake (D-38)** | **Jitu Bhaiya only** | `bw_staff_alert` |
+| New booking · **safety alert from the intake (D-38)** | **Jitendra Khimlani only** | `bw_staff_alert` |
 | Sign-in code (optional, instead of email) | Client | `bw_auth` |
 
 Clients who turn WhatsApp off in their privacy settings are skipped. Every send is logged; the last 8 show on the tools page.
@@ -26,7 +26,7 @@ Clients who turn WhatsApp off in their privacy settings are skipped. Every send 
 2. On https://app.bewiseglobal.in/api/tools.php, go to **WhatsApp (Mart2Meta)**:
    - Paste the Vendor UID and the token, then click **Save WhatsApp**.
    - Under **Send a test**, enter your own mobile with template `hello_world` and language `en_US`. Every new WhatsApp account has this template. If it doesn't arrive, the page shows Mart2Meta's exact reply.
-3. On the same page, in **Add a team member**, add each staff member's **WhatsApp number**. Jitu Bhaiya's number is needed for booking and safety alerts.
+3. On the same page, in **Add a team member**, add each staff member's **WhatsApp number**. Jitendra Khimlani's number is needed for booking and safety alerts.
 
 ## Step 2: Create the templates in Mart2Meta (Templates → Create)
 Create each template below and submit it. Meta usually approves within minutes to a few hours.
@@ -36,10 +36,10 @@ Create each template below and submit it. Meta usually approves within minutes t
 Copy the texts exactly. `{{1}}`, `{{2}}` and so on are the variables, in this order.
 
 **bw_booking_confirmed** (Utility)
-> Hello {{1}}, your {{2}} with Jitu Bhaiya is confirmed for {{3}}, {{4}}. Booking ID: {{5}}. To change the time, reply to this message or open My account on bewiseglobal.in. — BeWise Holistic Wellness
+> Hello {{1}}, your {{2}} with Jitendra Khimlani is confirmed for {{3}}, {{4}}. Booking ID: {{5}}. To change the time, reply to this message or open My account on bewiseglobal.in. — BeWise Holistic Wellness
 
 **bw_session_reminder** (Utility)
-> Hello {{1}}, a gentle reminder: your session with Jitu Bhaiya is {{2}} at {{3}}, {{4}}. See you soon! — BeWise
+> Hello {{1}}, a gentle reminder: your session with Jitendra Khimlani is {{2}} at {{3}}, {{4}}. See you soon! — BeWise
 
 **bw_payment_due** (Utility)
 > Hello {{1}}, we've reserved your {{2}}. Amount due: {{3}}. You can pay securely here: {{4}} — BeWise Holistic Wellness

@@ -13,7 +13,7 @@ export const FLOWERS = [
   'Star of Bethlehem', 'Sweet Chestnut', 'Vervain', 'Vine', 'Walnut', 'Water Violet', 'White Chestnut',
   'Wild Oat', 'Wild Rose', 'Willow', 'Rescue Remedy',
 ]
-/** One-line Bach description per flower (draft, pending Jitu Bhaiya's approval — D-10). Shown as the reason. */
+/** One-line Bach description per flower (draft, pending Jitendra Khimlani's approval — D-10). Shown as the reason. */
 export const FLOWER_NOTE: Record<string, string> = {
   Agrimony: 'worries hidden behind a cheerful face', Aspen: 'vague fear without a clear reason', Beech: 'critical, intolerant of others',
   Centaury: "can't say no, pleases others", Cerato: 'doubts own judgement', 'Cherry Plum': 'fear of losing control',
@@ -39,6 +39,11 @@ export const CONCERN_FLOWERS: Record<string, string[]> = {
   Grief: ['Star of Bethlehem', 'Honeysuckle'], Indecision: ['Scleranthus', 'Wild Oat'], Overwhelm: ['Elm', 'Vervain'],
   Guilt: ['Pine', 'Crab Apple'],
 }
+/** The client app's intake feelings (apps/client FEELINGS), the words a client picks when booking. */
+export const INTAKE_FEELINGS = [
+  'Fear', 'Worry', 'Anxiety', 'Overthinking', 'Anger', 'Irritability', 'Sadness', 'Loneliness', 'Guilt', 'Low confidence',
+  'Overwhelm', 'Indecision', 'Exhaustion', 'Grief or loss', 'Shock', 'Jealousy', 'Hopelessness', 'Restlessness',
+]
 /** Feedback tags a client can pick after a session (CL-23) — their words, never a claim by BeWise. */
 export const BENEFITS = ['Calmer', 'Felt heard', 'Sleeping better', 'Lighter', 'Clearer mind', 'More confident', 'Less anxious', 'More hopeful', 'More patient', 'More energy', 'At peace', 'More connected']
 const CONCERN_BENEFITS: Record<string, string[]> = {
@@ -101,7 +106,7 @@ export function startOfDay(t: number) { const d = new Date(t); d.setHours(0, 0, 
 export interface Seed { people: Person[]; appts: Appt[]; notices: Notice[]; requests: ApptRequest[]; threads: Thread[] }
 type Draft = Omit<Appt, 'service'> & { service?: Service }
 
-/** Notes Jitu Bhaiya writes after a Scanning session (demo, illustrative wording — no diagnosis). */
+/** Notes Jitendra Khimlani writes after a Scanning session (demo, illustrative wording — no diagnosis). */
 const SCAN_NOTES = [
   'Energy low and scattered today. Shoulders and jaw holding stress. Suggested 10 minutes of slow breathing before sleep.',
   'Much steadier than last time. Sleep pattern improving. Continue the evening walk and less screen time after 10 PM.',
@@ -259,7 +264,7 @@ export function makeSeed(now: number): Seed {
   for (const p of people) track.set(p.id, rs() < 0.22 ? 'scanning' : 'bach')
   ;[0, 1, 2].forEach((i) => track.set(todayPeople[i].id, 'bach'))
   ;[3, 4].forEach((i) => track.set(todayPeople[i].id, 'scanning'))
-  const STAFF: Staff[] = ['Haresh bhai', 'Shivani di', 'Haresh bhai', 'Jitu Bhaiya']
+  const STAFF: Staff[] = ['Haresh bhai', 'Shivani di', 'Haresh bhai', 'Jitendra Khimlani']
   for (const a of appts) {
     a.service = track.get(a.personId) ?? 'bach'
     if (a.service === 'scanning') {
@@ -280,6 +285,18 @@ export function makeSeed(now: number): Seed {
     while (chosen.length < n) { const b = pool[Math.floor(rb() * pool.length)]; if (!chosen.includes(b)) chosen.push(b) }
     a.benefits = chosen
   }
+
+  // ---- v5 (HUB 2026-11-20): feelings chosen in the client's intake quiz for today's and upcoming sessions,
+  //      plus one intake safety flag on today's later first visit (separate RNG so the rest of the demo stays stable)
+  const rf = mulberry32(5150)
+  for (const a of appts) {
+    if (a.start < today || a.troubling) continue
+    const n = 1 + Math.floor(rf() * 3)
+    const pool = [...INTAKE_FEELINGS]
+    a.feelings = Array.from({ length: n }, () => pool.splice(Math.floor(rf() * pool.length), 1)[0])
+  }
+  const laterFirst = appts.find((a) => startOfDay(a.start) === today && a.kind === 'first' && a.start > now)
+  if (laterFirst) laterFirst.safety = true
 
   // ---- "took my drops" log since the current blend was given (separate RNG)
   const rd = mulberry32(4242)
@@ -310,7 +327,7 @@ export function makeSeed(now: number): Seed {
     at: now - (35 + i * 170) * MIN,
   }))
 
-  // ---- in-app chat with Jitu Bhaiya (demo conversations; his replies never change medicines — he points to the doctor)
+  // ---- in-app chat with Jitendra Khimlani (demo conversations; his replies never change medicines — he points to the doctor)
   const CONVOS: [('c' | 'j'), string][][] = [
     [['c', 'Namaste Bhaiya 🙏 I have been taking the drops 4 times a day. Sleep is a little better.'], ['j', 'So happy to hear that. Keep going, and note how you feel each evening.'], ['c', 'Thank you Bhaiya, will do.']],
     [['c', 'Can I take the drops with my thyroid tablet?'], ['j', 'Please keep taking your medicine exactly as your doctor advised. Take the drops at a different time, 15 minutes apart. We can talk more in your session.']],

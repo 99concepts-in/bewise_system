@@ -16,7 +16,7 @@
 | Cancellation & refund policy · Shipping & delivery policy | `/refund-policy.html`, `/shipping-policy.html` |
 | My account (bookings, orders, pay pending) | `/account.html` |
 
-The site uses the same database as app.bewiseglobal.in. Bookings and orders appear in Jitu Bhaiya's, Haresh's and the owner's apps.
+The site uses the same database as app.bewiseglobal.in. Bookings and orders appear in Jitendra Khimlani's, Haresh's and the owner's apps.
 
 ## Go live (hPanel, once)
 1. **Back up the old site:** hPanel → Websites → **bewiseglobal.in** → **File Manager** → `public_html` → select all → **Compress** → download the zip.
@@ -31,7 +31,7 @@ The site uses the same database as app.bewiseglobal.in. Bookings and orders appe
 Every push to `main` that changes the website rebuilds the `website-site` branch automatically.
 
 ## Razorpay setup (owner, on https://app.bewiseglobal.in/api/tools.php)
-1. **Add Jitu Bhaiya** under *Add a team member*. Booking times only appear once a consultant exists. He gets default hours of Mon–Sat 10–1 and 4–7.
+1. **Add Jitendra Khimlani** under *Add a team member*. Booking times only appear once a consultant exists. He gets default hours of Mon–Sat 10–1 and 4–7.
 2. **Create the test login** for Razorpay's reviewers (username + password). Put the same details in the Razorpay form. Never put them in GitHub.
 3. **Add the Razorpay test keys:**
    - In the Razorpay Dashboard, switch to **Test mode**, go to **API Keys** and generate a key.

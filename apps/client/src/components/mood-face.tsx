@@ -12,7 +12,7 @@ export type Brows = 'none' | 'worried' | 'angry' | 'sad' | 'raised' | 'determine
 export type Extra = 'blush' | 'tear' | 'sweat' | 'sparkle' | 'heart' | 'zzz' | 'question' | 'tears'
 export type FaceSpec = { eyes: Eyes; mouth: Mouth; brows?: Brows; extras?: Extra[] }
 
-const INK = '#182957'
+const INK = '#243D91'
 
 function Eye({ kind, x, side }: { kind: Eyes; x: number; side: -1 | 1 }) {
   const y = 45

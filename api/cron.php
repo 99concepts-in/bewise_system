@@ -35,7 +35,7 @@ tx(function () use (&$out) {
             [gmdate('Y-m-d H:i:s', time() + $from), gmdate('Y-m-d H:i:s', time() + $to)]);
         foreach ($rows as $a) {
             $time = (new DateTimeImmutable($a['starts_at'], new DateTimeZone('UTC')))->setTimezone(new DateTimeZone(BW_TZ))->format('g:i a');
-            $place = $a['mode'] === 'online' ? ($a['meeting_url'] ? 'online: ' . $a['meeting_url'] : 'online — the video link comes on WhatsApp shortly') : 'at the BeWise studio, Alkapuri, Vadodara';
+            $place = $a['mode'] === 'online' ? ($a['meeting_url'] ? 'online: ' . $a['meeting_url'] : 'online — the video link comes on WhatsApp shortly') : 'at the BeWise center, Alkapuri, Vadodara';
             $ok = wa_send(wa_client_phone($a['client_id']), 'session_reminder', ['name' => wa_client_name($a['client_id']), 'day' => $day, 'time' => $time, 'place' => $place],
                 "$tag:{$a['id']}:{$a['starts_at']}", $a['id']);
             $out[] = "$tag {$a['code']} " . ($ok ? 'sent' : 'skipped');

@@ -6,7 +6,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { m } from 'motion/react'
 import { CalendarPlus, LayoutGrid, List, Search, UserPlus, X } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { Avatar, Chip, Empty, MoodFace, go } from '../ui/kit'
+import { AppHeader, Avatar, Chip, Empty, MoodFace, go } from '../ui/kit'
 import { TypeBadge } from '../ui/bits'
 import { JourneyTag, LastSeen } from '../ui/console'
 import { useSheets } from './Sheets'
@@ -61,6 +61,7 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
 
   return (
     <div className="screen">
+      <AppHeader />
       <div className="title-row">
         <h1 className="page-title">People<span className="title-count">{s.people.filter((p) => !p.archived).length} registered</span></h1>
         <div className="view-toggle" role="group" aria-label="View">
@@ -69,8 +70,8 @@ export default function People({ initialBucket }: { initialBucket?: Bucket }) {
         </div>
       </div>
       <div className="quick-actions">
-        <button className="btn btn-primary" onClick={() => sheets.addPerson('profile')}><UserPlus size={17} /> New person</button>
-        <button className="btn btn-quiet" onClick={() => sheets.newAppt()}><CalendarPlus size={17} /> New appointment</button>
+        <button className="btn btn-primary" onClick={() => sheets.addPerson('profile')}><UserPlus size={18} aria-hidden /> New person</button>
+        <button className="btn btn-quiet" onClick={() => sheets.newAppt()}><CalendarPlus size={18} aria-hidden /> New appointment</button>
       </div>
       <div className="search-wrap">
         <Search size={18} aria-hidden />

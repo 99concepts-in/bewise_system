@@ -86,3 +86,11 @@
 - Marketing tab: smart nudges (not using app, follow-up due, drifting, happy members → reviews, missed drops), broadcast with confirm, share a story / review / ready posts as images (canvas, BeWise logo + website flower art), booking link, recent activity.
 - Request: `requests/20261125-consultant-to-hub-marketing-and-appointment-view.md`. Spec: `specs/consultant/04-APPOINTMENT-VIEW-AND-MARKETING.md`.
 - Tests: 64 unit, 121 browser passed (3 skipped).
+
+## 2026-11-25 — Live fix + merged with v5 Blue Bloom (owner request)
+**Status:** Done, pushed to main (owner approved both)
+- Removed the floating "Build X's remedy" / "Start X's session" pill from Today on main (owner: confusing, pulls attention). Each row keeps its own action.
+- Merged main (HUB v5 Blue Bloom redesign of this app, D-45; consultant renamed "Jitendra Khimlani" everywhere) into the CONSULTANT branch, so the live app now has structure v3/v4: requests + assign, mood board, remedy ending + archive, Messages, Dashboard, Finance, Marketing, Scanning vs Bach flower, Lo Shu, consultant console, appointment view with sliding tabs.
+  - Kept v5's look: tokens, Fraunces + Inter, official logo header, white tab bar, flower/feeling art, mood circles, v5 Today (summary card + timeline), v5 remedy builder (flower tiles, max 7) now also for remedies between sessions.
+  - v3/v4 CSS moved onto v5 tokens; Fraunces latin file slimmed 121 → 58 KB (SOFT/WONK pinned, weights 400–800); --muted darkened to pass AA on the sky-50 page.
+- Tests: 68 unit, 121 browser passed (3 skipped). LCP budget 3.3 s (Fraunces greeting), FCP < 1 s.

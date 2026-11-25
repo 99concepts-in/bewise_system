@@ -38,7 +38,7 @@ Clients sign in with a 6-digit code sent by email.
 2. Fill in the form:
    1. **Database:** the name, user and password from Step 2. Host stays `localhost`, port stays `3306`.
    2. **Owner account:** your name, email and a password of at least 10 characters. You'll use this to sign in to `/owner/`.
-   3. **Team (optional):** Jitu Bhaiya's and Haresh's emails, each with a temporary password. Give them the passwords in person; they can change them after signing in.
+   3. **Team (optional):** Jitendra Khimlani's and Haresh's emails, each with a temporary password. Give them the passwords in person; they can change them after signing in.
    4. **Email:** choose *Hostinger mailbox (SMTP)*, enter the address from Step 3 and its password. Leave the host as `smtp.hostinger.com` and the port as `465`.
    5. **Razorpay:** leave it empty for now. Until it's added, clients can choose *Pay at the studio / pay later*, and Haresh records cash or UPI payments in the manager app.
 3. Click **Create tables & finish setup**.

@@ -8,7 +8,7 @@
 ## 1. Flow
 
 ```
-FIRST       CL-11 Choose ─(first time only)→ CL-12 Meet Jitu Bhaiya → IN-01…IN-11 Intake → CL-13 Online/In person
+FIRST       CL-11 Choose ─(first time only)→ CL-12 Meet Jitendra Khimlani → IN-01…IN-11 Intake → CL-13 Online/In person
             → CL-14 Date & time ─[holdAppointment + attachIntake]→ CL-16 Review & pay ─[Razorpay]→ CL-17 You're booked
 FOLLOW-UP   CL-11 Choose (Follow-up) → IN-12 Check-in (3 steps) → CL-13 → CL-14 ─[hold]→ CL-16 → CL-17
 ```
@@ -25,13 +25,13 @@ FOLLOW-UP   CL-11 Choose (Follow-up) → IN-12 Check-in (3 steps) → CL-13 → 
 | Headline | "Book a *session*" |
 | Card A | **First consultation** · "60 min · ₹1,000" · "A gentle, unhurried conversation about how you've been feeling. **Your personal remedy blend is included.**" |
 | Card B | **Follow-up** · "30 min · ₹800" · "See how you're doing and refresh your blend. **Blend included.**" — shown only if the client has ≥ 1 `completed` appointment; otherwise hidden (not disabled) |
-| Row | "Meet Jitu Bhaiya" → CL-12 · "Online or in person — you choose next" caption |
+| Row | "Meet Jitendra Khimlani" → CL-12 · "Online or in person — you choose next" caption |
 | Data | `scheduling.listConsultationTypes({activeOnly:true})` → name, durationMin, feePaise, modesAllowed. **Display only**; price charged = `holdAppointment().amountPaise` |
 | Guards | If an unpaid hold exists → banner "You have a time held until 11:12 — Finish booking" (→ CL-16). If a confirmed upcoming appointment of the same kind exists → soft note "You're already booked for Thu 21 Nov" + still allowed |
 | Flag | `booking` off → page shows "Online booking opens soon — WhatsApp us to book" with WhatsApp deep link (no dead CTA) |
 
 ### CL-12 Meet your consultant — `/app/book/consultant` (also linked from Help, CL-19)
-Real photo `design/assets/people/jitu-bhaiya-portrait.jpg` (alt "Jitu Bhaiya, smiling"). Name **Jitendra Khimlani — "Jitu Bhaiya"**, **Bach Remedy Therapist**, 2-line approach (owner to approve, draft: "Jitu Bhaiya listens first. Then he prepares a blend of Bach flower essences chosen for how *you* feel."), "12+ years guiding workshops · 2,00,000+ people", languages (**⏳ owner**), "How Bach remedies work" mini card (plays `design/motion/how-bach-remedies-work-9x16.mp4`, muted, poster frame, captions), testimonials carousel **only when consented testimonials exist** (CONTENT-CHECKLIST #1 — otherwise section absent), quiet link "Visit his website ↗" (www.jitendrakhimlani.com, `rel="noopener"`). CTA **Continue**. Shown automatically once to first-time bookers (`seen_consultant_intro` on profile prefs), otherwise via link.
+Real photo `design/assets/people/jitu-bhaiya-portrait.jpg` (alt "Jitendra Khimlani, smiling"). Name **Jitendra Khimlani — "Jitendra Khimlani"**, **Bach Remedy Therapist**, 2-line approach (owner to approve, draft: "Jitendra Khimlani listens first. Then he prepares a blend of Bach flower essences chosen for how *you* feel."), "12+ years guiding workshops · 2,00,000+ people", languages (**⏳ owner**), "How Bach remedies work" mini card (plays `design/motion/how-bach-remedies-work-9x16.mp4`, muted, poster frame, captions), testimonials carousel **only when consented testimonials exist** (CONTENT-CHECKLIST #1 — otherwise section absent), quiet link "Visit his website ↗" (www.jitendrakhimlani.com, `rel="noopener"`). CTA **Continue**. Shown automatically once to first-time bookers (`seen_consultant_intro` on profile prefs), otherwise via link.
 
 ### CL-13 Online or in person — `/app/book/mode`
 Two choice cards (radio): **Online** "Video call · link shared after booking" · **In person** "At the BeWise studio, Vadodara" + address (**⏳ CONTENT-CHECKLIST #7**; until supplied, In person card shows "Address shared after booking"). Only modes in `modesAllowed`. CTA Continue.
@@ -50,7 +50,7 @@ Two choice cards (radio): **Online** "Video call · link shared after booking" �
 ### CL-16 Review & pay — `/app/book/review?appointmentId=`
 | Element | Spec |
 |---|---|
-| Consultant row | Photo · "Jitu Bhaiya" · "Bach Remedy Therapist" |
+| Consultant row | Photo · "Jitendra Khimlani" · "Bach Remedy Therapist" |
 | Rows | type · "Thu 21 Nov · 11:00 AM" · "Online · 60 min" (icons as board) · "Your answers · shared ✓" (link back to IN-11) |
 | Included | Sage chip "Remedy blend included" |
 | Policy | Info card: "Sessions are non-refundable — you can reschedule free up to 24 h before." (D-08; window from `getSetting('policy.cancellation')`) + link "Booking policy" |
@@ -68,7 +68,7 @@ Two choice cards (radio): **Online** "Video call · link shared after booking" �
 Flag `checkout` off (dev/preview): stub `createCheckout` returns `{ stub:true }` → "Simulate payment" button visible **only** in non-production builds.
 
 ### CL-17 You're booked — `/app/book/confirmed/[appointmentId]`
-Headline "You're *booked*", mascot (celebrating), card "Thursday, 21 November · 11:00 AM · Online with Jitu Bhaiya". Buttons: **View appointment** (CL-19) · **Add to calendar** (CL-58: action sheet → Google Calendar link / Apple & others `.ics` download from `/api/app/appointments/[id]/ics`, title "BeWise session with Jitu Bhaiya", location = Meet link placeholder "Link shared in the app" / studio address, alarm −30 min). Line "A receipt is in Payments" and "Jitu Bhaiya will read your answers before you meet." If CL-49 auto-add is on → "Added to your calendar ✓" instead of the button. No refund wording.
+Headline "You're *booked*", mascot (celebrating), card "Thursday, 21 November · 11:00 AM · Online with Jitendra Khimlani". Buttons: **View appointment** (CL-19) · **Add to calendar** (CL-58: action sheet → Google Calendar link / Apple & others `.ics` download from `/api/app/appointments/[id]/ics`, title "BeWise session with Jitendra Khimlani", location = Meet link placeholder "Link shared in the app" / studio address, alarm −30 min). Line "A receipt is in Payments" and "Jitendra Khimlani will read your answers before you meet." If CL-49 auto-add is on → "Added to your calendar ✓" instead of the button. No refund wording.
 
 ### CL-53 Payment issue (variants)
 | Variant | Trigger | Copy | Actions |

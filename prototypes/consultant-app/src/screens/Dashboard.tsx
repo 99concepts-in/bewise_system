@@ -4,9 +4,9 @@
  */
 import { useMemo, useState } from 'react'
 import { m } from 'motion/react'
-import { ChevronRight, Leaf, MessageSquare, Sparkles } from 'lucide-react'
+import { ChevronRight, Droplet, MessageSquare, Sparkles } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { Avatar, CountUp, go, softSpring } from '../ui/kit'
+import { AppHeader, Avatar, CountUp, go, softSpring } from '../ui/kit'
 import { KindWords, Ring } from '../ui/bits'
 import { ImpactCard } from './Impact'
 import { adherence, growth, personView, remedyBoard, WEEK_GOAL, type PersonView } from '../lib/derive'
@@ -36,10 +36,11 @@ export default function Dashboard() {
 
   return (
     <div className="screen dash">
+      <AppHeader />
       <h1 className="page-title">Dashboard</h1>
 
       <m.section className="card remedy-hero" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={softSpring} aria-label="People taking a remedy">
-        <p className="rh-big"><Leaf size={22} /><b><CountUp to={b.on.length} /></b><span>people are on a remedy right now</span></p>
+        <p className="rh-big"><Droplet size={22} /><b><CountUp to={b.on.length} /></b><span>people are on a remedy right now</span></p>
         <div className="stack" role="img" aria-label={parts.map((x) => `${x.label}: ${x.n}`).join(', ')}>
           {parts.map((x, i) => x.n > 0 && (
             <m.span key={x.key} className={`stack-seg ${x.cls}`} initial={{ width: 0 }} animate={{ width: `${(x.n / total) * 100}%` }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.15 + i * 0.08 }} />

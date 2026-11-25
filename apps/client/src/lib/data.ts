@@ -103,9 +103,9 @@ export const searchMoods = (q: string) => {
 // @decision(D-09) @decision(D-02) fees include the remedy blend
 export const CONSULTATIONS = [
   // minutes = calendar-block length only (never shown — owner 2026-11-18)
-  { id: 'first', name: 'First consultation', minutes: 60, feePaise: 100000,
+  { id: 'first', name: 'First wellness session', minutes: 60, feePaise: 100000,
     blurb: 'A gentle, unhurried conversation about how you’ve been feeling.' },
-  { id: 'followup', name: 'Follow-up', minutes: 30, feePaise: 80000,
+  { id: 'followup', name: 'Follow-up session', minutes: 30, feePaise: 80000,
     blurb: 'See how you’re doing and refresh your blend.' },
 ] as const
 export type ConsultationId = (typeof CONSULTATIONS)[number]['id']
@@ -122,13 +122,17 @@ export const TESTIMONIALS: { name: string; city?: string; quote: string; rating?
   { name: 'Khushboo Gurnani', quote: 'Jitendra Khimlani has the best Bach flower & aroma oils therapy. I’ve benefited drastically mentally. It gave me a sense of calm and sound sleep after I took the treatment.' },
 ]
 /** BeWise contact from the brochure and remedy label. */
+/** owner 2026-11-24: Jitendra Khimlani's own Instagram (Home → "Connect with me on Instagram") */
+export const JITU_INSTAGRAM = { handle: '@jitubhaiyajgd', url: 'https://www.instagram.com/jitubhaiyajgd/' }
 export const CONTACT = { whatsapp: '919054220952', whatsappLabel: '90542 20952', social: '@bewiseglobal' }
 export const TESTIMONIALS_SOURCE = 'https://www.jitendrakhimlani.com'
+/** owner 2026-11-23: Jitendra Khimlani's Google reviews (opens the reviews panel on Google). */
+export const GOOGLE_REVIEWS_URL = 'https://www.google.com/search?q=jitendra+khimlani#lrd=0x395fc92b1f8e982f:0xc631ae8e4262d7c9,1,,,,'
 
-/** In-person studio (owner 2026-11-18; CONTENT-CHECKLIST #7). */
+/** In-person center (owner 2026-11-18; CONTENT-CHECKLIST #7). */
 const STUDIO_FULL = '102, Yogikrupa Apartment, 19/A, Nutan Bharat Society, Alkapuri, Vadodara, Gujarat 390007'
 export const STUDIO = {
-  name: 'BeWise studio',
+  name: 'BeWise Center',
   line1: '102, Yogikrupa Apartment',
   line2: '19/A, Nutan Bharat Society, Alkapuri',
   city: 'Vadodara, Gujarat 390007',
@@ -141,10 +145,10 @@ export const STUDIO = {
 }
 
 export const CONSULTANT = {
-  name: 'Jitu Bhaiya',
+  name: 'Jitendra Khimlani',
   fullName: 'Jitendra Khimlani',
-  title: 'Bach Remedy Therapist',
-  approach: 'Jitu Bhaiya listens first. Then he prepares a blend of Bach flower essences chosen for how you feel.',
+  title: 'Certified Bach Flower Remedy Therapist',
+  approach: 'Jitendra Khimlani listens first. Then he prepares a blend of Bach flower remedies chosen for how you feel.',
   stats: ['12+ years of workshops', '2,00,000+ people guided'],
   website: 'https://www.jitendrakhimlani.com',
 }
@@ -260,15 +264,15 @@ export const PRODUCTS: Product[] = [
   { slug: 'bach-remedy-dropper', name: 'Bach Flower Remedy', tagline: 'Your personal blend, dropper', format: 'Dropper', category: 'remedies', intents: ['calm'],
     art: 'products/bach-remedy-dropper', color: '#5E8F6A', tint: ['#e5efe2', '#f1f6ec'], personal: 'dropper',
     variants: [{ id: 'bach-remedy-dropper-30', label: '30 ml', pricePaise: 80000 }], allergens: [],
-    about: 'A personalised blend of Bach flower essences, chosen by Jitu Bhaiya for how you feel. Your first blend comes with your consultation; reorder the same blend here anytime.',
-    feel: ['Made for you', 'Gentle', 'Natural'], ingredients: 'Bach flower essences chosen for you by Jitu Bhaiya.',
+    about: 'A personalised blend of Bach flower remedies, chosen by Jitendra Khimlani for how you feel. Your first blend comes with your wellness session; reorder the same blend here anytime.',
+    feel: ['Made for you', 'Gentle', 'Natural'], ingredients: 'Bach flower remedies chosen for you by Jitendra Khimlani.',
     howTo: 'Take 4 drops, 4 times a day, directly or in any drink you like, or as your Bach expert suggests. A bottle lasts up to 25 days when taken regularly.',
     safety: 'An individual, customised remedy for personal use only. Store at room temperature, away from direct sunlight, and keep away from children. Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor.' },
   { slug: 'bach-remedy-spray', name: 'Bach Remedy Spray', tagline: 'Your personal blend, spray', format: 'Spray', category: 'remedies', intents: ['calm'],
     art: 'products/bach-remedy-spray', color: '#5E8F6A', tint: ['#e5efe2', '#eef1fb'], personal: 'spray',
     variants: [{ id: 'bach-remedy-spray-30', label: '30 ml', pricePaise: 80000 }], allergens: [],
-    about: 'Your personalised Bach flower blend in an easy spray, handy on the go. Available once Jitu Bhaiya has prepared your blend.',
-    feel: ['Made for you', 'On the go', 'Gentle'], ingredients: 'Bach flower essences chosen for you by Jitu Bhaiya.',
+    about: 'Your personalised Bach flower blend in an easy spray, handy on the go. Available once Jitendra Khimlani has prepared your blend.',
+    feel: ['Made for you', 'On the go', 'Gentle'], ingredients: 'Bach flower remedies chosen for you by Jitendra Khimlani.',
     howTo: 'Spray directly into your mouth, 3 sprays per dose, 4 times a day, or as your Bach expert recommends.',
     safety: 'An individual, customised remedy for personal use only. Store at room temperature, away from direct sunlight, and keep away from children. Bach flower remedies are a gentle, complementary practice for emotional balance, not a substitute for your doctor.' },
   { slug: 'rescue-remedy', name: 'Rescue Remedy', tagline: 'For stressful moments', format: 'Spray', category: 'remedies', intents: ['calm'],
@@ -306,21 +310,22 @@ export const PRODUCTS: Product[] = [
 ]
 /** Product line name as shown on cards: "Abundance" + "Roll-on" etc. */
 export const productTitle = (p: Product) => (p.category === 'remedies' || p.category === 'care' && p.format === 'Dropper' ? p.name : `${p.name} ${p.format === 'Bath salt' ? 'Bath Salt' : p.format === 'Roll-on' ? 'Roll-on' : p.slug === 'beauty-spray' ? 'Mist' : 'Spray'}`)
+// v5 (HUB 2026-11-20): category / intent tints moved to the Blue Bloom accent-100 family (presentation only)
 export const CATEGORIES: { key: Category | 'consult'; label: string; sub: string; tint: string; art: string[] }[] = [
-  { key: 'rollons', label: 'Roll-on oils', sub: '8 blends', tint: '#e7ecfa', art: ['products/sleep-rollon', 'products/abundance-rollon', 'products/immutime-rollon'] },
-  { key: 'sprays', label: 'Aura sprays', sub: '4 mists', tint: '#efe9fb', art: ['products/protection-spray', 'products/aura-spray'] },
-  { key: 'remedies', label: 'Bach remedies', sub: 'Made for you', tint: '#e5efe2', art: ['products/bach-remedy-dropper', 'products/rescue-remedy-spray'] },
-  { key: 'bath', label: 'Bath salts', sub: '3 rituals', tint: '#fbe9ee', art: ['products/aura-bath-salt', 'products/abundance-bath-salt'] },
-  { key: 'care', label: 'Hair & beauty', sub: 'Oil & mist', tint: '#fbf0dc', art: ['products/hair-oil', 'products/beauty-spray'] },
-  { key: 'consult', label: 'Consultation', sub: 'With Jitu Bhaiya', tint: '#f1ece4', art: [] },
+  { key: 'rollons', label: 'Roll-on oils', sub: '8 blends', tint: '#E6EDFF', art: ['products/sleep-rollon', 'products/abundance-rollon', 'products/immutime-rollon'] },
+  { key: 'sprays', label: 'Aura sprays', sub: '4 mists', tint: '#EEE8FF', art: ['products/protection-spray', 'products/aura-spray'] },
+  { key: 'remedies', label: 'Bach remedies', sub: 'Made for you', tint: '#DDF4F1', art: ['products/bach-remedy-dropper', 'products/rescue-remedy-spray'] },
+  { key: 'bath', label: 'Bath salts', sub: '3 rituals', tint: '#FDE3EB', art: ['products/aura-bath-salt', 'products/abundance-bath-salt'] },
+  { key: 'care', label: 'Hair & beauty', sub: 'Oil & mist', tint: '#FFF1D9', art: ['products/hair-oil', 'products/beauty-spray'] },
+  { key: 'consult', label: 'Wellness session', sub: 'With Jitendra Khimlani', tint: '#DFF0FF', art: [] },
 ]
 export const INTENTS: { key: Intent; label: string; emoji: string; tint: string; line: string }[] = [
-  { key: 'sleep', label: 'Sleep', emoji: '🌙', tint: '#e7ecfa', line: 'Wind down gently' },
-  { key: 'calm', label: 'Calm', emoji: '🍃', tint: '#e5efe2', line: 'Ease everyday stress' },
-  { key: 'abundance', label: 'Abundance', emoji: '✨', tint: '#fbf3dc', line: 'Positive and confident' },
-  { key: 'protection', label: 'Protection', emoji: '🛡️', tint: '#efe9fb', line: 'Grounded and shielded' },
-  { key: 'wellness', label: 'Wellness', emoji: '🌿', tint: '#dff0ee', line: 'Fresh and balanced' },
-  { key: 'beauty', label: 'Beauty', emoji: '🌸', tint: '#fbe9ee', line: 'Hair and skin care' },
+  { key: 'sleep', label: 'Sleep', emoji: '🌙', tint: '#EEE8FF', line: 'Wind down gently' },
+  { key: 'calm', label: 'Calm', emoji: '🍃', tint: '#DDF4F1', line: 'Ease everyday stress' },
+  { key: 'abundance', label: 'Abundance', emoji: '✨', tint: '#FFF1D9', line: 'Positive and confident' },
+  { key: 'protection', label: 'Protection', emoji: '🛡️', tint: '#E6EDFF', line: 'Grounded and shielded' },
+  { key: 'wellness', label: 'Wellness', emoji: '🌿', tint: '#DFF0FF', line: 'Fresh and balanced' },
+  { key: 'beauty', label: 'Beauty', emoji: '🌸', tint: '#FDE3EB', line: 'Hair and skin care' },
 ]
 export const productBySlug = (s: string) => PRODUCTS.find((p) => p.slug === s)
 export const variantById = (id: string) => {
@@ -331,7 +336,7 @@ export const REORDER_PRICE_PAISE = 80000 // owner sheet 2026-11-18: Bach Flower 
 
 // ---------- Slots (stub for scheduling.getAvailableSlots) ----------
 const BASE_SLOTS = ['10:00', '11:00', '12:00', '14:00', '15:30', '17:00', '18:30']
-/** A wall-clock time at the studio (IST, UTC+5:30) on the given calendar day — independent of the device's timezone. */
+/** A wall-clock time at the center (IST, UTC+5:30) on the given calendar day — independent of the device's timezone. */
 export function istDate(day: Date, hhmm: string) {
   const ymd = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
   return new Date(`${ymd}T${hhmm}:00+05:30`)
@@ -347,10 +352,56 @@ export function slotsFor(date: Date): string[] {
 }
 
 /** Session feedback — "How do you feel after the session?" in the client's own words (consultant request §2). Shown to
- * Jitu Bhaiya as "What people said they felt" — never as a BeWise claim. */
+ * Jitendra Khimlani as "What people said they felt" — never as a BeWise claim. */
 export const BENEFITS = ['Calmer', 'Felt heard', 'Sleeping better', 'Lighter', 'Clearer mind', 'More confident', 'Less anxious', 'More hopeful', 'More patient', 'More energy', 'At peace', 'More connected']
 
 export const HELPLINES = [
   { name: 'Tele-MANAS', number: '14416', note: 'Free, confidential, 24×7' }, // @decision(D-38) verify before launch
   { name: 'Emergency', number: '112', note: 'If you are in immediate danger' },
 ]
+
+/**
+ * Owner 2026-11-20: show each remedy in the client's blend and the emotion it addresses.
+ * Standard Bach indications, in plain wellbeing language (no medical claims). `mood` picks the face colour.
+ * @decision(D-10) Jitendra Khimlani can edit wording; it never states why a remedy was chosen for this client.
+ */
+export const BACH_REMEDIES: Record<string, { emotion: string; mood: string }> = {
+  Agrimony: { emotion: 'Hiding worries behind a cheerful face', mood: 'worried' },
+  Aspen: { emotion: 'Vague fears you can’t explain', mood: 'scared' },
+  Beech: { emotion: 'Feeling critical or intolerant of others', mood: 'irritated' },
+  Centaury: { emotion: 'Finding it hard to say no', mood: 'tired' },
+  Cerato: { emotion: 'Doubting your own judgement', mood: 'confused' },
+  'Cherry Plum': { emotion: 'Fear of losing control', mood: 'stressed' },
+  'Chestnut Bud': { emotion: 'Repeating the same patterns', mood: 'confused' },
+  Chicory: { emotion: 'Needing to be needed', mood: 'lonely' },
+  Clematis: { emotion: 'Daydreaming, not feeling present', mood: 'tired' },
+  'Crab Apple': { emotion: 'Not feeling good about yourself', mood: 'hurt' },
+  Elm: { emotion: 'Overwhelmed by responsibilities', mood: 'overwhelmed' },
+  Gentian: { emotion: 'Discouraged after a setback', mood: 'sad' },
+  Gorse: { emotion: 'Feeling hopeless', mood: 'sad' },
+  Heather: { emotion: 'Feeling alone and needing to be heard', mood: 'lonely' },
+  Holly: { emotion: 'Jealousy, anger or suspicion', mood: 'angry' },
+  Honeysuckle: { emotion: 'Living in the past', mood: 'hurt' },
+  Hornbeam: { emotion: 'Monday-morning tiredness, putting things off', mood: 'tired' },
+  Impatiens: { emotion: 'Impatience and irritation', mood: 'irritated' },
+  Larch: { emotion: 'Low confidence', mood: 'worried' },
+  Mimulus: { emotion: 'Everyday fears of known things', mood: 'scared' },
+  Mustard: { emotion: 'Sadness that comes without a reason', mood: 'sad' },
+  Oak: { emotion: 'Pushing on even when exhausted', mood: 'tired' },
+  Olive: { emotion: 'Mental and physical exhaustion', mood: 'tired' },
+  Pine: { emotion: 'Guilt and self-blame', mood: 'guilty' },
+  'Red Chestnut': { emotion: 'Worrying about loved ones', mood: 'worried' },
+  'Rock Rose': { emotion: 'Panic and sudden fear', mood: 'scared' },
+  'Rock Water': { emotion: 'Being too strict with yourself', mood: 'stressed' },
+  Scleranthus: { emotion: 'Unable to decide between two choices', mood: 'confused' },
+  'Star of Bethlehem': { emotion: 'Shock or grief', mood: 'hurt' },
+  'Sweet Chestnut': { emotion: 'Feeling you’ve reached your limit', mood: 'overwhelmed' },
+  Vervain: { emotion: 'Over-enthusiasm and tension', mood: 'restless' },
+  Vine: { emotion: 'Needing to be in control', mood: 'frustrated' },
+  Walnut: { emotion: 'Adjusting to change', mood: 'restless' },
+  'Water Violet': { emotion: 'Keeping to yourself, seeming distant', mood: 'lonely' },
+  'White Chestnut': { emotion: 'A busy mind, repeating thoughts', mood: 'stressed' },
+  'Wild Oat': { emotion: 'Unsure of your direction in life', mood: 'confused' },
+  'Wild Rose': { emotion: 'Feeling flat and resigned', mood: 'bored' },
+  Willow: { emotion: 'Resentment, feeling life is unfair', mood: 'frustrated' },
+}

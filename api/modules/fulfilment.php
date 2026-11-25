@@ -75,8 +75,8 @@ return [
         if ($stage === 'delivered') Events::emit('shipment.delivered', ['salesOrderId' => $t['sales_order_id'], 'deliveredAt' => iso(now_utc())]);
         if ($t['type'] === 'remedy_prep' && $stage === 'ready_to_dispatch' && (int)val('SELECT pickup FROM sales_orders WHERE id = ?', [$t['sales_order_id']])) {
             $cid = (string)val('SELECT client_id FROM sales_orders WHERE id = ?', [$t['sales_order_id']]);
-            notify(['clientId' => $cid], 'Your blend is ready', 'Collect it at the studio anytime.', '/client/app/remedies', 'normal', true);
-            wa_send(wa_client_phone($cid), 'remedy_ready', ['name' => wa_client_name($cid), 'how' => 'Collect it from the BeWise studio, Alkapuri (Mon–Sat 10–1 & 4–7).'], "ready:{$t['id']}", $t['id']);
+            notify(['clientId' => $cid], 'Your blend is ready', 'Collect it at the center anytime.', '/client/app/remedies', 'normal', true);
+            wa_send(wa_client_phone($cid), 'remedy_ready', ['name' => wa_client_name($cid), 'how' => 'Collect it from the BeWise center, Alkapuri (Mon–Sat 10–1 & 4–7).'], "ready:{$t['id']}", $t['id']);
         }
         fulfilment_sync_order($t['sales_order_id']);
         return fulfilment_task_view(one('SELECT * FROM fulfilment_tasks WHERE id = ?', [$t['id']]));

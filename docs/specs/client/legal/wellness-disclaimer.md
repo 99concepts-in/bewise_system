@@ -10,7 +10,7 @@
 |---|---|
 | Footer (public site, Help) | BeWise offers complementary wellness support for emotional balance. It isn't medical advice or treatment — please keep seeing your doctor. |
 | CL-11 / CL-16 booking | A gentle, complementary practice — not a replacement for your doctor or your medicines. |
-| CL-55 Ask BeWise caption | Not medical advice · for your blend, ask Jitu Bhaiya |
+| CL-55 Ask BeWise caption | Not medical advice · for your blend, ask Jitendra Khimlani |
 | IN-05 body map | We don't diagnose or treat medical conditions — please keep seeing your doctor. |
 | CL-35 product Safety tab | For external use only. Patch-test first, avoid eyes, keep away from children. Pregnant, breastfeeding or have allergies? Check with your doctor first. |
 
@@ -18,7 +18,7 @@
 
 ### What Bach flower remedies and aromatherapy are
 Bach flower remedies and aromatherapy are **complementary wellness practices**. At BeWise they are used to support
-emotional balance and a sense of calm. Jitu Bhaiya (Jitendra Khimlani), Bach Remedy Therapist, chooses the flowers in your
+emotional balance and a sense of calm. Jitendra Khimlani, Bach Remedy Therapist, chooses the flowers in your
 blend based on how you describe your feelings.
 
 ### What they are not
@@ -47,7 +47,7 @@ All BeWise remedy blends are prepared **alcohol-free** (owner, 2026-11-18). ⚠�
 
 ### Ask BeWise
 Ask BeWise is an AI companion. It answers from your own BeWise information and our catalogue, may sometimes be wrong, and
-**is not medical advice**. It never changes your remedy — for your blend, please ask Jitu Bhaiya.
+**is not medical advice**. It never changes your remedy — for your blend, please ask Jitendra Khimlani.
 
 ### If you are struggling or in crisis
 BeWise is not an emergency service. If you are having thoughts of harming yourself, or feel life isn't worth living, please reach out now:

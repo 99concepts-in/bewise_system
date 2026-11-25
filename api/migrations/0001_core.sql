@@ -63,7 +63,7 @@ CREATE TABLE counters (
 CREATE TABLE settings (
   `key` VARCHAR(100) PRIMARY KEY,
   value JSON NOT NULL,
-  is_public TINYINT(1) NOT NULL DEFAULT 0,     -- 1 = readable without login (fees, studio address, Razorpay key id)
+  is_public TINYINT(1) NOT NULL DEFAULT 0,     -- 1 = readable without login (fees, center address, Razorpay key id)
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   updated_by CHAR(36) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

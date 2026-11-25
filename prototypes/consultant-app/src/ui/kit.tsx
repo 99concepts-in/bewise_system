@@ -1,7 +1,13 @@
+/**
+ * UI kit: router, sheets, toast, chips, segmented, avatar, count-up, empty state, app header.
+ * v5 (HUB 2026-11-20): restyled to "Blue Bloom" (D-45); sheets move on the spec's 280 ms soft easing; header carries the official logo.
+ */
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, m } from 'motion/react'
 import { Check } from 'lucide-react'
 import type { Mood } from '../data/types'
+import { Logo, MoodCircle } from './art'
+import { ACCENT, MOOD_TONE } from './tone'
 
 // ---------------------------------------------------------------- router (hash)
 export function useRoute() {
@@ -34,13 +40,24 @@ export function useMedia(q: string) {
 // ---------------------------------------------------------------- springs
 export const spring = { type: 'spring', stiffness: 420, damping: 36, mass: 0.8 } as const
 export const softSpring = { type: 'spring', stiffness: 260, damping: 30 } as const
+/** Spec §8: one soft easing; 160 ms taps, 280 ms sheets, 450 ms hero moments. */
+export const EASE = [0.22, 1, 0.36, 1] as const
+export const sheetTween = { duration: 0.28, ease: EASE } as const
+
+// ---------------------------------------------------------------- app header: the official horizontal logo, 28 px (spec §1)
+export function AppHeader({ children }: { children?: ReactNode }) {
+  return (
+    <header className="topbar">
+      <Logo className="topbar-logo" />
+      {children && <div className="topbar-end">{children}</div>}
+    </header>
+  )
+}
 
 // ---------------------------------------------------------------- avatar
-const TINTS = ['#DCE2F5', '#DCE7D9', '#F4E6CF', '#EBDDF3', '#D8EBF2', '#F3DDD9']
-export const MOOD_COLOR: Record<Mood, string> = {
-  calm: '#BFD8C2', joyful: '#F6DE8D', grateful: '#F4C2C8', hopeful: '#B9CBF2',
-  tired: '#D6CBEF', anxious: '#BFE0F2', sad: '#C3CCD8', irritated: '#F3B1A4',
-}
+// v5: pale accent tints behind initials (ink text on every one is AA)
+const TINTS = ['#E6EDFF', '#DDF4F1', '#FFF1D9', '#EEE8FF', '#DFF0FF', '#FDE3EB', '#FFE6DE']
+export const MOOD_COLOR = Object.fromEntries(Object.entries(MOOD_TONE).map(([k, t]) => [k, ACCENT[t].c500])) as Record<Mood, string>
 function hash(s: string) { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h) }
 
 export function Avatar({ name, size = 44, mood, layoutId }: { name: string; size?: number; mood?: Mood; layoutId?: string }) {
@@ -57,8 +74,9 @@ export function Avatar({ name, size = 44, mood, layoutId }: { name: string; size
   )
 }
 
+/** A journal mood. v5 Blue Bloom draws it as an accent circle with a line icon (MoodCircle); the name stays for older screens. */
 export function MoodFace({ mood, size = 40 }: { mood: Mood; size?: number }) {
-  return <img className="mood" src={`./img/mood-${mood}.webp`} width={size} height={size} alt={mood} loading="lazy" decoding="async" />
+  return <MoodCircle mood={mood} size={size} />
 }
 
 // ---------------------------------------------------------------- segmented
@@ -76,9 +94,10 @@ export function Segmented<T extends string>({ value, options, onChange, id }: { 
 }
 
 // ---------------------------------------------------------------- chips
-export function Chip({ active, children, onClick, count }: { active?: boolean; children: ReactNode; onClick?: () => void; count?: number }) {
+/** `tone` (v5): a feeling chip — when on, it takes that feeling's accent tint instead of navy. */
+export function Chip({ active, children, onClick, count, tone }: { active?: boolean; children: ReactNode; onClick?: () => void; count?: number; tone?: string }) {
   return (
-    <button type="button" className={'chip' + (active ? ' is-on' : '')} aria-pressed={active} onClick={onClick}>
+    <button type="button" className={'chip' + (tone ? ` chip-tone tone-${tone}` : '') + (active ? ' is-on' : '')} aria-pressed={active} onClick={onClick}>
       {children}{count !== undefined && <span className="chip-count">{count}</span>}
     </button>
   )
@@ -100,16 +119,16 @@ export function Sheet({ open, onClose, children, label }: { open: boolean; onClo
   if (open) last.current = children
   useEffect(() => {
     if (open) { setMounted(true); return }
-    const t = setTimeout(() => setMounted(false), 340)
+    const t = setTimeout(() => setMounted(false), 320)
     return () => clearTimeout(t)
   }, [open])
   if (!mounted && !open) return null
   return (
     <div className="sheet-root" role="dialog" aria-modal aria-label={label} aria-hidden={!open} style={{ pointerEvents: open ? 'auto' : 'none' }}>
-      <m.div className="sheet-backdrop" initial={{ opacity: 0 }} animate={{ opacity: open ? 1 : 0 }} transition={{ duration: 0.2 }} onClick={onClose} />
+      <m.div className="sheet-backdrop" initial={{ opacity: 0 }} animate={{ opacity: open ? 1 : 0 }} transition={{ duration: 0.24, ease: EASE }} onClick={onClose} />
       <m.div
         className="sheet"
-        initial={{ y: '100%' }} animate={{ y: open ? 0 : '100%' }} transition={spring}
+        initial={{ y: '100%' }} animate={{ y: open ? 0 : '100%' }} transition={sheetTween}
         drag={open ? 'y' : false} dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0, bottom: 0.6 }} dragSnapToOrigin
         onDragEnd={(_, i) => { if (i.offset.y > 110 || i.velocity.y > 600) onClose() }}
       >

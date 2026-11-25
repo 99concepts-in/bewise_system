@@ -3,8 +3,9 @@
  * @module   companion
  * @owner    CLIENT
  * @screens  CL-55 Ask BeWise — mascot, streaming-style replies, product suggestions with Add to bag, confirm-before-action,
- *           crisis card, clear history. Caption: "Not medical advice · for your blend, ask Jitu Bhaiya"
+ *           crisis card, clear history. Caption: "Not medical advice · for your blend, ask Jitendra Khimlani"
  */
+import { goSafe } from '@/lib/nav'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
 import { ArrowUp, CalendarDays, ChevronLeft, MoreHorizontal, ShoppingBag, Trash2 } from 'lucide-react'
@@ -36,7 +37,7 @@ export default function Ask() {
     buzz(6); setText(''); s.pushChat({ role: 'user', text: m })
     const crisis = crisisCheck(m)
     setTyping(true)
-    const reply = respond(m, { name: firstName(s.profile?.name), blend: s.blend, droppedToday: s.drops[dayKey(new Date())], journal: s.journal, appointments: s.appointments, orders: s.orders, allergies: s.profile?.allergies ?? [] })
+    const reply = respond(m, { name: firstName(s.profile?.name), blend: s.blend, droppedToday: (s.doses[dayKey(new Date())] ?? 0) > 0 || s.drops[dayKey(new Date())], journal: s.journal, appointments: s.appointments, orders: s.orders, allergies: s.profile?.allergies ?? [] })
     setTimeout(() => {
       setTyping(false)
       s.pushChat({ role: 'bot', text: reply.text, products: reply.products, actions: [...(reply.actions ?? []), ...((reply.quick ?? []).map((q) => ({ id: `q:${q}`, label: q })))], safety: reply.safety })
@@ -48,21 +49,21 @@ export default function Ask() {
     buzz(8)
     if (id.startsWith('q:')) return send(id.slice(2))
     if (id.startsWith('remind-')) { const t = id.slice(7); toast(`We’ll remind you at ${t}`); s.pushChat({ role: 'bot', text: `Done! A gentle nudge at ${t}. 🌿` }); return }
-    if (id === 'book-followup') return router.push('/app/book?type=followup')
-    if (id === 'book-first') return router.push('/app/book')
-    if (id === 'open-remedies') return router.push('/app/remedies')
-    if (id === 'open-journal') return router.push('/app/journal')
-    if (id === 'open-shop') return router.push('/app/shop')
+    if (id === 'book-followup') return goSafe(router, '/app/book')
+    if (id === 'book-first') return goSafe(router, '/app/book')
+    if (id === 'open-remedies') return goSafe(router, '/app/remedies')
+    if (id === 'open-journal') return goSafe(router, '/app/journal')
+    if (id === 'open-shop') return goSafe(router, '/app/shop')
     if (id === 'log') return openLog()
-    if (id.startsWith('open-session-')) return router.push(`/app/sessions/view?id=${id.slice(13)}`)
-    if (id.startsWith('open-order-')) return router.push(`/app/orders/view?id=${id.slice(11)}`)
+    if (id.startsWith('open-session-')) return goSafe(router, `/app/sessions/view?id=${id.slice(13)}`)
+    if (id.startsWith('open-order-')) return goSafe(router, `/app/orders/view?id=${id.slice(11)}`)
     if (/whatsapp/i.test(label)) return toast('WhatsApp opens here once the business number is added')
-    if (/book/i.test(label)) return router.push('/app/book')
+    if (/book/i.test(label)) return goSafe(router, '/app/book')
   }
 
   return (
     <main className="flex min-h-dvh flex-col px-5">
-      <header className="sticky top-0 z-20 -mx-5 flex items-center gap-3 bg-gradient-to-b from-[#dce2f5] via-[#dce2f5]/90 to-transparent px-5 pb-4 pt-2 safe-t">
+      <header className="sticky top-0 z-20 -mx-5 flex items-center gap-3 bg-sky-50/95 backdrop-blur-xl px-5 pb-4 pt-2 safe-t">
         <IconBtn label="Back" onClick={() => router.back()}><ChevronLeft className="size-5" /></IconBtn>
         <div className="flex-1">
           <p className="text-[20px] font-extrabold leading-tight tracking-[-0.02em] text-navy">Ask <span className="text-soft">BeWise</span></p>
@@ -141,14 +142,14 @@ export default function Ask() {
         </div>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-2 pt-8 safe-b">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-2 pt-8 safe-b">
         <form onSubmit={(e) => { e.preventDefault(); send(text) }} className="flex h-16 items-center gap-2 rounded-full bg-white pl-5 pr-2 shadow-[var(--shadow-float)]">
           <input value={text} onChange={(e) => setText(e.target.value.slice(0, 1000))} placeholder="Ask anything…" aria-label="Message Ask BeWise" className="flex-1 bg-transparent text-[16px] outline-none placeholder:text-soft" />
-          <motion.button type="submit" aria-label="Send" whileTap={{ scale: 0.85 }} disabled={!text.trim() || typing} animate={{ scale: text.trim() ? 1 : 0.85, opacity: text.trim() ? 1 : 0.5 }} className="grid size-12 place-items-center rounded-full bg-[linear-gradient(135deg,#182957,#5e7fb8)] text-white">
+          <motion.button type="submit" aria-label="Send" whileTap={{ scale: 0.85 }} disabled={!text.trim() || typing} animate={{ scale: text.trim() ? 1 : 0.85, opacity: text.trim() ? 1 : 0.5 }} className="grid size-12 place-items-center rounded-full bg-navy text-white">
             <ArrowUp className="size-5" />
           </motion.button>
         </form>
-        <p className="mt-2 text-center text-[12px] text-muted">Not medical advice · for your blend, ask <b className="text-navy">Jitu Bhaiya</b></p>
+        <p className="mt-2 text-center text-[12px] text-muted">Not medical advice · for your blend, ask <b className="text-navy">Jitendra Khimlani</b></p>
       </div>
 
       <Sheet open={menu} onClose={() => setMenu(false)} title="Ask BeWise">

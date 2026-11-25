@@ -6,7 +6,7 @@
 **Effective:** [[EFFECTIVE_DATE]]
 
 ## In short
-- Your wellbeing information is private. **Only Jitu Bhaiya, your consultant, reads your answers.**
+- Your wellbeing information is private. **Only Jitendra Khimlani, your consultant, reads your answers.**
 - We collect what we need to care for you, prepare your remedy, deliver your order and keep your account safe — nothing more.
 - We never sell your data. We don't use it for advertising.
 - You can see, correct, download or delete your data anytime in **Me → Privacy & data**.
@@ -20,10 +20,10 @@ Under the DPDP Act we are the **Data Fiduciary** for the personal data you share
 |---|---|---|
 | Account details | Mobile number, name, date of birth, city, gender (optional) | Sign you in with a one-time code, address you by name, check age |
 | Contact & delivery | Email (optional), delivery addresses, pincode | Send confirmations, deliver remedies and products |
-| **Case-taking (intake) answers** — *sensitive* | What's on your mind, feelings and how strongly you feel them, voice notes, body map of discomfort, sleep & energy, life changes, goals | So Jitu Bhaiya understands you before your session |
+| **Case-taking (intake) answers** — *sensitive* | What's on your mind, feelings and how strongly you feel them, voice notes, body map of discomfort, sleep & energy, life changes, goals | So Jitendra Khimlani understands you before your session |
 | **Safety answers** — *sensitive* | Doctor/therapist, medicines, pregnancy or breastfeeding, allergies, the "one gentle question" about self-harm | Your safety, and preparing your remedy and product suggestions safely |
 | Mood journal & goals | The feeling you logged and when; your personal goals | Show you your patterns; shared with your consultant only if you allow it |
-| Session feedback | Rating, tags, notes for Jitu Bhaiya | Help him care for you better |
+| Session feedback | Rating, tags, notes for Jitendra Khimlani | Help him care for you better |
 | Appointments & remedies | Bookings, session mode, your current blend and ritual | Run your consultations and reminders |
 | Orders & payments | Items, amounts, invoices, payment status | Fulfil orders, issue GST invoices, keep accounts |
 | Ask BeWise chats | Your messages and the companion's replies | Answer your questions; safety review |
@@ -43,15 +43,15 @@ You can withdraw consent anytime in **Me → Privacy & data**. Withdrawing doesn
 | Person | Can see | Can't see |
 |---|---|---|
 | **You** | Everything you've entered, your remedy, orders, invoices | Your consultant's private notes |
-| **Jitu Bhaiya (Jitendra Khimlani), Bach Remedy Therapist** | Your intake and check-in answers, feedback, journal (if shared), AI summary | — |
+| **Jitendra Khimlani, Bach Remedy Therapist** | Your intake and check-in answers, feedback, journal (if shared), AI summary | — |
 | **Office manager** | Your name, delivery address, order and payment status, and only what's needed to prepare your remedy (e.g. which flowers go in your blend and the bottle size) | Your answers, journal, feedback or chats |
 | **Owner** | Business totals and anonymous statistics, session ratings | Your answers, journal, notes or chats |
 | **Accountant** | Invoices and payment records for tax | Anything about your wellbeing |
 
-**The self-harm question:** if you answer "Sometimes" or "Often", we show you free helplines straight away, and **only Jitu Bhaiya is alerted** so he can check in with care. Nobody else is told.
+**The self-harm question:** if you answer "Sometimes" or "Often", we show you free helplines straight away, and **only Jitendra Khimlani is alerted** so he can check in with care. Nobody else is told.
 
 ## 5. AI processing
-- We use **Claude (by Anthropic)**, on our servers, to turn your intake answers into a short private summary **for your consultant only**. You never see it in the app, and it never decides your remedy — Jitu Bhaiya does.
+- We use **Claude (by Anthropic)**, on our servers, to turn your intake answers into a short private summary **for your consultant only**. You never see it in the app, and it never decides your remedy — Jitendra Khimlani does.
 - **Ask BeWise**, our companion, uses the same AI to answer questions from *your own* data (appointments, blend, journal feelings, orders) and our product catalogue. It does not diagnose and does not change remedies.
 - Your consultant's private notes are **not** sent to AI.
 - Our AI provider does not use your data to train its models. ⚠️ OWNER TO CONFIRM against the final API agreement.

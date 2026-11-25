@@ -88,7 +88,7 @@ return [
         $order = remedies_create_order($f, $charge ? 'reorder' : 'included', $price, $charge ? 'pending_payment' : 'paid', null, ($in['delivery'] ?? 'pickup') !== 'ship');
         audit('remedy.given', 'formula', $fid, ['version' => $version, 'flowers' => count($flowers)]);
         Events::emit('remedy.given', ['formulaVersionId' => $fid, 'remedyOrderId' => $order['remedyOrderId'], 'clientId' => $client['id'], 'bottleSizeMl' => (int)$f['bottle_ml']]);
-        notify(['clientId' => $client['id']], 'Your new blend is ready', 'Jitu Bhaiya has prepared your blend. Open the app to see how to take it.', '/client/app/remedies', 'normal', true);
+        notify(['clientId' => $client['id']], 'Your new blend is ready', 'Jitendra Khimlani has prepared your blend. Open the app to see how to take it.', '/client/app/remedies', 'normal', true);
         notify(['role' => 'manager'], 'New remedy to prepare', ($client['name'] ?: 'Client') . " · {$f['bottle_ml']} ml " . ($alcoholFree ? '· ALCOHOL-FREE' : ''), '/manager/');
         return remedies_formula_view($f, true) + $order;
     },

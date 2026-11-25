@@ -1,9 +1,9 @@
 # BeWise v5 "Warm Bloom": design brief (PROPOSAL, awaiting owner approval)
 
-> **Owner:** HUB · 2026-11-20 · Scope: **client app + Jitu Bhaiya's app only** (manager and owner later).
+> **Owner:** HUB · 2026-11-20 · Scope: **client app + Jitendra Khimlani's app only** (manager and owner later).
 > **Inspiration:** mindfulremedies.co.uk (owner's reference: site, quiz, FAQ; 10 screenshots).
 > We take its *qualities*: warm editorial serif, confident colour blocks, friendly line icons, simple quiz rhythm.
-> We do **not** copy its brand, logo, artwork or copy. BeWise keeps its owl logo, navy, Jitu Bhaiya and its own voice.
+> We do **not** copy its brand, logo, artwork or copy. BeWise keeps its owl logo, navy, Jitendra Khimlani and its own voice.
 > v4 Soft Bloom (D-43) stays live until this brief is approved; then it becomes D-45.
 
 ## 1. Feeling we're designing for
@@ -63,7 +63,7 @@ Contrast: white text only on terracotta, forest, rose, ink and salmon at 18 px o
 - **What:** realistic botanical **vector (SVG)** for each flower, in one consistent style: natural colours, subtle tonal shading, transparent background, no text.
 - **Used for:**
   - flower library;
-  - Jitu Bhaiya's remedy builder (tap-to-add tiles);
+  - Jitendra Khimlani's remedy builder (tap-to-add tiles);
   - "Your blend" card and bottle label;
   - quiz results;
   - FAQ and empty states;
@@ -73,14 +73,14 @@ Contrast: white text only on terracotta, forest, rose, ink and salmon at 18 px o
 ## 6. Client app: what changes
 | Area | v5 design |
 |---|---|
-| Home | Greeting + **"How are you feeling today?"** colour-circle grid. Tapping a circle logs the mood and opens matching tips and products. Below that: the **"Meet Jitu Bhaiya" card**, today's blend, then the shop row. The floating "Book" pill stays above the tab bar |
-| Jitu Bhaiya story (tap the card) | **Full-screen**, shared-element transition from the card (portrait grows into an arch). It has:<ul><li>a warm peach hero with slow-floating line flowers;</li><li>headline reveal word by word;</li><li>stats that count up (12+ years · 2,00,000+ guided · 38 flowers);</li><li>"His approach" in three steps (icons draw in);</li><li>a swipeable testimonials carousel;</li><li>a gentle sticky "Book with Jitu Bhaiya" button.</li></ul>Respects *reduced motion* |
+| Home | Greeting + **"How are you feeling today?"** colour-circle grid. Tapping a circle logs the mood and opens matching tips and products. Below that: the **"Meet Jitendra Khimlani" card**, today's blend, then the shop row. The floating "Book" pill stays above the tab bar |
+| Jitendra Khimlani story (tap the card) | **Full-screen**, shared-element transition from the card (portrait grows into an arch). It has:<ul><li>a warm peach hero with slow-floating line flowers;</li><li>headline reveal word by word;</li><li>stats that count up (12+ years · 2,00,000+ guided · 38 flowers);</li><li>"His approach" in three steps (icons draw in);</li><li>a swipeable testimonials carousel;</li><li>a gentle sticky "Book with Jitendra Khimlani" button.</li></ul>Respects *reduced motion* |
 | Intake quiz | Their rhythm:<ol><li>"What should we call you?";</li><li>"Nice to meet you, {name}!" + feelings as **icon circles** (choose up to 3, sage = selected);</li><li>"Tell us a little more" as **list cards**, one per nuance statement;</li><li>Body, sleep, life changes, safety, goals.</li></ol>Sticky rose **Next**, thin progress bar, autosave. Same questions and answers as today, only the look changes (the API stays the same) |
-| Care tab (second tab) | Next appointment card, then **Your blend** card (flower vectors, day x of 25, "Took my drops"), then the **FAQ block**: a forest card with rose "+" accordions, Roca questions, and a bottle-on-petals image at the bottom. FAQ copy comes from Jitu Bhaiya; drafts are in §8 |
+| Care tab (second tab) | Next appointment card, then **Your blend** card (flower vectors, day x of 25, "Took my drops"), then the **FAQ block**: a forest card with rose "+" accordions, Roca questions, and a bottle-on-petals image at the bottom. FAQ copy comes from Jitendra Khimlani; drafts are in §8 |
 | Add to Home Screen | A **subtle** bottom card. It appears only after the 2nd visit or right after a first booking, and never on the first screen. iPhone shows 3 tiny illustrated steps (Share → Add to Home Screen). Android uses the native install prompt. "Not now" hides it for 14 days |
 | Notifications | Asked **in context, once**: after booking, "Want a gentle reminder before your session?" Only on "Yes" does the system permission prompt appear (on iPhone this works after Add to Home Screen, iOS 16.4+). Notifications can be managed later in Me → Reminders |
 
-## 7. Jitu Bhaiya's app: what changes
+## 7. Jitendra Khimlani's app: what changes
 - **Today:**
   - serif greeting;
   - a peach summary card (sessions, blends to give, today's sales);
@@ -89,13 +89,13 @@ Contrast: white text only on terracotta, forest, rose, ink and salmon at 18 px o
 - **Remedy builder:** a flower grid built from the 38 vectors, with "Flowers to consider" first (D-37). The floating pill shows "Build remedy · 3/7 flowers".
 - **Client profile:** the client's mood colours over time, the case summary card and the blend history with flower thumbnails.
 
-## 8. FAQ (draft for Jitu Bhaiya's approval; plain words, no medical claims)
+## 8. FAQ (draft for Jitendra Khimlani's approval; plain words, no medical claims)
 1. **What are Bach flower remedies?** Gentle flower essences, chosen for how you feel, to support emotional balance.
-2. **How do I take my blend?** 4 drops, 4 times a day, or as Jitu Bhaiya advises. A bottle lasts about 25 days.
+2. **How do I take my blend?** 4 drops, 4 times a day, or as Jitendra Khimlani advises. A bottle lasts about 25 days.
 3. **How soon will I notice a change?** Everyone is different; many people notice small shifts in 2–3 weeks.
-4. **Can I take them with my medicines?** They're a complementary practice and don't replace your doctor. Tell Jitu Bhaiya about any medicines.
+4. **Can I take them with my medicines?** They're a complementary practice and don't replace your doctor. Tell Jitendra Khimlani about any medicines.
 5. **Is there alcohol in it?** Traditionally a little brandy is used as a preservative; alcohol-free blends are available on request.
-6. **Are they safe for children and during pregnancy?** Tell us before your session and Jitu Bhaiya will advise. Always check with your doctor.
+6. **Are they safe for children and during pregnancy?** Tell us before your session and Jitendra Khimlani will advise. Always check with your doctor.
 7. **Online or in person?** Both. Online by video call, or at our studio in Alkapuri, Vadodara.
 8. **What if I need to reschedule?** It's free up to 24 hours before. We don't offer refunds, but your session is always kept for you.
 

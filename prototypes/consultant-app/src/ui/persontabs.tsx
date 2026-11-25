@@ -6,7 +6,7 @@
  */
 import { useState } from 'react'
 import { m } from 'motion/react'
-import { ArrowRight, Leaf, NotebookPen, Plus, Sparkles, Star, MapPin, Video, Sun, Target, Compass } from 'lucide-react'
+import { ArrowRight, Droplet, NotebookPen, Plus, Sparkles, Star, MapPin, Video, Sun, Target, Compass } from 'lucide-react'
 import { useStore } from '../state/store'
 import { MoodFace, softSpring, useToast } from './kit'
 import { LoShuGrid } from './loshu'
@@ -199,7 +199,7 @@ export function RemedyTab({ v, now, onCreate, createLabel }: { v: PersonView; no
   const cur = v.blend?.remedy
   return (
     <>
-      <button type="button" className="btn btn-primary btn-block rm-create" onClick={onCreate}><Leaf size={16} /> {createLabel}</button>
+      <button type="button" className="btn btn-primary btn-block rm-create" onClick={onCreate}><Droplet size={16} /> {createLabel}</button>
       {cur && (
         <section className="card pf-card rm-current">
           <div className="block-head"><h2>Current blend</h2><span className="tag tag-sage">{v.daysLeft !== undefined && v.daysLeft >= 0 ? `${v.daysLeft} days left` : 'Finished'}</span></div>

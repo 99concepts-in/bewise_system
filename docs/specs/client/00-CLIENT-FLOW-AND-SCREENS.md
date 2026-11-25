@@ -76,7 +76,7 @@ ME           Me → Personal details · Addresses · Goals · Reminders & notifi
 ### E. After the session
 | ID | Screen | Content |
 |---|---|---|
-| CL-23 | How was your session? | 5-step owl rating, quick chips (Felt heard, Clear guidance, Calming…), **"Notes for Jitu Bhaiya"** free text, "Visible only to your consultant". Can be added/edited later from the appointment. → `session_feedback` |
+| CL-23 | How was your session? | 5-step owl rating, quick chips (Felt heard, Clear guidance, Calming…), **"Notes for Jitendra Khimlani"** free text, "Visible only to your consultant". Can be added/edited later from the appointment. → `session_feedback` |
 | CL-24 | Session summary | Summary shared by consultant, next follow-up date, Book follow-up |
 | CL-25 | Your remedy is ready | Hero 3D amber bottle, blend name, flowers inside (chips), price / included, optional add-ons, Confirm & pay |
 | CL-26 | My Remedies | Current blend hero, ritual (4 drops × 4 a day), days left ring, Reorder, Past blends link |
@@ -125,7 +125,7 @@ ME           Me → Personal details · Addresses · Goals · Reminders & notifi
 ### K. Ask BeWise & progress (added 2026-11-16, round 2)
 | ID | Screen | Content |
 |---|---|---|
-| CL-55 | Ask BeWise (chat) | AI companion: answers from the client's own data (appointments, current blend & ritual, journal emotions, orders, payments) and the product catalogue; quick replies; can set reminders and suggest products with **Add to bag** (client taps to confirm). Caption "Not medical advice · for your blend, ask Jitu Bhaiya". Entry: owl-chat icon on Home header + Help |
+| CL-55 | Ask BeWise (chat) | AI companion: answers from the client's own data (appointments, current blend & ritual, journal emotions, orders, payments) and the product catalogue; quick replies; can set reminders and suggest products with **Add to bag** (client taps to confirm). Caption "Not medical advice · for your blend, ask Jitendra Khimlani". Entry: owl-chat icon on Home header + Help |
 | CL-56 | Progress card | "Since your blend began" — 3 AI lines on Home (CL-08) and My Remedies (CL-26); client-safe inputs only |
 
 **Ask BeWise guardrails:** never diagnoses, never changes or recommends Bach remedies (that is the consultant's role), never shows staff notes, never makes cure claims; suggests booking a follow-up when the client describes ongoing difficulty; urgent-distress language → shows helpline + "contact us" immediately; every conversation logged; client can clear history.

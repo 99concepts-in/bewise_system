@@ -65,7 +65,7 @@ export function TimePicker({ slot, setSlot, initialDay, heading = true }: { slot
                   return (
                     <motion.button key={t} onClick={() => pick(t)} aria-pressed={!!on} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.03 }}
                       className={cx('relative h-11 rounded-full text-[14px] font-semibold', on ? 'text-white' : 'bg-peri-50/70 text-navy')}>
-                      {on && <motion.span layoutId="slot-pill" transition={spring} className="absolute inset-0 rounded-full bg-navy shadow-[0_6px_14px_rgba(24,41,87,.3)]" />}
+                      {on && <motion.span layoutId="slot-pill" transition={spring} className="absolute inset-0 rounded-full bg-navy shadow-[0_6px_14px_rgba(23,33,74,.3)]" />}
                       <span className="relative">{fmtTime(d)}</span>
                     </motion.button>
                   )

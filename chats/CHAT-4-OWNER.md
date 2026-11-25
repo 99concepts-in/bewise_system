@@ -32,9 +32,9 @@ Finance is a real accounting system (PRD §10) — correctness beats speed.
 | Refunds | **None** (D-16) — no refund flows or approvals; credit notes only for owner accounting corrections |
 | Accountant | Role **`accountant`**: view & export reports, invoices, bills, ledgers, GST; no edits; no consultation/intake data; own computer view OW-30 (D-39) |
 | Later | **Personal finance** and **payroll** are later phases — don't build now (D-40, D-41) |
-| Numbers for team | Jitu Bhaiya and Haresh see **sales and profit** read-only — expose read-only analytics functions for them (D-33) |
+| Numbers for team | Jitendra Khimlani and Haresh see **sales and profit** read-only — expose read-only analytics functions for them (D-33) |
 | Privacy | Owner cannot read practitioner notes, flower reasons or intake answers (only aggregate, anonymous stats) (D-03, D-38) |
-| Safety alerts | Go to Jitu Bhaiya only — not the owner (D-38) |
+| Safety alerts | Go to Jitendra Khimlani only — not the owner (D-38) |
 | Integrations | Razorpay (payments), Shiprocket (via manager), WhatsApp Business (reminders, templates), Google Calendar (via consultant), email — show true status: Connected / Test mode / Not set up |
 | Greeting | "Good morning" until the owner gives a name (D-42) |
 | AI | Ask BeWise (business): read-only answers over analytics views, never acts; load the `claude-api` skill before coding |

@@ -1,5 +1,5 @@
 /**
- * @screens CN-30 Marketing (owner 2026-11-25): everything that helps Jitu Bhaiya bring more people in and get bookings.
+ * @screens CN-30 Marketing (owner 2026-11-25): everything that helps Jitendra Khimlani bring more people in and get bookings.
  *   - Do this today: smart nudges (not using the app, drifting, follow-up due, happy members for reviews, missed drops)
  *   - Share: a BeWise story, a review as a ready image, ready-made posts, broadcast to all, his booking link
  *   - Ready to post: images drawn in the browser, shared straight to WhatsApp / Instagram via the phone's share sheet
@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { m } from 'motion/react'
 import { BookOpen, Check, ChevronRight, Copy, Download, Image as ImageIcon, Link2, Megaphone, MessageCircle, Quote, Send, Share2, Smartphone, Sparkles, Star, UserRoundX, Users, Droplets, CalendarClock, Heart } from 'lucide-react'
 import { useIndex, useStore, type NudgeKind } from '../state/store'
-import { Avatar, Chip, Segmented, Sheet, softSpring, useToast } from '../ui/kit'
+import { AppHeader, Avatar, Chip, Segmented, Sheet, softSpring, useToast } from '../ui/kit'
 import { useSheets } from './Sheets'
 import { BROADCAST_TEMPLATES, NUDGE_TEXT, audiences, broadcastAudiences, fill, readyPosts, type Format, type Post } from '../lib/marketing'
 import { SIZE, download, loadAssets, paint, renderBlob, sharePost } from '../lib/canvasArt'
@@ -46,6 +46,7 @@ export default function Marketing() {
 
   return (
     <div className="screen marketing">
+      <AppHeader />
       <header className="mk-head">
         <h1>Grow BeWise</h1>
         <p className="muted">Small things, done often, bring people in. Everything here takes under a minute.</p>

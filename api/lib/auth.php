@@ -121,7 +121,7 @@ function bw_is_https(): bool
     return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 }
 
-/** Staff user id of the (single, v1) consultant — D-14: data supports many, UI assumes Jitu Bhaiya. */
+/** Staff user id of the (single, v1) consultant — D-14: data supports many, UI assumes Jitendra Khimlani. */
 function default_consultant_id(): string
 {
     $id = val("SELECT u.id FROM users u JOIN user_roles r ON r.user_id = u.id AND r.role = 'consultant' WHERE u.status = 'active' ORDER BY u.created_at LIMIT 1");

@@ -2,31 +2,39 @@
 /**
  * @module   client-shell
  * @owner    CLIENT
- * @screens  nav (Home · Remedies · Book · Shop · Me), header, CL-09 Log a feeling sheet, CL-10 Notifications sheet
+ * @screens  nav (Home · Care · Book · Shop · Me), header, CL-09 Log a feeling sheet, CL-10 Notifications sheet
+ * v5 (HUB 2026-11-20): white tab bar with labels + navy dot (DESIGN-SYSTEM §5); 2nd tab renamed "Care" (route stays
+ *   /app/remedies); header carries the official horizontal logo (32 px); hosts the install / reminder prompts.
  */
+import { goSafe } from '@/lib/nav'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { Bell, CalendarDays, ChevronLeft, Home, Leaf, Search, ShoppingBag, User, X } from 'lucide-react'
+import { Bell, ChevronLeft, House, Search, ShoppingBag, Sprout, User, X, BookOpen } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { create } from 'zustand'
-import { Avatar, Logo, MoodButton, MoodImg } from './brand'
-import { Btn, Chrome, IconBtn, Sheet, buzz, spring, toast, useChrome } from './ui'
+import { Avatar, Logo, MoodButton, MoodImg, LogoMark } from './brand'
+import { Btn, Chrome, IconBtn, Sheet, buzz, spring, toast, useChrome, type NoteAskReq } from './ui'
 import { MOODS, PRIMARY_MOODS, moodOf, searchMoods, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
-import { fmtTime, fmtDay } from '@/lib/format'
+import { dayKey, fmtTime, fmtDay } from '@/lib/format'
 import { BP } from '@/lib/asset'
+import { InstallPrompt, usePromptBoot } from './prompts'
+import { NoteAsk } from './note-card'
+import { encourage } from '@/lib/encourage'
 
 export const useUi = create<{ navHidden: boolean; setNavHidden: (v: boolean) => void }>((set) => ({ navHidden: false, setNavHidden: (v) => set({ navHidden: v }) }))
 
 const NAV = [
-  { href: '/app', label: 'Home', icon: Home, match: (p: string) => p === '/app' || p.startsWith('/app/journal') || p.startsWith('/app/goals') || p.startsWith('/app/ask') },
-  { href: '/app/remedies', label: 'Remedies', icon: Leaf, match: (p: string) => p.startsWith('/app/remedies') },
-  { href: '/app/book', label: 'Book', icon: CalendarDays, match: (p: string) => p.startsWith('/app/book') || p.startsWith('/app/sessions') },
+  { href: '/app', label: 'Home', icon: House, match: (p: string) => p === '/app' || p.startsWith('/app/journal') || p.startsWith('/app/goals') || p.startsWith('/app/ask') },
+  // owner 2026-11-18: no separate Book tab; remedies, sessions and booking live together under My care
+  { href: '/app/remedies', label: 'My care', icon: Sprout, match: (p: string) => p.startsWith('/app/remedies') || p.startsWith('/app/book') || p.startsWith('/app/sessions') },
+  // owner 2026-11-23: "Know how Bach flower therapy can help you" stories
+  { href: '/app/learn', label: 'Learn', icon: BookOpen, match: (p: string) => p.startsWith('/app/learn') },
   { href: '/app/shop', label: 'Shop', icon: ShoppingBag, match: (p: string) => p.startsWith('/app/shop') || p.startsWith('/app/bag') || p.startsWith('/app/checkout') || p.startsWith('/app/orders') },
   { href: '/app/me', label: 'Me', icon: User, match: (p: string) => p.startsWith('/app/me') || p.startsWith('/app/help') },
 ]
-const NAV_ROOTS = new Set(['/app', '/app/remedies', '/app/book', '/app/shop', '/app/me', '/app/journal', '/app/sessions', '/app/orders', '/app/goals'])
+const NAV_ROOTS = new Set(['/app', '/app/learn', '/app/remedies', '/app/book', '/app/shop', '/app/me', '/app/journal', '/app/sessions', '/app/orders', '/app/goals'])
 
 /** Static hosting serves /app/ (trailing slash) — compare routes without it. */
 export const usePath = () => { const p = usePathname() || '/'; return p.length > 1 ? p.replace(/\/+$/, '') : p }
@@ -52,30 +60,37 @@ function useBack(target?: string) {
   }
 }
 
+/** True on screens that show the tab bar (prompts and floating pills position against it). */
+export function useNavShown() {
+  const path = usePath()
+  const hidden = useUi((st) => st.navHidden)
+  return NAV_ROOTS.has(path) && !hidden
+}
+
 function BottomNav() {
   const path = usePath()
-  const hidden = useUi((s) => s.navHidden)
+  const show = useNavShown()
   const count = useApp((s) => s.cart.reduce((n, l) => n + l.qty, 0))
-  const show = NAV_ROOTS.has(path) && !hidden
   return (
     <AnimatePresence>
       {show && (
-        <motion.nav aria-label="Main" initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} transition={spring}
-          className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] px-5 safe-b">
-          <div className="flex h-16 items-center justify-between rounded-full bg-navy/95 px-2 shadow-[0_16px_40px_rgba(24,41,87,.35)] backdrop-blur-xl">
+        <motion.nav data-tour="nav" aria-label="Main" initial={{ y: 90 }} animate={{ y: 0 }} exit={{ y: 90 }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[480px] border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
+          <div className="flex h-16 items-stretch justify-around px-1">
             {NAV.map(({ href, label, icon: Icon, match }) => {
               const active = match(path)
               return (
-                <Link key={href} href={href} aria-label={label} aria-current={active ? 'page' : undefined} onClick={() => buzz(5)} id={label === 'Shop' ? 'nav-bag' : undefined}
-                  className="relative grid size-12 place-items-center rounded-full">
-                  {active && <motion.span layoutId="nav-active" transition={spring} className="absolute inset-0 rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,.18)]" />}
-                  <motion.span className="relative" animate={{ scale: active ? 1 : 0.94 }} transition={spring}>
-                    <Icon className={active ? 'size-[22px] text-navy' : 'size-[22px] text-white/85'} strokeWidth={active ? 2.3 : 1.9} />
-                  </motion.span>
-                  {label === 'Shop' && count > 0 && (
-                    <motion.span key={count} initial={{ scale: 0.3 }} animate={{ scale: [1.5, 1] }} transition={spring}
-                      className="absolute right-0.5 top-0.5 grid min-w-[18px] place-items-center rounded-full bg-[#f3b1a4] px-1 text-[10px] font-extrabold leading-[18px] text-navy">{count}</motion.span>
-                  )}
+                <Link key={href} href={href} aria-current={active ? 'page' : undefined} onClick={() => buzz(5)} id={label === 'Shop' ? 'nav-bag' : undefined}
+                  className={`relative flex min-w-[60px] flex-1 flex-col items-center justify-center gap-1 rounded-[14px] transition-colors ${active ? 'text-navy' : 'text-muted hover:text-ink'}`}>
+                  {active && <motion.span layoutId="nav-dot" transition={spring} className="absolute top-1.5 size-1 rounded-full bg-navy" />}
+                  <span className="relative mt-1">
+                    <Icon className="size-[22px]" strokeWidth={active ? 2.1 : 1.75} aria-hidden />
+                    {label === 'Shop' && count > 0 && (
+                      <motion.span key={count} initial={{ scale: 0.3 }} animate={{ scale: [1.4, 1] }} transition={spring}
+                        className="absolute -right-2.5 -top-1.5 grid min-w-[18px] place-items-center rounded-full bg-coral px-1 text-[10px] font-bold leading-[18px] text-white ring-2 ring-white">{count}</motion.span>
+                    )}
+                  </span>
+                  <span className={`text-[11px] leading-none ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
                 </Link>
               )
             })}
@@ -86,20 +101,31 @@ function BottomNav() {
   )
 }
 
+/** Header turns solid once the page scrolls under it (transparent over Home's soft wash). */
+function useScrolled() {
+  const [on, setOn] = useState(false)
+  useEffect(() => { const f = () => setOn(window.scrollY > 8); f(); window.addEventListener('scroll', f, { passive: true }); return () => window.removeEventListener('scroll', f) }, [])
+  return on
+}
+
 export function AppHeader({ back, right, title }: { back?: boolean | string; right?: ReactNode; title?: string }) {
   const goBack = useBack(typeof back === 'string' ? back : undefined)
   const { openNotices } = useChrome()
   const unread = useApp((s) => s.notices.filter((n) => !n.read).length)
   const profile = useApp((s) => s.profile)
+  const scrolled = useScrolled()
+  // owner 2026-11-18: a visible Back button on every screen except Home
+  const path = usePath()
+  const showBack = !!back || path !== '/app'
   return (
-    <header className="sticky top-0 z-30 -mx-5 flex items-center justify-between gap-3 bg-[linear-gradient(180deg,#dce2f5_0%,#dfe4f6_72%,rgba(223,228,246,0)_100%)] px-5 pb-4 pt-2 safe-t">
-      {back ? (
-        <div className="flex items-center gap-3">
+    <header className={`sticky top-0 z-30 -mx-5 flex items-center justify-between gap-3 px-5 pb-3 pt-2 safe-t transition-[background-color,box-shadow] duration-200 ${scrolled ? 'bg-sky-50/90 shadow-[0_1px_0_var(--color-line)] backdrop-blur-xl' : 'bg-transparent'}`}>
+      {showBack ? (
+        <div className="flex min-w-0 items-center gap-2.5">
           <IconBtn label="Back" onClick={goBack}><ChevronLeft className="size-5" /></IconBtn>
-          {title ? <span className="text-[16px] font-bold text-navy">{title}</span> : null}
+          {title ? <span className="truncate font-display text-[18px] font-semibold text-ink">{title}</span> : <Link href="/app" aria-label="Home" className="shrink-0"><LogoMark size={36} /></Link>}
         </div>
       ) : (
-        <Link href="/app" aria-label="Home"><Logo compact /></Link>
+        <Link href="/app" aria-label="BeWise home" className="-my-1 rounded-[8px] py-1"><Logo height={32} /></Link>
       )}
       <div className="flex items-center gap-2.5">
         {right ?? (
@@ -116,6 +142,7 @@ export function AppHeader({ back, right, title }: { back?: boolean | string; rig
 /** CL-09 — 8 main feelings + a searchable list of more (owner 2026-11-18: "add happy, more options, searchable"). */
 function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const logMood = useApp((s) => s.logMood)
+  const { askNote } = useChrome()
   const [pick, setPick] = useState<Emotion | null>(null)
   const [burst, setBurst] = useState(0)
   const [q, setQ] = useState('')
@@ -129,7 +156,7 @@ function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
     const m = moodOf(k), on = pick === k
     return (
       <motion.button type="button" layout whileTap={{ scale: 0.94 }} aria-pressed={on} onClick={() => choose(k)}
-        className={`inline-flex h-12 items-center gap-2 rounded-full pl-1.5 pr-4 text-[14px] font-semibold transition-colors ${on ? 'bg-navy text-white' : 'bg-peri-50/80 text-navy'}`}>
+        className={`inline-flex h-12 items-center gap-2 rounded-full pl-1.5 pr-4 text-[14px] font-semibold transition-colors ${on ? 'bg-navy text-white' : 'bg-sky-50 text-ink ring-1 ring-sky-200'}`}>
         <span className="grid size-9 place-items-center rounded-full bg-white"><MoodImg mood={k} size={30} /></span>{m.label}
       </motion.button>
     )
@@ -138,10 +165,10 @@ function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
     <Sheet open={open} onClose={onClose} title="Log a feeling" tall>
       <h2 className="h-duo mt-1 text-[26px]">How are you <em>feeling?</em></h2>
       <p className="mt-1 text-[14px] text-muted">Today · {fmtTime(now)}</p>
-      <label className="mt-4 flex h-12 items-center gap-3 rounded-full bg-peri-50 px-4 focus-within:ring-2 focus-within:ring-navy">
+      <label className="mt-4 flex h-12 items-center gap-3 rounded-[16px] bg-sky-50 px-4 ring-1 ring-sky-200 focus-within:ring-2 focus-within:ring-blue">
         <Search className="size-[18px] text-navy" aria-hidden />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search feelings like happy, stressed, loved…" aria-label="Search feelings"
-          className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted" />
+          className="flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted" />
         {q && <button aria-label="Clear search" onClick={() => setQ('')}><X className="size-4 text-muted" /></button>}
       </label>
       {q ? (
@@ -167,12 +194,12 @@ function LogSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
           <motion.label initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 block overflow-hidden">
             <span className="mb-1.5 block text-[13px] font-semibold text-navy">Add a note <span className="font-normal text-muted">(optional)</span></span>
             <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 500))} rows={3} placeholder="What’s behind this feeling? A word or two is enough."
-              className="w-full resize-none rounded-[20px] bg-peri-50/80 p-4 text-[15px] leading-6 outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
+              className="w-full resize-none rounded-[20px] bg-sky-50 p-4 text-[16px] leading-6 outline-none ring-1 ring-sky-200 placeholder:text-muted focus:ring-2 focus:ring-blue" />
           </motion.label>
         )}
       </AnimatePresence>
-      <div className="sticky bottom-0 -mx-5 mt-4 bg-gradient-to-t from-white via-white to-white/0 px-5 pb-1 pt-4">
-        <Btn full disabled={!pick} onClick={() => { if (!pick) return; logMood(pick, new Date(), note); toast(`Logged · ${moodOf(pick).label}`); onClose() }}>
+      <div className="sticky bottom-0 -mx-5 mt-4 bg-white px-5 pb-1 pt-3">
+        <Btn full disabled={!pick} onClick={() => { if (!pick) return; logMood(pick, new Date(), note); toast(`${moodOf(pick).label}, noted. ${encourage()}`); onClose(); askNote({ mood: pick }) }}>
           {pick ? `Save · ${moodOf(pick).label}` : 'Choose a feeling'}
         </Btn>
       </div>
@@ -199,7 +226,7 @@ function EntrySheet({ id, onClose }: { id: string | null; onClose: () => void })
           <label className="mt-5 block">
             <span className="mb-1.5 block text-[13px] font-semibold text-navy">Your note</span>
             <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 500))} rows={4} placeholder="What’s behind this feeling? A word or two is enough."
-              className="w-full resize-none rounded-[20px] bg-peri-50/80 p-4 text-[15px] leading-6 outline-none placeholder:text-muted focus:ring-2 focus:ring-navy" />
+              className="w-full resize-none rounded-[20px] bg-sky-50 p-4 text-[16px] leading-6 outline-none ring-1 ring-sky-200 placeholder:text-muted focus:ring-2 focus:ring-blue" />
             <span className="mt-1 block text-right text-[11px] text-muted tnum">{note.length}/500</span>
           </label>
           <div className="mt-3 flex gap-3">
@@ -226,9 +253,9 @@ function NoticeSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
         <ul className="mt-4 space-y-2">
           {notices.map((n, i) => (
             <motion.li key={n.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
-              <button onClick={() => { onClose(); if (n.href) router.push(n.href) }} className="flex w-full items-start gap-3 rounded-[20px] bg-peri-50/70 p-4 text-left">
-                <span className={`mt-1.5 size-2.5 shrink-0 rounded-full ${n.read ? 'bg-transparent' : 'bg-rose'}`} />
-                <span className="flex-1"><span className="block text-[15px] font-bold text-navy">{n.title}</span><span className="block text-[13px] text-muted">{n.body}</span></span>
+              <button onClick={() => { onClose(); if (n.href) goSafe(router, n.href) }} className="flex w-full items-start gap-3 rounded-[20px] bg-sky-50 p-4 text-left">
+                <span className={`mt-1.5 size-2.5 shrink-0 rounded-full ${n.read ? 'bg-transparent' : 'bg-coral'}`} />
+                <span className="flex-1"><span className="block font-display text-[16px] font-semibold text-ink">{n.title}</span><span className="block text-[13px] text-muted">{n.body}</span></span>
                 <span className="text-[12px] text-muted">{fmtDay(n.at)}</span>
               </button>
             </motion.li>
@@ -275,6 +302,7 @@ function IdlePrefetch() {
 
 export function AppChrome({ children }: { children: ReactNode }) {
   useTrail()
+  usePromptBoot()
   const [log, setLog] = useState(false)
   const [notes, setNotes] = useState(false)
   const [entry, setEntry] = useState<string | null>(null)
@@ -283,16 +311,32 @@ export function AppChrome({ children }: { children: ReactNode }) {
   const openLog = useCallback(() => setLog(true), [])
   const openNotices = useCallback(() => setNotes(true), [])
   const flyToBag = useCallback((from: DOMRect, img: string) => setFly({ from, img, id: Date.now() }), [])
-  const ctx = useMemo(() => ({ openLog, openNotices, openEntry, flyToBag }), [openLog, openNotices, openEntry, flyToBag])
+  // owner 2026-11-24: after a mood log (once a day), offer to send a note to Jitendra Khimlani (a beat later, once the log closes)
+  const [ask, setAsk] = useState<NoteAskReq | null>(null)
+  // owner 2026-11-24/25: once after the first mood log of the day, and once more after the day's last dose
+  const askNote = useCallback((a: NoteAskReq) => {
+    const st = useApp.getState(), today = dayKey(new Date())
+    if (a.lastDose) {
+      if (st.noteAskedLastDoseOn === today) return
+      st.setNoteAskedLastDoseOn(today); st.setNoteAskedOn(today)
+    } else {
+      if (st.noteAskedOn === today) return
+      st.setNoteAskedOn(today)
+    }
+    window.setTimeout(() => setAsk(a), 450)
+  }, [])
+  const ctx = useMemo(() => ({ openLog, openNotices, openEntry, flyToBag, askNote }), [openLog, openNotices, openEntry, flyToBag, askNote])
   return (
     <Chrome.Provider value={ctx}>
       {children}
       <IdlePrefetch />
       <BottomNav />
+      <InstallPrompt />
       <LogSheet open={log} onClose={() => setLog(false)} />
       <NoticeSheet open={notes} onClose={() => setNotes(false)} />
       <EntrySheet id={entry} onClose={() => setEntry(null)} />
       <Flyer fly={fly} onDone={() => setFly(null)} />
+      <NoteAsk ask={ask} onClose={() => setAsk(null)} />
     </Chrome.Provider>
   )
 }

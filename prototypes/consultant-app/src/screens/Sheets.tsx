@@ -28,7 +28,7 @@ export interface Api {
   newRemedy: (personId: string, apptId?: string) => void
   notices: () => void
   addPerson: (then?: 'profile' | 'express') => void
-  /** New appointment by Jitu Bhaiya or the team — any time of day; `express` jumps straight to the next free times */
+  /** New appointment by Jitendra Khimlani or the team — any time of day; `express` jumps straight to the next free times */
   newAppt: (o?: { personId?: string; requestId?: string; service?: Service }) => void
   assign: (requestId: string) => void
   express: (personId?: string) => void

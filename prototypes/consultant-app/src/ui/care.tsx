@@ -1,17 +1,19 @@
 /**
  * Care widgets shared by Profile, Live session and the remedy sheet:
  * - AdherenceCard: is the person taking their drops (client ticks "took my drops" daily)?
- * - Suggestions: flowers to consider, with reasons (D-37 — Jitu Bhaiya only; reference, he decides).
+ * - Suggestions: flowers to consider, with reasons (D-37 — Jitendra Khimlani only; reference, he decides).
+ * v5 (HUB 2026-11-20): suggestions and the remedy builder use flower tiles (FlowerTile); adherence restyled to Blue Bloom.
  */
-import { m } from 'motion/react'
-import { Check, MessageCircle, Plus, Sparkles } from 'lucide-react'
+import { AnimatePresence, m } from 'motion/react'
+import { Check, MessageCircle, Sparkles } from 'lucide-react'
+import { FlowerArt } from './art'
 import { adherence, type Suggestion } from '../lib/derive'
 import { fmtShort, fmtWeekday } from '../lib/time'
 import { softSpring, spring } from './kit'
 import type { Person } from '../data/types'
 
 export function nudgeText(first: string) {
-  return `Namaste ${first} 🙏 A gentle reminder to take your drops today: 4 drops, 4 times a day. Small steps, every day. Jitu Bhaiya`
+  return `Namaste ${first} 🙏 A gentle reminder to take your drops today: 4 drops, 4 times a day. Small steps, every day. Jitendra Khimlani`
 }
 
 export function AdherenceCard({ p, now, compact }: { p: Person; now: number; compact?: boolean }) {
@@ -45,41 +47,54 @@ export function AdherenceCard({ p, now, compact }: { p: Person; now: number; com
       {!compact && <p className="adh-legend"><i className="taken" />Took drops<i className="missed" />Missed<i className="none" />Not logged</p>}
       {!ok && (
         <a className="btn btn-quiet btn-sm adh-nudge" href={`https://wa.me/${p.phone.replace(/\D/g, '')}?text=${encodeURIComponent(nudgeText(p.first))}`} target="_blank" rel="noreferrer">
-          <MessageCircle size={15} /> Send a gentle nudge
+          <MessageCircle size={16} aria-hidden /> Send a gentle nudge
         </a>
       )}
     </section>
   )
 }
 
-export function Suggestions({ first, items, picked, onToggle, onAddAll, limit = 5 }: { first: string; items: Suggestion[]; picked: string[]; onToggle: (f: string) => void; onAddAll?: () => void; limit?: number }) {
+// ---------------------------------------------------------------- v5 (HUB 2026-11-20): flower tiles (spec §5 "Flower tile")
+/** Square tile: sky-50 field, the flower at 80 %, Fraunces name. Selected = navy ring + check. Read-only tiles are plain list content. */
+export function FlowerTile({ name, on, reason, onToggle, full }: { name: string; on?: boolean; reason?: string; onToggle?: (f: string) => void; full?: boolean }) {
+  const body = (
+    <>
+      <span className="ftile-art">
+        <FlowerArt name={name} decorative />
+        <AnimatePresence>{on && <m.span className="ftile-check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={spring}><Check size={14} strokeWidth={3.2} /></m.span>}</AnimatePresence>
+      </span>
+      <span className="ftile-name">{name}</span>
+      {reason && <span className="ftile-why">{reason}</span>}
+    </>
+  )
+  if (!onToggle) return <div className="ftile is-static">{body}</div>
+  return (
+    <m.button type="button" className={'ftile' + (on ? ' is-on' : '') + (full && !on ? ' is-full' : '')} aria-pressed={!!on} aria-disabled={full && !on ? true : undefined}
+      whileTap={{ scale: 0.95 }} transition={{ duration: 0.16 }} onClick={() => onToggle(name)}>
+      {body}
+    </m.button>
+  )
+}
+
+/** "Flowers to consider": reasons always visible (D-37), never auto-applied. Without onToggle it's reference only (live session). */
+export function Suggestions({ first, items, picked = [], onToggle, onAddAll, limit = 6, full }: { first: string; items: Suggestion[]; picked?: string[]; onToggle?: (f: string) => void; onAddAll?: () => void; limit?: number; full?: boolean }) {
   if (!items.length) return <p className="muted small sugg-empty">No suggestions yet. Mark what's troubling {first} today and flowers to consider appear here.</p>
   const shown = items.slice(0, limit)
   const allIn = shown.every((s) => picked.includes(s.flower))
   return (
     <section className="sugg">
       <div className="sugg-head">
-        <h4><Sparkles size={15} /> Suggested from {first}'s data</h4>
-        {onAddAll && !allIn && <button className="link" onClick={onAddAll}>Add all {shown.length}</button>}
+        <h4><Sparkles size={16} aria-hidden /> Flowers to consider</h4>
+        {onAddAll && !allIn && <button type="button" className="link" onClick={onAddAll}>Add all {Math.min(shown.length, 7)}</button>}
       </div>
-      <ul>
-        {shown.map((s, i) => {
-          const on = picked.includes(s.flower)
-          return (
-            <m.li key={s.flower} layout initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: i * 0.03 }}>
-              <div className="sugg-main">
-                <b>{s.flower}</b>
-                <small className="sugg-note">{s.note}</small>
-                <span className="sugg-why">{s.reasons.slice(0, 2).join('; ')}</span>
-              </div>
-              <m.button className={'sugg-add' + (on ? ' on' : '')} whileTap={{ scale: 0.9 }} onClick={() => onToggle(s.flower)} aria-pressed={on} aria-label={on ? `Remove ${s.flower}` : `Add ${s.flower}`}>
-                {on ? <Check size={16} strokeWidth={3} /> : <Plus size={16} strokeWidth={2.6} />}
-              </m.button>
-            </m.li>
-          )
-        })}
+      <ul className="ftile-grid">
+        {shown.map((s, i) => (
+          <m.li key={s.flower} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1], delay: i * 0.03 }}>
+            <FlowerTile name={s.flower} on={picked.includes(s.flower)} reason={s.reasons[0]} onToggle={onToggle} full={full} />
+          </m.li>
+        ))}
       </ul>
-      <p className="sugg-foot">Reference only, from troubling emotions, check-ins and past blends. Your judgement decides.</p>
+      <p className="sugg-foot">Suggested from {first}'s troubling emotions, check-ins and past blends. Reference only, your judgement decides.</p>
     </section>
   )
 }

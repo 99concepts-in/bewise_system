@@ -7,8 +7,8 @@
  */
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { Check, Home, MapPin, Package, Plus, Truck } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Check, Home, MapPin, Package, Plus, Truck, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { Mascot, Petals } from '@/components/brand'
 import { PaySheet } from '@/components/pay-sheet'
 import { AppHeader } from '@/components/shell'
@@ -29,6 +29,14 @@ export default function Checkout() {
   const { lines, sub, ship, discount, coupon, total } = useBagTotals()
   const [sel, setSel] = useState(addresses[0]?.id)
   const [adding, setAdding] = useState(addresses.length === 0)
+  // owner 2026-11-24: saved addresses load a moment after the page opens. Once they arrive, pick the first one and close
+  // the empty form (unless the member opened it themselves).
+  const userOpened = useRef(false)
+  useEffect(() => {
+    if (!addresses.length) return
+    setSel((x) => (x && addresses.some((a) => a.id === x) ? x : addresses[0].id))
+    if (!userOpened.current) setAdding(false)
+  }, [addresses])
   const [f, setF] = useState({ name: profile?.name ?? '', phone: profile?.phone ?? '', pin: '', line1: '', line2: '', city: '', state: '' })
   const [pay, setPay] = useState(false)
   const [how, setHow] = useState<'ship' | 'pickup'>('ship')
@@ -39,7 +47,7 @@ export default function Checkout() {
   useEffect(() => { const h = PIN_HINT[f.pin.slice(0, 3)]; if (f.pin.length === 6 && h && !f.city) setF((x) => ({ ...x, city: h[0], state: h[1] })) }, [f.pin, f.city])
 
   const valid = f.name.trim().length > 1 && /^[6-9]\d{9}$/.test(f.phone) && /^[1-9]\d{5}$/.test(f.pin) && f.line1.trim().length > 3 && f.city && f.state
-  const saveAddr = () => { if (!valid) return; const a = upsert({ name: f.name, phone: f.phone, pin: f.pin, line1: f.line1, line2: f.line2, city: f.city, state: f.state }); setSel(a.id); setAdding(false) }
+  const saveAddr = () => { if (!valid) return; const a = upsert({ name: f.name, phone: f.phone, pin: f.pin, line1: f.line1, line2: f.line2, city: f.city, state: f.state }); setSel(a.id); setAdding(false); userOpened.current = false }
   const eta = addDays(new Date(), 5)
 
   if (done) return (
@@ -66,16 +74,16 @@ export default function Checkout() {
     <main className="px-5 pb-40">
       <AppHeader back="/app/bag" title="Checkout" />
       <h1 className="h-duo pt-2">How would you like <em>it?</em></h1>
-      {/* owner 2026-11-18: pick up from the studio as well as home delivery */}
+      {/* owner 2026-11-18: pick up from the center as well as home delivery */}
       <div role="radiogroup" aria-label="Delivery or pickup" className="mt-5 grid grid-cols-2 gap-2.5">
         {([
           { k: 'ship', e: '🚚', t: 'Home delivery', d: ship ? `${formatINR(ship)} · 4 to 6 days` : 'Free · 4 to 6 days' },
-          { k: 'pickup', e: '🏡', t: 'Pick up from studio', d: `Free · ${STUDIO.short}` },
+          { k: 'pickup', e: '🏡', t: 'Pick up from the center', d: `Free · ${STUDIO.short}` },
         ] as const).map((o) => {
           const on = how === o.k
           return (
             <motion.button key={o.k} type="button" role="radio" aria-checked={on} whileTap={{ scale: 0.97 }} onClick={() => setHow(o.k)}
-              className={cx('relative rounded-[22px] p-4 text-left transition-colors', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
+              className={cx('relative rounded-[20px] p-4 text-left transition-colors', on ? 'bg-navy text-white shadow-[var(--shadow-float)]' : 'bg-white text-navy shadow-[var(--shadow-card)]')}>
               <span className="text-[22px]" aria-hidden>{o.e}</span>
               <span className="mt-1.5 block text-[15px] font-bold leading-tight">{o.t}</span>
               <span className={cx('block text-[12px] leading-4', on ? 'text-white/75' : 'text-muted')}>{o.d}</span>
@@ -103,7 +111,10 @@ export default function Checkout() {
         <AnimatePresence initial={false}>
           {adding ? (
             <motion.div key="form" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="card overflow-hidden p-4">
-              <p className="mb-3 flex items-center gap-2 text-[16px] font-bold text-navy"><MapPin className="size-5" /> New address</p>
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <p className="flex items-center gap-2 text-[16px] font-bold text-navy"><MapPin className="size-5" /> New address</p>
+                {addresses.length > 0 && <button type="button" onClick={() => { userOpened.current = false; setAdding(false) }} aria-label="Close new address" className="grid size-10 place-items-center rounded-full bg-peri-50 text-navy"><X className="size-5" /></button>}
+              </div>
               <div className="grid grid-cols-2 gap-2.5">
                 <In label="Full name" v={f.name} on={(name) => setF({ ...f, name })} span />
                 <In label="Mobile (+91)" v={f.phone} on={(phone) => setF({ ...f, phone: phone.replace(/\D/g, '').slice(0, 10) })} num />
@@ -116,7 +127,7 @@ export default function Checkout() {
               <Btn full size="md" className="mt-4" disabled={!valid} onClick={saveAddr}>Save address</Btn>
             </motion.div>
           ) : (
-            <motion.button key="add" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setAdding(true)} className="flex w-full items-center justify-center gap-2 rounded-[22px] border-2 border-dashed border-[#c9cfe1] py-4 text-[15px] font-semibold text-navy"><Plus className="size-4" /> Add a new address</motion.button>
+            <motion.button key="add" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => { userOpened.current = true; setAdding(true) }} className="flex w-full items-center justify-center gap-2 rounded-[20px] border-2 border-dashed border-[#c9cfe1] py-4 text-[15px] font-semibold text-navy"><Plus className="size-4" /> Add a new address</motion.button>
           )}
         </AnimatePresence>
       </div>
@@ -134,8 +145,8 @@ export default function Checkout() {
         <p className="mt-3 flex items-center gap-2 text-[13px] text-muted"><Package className="size-4" /> Arrives in 4 to 6 days · No returns for change of mind. Damaged or wrong items are replaced.</p>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-[#e6eee3] via-[#e6eee3]/95 to-transparent px-5 pb-3 pt-8 safe-b">
-        <Btn full variant="gradient" disabled={how === 'ship' && (!sel || adding)} onClick={() => setPay(true)}><span aria-hidden>🔒</span> Pay {formatINR(payable)}</Btn>
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-sky-50 via-sky-50/95 to-transparent px-5 pb-3 pt-8 safe-b">
+        <Btn full variant="gradient" disabled={how === 'ship' && !sel} onClick={() => setPay(true)}><span aria-hidden>🔒</span> Pay {formatINR(payable)}</Btn>
       </div>
       <PaySheet open={pay} amountPaise={payable} purpose="Your order" onClose={() => setPay(false)} onPaid={() => { if (how === 'ship' && !sel) return; const o = placeOrder(how === 'pickup' ? 'pickup' : sel!); setPay(false); setDone(o); if (o.lines.some((l) => l.kind === 'product')) setTimeout(() => setAsk(true), 1400) }} />
     </main>
@@ -185,7 +196,7 @@ function In({ label, v, on, span, num }: { label: string; v: string; on: (v: str
   return (
     <label className={cx('block', span && 'col-span-2')}>
       <span className="mb-1 block px-1 text-[12px] font-semibold text-muted">{label}</span>
-      <input value={v} onChange={(e) => on(e.target.value)} inputMode={num ? 'numeric' : undefined} className="h-12 w-full rounded-[16px] bg-peri-50 px-4 text-[15px] font-semibold text-navy outline-none focus:ring-2 focus:ring-navy" />
+      <input value={v} onChange={(e) => on(e.target.value)} inputMode={num ? 'numeric' : undefined} className="h-12 w-full rounded-[16px] bg-peri-50 px-4 text-[16px] font-semibold text-navy outline-none focus:ring-2 focus:ring-blue" />
     </label>
   )
 }
