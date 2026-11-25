@@ -175,43 +175,27 @@ const UNHAPPY_TAGS = ['Didn’t feel heard', 'Felt rushed', 'Too short', 'Guidan
 const MIXED_TAGS = ['Felt heard', 'Calming', 'Too short', 'Want clearer next steps', 'Started late', 'Hard to connect']
 const POSITIVE = new Set(HAPPY_TAGS)
 const tagsFor = (rating: number) => (rating >= 4 ? HAPPY_TAGS : rating === 3 ? MIXED_TAGS : rating > 0 ? UNHAPPY_TAGS : HAPPY_TAGS)
-/** theme swatches, Review / Tags / Both, and Edit for the words on the card */
-function CardControls({ theme, setTheme, show, setShow, canPick, text, setText, editing, setEditing }: {
-  theme: CardTheme; setTheme: (t: CardTheme) => void; show: CardShow; setShow: (s: CardShow) => void; canPick: boolean
-  text: string; setText: (t: string) => void; editing: boolean; setEditing: (e: boolean) => void
-}) {
-  if (editing) return (
-    <div className="rounded-[22px] bg-white/85 p-3 shadow-[var(--shadow-card)]">
-      <label htmlFor="cardtext" className="px-1 text-[13px] font-bold text-navy">Your words on the card</label>
-      <textarea id="cardtext" rows={3} autoFocus value={text} onChange={(e) => setText(e.target.value.slice(0, 220))} placeholder="A few words about your session…"
-        className="mt-1.5 w-full resize-none rounded-[16px] bg-peri-50/70 p-3 text-[16px] leading-6 outline-none focus:ring-2 focus:ring-navy" />
-      <div className="mt-1 flex items-center justify-between px-1">
-        <span className="text-[11px] text-muted tnum">{text.length}/220</span>
-        <button onClick={() => { buzz(6); setEditing(false) }} className="h-10 rounded-full bg-navy px-5 text-[14px] font-semibold text-white">Done</button>
-      </div>
-    </div>
-  )
+/** the Edit panel of the share screen: the words on the card, and Review / Tags / Both */
+function EditPanel({ show, setShow, canPick, text, setText }: { show: CardShow; setShow: (s: CardShow) => void; canPick: boolean; text: string; setText: (t: string) => void }) {
   return (
-    <div className="space-y-2">
-      <div className="flex gap-1.5" role="radiogroup" aria-label="Card theme">
-        {CARD_THEMES.map((t) => (
-          <button key={t.id} role="radio" aria-checked={theme === t.id} aria-label={t.label} onClick={() => { buzz(6); setTheme(t.id) }}
-            className={cx('flex h-10 flex-1 items-center justify-center gap-2 rounded-full text-[13px] font-semibold ring-1 transition-colors', theme === t.id ? 'bg-white text-navy ring-2 ring-navy' : 'bg-white/60 text-ink-2 ring-[#e3e0f0]')}>
-            <span className="size-4 rounded-full" style={{ background: t.swatch, boxShadow: 'inset 0 0 0 1px rgba(23,33,74,.18)' }} />{t.label}
-          </button>
-        ))}
+    <div className="space-y-3">
+      <div>
+        <label htmlFor="cardtext" className="px-1 text-[13px] font-bold text-navy">Your words on the card</label>
+        <textarea id="cardtext" rows={3} value={text} onChange={(e) => setText(e.target.value.slice(0, 220))} placeholder="A few words about your session…"
+          className="mt-1.5 w-full resize-none rounded-[16px] bg-peri-50/70 p-3 text-[16px] leading-6 outline-none focus:ring-2 focus:ring-navy" />
+        <p className="px-1 text-right text-[11px] text-muted tnum">{text.length}/220</p>
       </div>
-      <div className="flex gap-1.5">
-        {canPick ? (
-          <div className="flex flex-1 rounded-full bg-white/70 p-1 ring-1 ring-[#e3e0f0]" role="radiogroup" aria-label="Show on the card">
-            {([['review', 'Review'], ['tags', 'Tags'], ['both', 'Both']] as const).map(([k, l]) => (
+      {canPick && (
+        <div>
+          <p className="px-1 text-[13px] font-bold text-navy">Show on the card</p>
+          <div className="mt-1.5 flex rounded-full bg-peri-50 p-1" role="radiogroup" aria-label="Show on the card">
+            {([['review', 'Your words'], ['tags', 'Tags'], ['both', 'Both']] as const).map(([k, l]) => (
               <button key={k} role="radio" aria-checked={show === k} onClick={() => { buzz(6); setShow(k) }}
-                className={cx('h-8 flex-1 rounded-full text-[13px] font-semibold transition-colors', show === k ? 'bg-navy text-white' : 'text-navy')}>{l}</button>
+                className={cx('h-9 flex-1 rounded-full text-[13px] font-semibold transition-colors', show === k ? 'bg-navy text-white' : 'text-navy')}>{l}</button>
             ))}
           </div>
-        ) : <span className="flex-1" />}
-        <button onClick={() => { buzz(6); setEditing(true) }} className="flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-white px-4 text-[13px] font-semibold text-navy ring-1 ring-[#e3e0f0]"><PenLine className="size-4" /> Edit</button>
-      </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -229,7 +213,6 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
   const [theme, setTheme] = useState<CardTheme>('blush')
   const [show, setShow] = useState<CardShow>('review')
   const [cardText, setCardText] = useState('')
-  const [editing, setEditing] = useState(false)
   const kind = tags.filter((t) => POSITIVE.has(t))
   const cardQuote = cardText.trim() || (kind.length ? '' : 'My wellness session with Jitendra Khimlani.')
   const profile = useApp((s) => s.profile)
@@ -270,15 +253,17 @@ function FeedbackSheet({ open, onClose, id }: { open: boolean; onClose: () => vo
               <button type="button" onClick={() => setComment(true)} className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-peri-50 px-4 py-2.5 text-[14px] font-semibold text-navy"><Plus className="size-4" /> Add a comment</button>
             )}
             <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-muted"><Check className="size-3.5" /> Visible only to Jitendra Khimlani</p>
-            <Btn full className="mt-5" disabled={!rating} onClick={() => { give(id, { rating, tags, notes: comment ? notes : '', benefits: existing?.benefits ?? [] }); buzz(20); if (rating >= 4) { const t = comment ? notes.trim() : ''; setCardText(t); setShow(t ? 'review' : 'tags'); setEditing(false); onClose(); setShare(true) } else setSent(true) }}>Send to Jitendra Khimlani</Btn>
+            <Btn full className="mt-5" disabled={!rating} onClick={() => { give(id, { rating, tags, notes: comment ? notes : '', benefits: existing?.benefits ?? [] }); buzz(20); if (rating >= 4) { const t = comment ? notes.trim() : ''; setCardText(t); setShow(t ? 'review' : 'tags'); onClose(); setShare(true) } else setSent(true) }}>Send to Jitendra Khimlani</Btn>
           </motion.div>
         )}
       </AnimatePresence>
     </Sheet>
     {/* owner 2026-11-24: 4 or 5 stars → full screen with the card, share icons, or a Google review instead */}
-    <ShareScreen open={share} onClose={() => setShare(false)} title={<>Share your <em>experience</em></>} sub="Thank you 🌸 Pick a style, then share." googleUrl={GOOGLE_REVIEWS_URL}
-      make={() => reviewCard({ rating, quote: cardQuote, name: shortName, tags: kind, theme, show }, appUrl())} deps={`${theme}|${show}|${cardQuote}|${kind.join(',')}`} filename="bewise-review.jpg"
-      controls={<CardControls theme={theme} setTheme={setTheme} show={show} setShow={setShow} canPick={!!cardQuote && kind.length > 0} text={cardText} setText={setCardText} editing={editing} setEditing={setEditing} />}
+    <ShareScreen open={share} onClose={() => setShare(false)} title="Your review card"
+      variants={CARD_THEMES.map((t) => ({ id: t.id, label: t.label, bg: t.bg, dark: t.id === 'midnight' }))} variant={theme} onVariant={(v) => setTheme(v as CardTheme)}
+      make={(v) => reviewCard({ rating, quote: cardQuote, name: shortName, tags: kind, theme: (v as CardTheme) ?? theme, show }, appUrl())} deps={`${show}|${cardQuote}|${kind.join(',')}`} filename="bewise-review.jpg"
+      googleUrl={GOOGLE_REVIEWS_URL} googleText={cardQuote || kind.join(', ')}
+      editPanel={<EditPanel show={show} setShow={setShow} canPick={!!cardText.trim() && kind.length > 0} text={cardText} setText={setCardText} />}
       shareTitle="My BeWise wellness session" text="My wellness session with Jitendra Khimlani on BeWise. Begin your journey:" url={appUrl()} />
     </>
   )

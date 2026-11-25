@@ -30,14 +30,6 @@ import { LearnCard } from '@/components/learn-card'
 import { blendSupply } from '@/lib/supply'
 import { BP } from '@/lib/asset'
 
-// @decision(D-10) generic Bach descriptions — Jitendra Khimlani approves final wording before launch. Never the reason it was chosen.
-const ABOUT: Record<string, string> = {
-  Mimulus: 'Dr Bach described Mimulus for everyday fears of known things, a gentle companion for quiet courage.',
-  'White Chestnut': 'Associated with a busy mind and repeating thoughts, for a calmer, clearer head.',
-  Larch: 'Linked with self-belief, for having a go without expecting to fail.',
-  Impatiens: 'Associated with impatience and irritation, for an easier, unhurried pace.',
-  Walnut: 'Known as the remedy for times of change, for steadiness while life shifts.',
-}
 
 export default function Remedies() {
   const blend = useApp((s) => s.blend)
@@ -132,7 +124,7 @@ export default function Remedies() {
                 </div>
               </div>
               <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Remedies in this blend">
-                {blend.flowers.map((f) => <li key={f} className="rounded-full bg-white px-3 py-1 text-[12px] font-semibold text-navy">{f}</li>)}
+                {blend.flowers.map((f, i) => <li key={f} className="grid size-11 place-items-center rounded-full bg-white" aria-label={`Remedy ${i + 1}`}><FlowerArt name={f} decorative className="size-9" /></li>)}
               </ul>
             </div>
             <p className="mt-3 text-[12px] text-muted">Earlier blends appear here after each follow-up.</p>
@@ -140,15 +132,17 @@ export default function Remedies() {
         </Item>
       </Reveal>
 
-      <Sheet open={!!flower} onClose={() => setFlower(null)} title={flower ?? 'Flower'}>
+      {/* owner 2026-11-25: the remedy's image and what it supports, never its name */}
+      <Sheet open={!!flower} onClose={() => setFlower(null)} title="A remedy in your blend">
         {flower && (
           <div className="pb-2">
             <motion.div className="mx-auto grid size-[200px] place-items-center rounded-full bg-sky-50" initial={{ scale: 0.7, rotate: -8, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 220, damping: 16 }}>
-              <FlowerArt name={flower} className="h-[170px] w-[170px] text-[48px]" />
+              <FlowerArt name={flower} decorative className="h-[170px] w-[170px] text-[48px]" />
             </motion.div>
-            <h2 className="h-duo mt-2 text-[28px]">{flower}</h2>
-            {BACH_REMEDIES[flower] && <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-peri-50 py-1 pl-1 pr-3 text-[13px] font-semibold text-navy"><MoodImg mood={BACH_REMEDIES[flower].mood as never} size={26} /> For: {BACH_REMEDIES[flower].emotion}</p>}
-            <p className="mt-3 text-[15px] leading-6 text-ink">{ABOUT[flower] ?? (BACH_REMEDIES[flower] ? `Associated with ${BACH_REMEDIES[flower].emotion.charAt(0).toLowerCase()}${BACH_REMEDIES[flower].emotion.slice(1)}.` : 'One of Dr Bach’s flower remedies.')}</p>
+            <p className="mt-3 text-center text-[12px] font-bold uppercase tracking-[0.12em] text-muted">Supports</p>
+            <h2 className="h-duo mt-1 text-center text-[26px]">{BACH_REMEDIES[flower]?.emotion ?? 'Emotional balance'}</h2>
+            {BACH_REMEDIES[flower] && <p className="mx-auto mt-2 flex w-max items-center gap-2 rounded-full bg-peri-50 py-1 pl-1 pr-3 text-[13px] font-semibold text-navy"><MoodImg mood={BACH_REMEDIES[flower].mood as never} size={26} /> Chosen for how you feel</p>}
+            <p className="mt-3 text-center text-[14px] leading-6 text-ink-2">Jitendra Khimlani chose this flower for you. Your blend works as a whole, so take it as he advised.</p>
             <p className="mt-4 rounded-[18px] bg-marigold-100 p-3 text-[13px] font-semibold text-ink">In your blend since {fmtDay(blend.startedOn)}</p>
           </div>
         )}
@@ -186,11 +180,12 @@ function BlendRemedies({ flowers, onFlower }: { flowers: string[]; onFlower: (f:
               const info = BACH_REMEDIES[f]
               return (
                 <motion.li key={f} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.04 }} className={i === 0 ? 'mt-3' : 'mt-2'}>
-                  <button onClick={() => onFlower(f)} className="flex w-full items-center gap-3 rounded-[18px] bg-white p-2.5 text-left">
-                    <FlowerArt name={f} decorative className="size-11 shrink-0" />
+                  {/* owner 2026-11-25: no remedy names, only the flower image and what it supports */}
+                  <button onClick={() => onFlower(f)} aria-label={`Remedy for ${info?.emotion ?? 'emotional balance'}`} className="flex w-full items-center gap-3 rounded-[18px] bg-white p-2.5 text-left">
+                    <FlowerArt name={f} decorative className="size-12 shrink-0" />
                     <span className="min-w-0 flex-1">
-                      <span className="block font-display text-[15px] font-semibold text-ink">{f}</span>
-                      <span className="block text-[12px] leading-[17px] text-ink-2">For: {info?.emotion ?? 'emotional balance'}</span>
+                      <span className="block text-[12px] font-semibold text-muted">Supports</span>
+                      <span className="block font-display text-[15px] font-semibold leading-5 text-ink">{info?.emotion ?? 'Emotional balance'}</span>
                     </span>
                     {info && <MoodImg mood={info.mood as never} size={28} />}
                     <ChevronRight className="size-4 shrink-0 text-muted" />

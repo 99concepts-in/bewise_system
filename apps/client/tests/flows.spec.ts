@@ -112,22 +112,26 @@ test('review card: 4 or 5 stars invites a shareable card; 3 stars does not', asy
   const screen = page.getByRole('dialog', { name: 'Share your experience' })
   await expect(screen).toBeVisible()
   await expect(screen.getByRole('img', { name: 'Share card preview' })).toBeVisible({ timeout: 8000 })
-  for (const n of ['Instagram', 'More', 'Save', 'Copy link']) await expect(screen.getByRole('button', { name: n })).toBeVisible()
+  // owner 2026-11-25: one main Share button; WhatsApp, Instagram, Save, Copy link are secondary
+  await expect(screen.getByRole('button', { name: 'Share', exact: true })).toBeVisible()
+  for (const n of ['Instagram', 'Save', 'Copy link']) await expect(screen.getByRole('button', { name: n })).toBeVisible()
   await expect(screen.getByRole('link', { name: 'WhatsApp' })).toHaveAttribute('href', /wa\.me\/\?text=.*welcome/)
-  await expect(screen.getByRole('link', { name: /write a Google review/ })).toHaveAttribute('href', /google/)
-  // themes, edit the words, then review / tags / both
-  const src = () => screen.getByRole('img', { name: 'Share card preview' }).getAttribute('src')
-  const before = await src()
-  await screen.getByRole('radio', { name: 'Midnight' }).click()
-  await expect.poll(src).not.toBe(before)
-  await expect(screen.getByRole('radiogroup', { name: 'Show on the card' })).toHaveCount(0) // only tags so far
+  await expect(screen.getByRole('button', { name: /post it on Google/ })).toBeVisible()
+  // swipeable styles with the style names as tabs
+  for (const n of ['Blush style', 'Midnight style', 'Garden style']) await expect(screen.getByRole('option', { name: n })).toBeAttached()
+  await screen.getByRole('tab', { name: 'Midnight' }).click()
+  await expect(screen.getByRole('option', { name: 'Midnight style' })).toHaveAttribute('aria-selected', 'true')
+  await expect(screen.getByRole('tab', { name: 'Midnight' })).toHaveAttribute('aria-selected', 'true')
+  // Edit: the words, then what the card shows
   await screen.getByRole('button', { name: 'Edit' }).click()
-  await screen.getByLabel('Your words on the card').fill('I felt calm for the first time in weeks.')
-  await screen.getByRole('button', { name: 'Done' }).first().click()
-  for (const n of ['Review', 'Tags', 'Both']) await expect(screen.getByRole('radio', { name: n })).toBeVisible()
-  await screen.getByRole('radio', { name: 'Both' }).click()
-  await expect(screen.getByRole('radio', { name: 'Both' })).toHaveAttribute('aria-checked', 'true')
-  await screen.getByRole('button', { name: 'Done' }).click()
+  const edit = page.getByRole('dialog', { name: 'Edit your card' })
+  await edit.getByLabel('Your words on the card').fill('I felt calm for the first time in weeks.')
+  for (const n of ['Your words', 'Tags', 'Both']) await expect(edit.getByRole('radio', { name: n })).toBeVisible()
+  await edit.getByRole('radio', { name: 'Both' }).click()
+  await expect(edit.getByRole('radio', { name: 'Both' })).toHaveAttribute('aria-checked', 'true')
+  await edit.getByRole('button', { name: 'Done' }).click()
+  await expect(edit).toHaveCount(0)
+  await screen.getByRole('button', { name: 'Close' }).click()
   await expect(screen).toHaveCount(0)
 })
 
@@ -275,6 +279,16 @@ test('session page: "Before you begin" tips only for online sessions', async ({ 
   await expect(page.getByText('Before you begin')).toHaveCount(0)
   await page.goto('/app/sessions/view?id=a3') // online
   await expect(page.getByText('Before you begin')).toBeVisible()
+})
+
+test('my care: remedy names are never shown, only their images and what they support', async ({ page }) => {
+  await seed(page); await page.goto('/app/remedies')
+  await page.getByRole('button', { name: /Your blend supports/ }).click()
+  await expect(page.getByRole('list', { name: 'Remedies in your blend' }).getByRole('button')).toHaveCount(3)
+  await expect(page.getByText(/Mimulus|White Chestnut|Larch/)).toHaveCount(0)
+  await page.getByRole('button', { name: /^Remedy for / }).first().click()
+  await expect(page.getByRole('dialog', { name: 'A remedy in your blend' })).toBeVisible()
+  await expect(page.getByText(/Mimulus|White Chestnut|Larch/)).toHaveCount(0)
 })
 
 test('my care: remedies collapsed to what the blend supports; tap to expand', async ({ page }) => {

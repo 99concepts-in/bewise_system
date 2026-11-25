@@ -2,6 +2,21 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-25 · Review card share screen redesigned; remedy names removed from My care
+
+- **Share screen** (owner: swipeable styles, cleaner, Share as the main button, Google with their words). `ShareScreen` in `components/share-sheet.tsx`, laid out like a story editor:
+  - Top bar: ✕, "Your review card", Edit.
+  - The card is the hero: swipe between Blush, Midnight and Garden (real previews, side peeks). The style names below act as tabs, with no instruction text. The whole screen takes the style's colours (Midnight goes dark).
+  - Bottom panel in thumb reach: one big **Share** (system share sheet with the image), a quiet row of WhatsApp, Instagram, Save and Copy link, and "Also post it on Google · we copy your words".
+    - Google can't be pre-filled by any app, so the button copies their words to the clipboard, then opens the Google review page to paste.
+  - **Edit** opens a panel with their words (up to 220 characters) and Your words / Tags / Both.
+  - The swipe picks a style only once the cards come to rest; a tab tap's own scroll doesn't re-pick.
+- **My care, no remedy names** (owner 2026-11-25):
+  - The expanded list shows the flower image + "Supports: Everyday fears of known things".
+  - The detail sheet is titled "A remedy in your blend", with the image, what it supports, "Chosen for how you feel" and a note that the blend works as a whole.
+  - Blend journey shows flower images instead of name chips. The ABOUT texts (they named the flowers) are removed.
+- Tests: share screen (main Share, styles as tabs, Edit panel, Google) and "no remedy names in My care". 88/88 pass.
+
 ## 2026-11-24 · Share your experience: clean layout
 
 - Owner: "UI is all messed up". On iPhone the card preview (flex-1 + min height) overlapped the subtitle and the theme swatches.

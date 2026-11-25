@@ -1,4 +1,4 @@
-:HL["/bewise_system/preview/client/_next/static/chunks/0guh1pkxh1ex2.css","style"]
+:HL["/bewise_system/preview/client/_next/static/chunks/1xiqk705orn5k.css","style"]
 2:[["children",{"s":"__PAGE__","h":160}]]
 1:[["children",{"s":"/_not-found","h":96,"c":"$Q2"}]]
-0:{"b":"J-9m2CTp-zgSOvn1YYzer","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"oEu3-5gYvqJTBovCyrZbp","t":{"t":{"s":"","h":80,"c":"$Q1"}}}

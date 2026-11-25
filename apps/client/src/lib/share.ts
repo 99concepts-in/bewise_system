@@ -98,10 +98,10 @@ export async function storyCard(story: Story, url: string) {
 
 export type CardTheme = 'blush' | 'midnight' | 'garden'
 export type CardShow = 'review' | 'tags' | 'both'
-export const CARD_THEMES: { id: CardTheme; label: string; swatch: string }[] = [
-  { id: 'blush', label: 'Blush', swatch: 'linear-gradient(135deg,#FFF3DF,#FDE3EC 50%,#E7E4FF)' },
-  { id: 'midnight', label: 'Midnight', swatch: 'linear-gradient(135deg,#17214A,#2E3E8F)' },
-  { id: 'garden', label: 'Garden', swatch: 'linear-gradient(135deg,#FBF6EC,#E8F1DF)' },
+export const CARD_THEMES: { id: CardTheme; label: string; swatch: string; bg: string }[] = [
+  { id: 'blush', label: 'Blush', swatch: 'linear-gradient(135deg,#FFF3DF,#FDE3EC 50%,#E7E4FF)', bg: 'linear-gradient(170deg,#FFF3E4 0%,#FCE6EE 50%,#ECE8FF 100%)' },
+  { id: 'midnight', label: 'Midnight', swatch: 'linear-gradient(135deg,#17214A,#2E3E8F)', bg: 'linear-gradient(170deg,#1B2452 0%,#2B3880 60%,#3A2F78 100%)' },
+  { id: 'garden', label: 'Garden', swatch: 'linear-gradient(135deg,#FBF6EC,#E8F1DF)', bg: 'linear-gradient(170deg,#FAF6EC 0%,#F1F2E4 55%,#E3EFD9 100%)' },
 ]
 
 /**
