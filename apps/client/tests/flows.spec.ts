@@ -18,6 +18,8 @@ test('dose check-ins: each dose asks how you feel, then View my progress shows t
     await page.keyboard.press('Escape')
     await expect(page.getByRole('dialog', { name: 'Log how you feel' })).toHaveCount(0)
   }
+  // owner 2026-11-25: after the last dose the note popup comes; close it
+  await page.getByRole('button', { name: 'Not now' }).click()
   await expect(page.getByRole('group', { name: 'Today: 4 of 4 doses' })).toBeVisible()
   await expect(page.getByText('All done for today')).toBeVisible()
   expect(await bottle()).toBeLessThan(before)
@@ -618,6 +620,39 @@ test('gift (wellness journey plan) only after at least one session', async ({ pa
 test('home: connect with Jitendra Khimlani on Instagram', async ({ page }) => {
   await seed(page); await page.goto('/app')
   await expect(page.getByRole('link', { name: /Connect with Jitendra Khimlani on Instagram/ })).toHaveAttribute('href', 'https://www.instagram.com/jitubhaiyajgd/')
+})
+
+test('note popup after the last dose of the day, even when it already came after a mood log', async ({ page }) => {
+  await seed(page)
+  const today = await page.evaluate(() => { const x = new Date(); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}` })
+  await page.evaluate((d) => { const k = 'bewise-client-v1'; const r = JSON.parse(localStorage.getItem(k)!); r.state.doses = { ...(r.state.doses || {}), [d]: 3 }; r.state.noteAskedOn = d; localStorage.setItem(k, JSON.stringify(r)) }, today)
+  await page.goto('/app')
+  await page.getByRole('button', { name: 'Dose 4', exact: true }).click()
+  await page.getByRole('button', { name: 'Next' }).click()
+  await page.getByRole('dialog', { name: 'Log how you feel' }).getByRole('button', { name: 'Calm', exact: true }).click()
+  await page.getByRole('button', { name: 'Log it' }).click()
+  await page.getByRole('button', { name: 'Done' }).click()
+  await expect(page.getByText(/All your drops are done for today, and you felt calm/)).toBeVisible({ timeout: 3000 })
+  await page.getByRole('button', { name: 'Not now' }).click()
+  // once per day for the last dose: untick and tick again → no second popup
+  await page.getByRole('button', { name: 'Dose 4, taken' }).click()
+  await page.getByRole('button', { name: 'Dose 4', exact: true }).click()
+  await expect(page.getByRole('slider', { name: 'How pleasant or unpleasant' })).toBeVisible({ timeout: 3000 })
+  await page.keyboard.press('Escape'); await page.waitForTimeout(1000)
+  await expect(page.getByText(/All your drops are done for today/)).toHaveCount(0)
+})
+
+test('note popup after the last dose also when the mood screen is closed without logging', async ({ page }) => {
+  await seed(page)
+  const today = await page.evaluate(() => { const x = new Date(); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}` })
+  await page.evaluate((d) => { const k = 'bewise-client-v1'; const r = JSON.parse(localStorage.getItem(k)!); r.state.doses = { ...(r.state.doses || {}), [d]: 3 }; localStorage.setItem(k, JSON.stringify(r)) }, today)
+  await page.goto('/app')
+  await page.getByRole('button', { name: 'Dose 4', exact: true }).click()
+  await expect(page.getByRole('slider', { name: 'How pleasant or unpleasant' })).toBeVisible({ timeout: 3000 })
+  await page.keyboard.press('Escape')
+  await expect(page.getByText('All your drops are done for today. Tell him how your day went. He reads every note.')).toBeVisible({ timeout: 3000 })
+  await page.getByRole('button', { name: 'Send a note' }).click()
+  await page.waitForURL('**/app/chat?topic=feeling')
 })
 
 test('mood garden: blooms after 10 check-ins, asks for more before that', async ({ page }) => {

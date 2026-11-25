@@ -10,7 +10,7 @@ import { CheckCheck, ChevronRight, Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { MoodImg } from './brand'
 import { Verified } from './verified'
-import { Sheet, buzz } from './ui'
+import { Sheet, buzz, type NoteAskReq } from './ui'
 import { BP } from '@/lib/asset'
 import { moodOf, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
@@ -66,22 +66,24 @@ export function NoteCard() {
 }
 
 /** owner 2026-11-24: after a mood log, offer to send a note to Jitendra Khimlani, at most once a day. */
-export function NoteAsk({ ask, onClose }: { ask: { mood: Emotion; valence?: number } | null; onClose: () => void }) {
+export function NoteAsk({ ask, onClose }: { ask: NoteAskReq | null; onClose: () => void }) {
   const router = useRouter()
-  const m = ask ? moodOf(ask.mood) : null
+  const m = ask?.mood ? moodOf(ask.mood) : null
   return (
     <Sheet open={!!ask} onClose={onClose} title="Send a note">
-      {ask && m && (
+      {ask && (
         <div className="pb-2 text-center">
           <div className="relative mx-auto w-max">
             <img src={`${BP}/img/jitu-portrait.webp`} alt="" className="size-[76px] rounded-full object-cover object-[50%_30%] ring-4 ring-white shadow-[var(--shadow-card)]" />
-            <motion.span className="absolute -bottom-1 -right-3" initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 14 }}>
-              <MoodImg mood={ask.mood} size={38} />
+            <motion.span className="absolute -bottom-1 -right-3 grid size-[38px] place-items-center rounded-full bg-white text-[20px] shadow-[var(--shadow-card)]" initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 14 }}>
+              {ask.mood ? <MoodImg mood={ask.mood} size={38} /> : <span aria-hidden>🌸</span>}
             </motion.span>
           </div>
           <h2 className="h-duo mt-3 text-[24px]">Send a note to <em>Jitendra Khimlani?</em></h2>
-          <p className="mx-auto mt-1.5 max-w-[300px] text-[14px] leading-5 text-ink-2">You felt {m.label.toLowerCase()}. Let him know how you are doing. He reads every note.</p>
-          <button onClick={() => { buzz(8); onClose(); router.push(`/app/chat?topic=feeling&mood=${ask.mood}${ask.valence ? `&v=${ask.valence}` : ''}`) }}
+          <p className="mx-auto mt-1.5 max-w-[300px] text-[14px] leading-5 text-ink-2">{ask.lastDose
+              ? `All your drops are done for today${m ? `, and you felt ${m.label.toLowerCase()}` : ''}. Tell him how your day went. He reads every note.`
+              : `You felt ${m?.label.toLowerCase() ?? 'something'}. Let him know how you are doing. He reads every note.`}</p>
+          <button onClick={() => { buzz(8); onClose(); router.push(ask.mood ? `/app/chat?topic=feeling&mood=${ask.mood}${ask.valence ? `&v=${ask.valence}` : ''}` : '/app/chat?topic=feeling') }}
             className="mt-5 flex h-[52px] w-full items-center justify-center rounded-full bg-navy text-[16px] font-semibold text-white shadow-[var(--shadow-cta)] active:scale-[0.98]">Send a note</button>
           <button onClick={onClose} className="mt-2 h-12 w-full rounded-full text-[15px] font-semibold text-navy">Not now</button>
         </div>

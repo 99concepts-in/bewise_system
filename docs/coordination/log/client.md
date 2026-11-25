@@ -2,6 +2,17 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-25 · "Send a note" popup also after the day's last dose
+
+- Owner: the note popup should come first on a mood log, and also when the last (4th) dose is checked in.
+- **Rule** (`AppChrome.askNote`):
+  - Once after the first mood log of the day (`noteAskedOn`), as before.
+  - Once more after the day's last dose (`noteAskedLastDoseOn`), even if it already came that day.
+- **Flow:** the 4th dose opens the mood logger with `lastDose`. When it closes the popup comes, also if the member skipped logging.
+  - Copy: "All your drops are done for today, and you felt calm. Tell him how your day went." Without a mood: "All your drops are done for today. Tell him how your day went."
+  - Send a note opens the chat on "How I feel".
+- Tests: last dose after an earlier popup; skipped logging; only once per day for the last dose. 91/91 pass.
+
 ## 2026-11-25 · Mood garden: solid white data card
 
 - Owner: no gradient in the mood garden card, and make it a little different from the card below it (the note card, which keeps its soft gradient).

@@ -51,6 +51,7 @@ export default function Home() {
   const blend = useApp((s) => s.blend)
   const [story, setStory] = useState(false)
   const [logger, setLogger] = useState<'moment' | 'day' | null>(null)
+  const [lastDose, setLastDose] = useState(false)
   const now = useNow(60_000)
   useMorningNudge()
 
@@ -66,7 +67,7 @@ export default function Home() {
         {/* owner 2026-11-23: the remedy first, then "log how you feel" right under it (the feelings grid is gone) */}
         {/* owner 2026-11-24: the day's last dose opens the mood logger straight away (the breathe screen is off for now) */}
         {/* owner 2026-11-24: every dose checked in asks how they feel */}
-        {blend ? <Item data-tour="remedy"><TodaysBlend onDose={() => setLogger('moment')} /></Item> : <BlendPreparing />}
+        {blend ? <Item data-tour="remedy"><TodaysBlend onDose={(last) => { setLastDose(last); setLogger('moment') }} /></Item> : <BlendPreparing />}
 
         <Item data-tour="mood"><MoodPrompt onLog={(k) => setLogger(k)} /></Item>
 
@@ -95,7 +96,7 @@ export default function Home() {
         <Item data-tour="ask"><YourSpace /></Item>
       </Reveal>
 
-      <MoodLogger open={!!logger} kind={logger ?? 'moment'} onClose={() => setLogger(null)} />
+      <MoodLogger open={!!logger} kind={logger ?? 'moment'} lastDose={lastDose} onClose={() => { setLogger(null); setLastDose(false) }} />
       <Tour />
       <SetupFlow />
       <ReminderSetup />
@@ -410,7 +411,7 @@ function NextSession({ a }: { a: Appointment }) {
  * owner 2026-11-20: Home shows only the essentials of the blend: a bottle that empties as doses are checked in,
  * today's 4 drops, and a way into the full details (remedies, emotions, calendar) in My care.
  */
-function TodaysBlend({ onDose }: { onDose?: () => void }) {
+function TodaysBlend({ onDose }: { onDose?: (last: boolean) => void }) {
   const s = useApp()
   const [cal, setCal] = useState(false)
   const blend = s.blend!
@@ -423,7 +424,7 @@ function TodaysBlend({ onDose }: { onDose?: () => void }) {
   const tap = (i: number) => {
     const next = i < n ? i : i + 1
     s.logDoses(today, next); buzz(next > n ? 14 : 8)
-    if (next > n) { setPulse(Date.now()); if (next === of) toast(`All ${of} done today 🌸 Another day of self-care`); setTimeout(() => onDose?.(), 700) }
+    if (next > n) { setPulse(Date.now()); if (next === of) toast(`All ${of} done today 🌸 Another day of self-care`); setTimeout(() => onDose?.(next === of), 700) }
   }
   const caption = n >= of ? 'All done for today 🌿' : n === 0 ? 'Tap a drop each time you take your dose' : `${of - n} more to go today`
   return (

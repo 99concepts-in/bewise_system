@@ -14,7 +14,7 @@ import { Bell, ChevronLeft, House, Search, ShoppingBag, Sprout, User, X, BookOpe
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { create } from 'zustand'
 import { Avatar, Logo, MoodButton, MoodImg, LogoMark } from './brand'
-import { Btn, Chrome, IconBtn, Sheet, buzz, spring, toast, useChrome } from './ui'
+import { Btn, Chrome, IconBtn, Sheet, buzz, spring, toast, useChrome, type NoteAskReq } from './ui'
 import { MOODS, PRIMARY_MOODS, moodOf, searchMoods, type Emotion } from '@/lib/data'
 import { useApp } from '@/lib/store'
 import { dayKey, fmtTime, fmtDay } from '@/lib/format'
@@ -312,12 +312,17 @@ export function AppChrome({ children }: { children: ReactNode }) {
   const openNotices = useCallback(() => setNotes(true), [])
   const flyToBag = useCallback((from: DOMRect, img: string) => setFly({ from, img, id: Date.now() }), [])
   // owner 2026-11-24: after a mood log (once a day), offer to send a note to Jitendra Khimlani (a beat later, once the log closes)
-  const [ask, setAsk] = useState<{ mood: Emotion; valence?: number } | null>(null)
-  // owner 2026-11-24: only once a day
-  const askNote = useCallback((a: { mood: Emotion; valence?: number }) => {
+  const [ask, setAsk] = useState<NoteAskReq | null>(null)
+  // owner 2026-11-24/25: once after the first mood log of the day, and once more after the day's last dose
+  const askNote = useCallback((a: NoteAskReq) => {
     const st = useApp.getState(), today = dayKey(new Date())
-    if (st.noteAskedOn === today) return
-    st.setNoteAskedOn(today)
+    if (a.lastDose) {
+      if (st.noteAskedLastDoseOn === today) return
+      st.setNoteAskedLastDoseOn(today); st.setNoteAskedOn(today)
+    } else {
+      if (st.noteAskedOn === today) return
+      st.setNoteAskedOn(today)
+    }
     window.setTimeout(() => setAsk(a), 450)
   }, [])
   const ctx = useMemo(() => ({ openLog, openNotices, openEntry, flyToBag, askNote }), [openLog, openNotices, openEntry, flyToBag, askNote])

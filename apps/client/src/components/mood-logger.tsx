@@ -29,7 +29,7 @@ function fits(level: number) {
 }
 const dayWord = (l: number) => ['A very unpleasant', 'An unpleasant', 'A slightly unpleasant', 'A neutral', 'A slightly pleasant', 'A pleasant', 'A very pleasant'][l]
 
-export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: boolean; onClose: () => void; kind?: 'moment' | 'day' }) {
+export function MoodLogger({ open, onClose, kind: kind0 = 'moment', lastDose = false }: { open: boolean; onClose: () => void; kind?: 'moment' | 'day'; lastDose?: boolean }) {
   const logMood = useApp((s) => s.logMood)
   const { askNote } = useChrome()
   const [kind, setKind] = useState(kind0)
@@ -90,7 +90,14 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment' }: { open: bo
   }
   // owner 2026-11-24: once the logger closes after a log (Done, X or backdrop), offer a note to Jitendra Khimlani (once a day, see AppChrome)
   const logged = useRef<{ mood: Emotion; valence: number } | null>(null)
-  useEffect(() => { if (!open && logged.current) { askNote(logged.current); logged.current = null } }, [open, askNote])
+  // after the day's last dose the note popup comes even if the member skipped logging (owner 2026-11-25)
+  const wasLast = useRef(false)
+  useEffect(() => { if (open) wasLast.current = lastDose }, [open, lastDose])
+  useEffect(() => {
+    if (open) return
+    if (logged.current || wasLast.current) askNote({ ...(logged.current ?? {}), lastDose: wasLast.current })
+    logged.current = null; wasLast.current = false
+  }, [open, askNote])
   const names = picks.map((p) => moodOf(p).label).join(', ')
 
   return (
