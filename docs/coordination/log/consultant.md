@@ -94,3 +94,4 @@
   - Kept v5's look: tokens, Fraunces + Inter, official logo header, white tab bar, flower/feeling art, mood circles, v5 Today (summary card + timeline), v5 remedy builder (flower tiles, max 7) now also for remedies between sessions.
   - v3/v4 CSS moved onto v5 tokens; Fraunces latin file slimmed 121 → 58 KB (SOFT/WONK pinned, weights 400–800); --muted darkened to pass AA on the sky-50 page.
 - Tests: 68 unit, 121 browser passed (3 skipped). LCP budget 3.3 s (Fraunces greeting), FCP < 1 s.
+- 2026-11-25 (later): **any appointment can be started at any moment** (owner): Start on every upcoming row on Today and Sessions, "Start session" on every appointment screen (check-in stays optional), the live session starts awaiting-payment ones too. Test added.

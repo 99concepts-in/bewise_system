@@ -1422,3 +1422,5 @@ input, textarea, select { font-size: 16px !important; }
 .fin-today, .fin-grid, .stats { min-width: 0; } .stat { min-width: 0; overflow-wrap: anywhere; }
 @media (max-width: 360px) { .fin-stats .stat { padding: 14px; } .fin-stats .stat b { font-size: 22px; } }
 @media (max-width: 360px) { .sessions .row-hit > .avatar { display: none; } .sessions .row-time { min-width: 0; } }
+.act-start { background: var(--sky-100); color: var(--navy); }
+.ac-primary { display: grid; gap: 8px; }

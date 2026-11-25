@@ -32,13 +32,15 @@ export function ApptCard({ a, v, api, onRemedy }: { a: Appt; v: PersonView; api:
   const soon = a.start - now < 30 * MIN
   const when = `${dayLabel(a.start, now).toLowerCase()} at ${fmtTime(a.start)}`
 
+  // owner 2026-11-25: any appointment can be started at any moment; check-in stays optional
   let primary: JSX.Element | null = null
-  if (a.status === 'confirmed' && soon) primary = <button className="btn btn-primary" onClick={() => { dispatch({ type: 'checkIn', apptId: a.id }); toast(`${p.first} ${a.mode === 'online' ? 'has joined' : 'has arrived'}. Start when you're ready.`) }}><UserCheck size={16} /> Check in</button>
-  else if (a.status === 'checked_in') primary = <button className="btn btn-primary" onClick={() => go(`/session/${a.id}`)}><Play size={16} /> Start session</button>
+  if (upcoming) primary = <>
+    <button className="btn btn-primary" onClick={() => go(`/session/${a.id}`)}><Play size={16} /> Start session{soon ? '' : ` now`}</button>
+    {a.status === 'confirmed' && <button className="btn btn-quiet" onClick={() => { dispatch({ type: 'checkIn', apptId: a.id }); toast(`${p.first} ${a.mode === 'online' ? 'has joined' : 'has arrived'}. Start when you're ready.`) }}><UserCheck size={16} /> Check in</button>}
+  </>
   else if (a.status === 'in_session') primary = <button className="btn btn-primary" onClick={() => go(`/session/${a.id}`)}><Play size={16} /> Open the live session</button>
   else if (a.status === 'completed' && a.service === 'bach' && !a.remedy) primary = <button className="btn btn-primary" onClick={onRemedy}><Droplet size={16} /> Give remedy</button>
   else if (a.status === 'completed' || a.status === 'no_show') primary = <button className="btn btn-primary" onClick={() => api.newAppt({ personId: p.id, service: a.service })}><CalendarPlus size={16} /> Book the next one</button>
-  else if (upcoming) primary = <button className="btn btn-quiet" disabled><Play size={16} /> Starts {relative(a.start, now)}</button>
 
   return (
     <m.section className="appt-card" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={softSpring} aria-label="Appointment">

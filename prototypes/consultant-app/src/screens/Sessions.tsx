@@ -5,9 +5,9 @@
  */
 import { useDeferredValue, useMemo, useState } from 'react'
 import { AnimatePresence, m } from 'motion/react'
-import { CalendarDays, CalendarPlus, ChevronDown, Droplet, MapPin, MessageCircle, Search, Star, Video, X, Zap } from 'lucide-react'
+import { CalendarDays, CalendarPlus, ChevronDown, Droplet, MapPin, MessageCircle, Play, Search, Star, Video, X, Zap } from 'lucide-react'
 import { useIndex, useStore } from '../state/store'
-import { AppHeader, Avatar, Empty, Segmented, softSpring, spring } from '../ui/kit'
+import { AppHeader, Avatar, Empty, Segmented, go, softSpring, spring } from '../ui/kit'
 import { FlowerStack } from '../ui/art'
 import { useSheets, reminderText, waLink } from './Sheets'
 import { TypeBadge } from '../ui/bits'
@@ -19,7 +19,7 @@ import type { Appt } from '../data/types'
 
 type Tab = 'upcoming' | 'past'
 type Focus = 'all' | 'action' | 'first' | 'remedy' | 'followup' | 'noshow'
-type Act = { label: string; icon: 'remind' | 'remedy' | 'book'; run: () => void }
+type Act = { label: string; icon: 'remind' | 'remedy' | 'book' | 'start'; run: () => void }
 
 export default function Sessions() {
   const { s, now } = useStore()
@@ -47,6 +47,7 @@ export default function Sessions() {
     const p = person.get(a.personId)!
     if (a.status === 'awaiting_payment') return { label: 'Remind', icon: 'remind', run: () => window.open(waLink(p.phone, reminderText(p.first, a.start, now)), '_blank', 'noopener') }
     if (a.status === 'completed' && a.service === 'bach' && !a.remedy) return { label: 'Give remedy', icon: 'remedy', run: () => sheets.remedy(a.id) }
+    if (a.status === 'confirmed' || a.status === 'checked_in' || a.status === 'in_session') return { label: a.status === 'in_session' ? 'Open' : 'Start', icon: 'start', run: () => go(`/session/${a.id}`) }
     if (latestDone.has(a.id)) return { label: 'Book', icon: 'book', run: () => sheets.express(a.personId) }
     return null
   }
@@ -179,7 +180,7 @@ function Row({ a, act, n, past }: { a: Appt; act: Act | null; n: number; past: b
   let sub: string
   if (past) sub = a.status === 'no_show' ? 'Did not come' : a.benefits?.length ? `Felt ${a.benefits.slice(0, 2).join(', ').toLowerCase()}` : a.rating ? 'Left a rating' : 'No feedback yet'
   else sub = a.service === 'scanning' ? `session ${n}` : a.kind === 'first' ? 'first visit' : `session ${n}`
-  const Icon = act?.icon === 'remind' ? MessageCircle : act?.icon === 'remedy' ? Droplet : CalendarPlus
+  const Icon = act?.icon === 'remind' ? MessageCircle : act?.icon === 'remedy' ? Droplet : act?.icon === 'start' ? Play : CalendarPlus
   return (
     <li>
       <div className={'row row-split' + (soon ? ' is-soon' : '')}>

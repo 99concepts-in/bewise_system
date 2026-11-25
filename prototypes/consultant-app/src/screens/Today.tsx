@@ -101,8 +101,11 @@ function TodayList({ todays, next, done, now }: { todays: Appt[]; next?: Appt; d
           const lastTroubling = [...(byPerson.get(p.id) ?? [])].reverse().find((x) => x.start < a.start && x.troubling)?.troubling
           const feelings = a.feelings ?? a.troubling ?? lastTroubling ?? []
           let action: JSX.Element | null = null
-          if (a.status === 'confirmed' && soon) action = <m.button className="btn btn-quiet btn-sm" whileTap={{ scale: 0.95 }} onClick={() => { dispatch({ type: 'checkIn', apptId: a.id }); toast(`${p.first} ${a.mode === 'online' ? 'has joined' : 'has arrived'}. Start when you're ready.`) }}><UserCheck size={16} aria-hidden /> Check in</m.button>
-          else if (a.status === 'checked_in') action = <m.button className="btn btn-quiet btn-sm" whileTap={{ scale: 0.95 }} onClick={() => go(`/session/${a.id}`)}><Play size={16} aria-hidden /> Start</m.button>
+          // owner 2026-11-25: any appointment can be started at any moment; check-in stays optional
+          if (a.status === 'confirmed' || a.status === 'awaiting_payment' || a.status === 'checked_in') action = <>
+            {a.status === 'confirmed' && soon && <m.button className="btn btn-quiet btn-sm" whileTap={{ scale: 0.95 }} onClick={() => { dispatch({ type: 'checkIn', apptId: a.id }); toast(`${p.first} ${a.mode === 'online' ? 'has joined' : 'has arrived'}. Start when you're ready.`) }}><UserCheck size={16} aria-hidden /> Check in</m.button>}
+            <m.button className={'btn btn-sm ' + (a.status === 'checked_in' ? 'btn-primary' : 'btn-quiet')} whileTap={{ scale: 0.95 }} onClick={() => go(`/session/${a.id}`)}><Play size={16} aria-hidden /> Start</m.button>
+          </>
           else if (a.status === 'in_session') action = <m.button className="btn btn-quiet btn-sm" whileTap={{ scale: 0.95 }} onClick={() => go(`/session/${a.id}`)}><Play size={16} aria-hidden /> Open</m.button>
           else if (a.status === 'completed' && !a.remedy && a.service === 'bach') action = <m.button className="btn btn-quiet btn-sm" whileTap={{ scale: 0.95 }} onClick={() => sheets.remedy(a.id)}><Droplet size={16} aria-hidden /> Give remedy</m.button>
           const state = a.status === 'checked_in' ? { cls: 'teal', text: a.mode === 'online' ? 'Joined' : 'Checked in', tick: true }

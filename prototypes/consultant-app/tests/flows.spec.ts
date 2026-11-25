@@ -324,4 +324,19 @@ test.describe('@flows', () => {
     await post.getByRole('button', { name: 'Save image' }).click()
     expect((await dl).suggestedFilename()).toBe('bewise-review-story.png')
   })
+
+  test('any appointment can be started at any moment (owner 2026-11-25)', async ({ page }) => {
+    await fresh(page)
+    const s = await state(page)
+    const later = s.appts.filter((a: { status: string; start: number }) => a.status === 'confirmed' && a.start > Date.now() + 3 * 86400000)[0]
+    await page.goto('./#/appt/' + later.id)
+    await page.getByRole('region', { name: 'Appointment' }).getByRole('button', { name: /Start session/ }).click()
+    await expect(page.locator('.live-top')).toBeVisible()
+    expect((await state(page)).appts.find((a: { id: string }) => a.id === later.id).status).toBe('in_session')
+    // every upcoming session on Today has a Start button too
+    await page.goto('./#/')
+    const upcoming = page.locator('.tdl-row:not(.is-fin)')
+    const n = await upcoming.count()
+    for (let i = 0; i < n; i++) await expect(upcoming.nth(i).getByRole('button', { name: /Start|Open/ })).toBeVisible()
+  })
 })

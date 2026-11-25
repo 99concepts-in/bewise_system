@@ -32,7 +32,7 @@ export default function Live({ id }: { id: string }) {
   const [tick, setTick] = useState(Date.now())
   useEffect(() => { const t = setInterval(() => setTick(Date.now()), 1000); return () => clearInterval(t) }, [])
   // start the clock as soon as the session is opened
-  useEffect(() => { if (a && (a.status === 'confirmed' || a.status === 'checked_in')) dispatch({ type: 'start', apptId: a.id }) }, [a, dispatch])
+  useEffect(() => { if (a && (a.status === 'confirmed' || a.status === 'checked_in' || a.status === 'awaiting_payment')) dispatch({ type: 'start', apptId: a.id }) }, [a, dispatch])
 
   if (!a || !p || !v) return <div className="screen"><Empty img="owl-read" title="Session not found" body="It may have been moved or removed." action={<button className="btn btn-quiet" onClick={() => go('/sessions')}>Back to sessions</button>} /></div>
 
