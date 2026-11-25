@@ -2,6 +2,14 @@
 
 > Only the CLIENT chat writes this file. **Newest entry at the top.** Format: see `docs/04-COORDINATION-PROTOCOL.md` §4.
 
+## 2026-11-25 · Mood garden: solid white data card
+
+- Owner: no gradient in the mood garden card, and make it a little different from the card below it (the note card, which keeps its soft gradient).
+- The mood garden (and its first-10-check-ins state) is now a solid white card with a hairline ring. The flower is the only colour, with the small real rose in the corner.
+- Feelings are a simple list: colour dot, name, %. No pill backgrounds.
+- "Last 14 days" and the insights are separated by hairlines instead of nested tinted boxes. The tip sits in one soft yellow note.
+- 89/89 pass.
+
 ## 2026-11-25 · Story "Bach flowers in the spotlight" + "About Bach flower remedies" section
 
 - **New story** `spotlight` (7 slides), from public accounts on olive-tree.in/celebrities. Each line is attributed as reported, with its source shown:

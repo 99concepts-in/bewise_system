@@ -18,7 +18,6 @@ import { fmtDay } from '@/lib/format'
 import { BP } from '@/lib/asset'
 
 export const GARDEN_MIN = 10
-const WASH = 'linear-gradient(160deg,#FFF3DF 0%,#FDE3EC 42%,#E7E4FF 78%,#DDF0F4 100%)'
 
 /** petal from the centre up to length L (half width w); same shape at every size so motion can tween `d` */
 const petal = (L: number, w: number) => `M0 0C${w} ${-L * 0.3} ${w * 0.85} ${-L * 0.9} 0 ${-L}C${-w * 0.85} ${-L * 0.9} ${-w} ${-L * 0.3} 0 0Z`
@@ -35,30 +34,32 @@ export function MoodGarden({ onLog }: { onLog: () => void }) {
   const days = lastNDays(journal, 14)
   const lines = progressLines(journal, blend?.startedOn).slice(0, 2)
   return (
-    <section className="relative overflow-hidden rounded-[30px] p-5 shadow-[var(--shadow-card)]" style={{ background: WASH }} aria-labelledby="garden-h">
-      <Deco />
-      <div className="relative">
-        <p className="eyebrow text-[#8a4b6b]">{blend ? `Since ${fmtDay(blend.startedOn)}` : 'Last 30 days'}</p>
-        <h2 id="garden-h" className="h-duo mt-0.5 text-[26px]">Your mood <em>garden</em></h2>
+    // owner 2026-11-25: a calm, solid white data card (no gradient) so it reads differently from the soft note card below.
+    // The flower is the only colour; sections are separated by space and hairlines, not nested tinted boxes.
+    <section className="relative overflow-hidden rounded-[28px] bg-white p-5 shadow-[var(--shadow-card)] ring-1 ring-[#eef0f6]" aria-labelledby="garden-h">
+      <img src={`${BP}/img/deco/rose.webp`} alt="" aria-hidden className="pointer-events-none absolute -right-4 -top-5 w-[76px] rotate-[18deg] select-none" />
+      <div className="relative pr-14">
+        <p className="eyebrow text-muted">{blend ? `Since ${fmtDay(blend.startedOn)}` : 'Last 30 days'}</p>
+        <h2 id="garden-h" className="h-duo mt-0.5 text-[24px]">Your mood <em>garden</em></h2>
       </div>
 
-      <div className="relative mt-3 flex items-center gap-4">
+      <div className="relative mt-4 flex items-center gap-4">
         <Bloom mix={mix} total={journal.length} />
-        <ul className="min-w-0 flex-1 space-y-1.5" aria-label="How often you felt each way">
+        <ul className="min-w-0 flex-1 space-y-2.5" aria-label="How often you felt each way">
           {mix.slice(0, 5).map((m) => (
-            <li key={m.mood} className="flex items-center gap-2 rounded-full bg-white/70 py-1 pl-1 pr-3 text-[13px]">
-              <MoodImg mood={m.mood} size={24} />
+            <li key={m.mood} className="flex items-center gap-2 text-[14px]">
+              <span className="size-2.5 shrink-0 rounded-full" style={{ background: moodOf(m.mood).color, boxShadow: 'inset 0 0 0 1px rgba(23,33,74,.12)' }} aria-hidden />
               <span className="min-w-0 flex-1 truncate font-semibold text-ink">{moodOf(m.mood).label}</span>
-              <b className="tnum text-navy">{m.pct}%</b>
+              <span className="tnum font-bold text-navy">{m.pct}%</span>
             </li>
           ))}
         </ul>
       </div>
-      <p className="relative mt-2 text-[12px] font-semibold text-ink-2">Brighter petals: feelings you felt more often</p>
+      <p className="relative mt-3 text-[12px] text-muted">Brighter petals: feelings you felt more often</p>
 
-      <div className="relative mt-3 rounded-[22px] bg-white/65 px-3 pb-2.5 pt-3">
-        <p className="px-1 text-[12px] font-bold uppercase tracking-[0.1em] text-muted">Last 14 days</p>
-        <div className="mt-2 grid grid-cols-7 gap-y-2" role="img" aria-label={`Last 14 days: ${days.filter((d) => d.mood).length} days with a check-in`}>
+      <div className="relative mt-4 border-t border-[#eef0f6] pt-4">
+        <p className="text-[12px] font-bold uppercase tracking-[0.1em] text-muted">Last 14 days</p>
+        <div className="mt-2.5 grid grid-cols-7 gap-y-2.5" role="img" aria-label={`Last 14 days: ${days.filter((d) => d.mood).length} days with a check-in`}>
           {days.map((d, i) => (
             <div key={i} className="flex flex-col items-center gap-0.5">
               <MiniFlower color={d.mood ? moodOf(d.mood).color : undefined} delay={i * 0.04} />
@@ -68,17 +69,19 @@ export function MoodGarden({ onLog }: { onLog: () => void }) {
         </div>
       </div>
 
-      {lines.length > 0 && (
-        <ul className="relative mt-3 space-y-2">
-          {lines.map((l, i) => (
-            <motion.li key={i} className="flex items-center gap-3 rounded-[18px] bg-white/55 p-2.5 pr-3" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.1 }}>
-              <MoodImg mood={l.mood} size={34} /><p className="text-[14px] leading-5 text-ink">{l.text}</p>
-            </motion.li>
-          ))}
-        </ul>
-      )}
-      <p className="relative mt-3 flex items-start gap-2 text-[13px] leading-5 text-ink-2"><Lightbulb className="mt-0.5 size-4 shrink-0 text-gold" />{dailyInsight(journal)}</p>
-      <p className="relative mt-2 text-[11px] text-muted">From your check-ins · not medical advice</p>
+      <div className="relative mt-4 border-t border-[#eef0f6] pt-4">
+        {lines.length > 0 && (
+          <ul className="space-y-3">
+            {lines.map((l, i) => (
+              <motion.li key={i} className="flex items-center gap-3" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.1 }}>
+                <MoodImg mood={l.mood} size={30} /><p className="text-[14px] leading-5 text-ink">{l.text}</p>
+              </motion.li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-3 flex items-start gap-2 rounded-[14px] bg-[#FFF8E6] px-3 py-2.5 text-[13px] leading-5 text-ink-2"><Lightbulb className="mt-0.5 size-4 shrink-0 text-gold" />{dailyInsight(journal)}</p>
+        <p className="mt-2.5 text-[11px] text-muted">From your check-ins · not medical advice</p>
+      </div>
     </section>
   )
 }
@@ -129,8 +132,8 @@ function Seedling({ n, colors, onLog }: { n: number; colors: string[]; onLog: ()
   const still = useReducedMotion()
   const left = GARDEN_MIN - n
   return (
-    <section className="relative overflow-hidden rounded-[30px] p-5 shadow-[var(--shadow-card)]" style={{ background: WASH }} aria-labelledby="garden-h">
-      <Deco />
+    <section className="relative overflow-hidden rounded-[28px] bg-white p-5 shadow-[var(--shadow-card)] ring-1 ring-[#eef0f6]" aria-labelledby="garden-h">
+      <img src={`${BP}/img/deco/rose.webp`} alt="" aria-hidden className="pointer-events-none absolute -right-4 -top-5 w-[76px] rotate-[18deg] select-none" />
       <div className="relative flex items-center gap-4">
         <svg viewBox="-100 -100 200 200" className="size-[124px] shrink-0" role="img" aria-label={`${n} of ${GARDEN_MIN} check-ins`}>
           {Array.from({ length: GARDEN_MIN }, (_, i) => {
@@ -158,12 +161,3 @@ function Seedling({ n, colors, onLog }: { n: number; colors: string[]; onLog: ()
   )
 }
 
-/** owner 2026-11-24: real flower photos in the corners (wild rose, chicory), small and tucked in, never over the content */
-function Deco() {
-  return (
-    <>
-      <img src={`${BP}/img/deco/rose.webp`} alt="" aria-hidden className="pointer-events-none absolute -right-5 -top-6 w-[92px] rotate-[18deg] select-none drop-shadow-[0_6px_10px_rgba(120,60,90,.18)]" />
-      <img src={`${BP}/img/deco/chicory.webp`} alt="" aria-hidden className="pointer-events-none absolute -bottom-4 -right-3 w-[58px] -rotate-[14deg] select-none opacity-90" />
-    </>
-  )
-}
