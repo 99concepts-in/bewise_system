@@ -59,14 +59,13 @@ export function ShareSheet({ open, onClose, heading, sub, make, filename, shareT
   )
 }
 
-const IG = <svg viewBox="0 0 24 24" className="size-6" aria-hidden><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stopColor="#FEDA75" /><stop offset=".35" stopColor="#FA7E1E" /><stop offset=".6" stopColor="#D62976" /><stop offset=".85" stopColor="#962FBF" /><stop offset="1" stopColor="#4F5BD5" /></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#igg)" /><rect x="6.5" y="6.5" width="11" height="11" rx="5.5" fill="none" stroke="#fff" strokeWidth="1.8" /><circle cx="17.3" cy="6.7" r="1.2" fill="#fff" /></svg>
-const WA = <svg viewBox="0 0 24 24" className="size-6" aria-hidden><circle cx="12" cy="12" r="11" fill="#25D366" /><path fill="#fff" d="M12 5.2a6.8 6.8 0 0 0-5.9 10.2L5.2 18.8l3.5-.9A6.8 6.8 0 1 0 12 5.2Zm3.6 9.6c-.15.42-.88.8-1.22.83-.33.04-.66.06-2.23-.55-1.9-.75-3.1-2.7-3.2-2.83-.08-.13-.75-1-.75-1.97s.48-1.37.67-1.56c.16-.18.35-.2.47-.2h.34c.12 0 .27-.01.42.35l.55 1.35c.05.1.08.23.01.36l-.27.42-.27.3c-.09.11-.18.22-.07.42.12.2.53.86 1.13 1.4.77.69 1.43.9 1.63 1 .2.1.33.08.44-.05l.62-.73c.13-.18.27-.15.45-.09l1.3.62c.19.09.32.14.37.22.05.1.05.5-.12.98Z" /></svg>
 const GOOGLE = <svg viewBox="0 0 24 24" className="size-5" aria-hidden><path fill="#4285F4" d="M22.6 12.2c0-.7-.1-1.4-.2-2.1H12v4h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-7.9Z" /><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1-3.7 1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23Z" /><path fill="#FBBC05" d="M5.8 14.1a6.6 6.6 0 0 1 0-4.2V7.1H2.1a11 11 0 0 0 0 9.8l3.7-2.8Z" /><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.6l3.2-3.2A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4Z" /></svg>
 
 /**
  * owner 2026-11-24/25: after 4 or 5 star feedback, a full screen to share the review card.
  *   · Swipe between card styles (each a real preview), dots + style name underneath.
- *   · One main button: Share (the phone's share sheet with the image). WhatsApp, Instagram, Save and Copy link are secondary.
+ *   · One main button: Share (the phone's share sheet with the image: WhatsApp, Instagram, save… all live there).
+ *   · owner 2026-11-27: the only other button is "Review on Google".
  *   · Google: no app can pre-fill a Google review, so we copy their words first, then open the Google review page to paste.
  */
 export function ShareScreen({ open, onClose, title, variants, variant, onVariant, make, deps = '', editPanel, filename, shareTitle, text, url, googleUrl, googleText }: {
@@ -136,12 +135,6 @@ export function ShareScreen({ open, onClose, title, variants, variant, onVariant
     const r = await shareCard({ blob: cur?.blob, filename, title: shareTitle, text, url })
     if (r === 'unsupported') { save(); toast('Image saved. Share it from your photos.') }
   }
-  const insta = async () => {
-    buzz(8)
-    const r = await shareCard({ blob: cur?.blob, filename, title: shareTitle, text, url })
-    if (r === 'unsupported') { save(); toast('Image saved. Open Instagram and add it to your story.') }
-  }
-  const copy = async () => { try { await navigator.clipboard.writeText(url); toast('Link copied') } catch { toast(url) } }
   const google = async () => {
     buzz(8)
     let copied = false
@@ -149,12 +142,6 @@ export function ShareScreen({ open, onClose, title, variants, variant, onVariant
     toast(copied ? 'Your words are copied. Paste them in the Google review box.' : 'Opening Google reviews')
     window.open(googleUrl, '_blank', 'noopener')
   }
-  const small = [
-    { k: 'wa', label: 'WhatsApp', icon: WA, href: waLink(text, url) },
-    { k: 'ig', label: 'Instagram', icon: IG, on: insta },
-    { k: 'save', label: 'Save', icon: <Download className="size-[18px] text-navy" />, on: save },
-    { k: 'copy', label: 'Copy link', icon: <Link2 className="size-[18px] text-navy" />, on: copy },
-  ]
 
   const v = list[idx], dark = !!v.dark
   return (
@@ -197,19 +184,13 @@ export function ShareScreen({ open, onClose, title, variants, variant, onVariant
             <button onClick={share} disabled={!cur} className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-navy font-display text-[17px] font-semibold text-white shadow-[var(--shadow-cta)] active:scale-[0.98] disabled:opacity-60">
               <Share2 className="size-5" /> Share
             </button>
-            <div className="mt-3 flex justify-center gap-6" role="group" aria-label="Share to">
-              {small.map((x) => {
-                const inner = <><span className="grid size-10 place-items-center rounded-full bg-peri-50">{x.icon}</span><span className="text-[11px] font-medium text-ink-2">{x.label}</span></>
-                return x.href
-                  ? <a key={x.k} href={x.href} target="_blank" rel="noopener noreferrer" aria-label={x.label} className="flex flex-col items-center gap-1">{inner}</a>
-                  : <button key={x.k} onClick={x.on} disabled={!cur && x.k !== 'copy'} aria-label={x.label} className="flex flex-col items-center gap-1 disabled:opacity-50">{inner}</button>
-              })}
-            </div>
+            {/* owner 2026-11-27: just Share, and a Google review button (no WhatsApp / Instagram / Save / Copy link row) */}
             {googleUrl && (
-              <button onClick={google} className="mx-auto mt-3 flex h-10 items-center gap-2 rounded-full px-3 text-[13px] font-semibold text-ink-2">
-                <span className="[&>svg]:size-4">{GOOGLE}</span> Also post it on Google <span className="text-muted">· we copy your words</span>
+              <button onClick={google} className="mt-2.5 flex h-14 w-full items-center justify-center gap-2.5 rounded-full bg-white font-display text-[17px] font-semibold text-ink ring-1 ring-line active:scale-[0.98]">
+                <span className="[&>svg]:size-5">{GOOGLE}</span> Review on Google
               </button>
             )}
+            {googleUrl && <p className="mt-1.5 text-center text-[12px] text-muted">We copy your words so you can paste them in Google.</p>}
           </div>
 
           {/* edit: the words and what the card shows */}

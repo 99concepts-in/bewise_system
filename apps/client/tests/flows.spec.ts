@@ -117,11 +117,11 @@ test('review card: 4 or 5 stars invites a shareable card; 3 stars does not', asy
   const screen = page.getByRole('dialog', { name: 'Share your experience' })
   await expect(screen).toBeVisible()
   await expect(screen.getByRole('img', { name: 'Share card preview' })).toBeVisible({ timeout: 8000 })
-  // owner 2026-11-25: one main Share button; WhatsApp, Instagram, Save, Copy link are secondary
+  // owner 2026-11-27: only Share and Review on Google
   await expect(screen.getByRole('button', { name: 'Share', exact: true })).toBeVisible()
-  for (const n of ['Instagram', 'Save', 'Copy link']) await expect(screen.getByRole('button', { name: n })).toBeVisible()
-  await expect(screen.getByRole('link', { name: 'WhatsApp' })).toHaveAttribute('href', /wa\.me\/\?text=.*welcome/)
-  await expect(screen.getByRole('button', { name: /post it on Google/ })).toBeVisible()
+  await expect(screen.getByRole('button', { name: 'Review on Google' })).toBeVisible()
+  for (const n of ['Instagram', 'Save', 'Copy link']) await expect(screen.getByRole('button', { name: n })).toHaveCount(0)
+  await expect(screen.getByRole('link', { name: 'WhatsApp' })).toHaveCount(0)
   // swipeable styles with the style names as tabs
   for (const n of ['Blush style', 'Midnight style', 'Garden style']) await expect(screen.getByRole('option', { name: n })).toBeAttached()
   await screen.getByRole('tab', { name: 'Midnight' }).click()
