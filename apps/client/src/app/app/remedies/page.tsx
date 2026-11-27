@@ -26,7 +26,6 @@ import { DoseTracker } from '@/components/dose-tracker'
 import { HowToTake } from '@/components/how-to-take'
 import { BlendPreparing, usePreparing } from '@/components/blend-preparing'
 import { MadeWithCare } from '@/components/made-with-care'
-import { LearnCard } from '@/components/learn-card'
 import { blendSupply } from '@/lib/supply'
 import { BP } from '@/lib/asset'
 
@@ -105,7 +104,7 @@ export default function Remedies() {
 
         <Item><MadeWithCare /></Item>
 
-        <Item><LearnCard /></Item>
+        {/* owner 2026-11-27: "How Bach flowers can help" removed from My care (it stays on Home and in Learn) */}
 
         <Item><FaqCard /></Item>
 
