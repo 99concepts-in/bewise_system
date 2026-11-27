@@ -16,7 +16,7 @@ test('dose check-ins: each dose asks how you feel, then View my progress shows t
   for (let i = 1; i <= 4; i++) {
     await page.getByRole('button', { name: `Dose ${i}`, exact: true }).click()
     await expect(page.getByRole('slider', { name: 'How pleasant or unpleasant' })).toBeVisible({ timeout: 3000 })
-    if (i % 2) await page.getByRole('button', { name: 'Skip, my drops are logged' }).click()
+    if (i % 2) await page.getByRole('button', { name: 'Skip for now' }).click()
     else await page.keyboard.press('Escape')
     await expect(page.getByRole('dialog', { name: 'Log how you feel' })).toHaveCount(0)
     if (i < 4) { await page.waitForTimeout(700); await expect(page.getByRole('button', { name: 'Not now' })).toHaveCount(0) }
@@ -706,7 +706,7 @@ test('logging a mood does not ask for a note; only the day\'s last dose does (ow
   await expect(page.getByRole('heading', { name: /Send a note to Jitendra Khimlani\?/ })).toHaveCount(0)
   // the first dose of the day: no note either
   await page.getByRole('button', { name: 'Dose 1', exact: true }).click()
-  await page.getByRole('button', { name: 'Skip, my drops are logged' }).click()
+  await page.getByRole('button', { name: 'Skip for now' }).click()
   await page.waitForTimeout(1200)
   await expect(page.getByRole('heading', { name: /Send a note to Jitendra Khimlani\?/ })).toHaveCount(0)
 })
@@ -717,7 +717,7 @@ test('why we ask how you feel: shown once, before the first feeling, and can be 
   await page.goto('/app')
   await page.getByRole('button', { name: 'Dose 1', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Why we ask how you feel' })).toBeVisible({ timeout: 3000 })
-  await page.getByRole('button', { name: 'Skip for now, my drops are logged' }).click()
+  await page.getByRole('button', { name: 'Skip for now' }).click()
   await expect(page.getByRole('dialog', { name: 'Log how you feel' })).toHaveCount(0)
   // next time it goes straight to the slider
   await page.getByRole('button', { name: /Log how you feel right now/ }).click()

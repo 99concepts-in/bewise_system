@@ -146,7 +146,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment', lastDose = f
                     </ul>
                   </div>
                   <button onClick={() => { buzz(8); setStep('feel') }} className="h-14 w-full rounded-full bg-white text-[17px] font-semibold text-[#17181d] shadow-[0_10px_30px_rgba(0,0,0,.35)]">Log how I feel</button>
-                  <button onClick={onClose} className="mt-2 h-12 w-full rounded-full text-[15px] font-semibold text-white/75">{afterDose ? 'Skip for now, my drops are logged' : 'Not now'}</button>
+                  <button onClick={onClose} className="mt-2 h-12 w-full rounded-full text-[15px] font-semibold text-white/75">{afterDose ? 'Skip for now' : 'Not now'}</button>
                 </motion.div>
               )}
 
@@ -175,7 +175,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment', lastDose = f
                   <motion.button onClick={() => { buzz(8); setStep('pick') }} style={{ background: btn, color: ink }} whileTap={{ scale: 0.98 }}
                     className="mt-7 h-14 w-full rounded-full text-[17px] font-semibold shadow-[0_10px_30px_rgba(0,0,0,.35)] ring-1 ring-white/20">Next</motion.button>
                   {/* owner 2026-11-27: logging a feeling after the drops is never required */}
-                  {afterDose && <button onClick={onClose} className="mt-1 h-12 w-full rounded-full text-[15px] font-semibold text-white/75">Skip, my drops are logged</button>}
+                  {afterDose && <button onClick={onClose} className="mt-1 h-12 w-full rounded-full text-[15px] font-semibold text-white/75">Skip for now</button>}
                 </motion.div>
               )}
 
