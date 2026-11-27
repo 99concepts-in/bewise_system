@@ -52,6 +52,7 @@ export default function Home() {
   const [story, setStory] = useState(false)
   const [logger, setLogger] = useState<'moment' | 'day' | null>(null)
   const [lastDose, setLastDose] = useState(false)
+  const [afterDose, setAfterDose] = useState(false)
   const now = useNow(60_000)
   useMorningNudge()
 
@@ -67,7 +68,7 @@ export default function Home() {
         {/* owner 2026-11-23: the remedy first, then "log how you feel" right under it (the feelings grid is gone) */}
         {/* owner 2026-11-24: the day's last dose opens the mood logger straight away (the breathe screen is off for now) */}
         {/* owner 2026-11-24: every dose checked in asks how they feel */}
-        {blend ? <Item data-tour="remedy"><TodaysBlend onDose={(last) => { setLastDose(last); setLogger('moment') }} /></Item> : <BlendPreparing />}
+        {blend ? <Item data-tour="remedy"><TodaysBlend onDose={(last) => { setLastDose(last); setAfterDose(true); setLogger('moment') }} /></Item> : <BlendPreparing />}
 
         <Item data-tour="mood"><MoodPrompt onLog={(k) => setLogger(k)} /></Item>
 
@@ -96,7 +97,7 @@ export default function Home() {
         <Item data-tour="ask"><YourSpace /></Item>
       </Reveal>
 
-      <MoodLogger open={!!logger} kind={logger ?? 'moment'} lastDose={lastDose} onClose={() => { setLogger(null); setLastDose(false) }} />
+      <MoodLogger open={!!logger} kind={logger ?? 'moment'} lastDose={lastDose} afterDose={afterDose} onClose={() => { setLogger(null); setLastDose(false); setAfterDose(false) }} />
       <Tour />
       <SetupFlow />
       <ReminderSetup />

@@ -11,7 +11,7 @@
  *           "Right now" or "Today overall". Saved as a journal entry (valence 1 to 7, kind, extra feelings in `also`).
  */
 import { AnimatePresence, animate, motion, useMotionValue, useMotionValueEvent, useTransform } from 'motion/react'
-import { Check, ChevronLeft, Search, X } from 'lucide-react'
+import { Check, ChevronLeft, MessageCircleHeart, Search, ShieldCheck, Sparkles, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { buzz, cx, toast, useChrome } from './ui'
 import { encourage } from '@/lib/encourage'
@@ -29,18 +29,21 @@ function fits(level: number) {
 }
 const dayWord = (l: number) => ['A very unpleasant', 'An unpleasant', 'A slightly unpleasant', 'A neutral', 'A slightly pleasant', 'A pleasant', 'A very pleasant'][l]
 
-export function MoodLogger({ open, onClose, kind: kind0 = 'moment', lastDose = false }: { open: boolean; onClose: () => void; kind?: 'moment' | 'day'; lastDose?: boolean }) {
+export function MoodLogger({ open, onClose, kind: kind0 = 'moment', lastDose = false, afterDose = false }: { open: boolean; onClose: () => void; kind?: 'moment' | 'day'; lastDose?: boolean; afterDose?: boolean }) {
   const logMood = useApp((s) => s.logMood)
+  // owner 2026-11-27: before the very first feeling, say why we ask (once)
+  const firstTime = useApp((s) => !s.moodWhySeen && s.journal.length === 0)
+  const setMoodWhySeen = useApp((s) => s.setMoodWhySeen)
   const { askNote } = useChrome()
   const [kind, setKind] = useState(kind0)
-  const [step, setStep] = useState<'feel' | 'pick' | 'done'>('feel')
+  const [step, setStep] = useState<'why' | 'feel' | 'pick' | 'done'>('feel')
   const v = useMotionValue(3)
   const [level, setLevel] = useState(3)
   const [q, setQ] = useState('')
   const [picks, setPicks] = useState<Emotion[]>([])
   const [note, setNote] = useState('')
   const [cheer, setCheer] = useState('')
-  useEffect(() => { if (open) { setKind(kind0); setStep('feel'); v.set(3); setLevel(3); lastLevel.current = 3; setQ(''); setPicks([]); setNote('') } }, [open, kind0, v])
+  useEffect(() => { if (open) { setKind(kind0); setStep(firstTime ? 'why' : 'feel'); if (firstTime) setMoodWhySeen(); v.set(3); setLevel(3); lastLevel.current = 3; setQ(''); setPicks([]); setNote('') } }, [open, kind0, v]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!open) return
     const prev = document.body.style.overflow; document.body.style.overflow = 'hidden'
@@ -115,7 +118,7 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment', lastDose = f
               <button onClick={() => (step === 'pick' ? setStep('feel') : onClose())} aria-label={step === 'pick' ? 'Back' : 'Close'} aria-hidden={step === 'done' || undefined} tabIndex={step === 'done' ? -1 : undefined} className={cx('grid size-11 place-items-center rounded-full bg-black/25 ring-1 ring-white/10', step === 'done' && 'invisible')}>
                 {step === 'pick' ? <ChevronLeft className="size-5" /> : <X className="size-5" />}
               </button>
-              {step !== 'done' ? (
+              {step === 'why' ? <span /> : step !== 'done' ? (
                 <div className="flex rounded-full bg-black/25 p-1 ring-1 ring-white/10" role="tablist" aria-label="What are you logging?">
                   {(['moment', 'day'] as const).map((k) => (
                     <button key={k} role="tab" aria-selected={kind === k} onClick={() => setKind(k)} className={cx('rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors', kind === k ? 'bg-white text-[#17181d]' : 'text-white/80')}>
@@ -124,10 +127,29 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment', lastDose = f
                   ))}
                 </div>
               ) : <p className="text-[15px] font-semibold">{kind === 'day' ? 'Daily mood' : 'Logged'}</p>}
-              <button onClick={onClose} aria-label="Close" className={cx('grid size-11 place-items-center rounded-full bg-black/25 ring-1 ring-white/10', step === 'feel' && 'invisible')}><X className="size-5" /></button>
+              <button onClick={onClose} aria-label="Close" className={cx('grid size-11 place-items-center rounded-full bg-black/25 ring-1 ring-white/10', (step === 'feel' || step === 'why') && 'invisible')}><X className="size-5" /></button>
             </div>
 
             <AnimatePresence mode="wait" initial={false}>
+              {step === 'why' && (
+                <motion.div key="why" className="relative flex min-h-0 flex-1 flex-col overflow-y-auto px-6 pb-[max(env(safe-area-inset-bottom),20px)]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }}>
+                  <div className="flex flex-1 flex-col justify-center py-6">
+                    <span className="mx-auto grid size-16 place-items-center rounded-full bg-white/12 ring-1 ring-white/15"><Sparkles className="size-7" aria-hidden /></span>
+                    <h2 className="mt-5 text-center font-sans text-[26px] font-semibold leading-8 text-white/95">Why we ask how you feel</h2>
+                    <p className="mx-auto mt-3 max-w-[320px] text-center text-[16px] leading-6 text-white/80">
+                      Bach flowers work on feelings. A quick check-in between sessions shows Jitendra Khimlani how you have really been, not just how you feel on the day you meet.
+                    </p>
+                    <ul className="mx-auto mt-6 w-full max-w-[340px] space-y-3">
+                      <li className="flex gap-3 rounded-[20px] bg-white/10 p-3.5 ring-1 ring-white/10"><MessageCircleHeart className="mt-0.5 size-5 shrink-0" aria-hidden /><span className="text-[14px] leading-5 text-white/85">At your next session he sees what changed and what still feels heavy, so he knows what to talk about.</span></li>
+                      <li className="flex gap-3 rounded-[20px] bg-white/10 p-3.5 ring-1 ring-white/10"><Sparkles className="mt-0.5 size-5 shrink-0" aria-hidden /><span className="text-[14px] leading-5 text-white/85">It helps him choose the right flowers for your next blend, or keep the ones that are working.</span></li>
+                      <li className="flex gap-3 rounded-[20px] bg-white/10 p-3.5 ring-1 ring-white/10"><ShieldCheck className="mt-0.5 size-5 shrink-0" aria-hidden /><span className="text-[14px] leading-5 text-white/85">Only he sees it. It is always optional: skip any time.</span></li>
+                    </ul>
+                  </div>
+                  <button onClick={() => { buzz(8); setStep('feel') }} className="h-14 w-full rounded-full bg-white text-[17px] font-semibold text-[#17181d] shadow-[0_10px_30px_rgba(0,0,0,.35)]">Log how I feel</button>
+                  <button onClick={onClose} className="mt-2 h-12 w-full rounded-full text-[15px] font-semibold text-white/75">{afterDose ? 'Skip for now, my drops are logged' : 'Not now'}</button>
+                </motion.div>
+              )}
+
               {step === 'feel' && (
                 <motion.div key="feel" className="relative flex min-h-0 flex-1 flex-col px-6 pb-[max(env(safe-area-inset-bottom),20px)]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }}>
                   <h2 className="mt-5 text-center font-sans text-[26px] font-semibold leading-8 text-white/90">{kind === 'day' ? 'Choose how you’ve felt overall today' : 'Choose how you feel right now'}</h2>
@@ -152,6 +174,8 @@ export function MoodLogger({ open, onClose, kind: kind0 = 'moment', lastDose = f
                   </div>
                   <motion.button onClick={() => { buzz(8); setStep('pick') }} style={{ background: btn, color: ink }} whileTap={{ scale: 0.98 }}
                     className="mt-7 h-14 w-full rounded-full text-[17px] font-semibold shadow-[0_10px_30px_rgba(0,0,0,.35)] ring-1 ring-white/20">Next</motion.button>
+                  {/* owner 2026-11-27: logging a feeling after the drops is never required */}
+                  {afterDose && <button onClick={onClose} className="mt-1 h-12 w-full rounded-full text-[15px] font-semibold text-white/75">Skip, my drops are logged</button>}
                 </motion.div>
               )}
 

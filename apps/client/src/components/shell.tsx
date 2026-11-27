@@ -313,16 +313,13 @@ export function AppChrome({ children }: { children: ReactNode }) {
   const flyToBag = useCallback((from: DOMRect, img: string) => setFly({ from, img, id: Date.now() }), [])
   // owner 2026-11-24: after a mood log (once a day), offer to send a note to Jitendra Khimlani (a beat later, once the log closes)
   const [ask, setAsk] = useState<NoteAskReq | null>(null)
-  // owner 2026-11-24/25: once after the first mood log of the day, and once more after the day's last dose
+  // owner 2026-11-27: only after the day's last dose (not after the first dose or a mood log), once a day.
+  // The note card on Home stays there for anyone who wants to write at any time.
   const askNote = useCallback((a: NoteAskReq) => {
+    if (!a.lastDose) return
     const st = useApp.getState(), today = dayKey(new Date())
-    if (a.lastDose) {
-      if (st.noteAskedLastDoseOn === today) return
-      st.setNoteAskedLastDoseOn(today); st.setNoteAskedOn(today)
-    } else {
-      if (st.noteAskedOn === today) return
-      st.setNoteAskedOn(today)
-    }
+    if (st.noteAskedLastDoseOn === today) return
+    st.setNoteAskedLastDoseOn(today); st.setNoteAskedOn(today)
     window.setTimeout(() => setAsk(a), 450)
   }, [])
   const ctx = useMemo(() => ({ openLog, openNotices, openEntry, flyToBag, askNote }), [openLog, openNotices, openEntry, flyToBag, askNote])

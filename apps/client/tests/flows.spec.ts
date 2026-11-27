@@ -12,11 +12,14 @@ test('dose check-ins: each dose asks how you feel, then View my progress shows t
   const bottle = async () => Number((await page.getByRole('img', { name: /Remedy bottle/ }).getAttribute('aria-label'))!.match(/(\d+)%/)![1])
   const before = await bottle()
   // owner 2026-11-24: every dose asks how they feel (the mood logger opens); close it and carry on
+  // owner 2026-11-27: logging a feeling is optional (Skip), and no note popup until the last dose
   for (let i = 1; i <= 4; i++) {
     await page.getByRole('button', { name: `Dose ${i}`, exact: true }).click()
     await expect(page.getByRole('slider', { name: 'How pleasant or unpleasant' })).toBeVisible({ timeout: 3000 })
-    await page.keyboard.press('Escape')
+    if (i % 2) await page.getByRole('button', { name: 'Skip, my drops are logged' }).click()
+    else await page.keyboard.press('Escape')
     await expect(page.getByRole('dialog', { name: 'Log how you feel' })).toHaveCount(0)
+    if (i < 4) { await page.waitForTimeout(700); await expect(page.getByRole('button', { name: 'Not now' })).toHaveCount(0) }
   }
   // owner 2026-11-25: after the last dose the note popup comes; close it
   await page.getByRole('button', { name: 'Not now' }).click()
@@ -394,6 +397,10 @@ test('home: log how you feel (slider → feeling → note), shown for 4 hours; e
   await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('bewise-client-v1')!); r.state.journal = []; localStorage.setItem('bewise-client-v1', JSON.stringify(r)) })
   await page.goto('/app')
   await page.getByRole('button', { name: /Log how you feel right now/ }).click()
+  // owner 2026-11-27: before the first feeling, why we ask (once)
+  await expect(page.getByRole('heading', { name: 'Why we ask how you feel' })).toBeVisible()
+  await expect(page.getByText(/choose the right flowers for your next blend/)).toBeVisible()
+  await page.getByRole('button', { name: 'Log how I feel' }).click()
   const slider = page.getByRole('slider', { name: 'How pleasant or unpleasant' })
   await slider.fill('6')
   await expect(page.getByText('Very pleasant', { exact: true }).first()).toBeVisible()
@@ -688,20 +695,8 @@ test('note to Jitendra Khimlani: pick a topic, send, see delivered then read', a
   await expect(page.getByText(/Read by Jitendra Khimlani/)).toBeVisible({ timeout: 16000 })
 })
 
-test('after logging a mood, a popup offers a note to Jitendra Khimlani, once a day', async ({ page }) => {
+test('logging a mood does not ask for a note; only the day\'s last dose does (owner 2026-11-27)', async ({ page }) => {
   await seed(page); await page.goto('/app')
-  await page.getByRole('button', { name: /Log how you feel|Log again/ }).first().click()
-  await page.getByRole('button', { name: 'Next' }).click()
-  await page.getByRole('dialog', { name: 'Log how you feel' }).getByRole('button', { name: 'Calm', exact: true }).click()
-  await page.getByRole('button', { name: 'Log it' }).click()
-  await expect(page.getByRole('status').filter({ hasText: /Keep it up|first step|Logging regularly|Naming a feeling|check-ins|showed up|journal|skill|Awareness|Feelings come|Well done|honesty/ })).toBeVisible()
-  await page.getByRole('button', { name: 'Done' }).click()
-  await expect(page.getByRole('heading', { name: /Send a note to Jitendra Khimlani\?/ })).toBeVisible({ timeout: 3000 })
-  await page.getByRole('button', { name: 'Send a note' }).click()
-  await page.waitForURL('**/app/chat?topic=feeling&mood=calm**')
-  await expect(page.getByRole('textbox', { name: 'Message Jitendra Khimlani' })).toHaveValue(/^Today I’m feeling calm\./)
-  // only once a day: logging again today does not ask again
-  await page.goto('/app')
   await page.getByRole('button', { name: /Log how you feel|Log again/ }).first().click()
   await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('dialog', { name: 'Log how you feel' }).getByRole('button', { name: 'Calm', exact: true }).click()
@@ -709,6 +704,26 @@ test('after logging a mood, a popup offers a note to Jitendra Khimlani, once a d
   await page.getByRole('button', { name: 'Done' }).click()
   await page.waitForTimeout(1200)
   await expect(page.getByRole('heading', { name: /Send a note to Jitendra Khimlani\?/ })).toHaveCount(0)
+  // the first dose of the day: no note either
+  await page.getByRole('button', { name: 'Dose 1', exact: true }).click()
+  await page.getByRole('button', { name: 'Skip, my drops are logged' }).click()
+  await page.waitForTimeout(1200)
+  await expect(page.getByRole('heading', { name: /Send a note to Jitendra Khimlani\?/ })).toHaveCount(0)
+})
+
+test('why we ask how you feel: shown once, before the first feeling, and can be skipped', async ({ page }) => {
+  await seed(page)
+  await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('bewise-client-v1')!); r.state.journal = []; delete r.state.moodWhySeen; localStorage.setItem('bewise-client-v1', JSON.stringify(r)) })
+  await page.goto('/app')
+  await page.getByRole('button', { name: 'Dose 1', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Why we ask how you feel' })).toBeVisible({ timeout: 3000 })
+  await page.getByRole('button', { name: 'Skip for now, my drops are logged' }).click()
+  await expect(page.getByRole('dialog', { name: 'Log how you feel' })).toHaveCount(0)
+  // next time it goes straight to the slider
+  await page.getByRole('button', { name: /Log how you feel right now/ }).click()
+  await expect(page.getByRole('slider', { name: 'How pleasant or unpleasant' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Why we ask how you feel' })).toHaveCount(0)
+  expect((await state(page)).moodWhySeen).toBe(true)
 })
 
 test('mood logger fits a short Safari screen: the Next button is fully visible', async ({ page }) => {

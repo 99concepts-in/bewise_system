@@ -111,6 +111,8 @@ type State = {
   noteAskedOn?: string
   /** owner 2026-11-25: the day the note popup last came after the final dose */
   noteAskedLastDoseOn?: string
+  /** owner 2026-11-27: the one-time 'why we ask how you feel' screen before the first feeling was shown */
+  moodWhySeen?: boolean
   notices: Notice[]
   plan: Plan | null
   coupon: Coupon | null
@@ -127,6 +129,7 @@ type State = {
   markNote: (id: string, patch: Pick<NoteMsg, 'deliveredAt' | 'readAt'>) => void     // preview only: server sets these
   setNoteAskedOn: (day: string) => void
   setNoteAskedLastDoseOn: (day: string) => void
+  setMoodWhySeen: () => void
   updateMood: (id: string, patch: Partial<Pick<JournalEntry, 'emotion' | 'note'>>) => void
   removeMood: (id: string) => void
   addGoal: (title: string, kind?: 'daily' | 'once') => void
@@ -311,6 +314,7 @@ export const useApp = create<State>()(
         return m
       },
       setNoteAskedOn: (day) => set({ noteAskedOn: day }),
+      setMoodWhySeen: () => set({ moodWhySeen: true }),
       setNoteAskedLastDoseOn: (day) => set({ noteAskedLastDoseOn: day }),
       markNote: (id, patch) => set((s) => ({ notes: (s.notes ?? []).map((m) => (m.id === id ? { ...m, ...patch } : m)) })),
       confirmTime: (id) => {
