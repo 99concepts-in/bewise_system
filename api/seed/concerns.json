@@ -1,0 +1,55 @@
+{
+ "Anxiety": [
+  "Aspen",
+  "Mimulus",
+  "Red Chestnut"
+ ],
+ "Fear": [
+  "Mimulus",
+  "Rock Rose",
+  "Aspen"
+ ],
+ "Overthinking": [
+  "White Chestnut",
+  "Vervain"
+ ],
+ "Sadness": [
+  "Mustard",
+  "Gentian"
+ ],
+ "Loneliness": [
+  "Heather",
+  "Water Violet"
+ ],
+ "Anger": [
+  "Holly",
+  "Impatiens",
+  "Willow"
+ ],
+ "Insecurity": [
+  "Larch",
+  "Cerato",
+  "Centaury"
+ ],
+ "Exhaustion": [
+  "Olive",
+  "Hornbeam",
+  "Oak"
+ ],
+ "Grief": [
+  "Star of Bethlehem",
+  "Honeysuckle"
+ ],
+ "Indecision": [
+  "Scleranthus",
+  "Wild Oat"
+ ],
+ "Overwhelm": [
+  "Elm",
+  "Vervain"
+ ],
+ "Guilt": [
+  "Pine",
+  "Crab Apple"
+ ]
+}

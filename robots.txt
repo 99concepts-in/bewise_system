@@ -1,0 +1,13 @@
+User-agent: facebookexternalhit
+User-agent: WhatsApp
+User-agent: TelegramBot
+User-agent: Twitterbot
+User-agent: LinkedInBot
+User-agent: Slackbot-LinkExpanding
+Allow: /client/s/
+Allow: /client/img/
+Allow: /client/_next/
+Disallow: /
+
+User-agent: *
+Disallow: /
