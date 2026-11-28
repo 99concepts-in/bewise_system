@@ -23,7 +23,7 @@ export function SessionOnly({ dark, className }: { dark?: boolean; className?: s
 const POINTS = [
   { e: '🕉️', t: 'Vibrationally charged', d: 'Charged with mantras while each blend is being made.' },
   { e: '🎓', t: 'Curated by a certified expert', d: 'Every blend is chosen by Jitendra Khimlani, Certified Bach Flower Remedy Therapist, for you alone.' },
-  { e: '🌼', t: 'Best quality flower blends', d: 'Made with the finest flower remedies, for the best results.' },
+  { e: '🌼', t: 'Best quality flower blends', d: 'Made with the finest flower remedies, imported from the official Bach Centre, UK.' },
 ]
 
 export function MadeWithCare({ className }: { className?: string }) {
